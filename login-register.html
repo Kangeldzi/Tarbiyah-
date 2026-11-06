@@ -21,6 +21,40 @@
   <script defer src="./js/auth.js"></script>
   <script defer src="./js/auth-page.js"></script>
   <script defer src="./js/pwa.js"></script>
+
+  <!-- ============================================================
+     TEMPORARY DEBUGGING TOOL — ERUDA CONSOLE
+     Khusus pengujian TARBIYAH melalui HP Android.
+     HAPUS SETELAH DEBUGGING SELESAI!
+============================================================ -->
+
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+
+<script>
+  window.addEventListener("load", function () {
+    if (window.eruda) {
+      eruda.init({
+        tool: [
+          "console",
+          "network",
+          "elements",
+          "resources",
+          "info"
+        ],
+        defaults: {
+          displaySize: 50,
+          transparency: 0.95,
+          theme: "Monokai Pro"
+        }
+      });
+
+      console.log("================================");
+      console.log("TARBIYAH DEBUG CONSOLE AKTIF");
+      console.log("================================");
+    }
+  });
+</script>
+  
 </head>
 <body class="auth-page">
   <main class="auth-layout">
@@ -109,12 +143,5 @@
       <footer class="auth-copyright">© <span id="currentYear"></span> TARBIYAH. Belajar, Bertumbuh, dan Berukhuwah.</footer>
     </section>
   </main>
-  <body>
-‎	<!-- ============================================================ -->
-‎	<!-- TEMPORARY: Eruda Console (untuk debug di HP)            	-->
-‎	<!-- HAPUS SETELAH SELESAI DEBUGGING!                        	-->
-‎	<!-- ============================================================ -->
-‎	<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-‎	<script>eruda.init();</script>
 </body>
 </html>
