@@ -1,0 +1,1 @@
+*{box-sizing:border-box}html{min-height:100%;scroll-behavior:smooth}body{margin:0;font-family:var(--font-body);background:var(--green-900);color:var(--ivory);-webkit-font-smoothing:antialiased}button{font:inherit}button:focus-visible,a:focus-visible{outline:3px solid var(--gold-500);outline-offset:3px}a{color:inherit} [hidden]{display:none!important}
