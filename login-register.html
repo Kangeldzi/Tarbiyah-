@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Masuk atau daftar akun TARBIYAH.">
+  <title>Masuk & Daftar — TARBIYAH</title>
+  <link rel="icon" href="./assets/icons/tarbiyah-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/authentication.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="./js/config.js"></script>
+  <script defer src="./js/supabase-client.js"></script>
+  <script defer src="./js/theme-manager.js"></script>
+  <script defer src="./js/auth.js"></script>
+  <script defer src="./js/auth-page.js"></script>
+  <script defer src="./js/pwa.js"></script>
+</head>
+<body class="auth-page">
+  <main class="auth-layout">
+    <aside class="auth-aside">
+      <a class="auth-brand" href="./index.html" aria-label="Kembali ke beranda TARBIYAH">
+        <img src="./assets/icons/tarbiyah-mark.svg" alt="">
+        <span>TARBIYAH</span>
+      </a>
+      <div class="aside-content">
+        <span class="aside-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+        <p class="aside-eyebrow">RUANG BELAJAR & UKHUWAH</p>
+        <h1>Berawal dari ilmu,<br><em>bertumbuh dalam kebaikan.</em></h1>
+        <p class="aside-description">Satu ruang untuk belajar, mengikuti kajian, berbagi manfaat, dan menguatkan ukhuwah.</p>
+        <div class="aside-points">
+          <span><i>✦</i> Pembelajaran dan materi</span>
+          <span><i>✦</i> Kajian dan agenda komunitas</span>
+          <span><i>✦</i> Diskusi dan dokumentasi</span>
+        </div>
+      </div>
+      <div class="aside-footer">ILMU <b>•</b> AMAL <b>•</b> UKHUWAH</div>
+      <div class="aside-glow aside-glow-one"></div><div class="aside-glow aside-glow-two"></div>
+    </aside>
+
+    <section class="auth-main">
+      <header class="auth-topbar">
+        <a class="mobile-brand" href="./index.html"><img src="./assets/icons/tarbiyah-mark.svg" alt=""> TARBIYAH</a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ganti tema" title="Ganti tema">◐</button>
+      </header>
+
+      <div class="auth-card">
+        <div class="auth-heading">
+          <div class="auth-mini-mark"><img src="./assets/icons/tarbiyah-mark.svg" alt=""></div>
+          <p class="auth-overline">ASSALAMU'ALAIKUM</p>
+          <h2 id="formTitle">Selamat datang kembali</h2>
+          <p id="formSubtitle">Masuk untuk melanjutkan perjalanan kebaikan Anda.</p>
+        </div>
+
+        <div class="auth-tabs" id="authTabs" role="tablist" aria-label="Pilih masuk atau daftar">
+          <button class="auth-tab active" id="loginTab" type="button" role="tab" aria-selected="true">Masuk</button>
+          <button class="auth-tab" id="registerTab" type="button" role="tab" aria-selected="false">Buat Akun</button>
+        </div>
+
+        <div class="auth-alert" id="authAlert" role="status" aria-live="polite" hidden></div>
+
+        <form id="loginForm" class="auth-form" novalidate>
+          <label for="loginEmail">Alamat email</label>
+          <div class="field-wrap"><span class="field-icon">✉</span><input id="loginEmail" name="email" type="email" autocomplete="email" placeholder="nama@email.com" required></div>
+          <div class="label-line"><label for="loginPassword">Kata sandi</label><button class="text-action" type="button" data-forgot> Lupa kata sandi? </button></div>
+          <div class="field-wrap"><span class="field-icon">⌑</span><input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required minlength="6"><button class="password-toggle" type="button" data-toggle="loginPassword" aria-label="Tampilkan kata sandi">◉</button></div>
+          <button class="submit-button" type="submit"><span>Masuk ke TARBIYAH</span><b>↗</b></button>
+        </form>
+
+        <form id="registerForm" class="auth-form" hidden novalidate>
+          <label for="registerName">Nama lengkap</label>
+          <div class="field-wrap"><span class="field-icon">♙</span><input id="registerName" name="fullName" type="text" autocomplete="name" placeholder="Nama lengkap Anda" required maxlength="80"></div>
+          <label for="registerEmail">Alamat email</label>
+          <div class="field-wrap"><span class="field-icon">✉</span><input id="registerEmail" name="email" type="email" autocomplete="email" placeholder="nama@email.com" required></div>
+          <label for="registerPassword">Kata sandi</label>
+          <div class="field-wrap"><span class="field-icon">⌑</span><input id="registerPassword" name="password" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" required minlength="8"><button class="password-toggle" type="button" data-toggle="registerPassword" aria-label="Tampilkan kata sandi">◉</button></div>
+          <label for="registerConfirm">Ulangi kata sandi</label>
+          <div class="field-wrap"><span class="field-icon">⌑</span><input id="registerConfirm" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Ulangi kata sandi" required minlength="8"><button class="password-toggle" type="button" data-toggle="registerConfirm" aria-label="Tampilkan kata sandi">◉</button></div>
+          <label class="terms-check"><input id="acceptTerms" type="checkbox" required><span>Saya menyetujui ketentuan penggunaan dan kebijakan privasi TARBIYAH.</span></label>
+          <button class="submit-button" type="submit"><span>Buat Akun TARBIYAH</span><b>↗</b></button>
+        </form>
+
+        <form id="forgotForm" class="auth-form" hidden novalidate>
+          <p class="form-note">Masukkan email akun Anda. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi.</p>
+          <label for="forgotEmail">Alamat email</label>
+          <div class="field-wrap"><span class="field-icon">✉</span><input id="forgotEmail" type="email" autocomplete="email" placeholder="nama@email.com" required></div>
+          <button class="submit-button" type="submit"><span>Kirim Tautan Pemulihan</span><b>↗</b></button>
+          <button class="back-action" type="button" data-back-login>← Kembali ke halaman masuk</button>
+        </form>
+
+        <form id="recoveryForm" class="auth-form" hidden novalidate>
+          <p class="form-note">Buat kata sandi baru untuk akun Anda.</p>
+          <label for="newPassword">Kata sandi baru</label>
+          <div class="field-wrap"><span class="field-icon">⌑</span><input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Minimal 8 karakter" required><button class="password-toggle" type="button" data-toggle="newPassword" aria-label="Tampilkan kata sandi">◉</button></div>
+          <label for="newPasswordConfirm">Ulangi kata sandi baru</label>
+          <div class="field-wrap"><span class="field-icon">⌑</span><input id="newPasswordConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="Ulangi kata sandi" required><button class="password-toggle" type="button" data-toggle="newPasswordConfirm" aria-label="Tampilkan kata sandi">◉</button></div>
+          <button class="submit-button" type="submit"><span>Simpan Kata Sandi Baru</span><b>↗</b></button>
+        </form>
+
+        <div class="auth-bottom" id="authBottom">Belum memiliki akun? <button type="button" data-switch-register>Daftar sekarang</button></div>
+        <a class="back-home" href="./index.html">← Kembali ke halaman utama</a>
+      </div>
+      <footer class="auth-copyright">© <span id="currentYear"></span> TARBIYAH. Belajar, Bertumbuh, dan Berukhuwah.</footer>
+    </section>
+  </main>
+</body>
+</html>
