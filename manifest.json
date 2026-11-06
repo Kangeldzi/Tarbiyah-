@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "TARBIYAH — Pembelajaran Muslim",
+  "short_name": "TARBIYAH",
+  "description": "Platform pembelajaran Islam dan komunitas Muslim.",
+  "lang": "id-ID",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#102a22",
+  "theme_color": "#102a22",
+  "icons": [
+    {
+      "src": "./assets/icons/tarbiyah-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
