@@ -105,6 +105,11 @@
   style="background:#087f5b">
   UJI PERSETUJUAN ANGGOTA
   </button>
+
+  <button onclick="runMemberAuthorizationTest()"
+  style="background:#2563eb">
+  UJI KEWENANGAN MEMBER
+  </button>
   
   <div class="card">
     <h3>Hasil Pengujian</h3>
@@ -576,6 +581,98 @@ async function runApproveMemberTest() {
       roles_error: rolesError?.message ?? null,
       expected_membership: "active",
       expected_role: "member"
+    }, null, 2);
+}
+
+async function runMemberAuthorizationTest() {
+  const output = document.getElementById("output");
+  const sb = window.tarbiyahSupabase;
+
+  const targetUserId =
+    "51f0f267-e18e-450a-952d-f88cb5b8c0ca";
+
+  output.textContent =
+    "MEMULAI PENGUJIAN KEWENANGAN MEMBER...\n";
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    output.textContent += "GAGAL: Supabase belum siap.";
+    return;
+  }
+
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    output.textContent += "GAGAL: Sesi login tidak ditemukan.";
+    return;
+  }
+
+  const user = authData.user;
+
+  if (user.id !== "e5ffb4a9-c66e-4ca0-81ae-3de81f215519") {
+    output.textContent +=
+      "DIBATALKAN: Gunakan akun Tesla.";
+    return;
+  }
+
+  output.textContent +=
+    "Akun Tesla terdeteksi.\n" +
+    "Menguji batas kewenangan MEMBER...\n";
+
+  // Uji 1: Member mencoba menyetujui akun Kang L.
+  const test1 = await sb.rpc("review_member", {
+    p_user_id: targetUserId,
+    p_decision: "active",
+    p_note: "Pengujian batas kewenangan MEMBER"
+  });
+
+  output.textContent +=
+    "\n1. MEMBER MENYETUJUI ANGGOTA LAIN:\n" +
+    JSON.stringify({
+      expected: "DITOLAK",
+      actual: test1.error ? "DITOLAK" : "BERHASIL",
+      error: test1.error?.message ?? null,
+      error_code: test1.error?.code ?? null,
+      passed: !!test1.error
+    }, null, 2);
+
+  // Uji 2: Member mencoba memberikan role Admin.
+  const test2 = await sb.rpc("set_admin_access", {
+    p_user_id: targetUserId,
+    p_enabled: true
+  });
+
+  output.textContent +=
+    "\n\n2. MEMBER MEMBERIKAN ROLE ADMIN:\n" +
+    JSON.stringify({
+      expected: "DITOLAK",
+      actual: test2.error ? "DITOLAK" : "BERHASIL",
+      error: test2.error?.message ?? null,
+      error_code: test2.error?.code ?? null,
+      passed: !!test2.error
+    }, null, 2);
+
+  // Verifikasi kondisi akun Kang L.
+  const { data: member, error: memberError } =
+    await sb.from("members")
+      .select("membership_status")
+      .eq("user_id", targetUserId)
+      .maybeSingle();
+
+  const { data: roles, error: rolesError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", targetUserId);
+
+  output.textContent +=
+    "\n\n3. VERIFIKASI AKUN KANG L:\n" +
+    JSON.stringify({
+      membership: member,
+      membership_error: memberError?.message ?? null,
+      roles: roles,
+      roles_error: rolesError?.message ?? null,
+      expected_membership: "pending",
+      expected_role: "registered_user"
     }, null, 2);
 }
   
