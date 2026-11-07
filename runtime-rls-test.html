@@ -233,6 +233,23 @@ async function runRLSTest() {
 
 
 async function runWriteSecurityTest() {
+  console.log("=== TARBIYAH SUPABASE DIAGNOSTIC ===");
+
+console.log("Supabase CDN:", !!window.supabase);
+
+console.log("TARBIYAH CONFIG:", !!window.TARBIYAH_CONFIG);
+
+console.log("SUPABASE URL:",
+  window.TARBIYAH_CONFIG?.SUPABASE_URL
+);
+
+console.log("SUPABASE CLIENT:",
+  !!window.tarbiyahSupabase
+);
+
+console.log("BACKEND READY:",
+  window.TARBIYAH_BACKEND_READY
+);
   const output = document.getElementById("output");
   const sb = window.tarbiyahSupabase;
 
