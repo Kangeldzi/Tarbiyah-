@@ -117,6 +117,10 @@
     <pre id="output">Menunggu pengujian...</pre>
   </div>
 
+  <button onclick="runGrantAdminTest()">
+  UJI PEMBERIAN ROLE ADMIN
+  </button>
+  
 </div>
 
 <script>
@@ -732,6 +736,138 @@ async function runMemberAuthorizationTest() {
       expected_membership: "pending",
       expected_role: "registered_user"
     }, null, 2);
+}
+
+  async function runGrantAdminTest() {
+  const output = document.getElementById("output");
+  const sb = window.tarbiyahSupabase;
+
+  const superAdminId =
+    "efe7bc11-0f70-4abf-a30d-d02e2716a115";
+
+  const targetUserId =
+    "9938f1a9-e2cf-4ccd-9379-a8e34783f7ec";
+
+  output.textContent =
+    "MEMULAI PEMBERIAN ROLE ADMIN KEPADA PRABU...\n";
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    output.textContent += "GAGAL: Supabase belum siap.";
+    return;
+  }
+
+  // 1. Verifikasi sesi Super Admin
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    output.textContent += "GAGAL: Sesi tidak ditemukan.";
+    return;
+  }
+
+  if (authData.user.id !== superAdminId) {
+    output.textContent +=
+      "DIBATALKAN: Bukan akun Super Admin.";
+    return;
+  }
+
+  output.textContent += "Super Admin terdeteksi.\n";
+
+  // 2. Periksa status keanggotaan Prabu
+  const { data: member, error: memberError } =
+    await sb.from("members")
+      .select("membership_status")
+      .eq("user_id", targetUserId)
+      .maybeSingle();
+
+  if (memberError || !member) {
+    output.textContent +=
+      "GAGAL MEMERIKSA ANGGOTA:\n" +
+      (memberError?.message || "Data tidak ditemukan.");
+    return;
+  }
+
+  if (member.membership_status !== "active") {
+    output.textContent +=
+      "DIBATALKAN: Prabu belum berstatus active.";
+    return;
+  }
+
+  output.textContent +=
+    "Membership Prabu: active.\n";
+
+  // 3. Periksa role sebelum perubahan
+  const { data: beforeRoles, error: beforeError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", targetUserId);
+
+  if (beforeError) {
+    output.textContent +=
+      "GAGAL MEMERIKSA ROLE:\n" + beforeError.message;
+    return;
+  }
+
+  output.textContent +=
+    "Role sebelum: " + JSON.stringify(beforeRoles) + "\n";
+
+  // 4. Berikan role Admin melalui RPC
+  output.textContent += "Mengirim permintaan pemberian Admin...\n";
+
+  const { data: rpcData, error: rpcError } =
+    await sb.rpc("set_admin_access", {
+      p_user_id: targetUserId,
+      p_enabled: true
+    });
+
+  output.textContent +=
+    "\nHASIL RPC:\n" +
+    JSON.stringify({
+      expected: "BERHASIL",
+      actual: rpcError ? "GAGAL" : "BERHASIL",
+      error: rpcError?.message || null,
+      error_code: rpcError?.code || null,
+      data: rpcData
+    }, null, 2);
+
+  if (rpcError) return;
+
+  // 5. Verifikasi role setelah perubahan
+  const { data: afterRoles, error: afterError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", targetUserId);
+
+  if (afterError) {
+    output.textContent +=
+      "\nGAGAL VERIFIKASI ROLE AKHIR:\n" +
+      afterError.message;
+    return;
+  }
+
+  const roleNames = (afterRoles || [])
+    .map(item => item.roles?.name)
+    .filter(Boolean);
+
+  const hasMember = roleNames.includes("member");
+  const hasAdmin = roleNames.includes("admin");
+
+  output.textContent +=
+    "\n\n========== VERIFIKASI AKHIR ==========\n" +
+    JSON.stringify({
+      account: "Prabu",
+      user_id: targetUserId,
+      membership: member.membership_status,
+      roles: roleNames,
+      member_role_exists: hasMember,
+      admin_role_exists: hasAdmin,
+      overall_success: hasMember && hasAdmin
+    }, null, 2);
+
+  output.textContent +=
+    hasMember && hasAdmin
+      ? "\nBERHASIL: PRABU SEKARANG MEMILIKI ROLE ADMIN."
+      : "\nPERINGATAN: ROLE ADMIN BELUM TERVERIFIKASI.";
 }
   
 </script>
