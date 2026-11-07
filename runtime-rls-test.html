@@ -100,6 +100,11 @@
   style="background:#8b3c85">
   MULAI RPC AUTHORIZATION TEST
   </button>
+
+  <button onclick="runApproveMemberTest()"
+  style="background:#087f5b">
+  UJI PERSETUJUAN ANGGOTA
+  </button>
   
   <div class="card">
     <h3>Hasil Pengujian</h3>
@@ -468,6 +473,112 @@ async function runRPCTest() {
   });
 }
 
+async function runApproveMemberTest() {
+  const output = document.getElementById("output");
+  const sb = window.tarbiyahSupabase;
+
+  const superAdminId =
+    "efe7bc11-0f70-4abf-a30d-d02e2716a115";
+
+  const targetUserId =
+    "e5ffb4a9-c66e-4ca0-81ae-3de81f215519";
+
+  output.textContent =
+    "MEMULAI PENGUJIAN PERSETUJUAN ANGGOTA...\n";
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    output.textContent +=
+      "GAGAL: Supabase belum siap.";
+    return;
+  }
+
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    output.textContent +=
+      "GAGAL: Sesi login tidak ditemukan.";
+    return;
+  }
+
+  const currentUser = authData.user;
+
+  if (currentUser.id !== superAdminId) {
+    output.textContent +=
+      "DITOLAK: Halaman ini harus dibuka menggunakan akun Super Admin.";
+    return;
+  }
+
+  // Pastikan akun target masih pending.
+  const { data: before, error: beforeError } =
+    await sb.from("members")
+      .select("membership_status")
+      .eq("user_id", targetUserId)
+      .maybeSingle();
+
+  if (beforeError || !before) {
+    output.textContent +=
+      "GAGAL MEMERIKSA AKUN TARGET:\n" +
+      (beforeError?.message || "Data anggota tidak ditemukan.");
+    return;
+  }
+
+  if (before.membership_status !== "pending") {
+    output.textContent +=
+      "DIBATALKAN: Status target bukan pending. Status saat ini: " +
+      before.membership_status;
+    return;
+  }
+
+  output.textContent +=
+    "\nAkun Super Admin terdeteksi." +
+    "\nAkun target terverifikasi masih pending." +
+    "\nMengirim permintaan persetujuan...\n";
+
+  const { data, error } = await sb.rpc(
+    "review_member",
+    {
+      p_user_id: targetUserId,
+      p_decision: "active",
+      p_note: "Persetujuan anggota melalui pengujian runtime TARBIYAH"
+    }
+  );
+
+  output.textContent +=
+    "\nHASIL RPC:\n" +
+    JSON.stringify({
+      expected: "BERHASIL",
+      actual: error ? "GAGAL" : "BERHASIL",
+      error: error?.message ?? null,
+      data
+    }, null, 2);
+
+  if (error) return;
+
+  // Verifikasi kondisi akhir database.
+  const { data: member, error: memberError } =
+    await sb.from("members")
+      .select("membership_status")
+      .eq("user_id", targetUserId)
+      .maybeSingle();
+
+  const { data: roles, error: rolesError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", targetUserId);
+
+  output.textContent +=
+    "\n\nVERIFIKASI AKHIR:\n" +
+    JSON.stringify({
+      membership: member,
+      membership_error: memberError?.message ?? null,
+      roles: roles,
+      roles_error: rolesError?.message ?? null,
+      expected_membership: "active",
+      expected_role: "member"
+    }, null, 2);
+}
+  
 </script>
 </body>
 </html>
