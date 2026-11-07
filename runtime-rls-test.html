@@ -81,8 +81,10 @@
     <p>Pengujian keamanan database melalui sesi login pengguna.</p>
 
     <div class="warning">
-      Pengujian ini hanya membaca data. Tidak mengubah profil,
-      role, keanggotaan, atau data pengguna.
+  Halaman ini berisi pengujian baca-saja dan pengujian
+  perubahan data terkontrol. Tombol UJI PERSETUJUAN
+  ANGGOTA akan mengubah status keanggotaan akun target
+  melalui RPC Supabase.
     </div>
 
     <button onclick="runRLSTest()">
