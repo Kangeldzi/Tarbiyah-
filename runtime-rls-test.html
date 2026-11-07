@@ -91,6 +91,11 @@
     </button>
   </div>
 
+  <button onclick="runWriteSecurityTest()"
+  style="background:#9a5b16">
+  MULAI WRITE SECURITY TEST
+  </button>
+ 
   <div class="card">
     <h3>Hasil Pengujian</h3>
     <pre id="output">Menunggu pengujian...</pre>
@@ -225,7 +230,109 @@ async function runRLSTest() {
     message: "Silakan periksa seluruh hasil pengujian."
   });
 }
-</script>
 
+
+async function runWriteSecurityTest() {
+  const output = document.getElementById("output");
+  const sb = window.tarbiyahSupabase;
+
+  output.textContent = "MEMULAI WRITE SECURITY TEST...\n";
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    output.textContent += "GAGAL: Supabase belum siap.";
+    return;
+  }
+
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    output.textContent += "GAGAL: Sesi login tidak ditemukan.";
+    return;
+  }
+
+  const user = authData.user;
+
+  const superAdminId =
+    "efe7bc11-0f70-4abf-a30d-d02e2716a115";
+
+  if (user.id === superAdminId) {
+    output.textContent +=
+      "DIBATALKAN: Gunakan akun Kang L.";
+    return;
+  }
+
+  function log(title, result) {
+    output.textContent +=
+      "\n\n" + title + "\n" +
+      JSON.stringify(result, null, 2);
+  }
+
+  async function testDenied(label, operation) {
+    try {
+      const { data, error } = await operation();
+
+      log(label, {
+        expected: "DITOLAK",
+        actual: error
+          ? "DITOLAK OLEH SUPABASE"
+          : "TIDAK ADA ERROR",
+        error: error?.message ?? null,
+        returned_data: data,
+        passed: !!error
+      });
+
+    } catch (err) {
+      log(label, {
+        expected: "DITOLAK",
+        actual: "ERROR",
+        error: err.message,
+        passed: true
+      });
+    }
+  }
+
+  // 1. UPDATE membership dengan nilai yang sama.
+  await testDenied(
+    "1. UPDATE MEMBERSHIP SENDIRI",
+    () => sb.from("members")
+      .update({ membership_status: "pending" })
+      .eq("user_id", user.id)
+      .select("user_id, membership_status")
+  );
+
+  // 2. UPDATE user_roles dengan nilai user_id yang sama.
+  await testDenied(
+    "2. UPDATE ROLE SENDIRI",
+    () => sb.from("user_roles")
+      .update({ user_id: user.id })
+      .eq("user_id", user.id)
+      .select("user_id")
+  );
+
+  // 3. UPDATE roles dengan nama yang sama.
+  await testDenied(
+    "3. UPDATE DAFTAR ROLE SISTEM",
+    () => sb.from("roles")
+      .update({ name: "registered_user" })
+      .eq("name", "registered_user")
+      .select("name")
+  );
+
+  log(
+    "4. RPC SET ADMIN ACCESS",
+    {
+      status: "BELUM DIUJI",
+      reason: "Nama parameter RPC perlu diverifikasi dahulu."
+    }
+  );
+
+  log("WRITE SECURITY TEST SELESAI", {
+    user_id: user.id,
+    message: "Periksa hasil masing-masing operasi."
+  });
+}
+
+</script>
 </body>
 </html>
