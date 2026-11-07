@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TARBIYAH - Runtime RLS Test</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f1f5f2;
+      color: #18352a;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 18px #0000000d;
+    }
+
+    h2 { margin-top: 0; }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 10px;
+      background: #087b53;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+
+    pre {
+      background: #10251d;
+      color: #b8f5d5;
+      padding: 14px;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .warning {
+      color: #986000;
+      background: #fff6df;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+  </style>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Konfigurasi TARBIYAH -->
+  <script src="js/config.js"></script>
+
+  <!-- Supabase Client TARBIYAH -->
+  <script src="js/supabase-client.js"></script>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="card">
+    <h2>🛡️ TARBIYAH Runtime RLS Test</h2>
+    <p>Pengujian keamanan database melalui sesi login pengguna.</p>
+
+    <div class="warning">
+      Pengujian ini hanya membaca data. Tidak mengubah profil,
+      role, keanggotaan, atau data pengguna.
+    </div>
+
+    <button onclick="runRLSTest()">
+      MULAI RUNTIME RLS TEST
+    </button>
+  </div>
+
+  <div class="card">
+    <h3>Hasil Pengujian</h3>
+    <pre id="output">Menunggu pengujian...</pre>
+  </div>
+
+</div>
+
+<script>
+async function runRLSTest() {
+  const output = document.getElementById("output");
+
+  function log(title, data) {
+    output.textContent +=
+      "\n\n" + title + "\n" +
+      JSON.stringify(data, null, 2);
+  }
+
+  output.textContent = "MEMULAI PENGUJIAN...\n";
+
+  const sb = window.tarbiyahSupabase;
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    log("KONEKSI SUPABASE", {
+      success: false,
+      message: "Supabase Client belum tersedia."
+    });
+    return;
+  }
+
+  const superAdminId =
+    "efe7bc11-0f70-4abf-a30d-d02e2716a115";
+
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    log("STATUS LOGIN", {
+      success: false,
+      message: "Sesi login tidak ditemukan.",
+      error: authError?.message
+    });
+    return;
+  }
+
+  const user = authData.user;
+
+  log("STATUS LOGIN", {
+    success: true,
+    message: "Pengguna berhasil dikenali.",
+    user_id: user.id
+  });
+
+  if (user.id === superAdminId) {
+    log("PERINGATAN", {
+      success: false,
+      message: "Halaman ini harus dijalankan menggunakan akun Kang L."
+    });
+    return;
+  }
+
+  async function test(label, query, expectedRows) {
+    try {
+      const { data, error } = await query;
+
+      const actualRows = data?.length ?? 0;
+
+      log(label, {
+        success: !error,
+        expected_rows: expectedRows,
+        actual_rows: actualRows,
+        result_matches_expectation:
+          !error && actualRows === expectedRows,
+        data,
+        error: error?.message ?? null
+      });
+    } catch (err) {
+      log(label, {
+        success: false,
+        error: err.message
+      });
+    }
+  }
+
+  await test(
+    "1. PROFIL MILIK SENDIRI",
+    sb.from("profiles")
+      .select("id, full_name, username")
+      .eq("id", user.id),
+    1
+  );
+
+  await test(
+    "2. KEANGGOTAAN MILIK SENDIRI",
+    sb.from("members")
+      .select("user_id, membership_status")
+      .eq("user_id", user.id),
+    1
+  );
+
+  await test(
+    "3. PROFIL SUPER ADMIN",
+    sb.from("profiles")
+      .select("id")
+      .eq("id", superAdminId),
+    0
+  );
+
+  await test(
+    "4. KEANGGOTAAN SUPER ADMIN",
+    sb.from("members")
+      .select("user_id")
+      .eq("user_id", superAdminId),
+    0
+  );
+
+  await test(
+    "5. DAFTAR ROLE",
+    sb.from("roles")
+      .select("name"),
+    4
+  );
+
+  await test(
+    "6. USER ROLE SUPER ADMIN",
+    sb.from("user_roles")
+      .select("user_id")
+      .eq("user_id", superAdminId),
+    0
+  );
+
+  log("PENGUJIAN SELESAI", {
+    message: "Silakan periksa seluruh hasil pengujian."
+  });
+}
+</script>
+
+</body>
+</html>
