@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="TAUHID — Belajar, Bertumbuh, dan Berukhuwah.">
+  <title>TAUHID — Belajar, Bertumbuh, dan Berukhuwah</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/tauhid-logo.png" type="image/png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-body: "Inter", sans-serif;
+      --font-heading: "Poppins", sans-serif;
+      --shadow: 0 18px 55px rgba(0, 0, 0, .28);
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 100%; }
+
+    body.splash-page {
+      min-height: 100svh;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 40%, #1b5943 0%, #102f25 42%, #081b15 100%);
+      color: #f8f6ef;
+      font-family: var(--font-body);
+    }
+
+    .splash-shell {
+      position: relative;
+      isolation: isolate;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 28px 20px 64px;
+      overflow: hidden;
+    }
+
+    .ambient {
+      position: absolute;
+      width: 42vw;
+      height: 42vw;
+      min-width: 260px;
+      min-height: 260px;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: .22;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .ambient-one {
+      background: #43c68c;
+      top: -15%;
+      left: -12%;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    .ambient-two {
+      background: #d6a84e;
+      right: -15%;
+      bottom: -20%;
+      animation: drift 15s ease-in-out infinite alternate-reverse;
+    }
+
+    .star-field {
+      position: absolute;
+      inset: 0;
+      opacity: .32;
+      background-image:
+        radial-gradient(1px 1px at 12% 22%, #fff 98%, transparent),
+        radial-gradient(2px 2px at 76% 18%, #f2d99b 98%, transparent),
+        radial-gradient(1px 1px at 86% 73%, #fff 98%, transparent),
+        radial-gradient(1px 1px at 28% 82%, #fff 98%, transparent),
+        radial-gradient(2px 2px at 52% 9%, #fff 98%, transparent);
+      background-size: 290px 260px;
+      animation: twinkle 5s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    .brand-stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: brandEnter 1.2s cubic-bezier(.2, .8, .2, 1) both;
+      z-index: 1;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 148px;
+      height: 148px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      isolation: isolate;
+      border-radius: 38px;
+      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.035));
+      border: 1px solid rgba(240,220,167,.45);
+      box-shadow: 0 0 25px rgba(214,181,109,.22), inset 0 0 28px rgba(255,255,255,.07);
+      backdrop-filter: blur(12px);
+      animation: markPulse 3s ease-in-out infinite;
+    }
+
+    .brand-mark::before {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      inset: -65% -35%;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(
+        112deg,
+        transparent 39%,
+        rgba(255,255,255,0) 43%,
+        rgba(255,248,218,.16) 47%,
+        rgba(255,255,255,.92) 50%,
+        rgba(255,226,151,.48) 53%,
+        rgba(255,255,255,0) 58%,
+        transparent 62%
+      );
+      transform: translate3d(-85%, 0, 0) rotate(-14deg);
+      mix-blend-mode: screen;
+      animation: logoShine 5.8s ease-in-out infinite;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 231, 174, .16);
+      box-shadow: inset 0 0 24px rgba(255, 222, 148, .09);
+      pointer-events: none;
+    }
+
+    .brand-mark img {
+      display: block;
+      width: 118px;
+      height: 118px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 0 9px rgba(240,220,167,.48));
+      animation: logoBlink 4.6s ease-in-out infinite;
+    }
+
+    /* Kilatan lembut berpindah arah secara acak melalui variasi keyframe. */
+    .brand-mark.shine-left::before { animation-name: shineLeft; }
+    .brand-mark.shine-right::before { animation-name: shineRight; }
+    .brand-mark.shine-up::before { animation-name: shineUp; }
+    .brand-mark.shine-down::before { animation-name: shineDown; }
+
+    .brand-aura {
+      position: absolute;
+      top: -25px;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      border: 1px solid rgba(240,220,167,.18);
+      box-shadow: 0 0 35px rgba(214,181,109,.1);
+      animation: aura 7s linear infinite;
+      pointer-events: none;
+    }
+
+    .orbit {
+      position: absolute;
+      top: 68px;
+      width: 205px;
+      height: 58px;
+      border: 1px solid rgba(240,220,167,.27);
+      border-radius: 50%;
+      transform: rotate(-28deg);
+      pointer-events: none;
+    }
+
+    .orbit-two {
+      transform: rotate(58deg);
+      border-color: rgba(89,207,153,.28);
+      animation: orbitGlow 4s ease-in-out infinite;
+    }
+
+    .brand-kicker {
+      font-size: 10px;
+      letter-spacing: .28em;
+      color: #d6b56d;
+      margin: 32px 0 8px;
+      font-weight: 700;
+    }
+
+    .brand-title {
+      font: 800 clamp(38px, 9vw, 58px)/1.1 var(--font-heading);
+      letter-spacing: .12em;
+      margin: 0;
+      background: linear-gradient(100deg, #fff3cc, #d6b56d 45%, #fff8df 70%, #c59a4b);
+      background-size: 220% auto;
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      animation: shimmer 4s linear infinite;
+      text-shadow: 0 0 35px rgba(214,181,109,.12);
+    }
+
+    .brand-tagline {
+      color: #d7e5dc;
+      font-size: 13px;
+      margin: 12px 0 24px;
+      letter-spacing: .02em;
+    }
+
+    .loading-line {
+      height: 3px;
+      width: 145px;
+      background: rgba(255,255,255,.12);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .loading-line span {
+      display: block;
+      width: 40%;
+      height: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, transparent, #f0dca7, #fff, transparent);
+      animation: load 1.8s ease-in-out infinite;
+    }
+
+    .loading-caption {
+      font-size: 11px;
+      color: #9db9aa;
+      margin-top: 12px;
+    }
+
+    .welcome-card {
+      width: min(100%, 430px);
+      padding: 30px 26px 24px;
+      border: 1px solid rgba(240,220,167,.25);
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(28,73,56,.88), rgba(12,37,29,.94));
+      box-shadow: var(--shadow), 0 0 55px rgba(214,181,109,.09);
+      backdrop-filter: blur(22px);
+      text-align: center;
+      animation: cardEnter .65s ease both;
+    }
+
+    [hidden] { display: none !important; }
+
+    .welcome-symbol {
+      font-size: 25px;
+      color: #f0dca7;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      font-size: 10px;
+      letter-spacing: .22em;
+      font-weight: 800;
+      color: #d6b56d;
+    }
+
+    .welcome-card h2, .about-dialog h2 {
+      font: 700 26px var(--font-heading);
+      margin: 9px 0;
+    }
+
+    .welcome-copy {
+      color: #c1d2c8;
+      line-height: 1.7;
+      font-size: 13px;
+      margin: 0 auto 22px;
+      max-width: 330px;
+    }
+
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      font: 700 14px var(--font-body);
+      transition: transform .2s, filter .2s, box-shadow .2s;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .button-primary {
+      background: linear-gradient(110deg, #f0dca7, #c99e51);
+      color: #193629;
+      box-shadow: 0 8px 24px rgba(214,181,109,.22);
+    }
+
+    .button-primary span { float: right; }
+
+    .button-quiet {
+      margin-top: 8px;
+      background: transparent;
+      color: #e4eee7;
+      border: 1px solid rgba(255,255,255,.15);
+    }
+
+    .welcome-foot {
+      font-size: 10px;
+      letter-spacing: .18em;
+      color: #9db9aa;
+      margin: 22px 0 0;
+    }
+
+    .toast {
+      position: fixed;
+      top: calc(18px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translate(-50%, -16px);
+      padding: 11px 16px;
+      border-radius: 99px;
+      background: #f0dca7;
+      color: #173629;
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s;
+      z-index: 5;
+      box-shadow: 0 8px 30px #0004;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .splash-footer {
+      position: absolute;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+      color: #8eaa9a;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-align: center;
+      padding: 0 12px;
+    }
+
+    .splash-footer span:first-child {
+      color: #d6b56d;
+      font-weight: 800;
+    }
+
+    .about-dialog {
+      width: min(calc(100% - 32px), 430px);
+      border: 1px solid rgba(214,181,109,.35);
+      border-radius: 22px;
+      background: #14382b;
+      color: #f8f6ef;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .about-dialog::backdrop {
+      background: #020b08c9;
+      backdrop-filter: blur(7px);
+    }
+
+    .about-dialog p:not(.eyebrow) {
+      color: #c1d2c8;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .dialog-close {
+      float: right;
+      border: 0;
+      background: transparent;
+      color: #f8f6ef;
+      font-size: 26px;
+      cursor: pointer;
+    }
+
+    @keyframes brandEnter {
+      from { opacity: 0; transform: translateY(20px) scale(.96); }
+      to { opacity: 1; transform: none; }
+    }
+
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(18px) scale(.98); }
+      to { opacity: 1; transform: none; }
+    }
+
+    @keyframes markPulse {
+      0%, 100% {
+        box-shadow: 0 0 22px #d6b56d30, inset 0 0 28px #fff1;
+      }
+      50% {
+        box-shadow: 0 0 42px #d6b56d66, inset 0 0 35px #fff2;
+      }
+    }
+
+    @keyframes logoBlink {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(240,220,167,.42)) brightness(1); }
+      48% { filter: drop-shadow(0 0 15px rgba(255,225,151,.78)) brightness(1.12); }
+      52% { filter: drop-shadow(0 0 23px rgba(255,255,225,.95)) brightness(1.22); }
+      56% { filter: drop-shadow(0 0 12px rgba(240,220,167,.62)) brightness(1.06); }
+    }
+
+    @keyframes shineLeft {
+      0%, 12% { opacity: 0; transform: translate3d(-90%, 0, 0) rotate(-14deg); }
+      22% { opacity: .9; }
+      45%, 100% { opacity: 0; transform: translate3d(90%, 0, 0) rotate(-14deg); }
+    }
+
+    @keyframes shineRight {
+      0%, 12% { opacity: 0; transform: translate3d(90%, 0, 0) rotate(166deg); }
+      22% { opacity: .9; }
+      45%, 100% { opacity: 0; transform: translate3d(-90%, 0, 0) rotate(166deg); }
+    }
+
+    @keyframes shineUp {
+      0%, 12% { opacity: 0; transform: translate3d(0, 90%, 0) rotate(76deg); }
+      22% { opacity: .9; }
+      45%, 100% { opacity: 0; transform: translate3d(0, -90%, 0) rotate(76deg); }
+    }
+
+    @keyframes shineDown {
+      0%, 12% { opacity: 0; transform: translate3d(0, -90%, 0) rotate(-104deg); }
+      22% { opacity: .9; }
+      45%, 100% { opacity: 0; transform: translate3d(0, 90%, 0) rotate(-104deg); }
+    }
+
+    @keyframes aura { to { transform: rotate(360deg); } }
+    @keyframes orbitGlow {
+      50% { filter: drop-shadow(0 0 8px #62dba3); opacity: .55; }
+    }
+    @keyframes shimmer { to { background-position: 220% center; } }
+    @keyframes load { 0% { transform: translateX(-120%); } 100% { transform: translateX(360%); } }
+    @keyframes twinkle { to { opacity: .58; } }
+    @keyframes drift { to { transform: translate(10vw, 8vh) scale(1.2); } }
+
+    @media (max-width: 480px) {
+      .brand-mark { width: 124px; height: 124px; border-radius: 32px; }
+      .brand-mark img { width: 98px; height: 98px; }
+      .brand-aura { width: 164px; height: 164px; }
+      .orbit { top: 58px; width: 174px; }
+      .welcome-card { padding: 26px 20px 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="splash-page">
+  <main class="splash-shell">
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+    <div class="star-field" aria-hidden="true"></div>
+
+    <section class="brand-stage" id="brandStage" aria-label="TAUHID">
+      <div class="orbit orbit-one" aria-hidden="true"></div>
+      <div class="orbit orbit-two" aria-hidden="true"></div>
+      <div class="brand-aura" aria-hidden="true"></div>
+
+      <div class="brand-mark shine-left" id="brandMark">
+        <img
+          id="brandLogo"
+          src="./icons/icon/icon-512.png"
+          alt="Logo kaligrafi Tauhid dengan telunjuk mengarah ke atas"
+          width="512"
+          height="512"
+          fetchpriority="high"
+        >
+      </div>
+
+      <p class="brand-kicker">KALIMAT TAUHID</p>
+      <h1 class="brand-title" id="brandTitle">TARBIYAH</h1>
+      <p class="brand-tagline">Belajar, Berdakwah, dan Beramaliyah.</p>
+
+      <div class="loading-line" role="progressbar" aria-label="Memuat aplikasi">
+        <span></span>
+      </div>
+      <p class="loading-caption" id="loadingCaption">Menyiapkan ruang kebaikan...</p>
+    </section>
+
+    <section class="welcome-card" id="welcomeCard" aria-labelledby="welcomeTitle" hidden>
+      <div class="welcome-symbol" lang="ar" dir="rtl">بِسْمِ اللَّهِ</div>
+      <p class="eyebrow">SELAMAT DATANG</p>
+      <h2 id="welcomeTitle">Assalamu'alaikum!</h2>
+      <p class="welcome-copy">
+        Temukan ruang untuk belajar, berbagi ilmu, mengikuti kajian,
+        dan bertumbuh bersama dalam kebaikan & Keimanan.
+      </p>
+      <button class="button button-primary" id="enterButton" type="button">
+        Masuk Sekarang <span aria-hidden="true">↗</span>
+      </button>
+      <button class="button button-quiet" id="aboutButton" type="button">
+        Pelajari Aplikasi
+      </button>
+      <p class="welcome-foot">Ilmu • Amal • Ukhuwah</p>
+    </section>
+
+    <div class="toast" id="appToast" role="status" aria-live="polite"></div>
+
+    <footer class="splash-footer">
+      <span id="footerBrand">TAUHID</span>
+      <span>Platform Pembelajaran Muslim</span>
+    </footer>
+  </main>
+
+  <dialog class="about-dialog" id="aboutDialog" aria-labelledby="aboutTitle">
+    <form method="dialog">
+      <button class="dialog-close" type="submit" aria-label="Tutup">×</button>
+      <p class="eyebrow">TENTANG TAUHID</p>
+      <h2 id="aboutTitle">Belajar Memahami Keimanan.</h2>
+      <p>
+        TAUHID menghadirkan pembelajaran Islam, kajian, agenda komunitas,
+        ruang diskusi, dokumentasi, dan informasi kegiatan dalam satu aplikasi.
+      </p>
+      <button class="button button-primary" value="close">Mengerti</button>
+    </form>
+  </dialog>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const brandMark = document.getElementById("brandMark");
+      const aboutButton = document.getElementById("aboutButton");
+      const aboutDialog = document.getElementById("aboutDialog");
+      const enterButton = document.getElementById("enterButton");
+      const toast = document.getElementById("appToast");
+
+      // Ganti URL ini ke halaman utama aplikasi saat sudah tersedia.
+      const APP_HOME_URL = "./index.html";
+
+      const directions = ["shine-left", "shine-right", "shine-up", "shine-down"];
+      let previousDirection = "";
+
+      function playRandomShine() {
+        if (!brandMark) return;
+
+        let nextDirection = directions[
+          Math.floor(Math.random() * directions.length)
+        ];
+
+        // Menghindari arah yang sama dua kali berturut-turut.
+        if (directions.length > 1) {
+          while (nextDirection === previousDirection) {
+            nextDirection = directions[
+              Math.floor(Math.random() * directions.length)
+            ];
+          }
+        }
+
+        previousDirection = nextDirection;
+        brandMark.classList.remove(...directions);
+        void brandMark.offsetWidth;
+        brandMark.classList.add(nextDirection);
+      }
+
+      // Kilatan pertama setelah logo tampil, lalu interval acak 3,5–6,5 detik.
+      let shineTimer;
+      function scheduleShine(delay = 900) {
+        window.clearTimeout(shineTimer);
+        shineTimer = window.setTimeout(() => {
+          playRandomShine();
+          scheduleShine(3500 + Math.random() * 3000);
+        }, delay);
+      }
+
+      scheduleShine();
+
+      aboutButton?.addEventListener("click", () => {
+        if (typeof aboutDialog.showModal === "function") {
+          aboutDialog.showModal();
+        } else {
+          showToast("Fitur informasi tidak didukung browser ini.");
+        }
+      });
+
+      enterButton?.addEventListener("click", () => {
+        window.location.href = APP_HOME_URL;
+      });
+
+      function showToast(message) {
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add("show");
+        window.setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      // Opsional: ubah splash menjadi kartu sambutan setelah durasi tertentu.
+      // Aktifkan dengan mengubah SHOW_WELCOME_CARD menjadi true.
+      const SHOW_WELCOME_CARD = false;
+      const WELCOME_DELAY_MS = 4200;
+
+      if (SHOW_WELCOME_CARD) {
+        window.setTimeout(() => {
+          const stage = document.getElementById("brandStage");
+          const card = document.getElementById("welcomeCard");
+          if (stage && card) {
+            stage.hidden = true;
+            card.hidden = false;
+          }
+        }, WELCOME_DELAY_MS);
+      }
+
+      // Hentikan timer ketika tab tidak terlihat untuk menghemat sumber daya.
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          window.clearTimeout(shineTimer);
+        } else {
+          scheduleShine(250);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
