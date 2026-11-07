@@ -111,15 +111,19 @@
   style="background:#2563eb">
   UJI KEWENANGAN MEMBER
   </button>
+
+  <button onclick="runGrantAdminTest()">
+  UJI PEMBERIAN ROLE ADMIN
+  </button>
+  
+  <button onclick="runAdminAuthorizationTest()">
+  UJI KEWENANGAN ADMIN PRABU
+  </button>
   
   <div class="card">
     <h3>Hasil Pengujian</h3>
     <pre id="output">Menunggu pengujian...</pre>
   </div>
-
-  <button onclick="runGrantAdminTest()">
-  UJI PEMBERIAN ROLE ADMIN
-  </button>
   
 </div>
 
@@ -868,6 +872,155 @@ async function runMemberAuthorizationTest() {
     hasMember && hasAdmin
       ? "\nBERHASIL: PRABU SEKARANG MEMILIKI ROLE ADMIN."
       : "\nPERINGATAN: ROLE ADMIN BELUM TERVERIFIKASI.";
+}
+
+  async function runAdminAuthorizationTest() {
+  const output = document.getElementById("output");
+  const sb = window.tarbiyahSupabase;
+
+  const adminId =
+    "9938f1a9-e2cf-4ccd-9379-a8e34783f7ec";
+
+  const kangLId =
+    "51f0f267-e18e-450a-952d-f88cb5b8c0ca";
+
+  output.textContent =
+    "MEMULAI PENGUJIAN KEWENANGAN ADMIN PRABU...\n";
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    output.textContent += "GAGAL: Supabase belum siap.";
+    return;
+  }
+
+  // 1. Verifikasi sesi Prabu
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    output.textContent += "GAGAL: Sesi login tidak ditemukan.";
+    return;
+  }
+
+  if (authData.user.id !== adminId) {
+    output.textContent +=
+      "DIBATALKAN: Silakan login menggunakan akun Prabu.";
+    return;
+  }
+
+  output.textContent += "Akun Prabu terdeteksi.\n";
+
+  // 2. Pastikan role Admin dan Member terpasang
+  const { data: ownRoles, error: ownRolesError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", adminId);
+
+  if (ownRolesError) {
+    output.textContent += ownRolesError.message;
+    return;
+  }
+
+  const roleNames = (ownRoles || [])
+    .map(item => item.roles?.name)
+    .filter(Boolean);
+
+  output.textContent +=
+    "Role Prabu: " + JSON.stringify(roleNames) + "\n";
+
+  if (!roleNames.includes("admin")) {
+    output.textContent +=
+      "GAGAL: Role Admin tidak ditemukan.";
+    return;
+  }
+
+  // 3. Uji review_member pada akun sendiri.
+  // Seharusnya ditolak karena Admin tidak boleh meninjau dirinya sendiri.
+  output.textContent +=
+    "\nTES 1: MENGUJI BATAS REVIEW ANGGOTA...\n";
+
+  const { error: reviewError } =
+    await sb.rpc("review_member", {
+      p_user_id: adminId,
+      p_decision: "suspended",
+      p_note: "Pengujian batas kewenangan Admin"
+    });
+
+  output.textContent += JSON.stringify({
+    expected: "DITOLAK KARENA REVIEW DIRI SENDIRI",
+    actual: reviewError ? "DITOLAK" : "BERHASIL",
+    error: reviewError?.message || null,
+    error_code: reviewError?.code || null
+  }, null, 2);
+
+  // 4. Pastikan Kang L bukan Admin sebelum tes pencabutan.
+  const { data: kangRoles, error: kangError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", kangLId);
+
+  if (kangError) {
+    output.textContent +=
+      "\nGAGAL MEMERIKSA ROLE KANG L:\n" +
+      kangError.message;
+    return;
+  }
+
+  const kangRoleNames = (kangRoles || [])
+    .map(item => item.roles?.name)
+    .filter(Boolean);
+
+  if (kangRoleNames.includes("admin")) {
+    output.textContent +=
+      "\nDIBATALKAN: Kang L ternyata memiliki role Admin.";
+    return;
+  }
+
+  // 5. Admin mencoba mencabut role Admin Kang L.
+  // Karena Kang L bukan Admin, tidak ada role Admin yang perlu dicabut.
+  // RPC seharusnya tetap menolak karena pemanggil bukan Super Admin.
+  output.textContent +=
+    "\nTES 2: MENGUJI LARANGAN MENGELOLA ROLE ADMIN...\n";
+
+  const { error: roleError } =
+    await sb.rpc("set_admin_access", {
+      p_user_id: kangLId,
+      p_enabled: false
+    });
+
+  output.textContent += JSON.stringify({
+    expected: "DITOLAK: HANYA SUPER ADMIN",
+    actual: roleError ? "DITOLAK" : "BERHASIL",
+    error: roleError?.message || null,
+    error_code: roleError?.code || null
+  }, null, 2);
+
+  // 6. Pastikan Kang L tetap tidak berubah.
+  const { data: kangRolesAfter, error: afterError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", kangLId);
+
+  if (afterError) {
+    output.textContent +=
+      "\nGAGAL VERIFIKASI AKHIR:\n" + afterError.message;
+    return;
+  }
+
+  const finalKangRoles = (kangRolesAfter || [])
+    .map(item => item.roles?.name)
+    .filter(Boolean);
+
+  output.textContent +=
+    "\n========== VERIFIKASI AKHIR ==========\n" +
+    JSON.stringify({
+      admin_account: "Prabu",
+      admin_role_detected: roleNames.includes("admin"),
+      member_role_detected: roleNames.includes("member"),
+      self_review_blocked: !!reviewError,
+      admin_role_management_blocked: !!roleError,
+      kang_l_roles_before: kangRoleNames,
+      kang_l_roles_after: finalKangRoles
+    }, null, 2);
 }
   
 </script>
