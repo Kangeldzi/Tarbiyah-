@@ -95,7 +95,12 @@
   style="background:#9a5b16">
   MULAI WRITE SECURITY TEST
   </button>
- 
+
+  <button onclick="runRPCTest()"
+  style="background:#8b3c85">
+  MULAI RPC AUTHORIZATION TEST
+  </button>
+  
   <div class="card">
     <h3>Hasil Pengujian</h3>
     <pre id="output">Menunggu pengujian...</pre>
@@ -347,6 +352,119 @@ console.log("BACKEND READY:",
   log("WRITE SECURITY TEST SELESAI", {
     user_id: user.id,
     message: "Periksa hasil masing-masing operasi."
+  });
+}
+
+
+async function runRPCTest() {
+  const output = document.getElementById("output");
+  const sb = window.tarbiyahSupabase;
+
+  output.textContent = "MEMULAI RPC AUTHORIZATION TEST...\n";
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    output.textContent += "GAGAL: Supabase belum siap.";
+    return;
+  }
+
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    output.textContent += "GAGAL: Sesi login tidak ditemukan.";
+    return;
+  }
+
+  const user = authData.user;
+
+  const superAdminId =
+    "efe7bc11-0f70-4abf-a30d-d02e2716a115";
+
+  if (user.id === superAdminId) {
+    output.textContent +=
+      "DIBATALKAN: Gunakan akun Kang L.";
+    return;
+  }
+
+  function log(title, result) {
+    output.textContent +=
+      "\n\n" + title + "\n" +
+      JSON.stringify(result, null, 2);
+  }
+
+  // Uji 1: Pengguna biasa mencoba menyetujui
+  // keanggotaannya sendiri.
+  try {
+    const { data, error } = await sb.rpc(
+      "review_member",
+      {
+        p_user_id: user.id,
+        p_decision: "active",
+        p_note: "Pengujian keamanan RPC"
+      }
+    );
+
+    log("1. REVIEW_MEMBER - SELF APPROVAL", {
+      expected: "DITOLAK",
+      actual: error ? "DITOLAK" : "TIDAK ADA ERROR",
+      error: error?.message ?? null,
+      data,
+      passed: !!error
+    });
+  } catch (err) {
+    log("1. REVIEW_MEMBER - SELF APPROVAL", {
+      expected: "DITOLAK",
+      error: err.message
+    });
+  }
+
+  // Uji 2: Pengguna biasa mencoba memberi
+  // akses admin kepada dirinya sendiri.
+  try {
+    const { data, error } = await sb.rpc(
+      "set_admin_access",
+      {
+        p_user_id: user.id,
+        p_enabled: true
+      }
+    );
+
+    log("2. SET_ADMIN_ACCESS - SELF PROMOTION", {
+      expected: "DITOLAK",
+      actual: error ? "DITOLAK" : "TIDAK ADA ERROR",
+      error: error?.message ?? null,
+      data,
+      passed: !!error
+    });
+  } catch (err) {
+    log("2. SET_ADMIN_ACCESS - SELF PROMOTION", {
+      expected: "DITOLAK",
+      error: err.message
+    });
+  }
+
+  // Periksa ulang status membership dan role
+  // setelah kedua percobaan.
+  const { data: memberData, error: memberError } =
+    await sb.from("members")
+      .select("membership_status")
+      .eq("user_id", user.id);
+
+  const { data: roleData, error: roleError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", user.id);
+
+  log("3. VERIFIKASI KONDISI SETELAH RPC", {
+    membership: memberData,
+    membership_error: memberError?.message ?? null,
+    roles: roleData,
+    role_error: roleError?.message ?? null
+  });
+
+  log("RPC AUTHORIZATION TEST SELESAI", {
+    user_id: user.id,
+    message: "Periksa pesan penolakan dan kondisi akhir."
   });
 }
 
