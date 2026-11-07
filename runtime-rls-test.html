@@ -119,6 +119,10 @@
   <button onclick="runAdminAuthorizationTest()">
   UJI KEWENANGAN ADMIN PRABU
   </button>
+
+  <button onclick="runAdminApproveMemberTest()">
+  UJI ADMIN MENYETUJUI ANGGOTA
+  </button>
   
   <div class="card">
     <h3>Hasil Pengujian</h3>
@@ -1020,6 +1024,139 @@ async function runMemberAuthorizationTest() {
       admin_role_management_blocked: !!roleError,
       kang_l_roles_before: kangRoleNames,
       kang_l_roles_after: finalKangRoles
+    }, null, 2);
+}
+
+async function runAdminApproveMemberTest() {
+  const output = document.getElementById("output");
+  const sb = window.tarbiyahSupabase;
+
+  const adminId =
+    "9938f1a9-e2cf-4ccd-9379-a8e34783f7ec";
+
+  const targetId =
+    "87184b56-eba3-44c1-8889-34a263f2991e";
+
+  output.textContent =
+    "MEMULAI PENGUJIAN PERSETUJUAN ANGGOTA OLEH ADMIN...\n";
+
+  if (!sb || !window.TARBIYAH_BACKEND_READY) {
+    output.textContent += "GAGAL: Supabase belum siap.";
+    return;
+  }
+
+  // 1. Pastikan akun yang login adalah Prabu
+  const { data: authData, error: authError } =
+    await sb.auth.getUser();
+
+  if (authError || !authData?.user) {
+    output.textContent += "GAGAL: Sesi login tidak ditemukan.";
+    return;
+  }
+
+  if (authData.user.id !== adminId) {
+    output.textContent +=
+      "DIBATALKAN: Login menggunakan akun Admin Prabu terlebih dahulu.";
+    return;
+  }
+
+  output.textContent += "Admin Prabu terdeteksi.\n";
+
+  // 2. Periksa akun Queendzi
+  const { data: before, error: beforeError } =
+    await sb.from("members")
+      .select("membership_status")
+      .eq("user_id", targetId)
+      .maybeSingle();
+
+  if (beforeError || !before) {
+    output.textContent +=
+      "GAGAL MEMERIKSA TARGET:\n" +
+      (beforeError?.message || "Data tidak ditemukan.");
+    return;
+  }
+
+  if (before.membership_status !== "pending") {
+    output.textContent +=
+      "DIBATALKAN: Status Queendzi bukan pending.";
+    return;
+  }
+
+  output.textContent +=
+    "Status awal Queendzi: pending.\n";
+
+  // 3. Admin menyetujui keanggotaan Queendzi
+  output.textContent +=
+    "Mengirim permintaan persetujuan melalui RPC...\n";
+
+  const { data: rpcData, error: rpcError } =
+    await sb.rpc("review_member", {
+      p_user_id: targetId,
+      p_decision: "active",
+      p_note:
+        "Persetujuan anggota oleh Admin Prabu melalui pengujian runtime"
+    });
+
+  output.textContent +=
+    "\nHASIL RPC:\n" +
+    JSON.stringify({
+      expected: "BERHASIL",
+      actual: rpcError ? "GAGAL" : "BERHASIL",
+      error: rpcError?.message || null,
+      error_code: rpcError?.code || null,
+      data: rpcData
+    }, null, 2);
+
+  if (rpcError) return;
+
+  // 4. Verifikasi membership
+  const { data: after, error: afterError } =
+    await sb.from("members")
+      .select("membership_status")
+      .eq("user_id", targetId)
+      .maybeSingle();
+
+  if (afterError || !after) {
+    output.textContent +=
+      "\nGAGAL VERIFIKASI MEMBERSHIP:\n" +
+      (afterError?.message || "Data tidak ditemukan.");
+    return;
+  }
+
+  // 5. Verifikasi role Queendzi
+  const { data: roles, error: rolesError } =
+    await sb.from("user_roles")
+      .select("roles(name)")
+      .eq("user_id", targetId);
+
+  if (rolesError) {
+    output.textContent +=
+      "\nGAGAL VERIFIKASI ROLE:\n" + rolesError.message;
+    return;
+  }
+
+  const roleNames = (roles || [])
+    .map(item => item.roles?.name)
+    .filter(Boolean);
+
+  output.textContent +=
+    "\n========== VERIFIKASI AKHIR ==========\n" +
+    JSON.stringify({
+      admin: "Prabu",
+      target: "Queendzi",
+      target_user_id: targetId,
+      membership: after.membership_status,
+      roles: roleNames,
+      membership_active:
+        after.membership_status === "active",
+      member_role_exists:
+        roleNames.includes("member"),
+      registered_user_removed:
+        !roleNames.includes("registered_user"),
+      overall_success:
+        after.membership_status === "active" &&
+        roleNames.includes("member") &&
+        !roleNames.includes("registered_user")
     }, null, 2);
 }
   
