@@ -1,8 +1,8 @@
-const CACHE_NAME = "tarbiyah-shell-v2";
+const CACHE_NAME = "tarbiyah-shell-v4";
 const SHELL_FILES = [
-  "./index.html", "./manifest.json",
-  "./css/variables.css", "./css/global.css", "./css/theme.css", "./css/splash.css",
-  "./js/config.js", "./js/supabase-client.js", "./js/theme-manager.js", "./js/auth.js", "./js/splash.js", "./js/pwa.js",
+  "./index.html", "./dashboard.html", "./module.html", "./manifest.json",
+  "./css/variables.css", "./css/global.css", "./css/theme.css", "./css/splash.css", "./css/dashboard.css", "./css/module.css",
+  "./js/supabase-client.js", "./js/theme-manager.js", "./js/auth.js", "./js/auth-guard.js", "./js/dashboard.js", "./js/module.js", "./js/splash.js", "./js/pwa.js",
   "./assets/icons/icon-192.png", "./assets/icons/icon-512.png"
 ];
 self.addEventListener("install", event => {
