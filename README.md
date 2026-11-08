@@ -21,3 +21,9 @@
 - Data pribadi, data Supabase, dan bukti transaksi tidak dimasukkan ke cache service worker.
 - Service worker ini adalah fondasi cache shell, belum merupakan implementasi offline penuh atau push notification.
 - Galeri album foto/video, feed media dashboard, ekspor Excel/CSV, peta agenda Google Maps, serta riwayat anggota merupakan persyaratan tetap pada tahap modul terkait.
+
+# TARBIYAH — Fondasi Aplikasi
+
+Paket ini menggabungkan fondasi Tahap 1 dan autentikasi Tahap 2, lalu menambahkan kerangka Dashboard Utama Tahap 3. Baca `README-INTEGRASI-TAHAP-3.md` sebelum deployment.
+
+Halaman produksi setelah login adalah `dashboard.html`. File `tarbiyah.html` tidak disertakan karena hanya halaman uji sementara.
