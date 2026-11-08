@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah.">
+  <title>TAUHID — Tarbiyah, Dakwah, dan Beramal</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-512.png" type="image/png">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/splash.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="./js/config.js"></script>
+  <script defer src="./js/supabase-client.js"></script>
+  <script defer src="./js/theme-manager.js"></script>
+  <script defer src="./js/auth.js"></script>
+  <script defer src="./js/splash.js"></script>
+  <script defer src="./js/pwa.js"></script>
+</head>
+<body class="splash-page">
+  <main class="splash-shell">
+    <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+    <div class="star-field" aria-hidden="true"></div>
+    <section class="brand-stage" aria-label="TARBIYAH">
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="brand-aura"></div>
+      <div class="brand-mark" id="brandMark">
+        <img id="brandLogo" src="./assets/icons/icon-512.png" alt="Logo TARBIYAH">
+      </div>
+      <p class="brand-kicker">RUANG BELAJAR & UKHUWAH</p>
+      <h1 class="brand-title" id="brandTitle">TAUHID</h1>
+      <p class="brand-tagline">Tarbiyah, Dakwah, dan Beramal.</p>
+      <div class="loading-line" aria-label="Memuat aplikasi"><span></span></div>
+      <p class="loading-caption" id="loadingCaption">Menyiapkan ruang kebaikan...</p>
+    </section>
+    <section class="welcome-card" id="welcomeCard" aria-labelledby="welcomeTitle" hidden>
+      <div class="welcome-symbol">بِسْمِ اللَّهِ</div>
+      <p class="eyebrow">SELAMAT DATANG</p>
+      <h2 id="welcomeTitle">Assalamu'alaikum!</h2>
+      <p class="welcome-copy">Temukan ruang untuk belajar, berbagi ilmu, mengikuti kajian, dan bertumbuh bersama dalam keimanan.</p>
+      <button class="button button-primary" id="enterButton" type="button">
+        Masuk Sekarang <span aria-hidden="true">↗</span>
+      </button>
+      <button class="button button-quiet" id="aboutButton" type="button">Pelajari Aplikasi</button>
+      <p class="welcome-foot">Ilmu • Dakwah • Amal</p>
+    </section>
+    <div class="toast" id="appToast" role="status" aria-live="polite"></div>
+    <footer class="splash-footer"><span id="footerBrand">TARBIYAH</span><span>Platform Pembelajaran Muslim</span></footer>
+  </main>
+  <dialog class="about-dialog" id="aboutDialog">
+    <form method="dialog">
+      <button class="dialog-close" aria-label="Tutup">×</button>
+      <p class="eyebrow">TENTANG TARBIYAH</p>
+      <h2>Belajar dalam keimanan.</h2>
+      <p>TARBIYAH menghadirkan pembelajaran Islam, kajian, agenda komunitas, ruang diskusi, dokumentasi, dan informasi kegiatan dalam satu aplikasi.</p>
+      <button class="button button-primary" value="close">Mengerti</button>
+    </form>
+  </dialog>
+</body>
+</html>
