@@ -62,3 +62,8 @@ html[data-theme="light"]{--auth-bg:#f1f4ee;--auth-panel:#e5eee5;--auth-card:rgba
 @media(max-width:850px){.auth-layout{grid-template-columns:1fr}.auth-aside{display:none}.auth-main{min-height:100vh;padding:14px 18px 16px}.auth-topbar{justify-content:space-between}.mobile-brand{display:inline-flex;font-size:13px}.mobile-brand img{width:34px;height:34px}.auth-card{margin:22px 0;width:min(100%,460px)}}
 @media(max-width:420px){.auth-main{padding:10px 13px}.auth-card{padding:23px 19px;border-radius:20px}.auth-heading{margin-bottom:20px}.field-wrap input{height:46px}.auth-copyright{font-size:9px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Penyesuaian identitas PNG dan area aman perangkat */
+.auth-brand img,.mobile-brand img,.auth-mini-mark img{object-fit:contain}
+@supports(height:100dvh){.auth-page,.auth-layout{min-height:100dvh}}
+@media(max-width:850px){.auth-topbar{padding-top:max(16px,env(safe-area-inset-top))}.auth-main{padding-bottom:max(24px,env(safe-area-inset-bottom))}}
