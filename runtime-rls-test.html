@@ -1159,7 +1159,22 @@ async function runAdminApproveMemberTest() {
         !roleNames.includes("registered_user")
     }, null, 2);
 }
-  
+
+<!-- ERUDA CONSOLE - TARBIYAH DEBUGGING -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  eruda.init({
+    tool: ['console', 'elements', 'network', 'resources'],
+    defaults: {
+      displaySize: 50,
+      transparency: 0.95,
+      theme: 'Monokai Pro'
+    }
+  });
+
+  console.log('TARBIYAH ERUDA CONSOLE SIAP');
+  console.log('Supabase tersedia:', !!window.tarbiyahSupabase);
+  console.log('Backend ready:', window.TARBIYAH_BACKEND_READY);
 </script>
 </body>
 </html>
