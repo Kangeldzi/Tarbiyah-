@@ -21,3 +21,9 @@ Paket ini memperbarui fondasi tema, jalur dashboard, manifest, dan standar logo.
 - `login-register.html` — autentikasi
 - `dashboard.html` — dashboard produksi
 - `tarbiyah.html` — tidak digunakan sebagai dashboard produksi
+
+# TARBIYAH — Fondasi Aplikasi
+
+Paket ini menggabungkan fondasi Tahap 1 dan autentikasi Tahap 2, lalu menambahkan kerangka Dashboard Utama Tahap 3. Baca `README-INTEGRASI-TAHAP-3.md` sebelum deployment.
+
+Halaman produksi setelah login adalah `dashboard.html`. File `tarbiyah.html` tidak disertakan karena hanya halaman uji sementara.
