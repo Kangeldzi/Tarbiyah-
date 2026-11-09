@@ -1,13 +1,9 @@
+/* TARBIYAH · design tokens bersama */
 :root{
  --primary:#267A78;--primary2:#328F88;--primary-dark:#1D6261;--accent:#D8AA91;
  --bg:#F4F7F6;--surface:#FFFFFF;--ink:#172033;--muted:#718096;--line:#E5ECEA;--soft:#EAF4F2;
  --navy:#F4F7F6;--panel:#FFFFFF;--panel2:#EAF4F2;--aqua:#328F88;--gold:#D8AA91;
- --shadow:0 18px 50px rgba(23,72,69,.10);--radius:18px;
+ --shadow:0 18px 50px rgba(23,72,69,.09);--radius:20px;--logo-size:42px;--logo-gap:12px;
 }
-html[data-theme="dark"]{
- --bg:#102A2A;--surface:#173635;--ink:#EFF8F6;--muted:#A6BFBA;--line:rgba(190,222,214,.14);--soft:#1D4542;
- --navy:#102A2A;--panel:#173635;--panel2:#1D4542;--aqua:#74C9BD;--gold:#D8AA91;
- --shadow:0 18px 50px rgba(0,0,0,.25);
-}
-*{box-sizing:border-box}html{color-scheme:light}html[data-theme="dark"]{color-scheme:dark}
-body{background:var(--bg);color:var(--ink)}
+html[data-theme="dark"]{--bg:#102A2A;--surface:#173635;--ink:#EFF8F6;--muted:#A6BFBA;--line:rgba(190,222,214,.14);--soft:#1D4542;--navy:#102A2A;--panel:#173635;--panel2:#1D4542;--aqua:#74C9BD;--gold:#D8AA91;--shadow:0 18px 50px rgba(0,0,0,.24)}
+*{box-sizing:border-box}html{color-scheme:light}html[data-theme="dark"]{color-scheme:dark}body{background:var(--bg);color:var(--ink)}
