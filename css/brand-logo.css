@@ -1,0 +1,15 @@
+/* TARBIYAH — Standar Logo Induk
+   Acuan: dashboard.html (.sidebar-brand img 42x42) dan login-register.html (.auth-brand img 42x42).
+   Gunakan aset PNG resmi yang sama di seluruh halaman. */
+:root{--tarbiyah-logo-size:42px;--tarbiyah-logo-gap:12px;--tarbiyah-logo-fit:contain}
+.sidebar-brand img,.auth-brand img,.mobile-brand img,.page-brand img,.module-brand img,.brand-logo img,.brand-logo-image{
+  width:var(--tarbiyah-logo-size);height:var(--tarbiyah-logo-size);aspect-ratio:1/1;
+  object-fit:var(--tarbiyah-logo-fit);display:block;flex:0 0 auto;
+  border:0;border-radius:0;padding:0;background:transparent;box-shadow:none;
+}
+.sidebar-brand,.auth-brand,.mobile-brand,.page-brand,.module-brand,.brand-logo{
+  display:inline-flex;align-items:center;gap:var(--tarbiyah-logo-gap);text-decoration:none;
+}
+.mobile-brand img{width:var(--tarbiyah-logo-size);height:var(--tarbiyah-logo-size)}
+.auth-mini-mark img{width:100%;height:100%;object-fit:contain;display:block}
+@media(max-width:700px){.sidebar-brand img,.auth-brand img,.mobile-brand img,.page-brand img,.module-brand img,.brand-logo img,.brand-logo-image{width:var(--tarbiyah-logo-size);height:var(--tarbiyah-logo-size)}}
