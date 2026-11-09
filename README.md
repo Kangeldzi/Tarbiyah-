@@ -38,9 +38,3 @@ Di Supabase Dashboard:
 - Tanpa konfigurasi Supabase, halaman tetap bisa dibuka untuk memeriksa UI, tetapi login/daftar tidak akan berhasil.
 - `tarbiyah.html` hanya halaman sementara untuk uji alur. Akan digantikan oleh dashboard lengkap pada Tahap 3.
 - Pastikan deployment memakai HTTPS; jangan menguji dengan membuka file HTML melalui `file://`.
-
-# TARBIYAH — Fondasi Aplikasi
-
-Paket ini menggabungkan fondasi Tahap 1 dan autentikasi Tahap 2, lalu menambahkan kerangka Dashboard Utama Tahap 3. Baca `README-INTEGRASI-TAHAP-3.md` sebelum deployment.
-
-Halaman produksi setelah login adalah `dashboard.html`. File `tarbiyah.html` tidak disertakan karena hanya halaman uji sementara.
