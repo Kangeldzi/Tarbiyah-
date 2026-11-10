@@ -1,6 +1,6 @@
 {
   "id": "./",
-  "name": "TARBIYAH TAUHID — Pembelajaran Muslim",
+  "name": "TARBIYAH — Pembelajaran Muslim",
   "short_name": "TARBIYAH",
   "description": "Ruang belajar, kajian, dan ukhuwah Muslim.",
   "lang": "id-ID",
@@ -10,7 +10,15 @@
   "background_color": "#F4F7F6",
   "theme_color": "#267A78",
   "icons": [
-    {"src":"./assets/icons/icon-192.png","sizes":"192x192","type":"image/png"},
-    {"src":"./assets/icons/icon-512.png","sizes":"512x512","type":"image/png"}
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
