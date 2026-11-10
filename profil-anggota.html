@@ -1,1 +1,773 @@
-<!doctype html><html lang="id" data-theme="light" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#267A78"><meta name="description" content="Kelola informasi profil, identitas anggota, dan data keanggotaan."><title>Profil & Anggota — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/brand-logo.css"><link rel="stylesheet" href="./css/module-shell.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/module-shell.js"></script><script defer src="./js/pwa.js"></script></head><body><div class="app-shell"><aside class="app-sidebar"><a class="module-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span>TARBIYAH<small>Ruang Ilmu & Ukhuwah</small></span></a><div class="nav-caption">MENU UTAMA</div><nav class="app-nav" aria-label="Navigasi aplikasi"><a href="./dashboard.html" ><span class="nav-ico">⌂</span>Dashboard</a><a href="./profil-anggota.html" aria-current="page"><span class="nav-ico">◉</span>Profil & Anggota</a><a href="./agenda-tarbiyah.html" ><span class="nav-ico">▦</span>Agenda Tarbiyah</a><a href="./pembelajaran.html" ><span class="nav-ico">✧</span>Pembelajaran</a><a href="./materi-pembelajaran.html" ><span class="nav-ico">▤</span>Materi Pembelajaran</a><a href="./berita-pengumuman.html" ><span class="nav-ico">▧</span>Berita & Pengumuman</a><a href="./presensi-tarbiyah.html" ><span class="nav-ico">✓</span>Presensi Tarbiyah</a><a href="./galeri-foto-video.html" ><span class="nav-ico">▣</span>Galeri Foto & Video</a><a href="./diskusi-tarbiyah.html" ><span class="nav-ico">☷</span>Diskusi Tarbiyah</a><a href="./donasi-infaq.html" ><span class="nav-ico">♡</span>Donasi, Infaq & Shodaqoh</a><a href="./kehadiran.html" ><span class="nav-ico">◷</span>Kehadiran</a><a href="./catatan-refleksi.html" ><span class="nav-ico">✎</span>Catatan & Refleksi</a><a href="./notifikasi.html" ><span class="nav-ico">♧</span>Notifikasi</a><a href="./riwayat-aktivitas.html" ><span class="nav-ico">◷</span>Riwayat Aktivitas</a><a href="./administrasi-pengaturan.html" ><span class="nav-ico">⚙</span>Administrasi & Pengaturan</a></nav><div class="sidebar-foot">Ilmu · Amal · Ukhuwah<br>© <span data-year></span> TARBIYAH</div></aside><div class="mobile-scrim" data-scrim></div><main class="app-main"><header class="app-topbar"><div class="top-left"><button class="icon-btn menu-toggle" data-menu aria-label="Buka navigasi" aria-expanded="false">☰</button><div class="crumb">TARBIYAH&nbsp; / &nbsp;<b>Profil & Anggota</b></div></div><div class="top-actions"><button class="icon-btn" data-theme-toggle aria-label="Ganti tema">◐</button><a class="icon-btn" href="./notifikasi.html" aria-label="Notifikasi" style="display:grid;place-items:center;text-decoration:none">♧</a><a class="profile-chip" href="./profil-anggota.html" aria-label="Profil">T</a></div></header><div class="module-content"><div class="module-head"><div><div class="eyebrow">RUANG TARBIYAH · MODUL</div><h1>Profil & Anggota</h1><p>Kelola informasi profil, identitas anggota, dan data keanggotaan.</p></div><div class="head-actions"><button class="btn secondary" type="button" data-back>← Kembali</button><button class="btn" type="button" data-action>Perbarui profil <span>↗</span></button></div></div><div class="notice"><b>Informasi pengembangan:</b> antarmuka dan navigasi modul ini sudah disiapkan. Data produksi belum ditampilkan sampai tabel dan kebijakan keamanan Supabase diverifikasi. Ini mencegah data contoh dianggap sebagai data komunitas yang sebenarnya.</div><section class="metric-grid"><article class="metric-card"><div class="metric-label">Anggota terdaftar</div><div class="metric-value">—</div><div class="metric-hint">Menunggu data terverifikasi</div></article><article class="metric-card"><div class="metric-label">Status sinkronisasi</div><div class="metric-value" style="font-size:17px">Belum aktif</div><div class="metric-hint">Koneksi tabel belum dipetakan</div></article><article class="metric-card"><div class="metric-label">Akses akun</div><div class="metric-value" style="font-size:17px">Terproteksi</div><div class="metric-hint">Mengikuti sesi autentikasi</div></article><article class="metric-card"><div class="metric-label">Tema aplikasi</div><div class="metric-value" style="font-size:17px">Teal</div><div class="metric-hint">Mengikuti tema induk TARBIYAH</div></article></section><div class="panel-grid"><section class="panel"><h2>Profil saya</h2><p class="panel-desc">Kelola informasi profil, identitas anggota, dan data keanggotaan.</p><div class="toolbar"><input class="field" type="search" placeholder="Cari data..." aria-label="Cari data" disabled><button class="btn secondary" type="button" disabled>Filter</button></div><div class="empty-box"><div class="empty-icon">◉</div><b>Belum ada data untuk ditampilkan</b><p>Identitas anggota, status keanggotaan, dan informasi profil akan ditampilkan setelah sumber data anggota terhubung.</p></div></section><aside class="panel"><h2>Data keanggotaan</h2><p class="panel-desc">Informasi akan mengikuti data akun dan hak akses Anda.</p><div class="notice">Status integrasi: tampilan modul disiapkan. Pembacaan dan penyimpanan data menunggu verifikasi tabel, kolom, serta kebijakan RLS Supabase.</div><div class="empty-box"><div class="empty-icon">✦</div><b>Belum terhubung ke sumber data</b><p>Tidak ada data contoh atau angka rekaan yang ditampilkan.</p></div></aside></div><footer class="app-footer">TARBIYAH · Pembelajaran Muslim <span style="float:right">Versi pengembangan</span></footer></div></main></div><div class="toast" role="status" aria-live="polite" data-toast></div><script type="application/json" id="module-meta">{"key":"profil-anggota","title":"Profil & Anggota"}</script></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Profil & Anggota — TARBIYAH</title>
+  <meta name="description" content="Halaman profil anggota TARBIYAH — Pembelajaran Muslim.">
+  <meta name="theme-color" content="#102a22">
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/tarbiyah-mark.svg" type="image/svg+xml">
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS utama aplikasi -->
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <!-- CSS khusus halaman profil -->
+  <link rel="stylesheet" href="./css/profil-anggota.css">
+
+  <!-- Ikon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="auth-pending">
+
+  <!-- Overlay sidebar untuk perangkat mobile -->
+  <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+  <div class="app-shell">
+
+    <!-- =====================================
+         SIDEBAR NAVIGASI
+    ====================================== -->
+    <aside class="app-sidebar" id="appSidebar">
+
+      <div class="module-brand">
+        <a href="./tarbiyah.html" class="brand-logo" aria-label="TARBIYAH Dashboard">
+          <img
+            src="./assets/icons/tarbiyah-mark.svg"
+            alt="Logo TARBIYAH"
+            class="brand-logo-image"
+          >
+          <span class="brand-text">
+            <strong>TARBIYAH</strong>
+            <small>Pembelajaran Muslim</small>
+          </span>
+        </a>
+
+        <button
+          type="button"
+          class="sidebar-close"
+          id="sidebarClose"
+          aria-label="Tutup navigasi"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-profile-mini">
+        <div class="sidebar-avatar" id="sidebarAvatar">
+          <i class="fa-solid fa-user"></i>
+        </div>
+
+        <div class="sidebar-user-info">
+          <strong id="sidebarUserName">Anggota TARBIYAH</strong>
+          <small id="sidebarUserRole">Anggota</small>
+        </div>
+      </div>
+
+      <div class="nav-caption">MENU UTAMA</div>
+
+      <nav class="app-nav" aria-label="Navigasi utama">
+
+        <a href="./tarbiyah.html" class="nav-link">
+          <i class="fa-solid fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="./profil-anggota.html" class="nav-link active" aria-current="page">
+          <i class="fa-solid fa-users"></i>
+          <span>Profil & Anggota</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-calendar-days"></i>
+          <span>Agenda Tarbiyah</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Pembelajaran</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-book"></i>
+          <span>Materi Pembelajaran</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-newspaper"></i>
+          <span>Berita & Pengumuman</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-clipboard-check"></i>
+          <span>Presensi Tarbiyah</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-photo-film"></i>
+          <span>Galeri Foto & Video</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-comments"></i>
+          <span>Diskusi Tarbiyah</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-hand-holding-heart"></i>
+          <span>Donasi / Infaq / Shodaqoh</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-user-check"></i>
+          <span>Kehadiran</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-book-open-reader"></i>
+          <span>Catatan & Refleksi</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-bell"></i>
+          <span>Notifikasi</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Riwayat Aktivitas</span>
+        </a>
+
+        <a href="#" class="nav-link" data-action="placeholder">
+          <i class="fa-solid fa-gear"></i>
+          <span>Administrasi & Pengaturan</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-line"></div>
+        <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
+        <small>© <span id="currentYear">2026</span> TARBIYAH</small>
+      </div>
+
+    </aside>
+
+    <!-- =====================================
+         AREA KONTEN UTAMA
+    ====================================== -->
+    <main class="app-main">
+
+      <!-- TOPBAR -->
+      <header class="app-topbar">
+
+        <div class="topbar-left">
+          <button
+            type="button"
+            class="menu-toggle"
+            id="menuToggle"
+            aria-label="Buka navigasi"
+            aria-controls="appSidebar"
+            aria-expanded="false"
+          >
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <div class="topbar-heading">
+            <span class="topbar-eyebrow">RUANG ANGGOTA</span>
+            <h1>Profil & Anggota</h1>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+
+          <button
+            type="button"
+            class="topbar-icon-btn"
+            id="themeToggle"
+            data-theme-toggle
+            aria-label="Ubah tema tampilan"
+            title="Ubah tema"
+          >
+            <i class="fa-solid fa-circle-half-stroke"></i>
+          </button>
+
+          <a
+            href="#"
+            class="topbar-icon-btn notification-button"
+            data-action="placeholder"
+            aria-label="Notifikasi"
+            title="Notifikasi"
+          >
+            <i class="fa-regular fa-bell"></i>
+            <span class="notification-dot"></span>
+          </a>
+
+          <div class="topbar-user">
+            <div class="topbar-avatar" id="topbarAvatar">
+              <i class="fa-solid fa-user"></i>
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- =====================================
+           KONTEN PROFIL ANGGOTA
+      ====================================== -->
+      <section class="module-content profile-module" id="profileModule">
+
+        <!-- JUDUL HALAMAN -->
+        <div class="module-head profile-page-heading">
+          <div>
+            <div class="profile-breadcrumb">
+              <span>Dashboard</span>
+              <i class="fa-solid fa-chevron-right"></i>
+              <strong>Profil & Anggota</strong>
+            </div>
+
+            <h2>Profil Anggota</h2>
+            <p>
+              Kelola informasi pribadi dan lihat informasi keanggotaan
+              Anda di komunitas TARBIYAH.
+            </p>
+          </div>
+
+          <div class="profile-heading-decoration">
+            <i class="fa-solid fa-users"></i>
+          </div>
+        </div>
+
+        <!-- NOTIFIKASI STATUS HALAMAN -->
+        <div
+          class="profile-alert"
+          id="profileAlert"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          <i class="fa-solid fa-circle-info"></i>
+          <span id="profileAlertMessage"></span>
+        </div>
+
+        <!-- LOADING -->
+        <div class="profile-loading" id="profileLoading">
+          <div class="profile-loading-spinner"></div>
+          <strong>Memuat data profil...</strong>
+          <span>Mohon tunggu sebentar.</span>
+        </div>
+
+        <!-- KONTEN UTAMA PROFIL -->
+        <div class="profile-content" id="profileContent" hidden>
+
+          <!-- KARTU IDENTITAS -->
+          <section class="profile-hero panel">
+
+            <div class="profile-hero-decoration decoration-one"></div>
+            <div class="profile-hero-decoration decoration-two"></div>
+
+            <div class="profile-hero-main">
+
+              <div class="profile-avatar-wrap">
+                <div class="profile-avatar" id="profileAvatar">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+
+                <span class="profile-avatar-status" title="Status akun aktif"></span>
+              </div>
+
+              <div class="profile-identity">
+
+                <span class="profile-kicker">
+                  <i class="fa-solid fa-star"></i>
+                  PROFIL SAYA
+                </span>
+
+                <h2 id="profileFullName">Nama Anggota</h2>
+
+                <p class="profile-username" id="profileUsername">
+                  @username
+                </p>
+
+                <div class="profile-identity-meta">
+                  <span>
+                    <i class="fa-solid fa-envelope"></i>
+                    <span id="profileEmail">Email akun</span>
+                  </span>
+
+                  <span>
+                    <i class="fa-solid fa-calendar-check"></i>
+                    Anggota TARBIYAH
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="profile-hero-action">
+              <button
+                type="button"
+                class="profile-edit-button"
+                id="openProfileEditor"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Edit Profil</span>
+              </button>
+            </div>
+
+          </section>
+
+          <!-- GRID INFORMASI -->
+          <div class="panel-grid profile-panel-grid">
+
+            <!-- INFORMASI PRIBADI -->
+            <section class="panel profile-info-panel">
+
+              <div class="panel-heading">
+                <div class="panel-heading-icon">
+                  <i class="fa-solid fa-id-card"></i>
+                </div>
+
+                <div>
+                  <h3>Informasi Pribadi</h3>
+                  <p>Data identitas akun Anda</p>
+                </div>
+              </div>
+
+              <div class="profile-details">
+
+                <div class="profile-detail-item">
+                  <span class="detail-label">
+                    <i class="fa-solid fa-user"></i>
+                    Nama Lengkap
+                  </span>
+                  <strong id="detailFullName">Belum diisi</strong>
+                </div>
+
+                <div class="profile-detail-item">
+                  <span class="detail-label">
+                    <i class="fa-solid fa-at"></i>
+                    Username
+                  </span>
+                  <strong id="detailUsername">Belum diisi</strong>
+                </div>
+
+                <div class="profile-detail-item">
+                  <span class="detail-label">
+                    <i class="fa-solid fa-phone"></i>
+                    Nomor Telepon
+                  </span>
+                  <strong id="detailPhone">Belum diisi</strong>
+                </div>
+
+                <div class="profile-detail-item">
+                  <span class="detail-label">
+                    <i class="fa-solid fa-envelope"></i>
+                    Email
+                  </span>
+                  <strong id="detailEmail">-</strong>
+                </div>
+
+                <div class="profile-detail-item profile-detail-bio">
+                  <span class="detail-label">
+                    <i class="fa-solid fa-align-left"></i>
+                    Tentang Saya
+                  </span>
+                  <p id="detailBio">Belum ada deskripsi profil.</p>
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                class="panel-text-button"
+                id="openProfileEditorSecondary"
+              >
+                Perbarui informasi
+                <i class="fa-solid fa-arrow-right"></i>
+              </button>
+
+            </section>
+
+            <!-- INFORMASI KEANGGOTAAN -->
+            <section class="panel membership-panel">
+
+              <div class="panel-heading">
+                <div class="panel-heading-icon membership-icon">
+                  <i class="fa-solid fa-users"></i>
+                </div>
+
+                <div>
+                  <h3>Informasi Keanggotaan</h3>
+                  <p>Status keanggotaan TARBIYAH</p>
+                </div>
+              </div>
+
+              <div class="membership-status-area">
+
+                <span class="membership-status-label">STATUS KEANGGOTAAN</span>
+
+                <div class="membership-status" id="membershipStatus">
+                  <span class="status-indicator"></span>
+                  <strong id="membershipStatusText">Memuat status...</strong>
+                </div>
+
+                <p class="membership-status-description" id="membershipDescription">
+                  Informasi status keanggotaan Anda akan ditampilkan di sini.
+                </p>
+
+              </div>
+
+              <div class="membership-details">
+
+                <div class="membership-detail-item">
+                  <span>Nomor Anggota</span>
+                  <strong id="memberNumber">Belum tersedia</strong>
+                </div>
+
+                <div class="membership-detail-item">
+                  <span>Tanggal Pendaftaran</span>
+                  <strong id="membershipSubmittedAt">-</strong>
+                </div>
+
+                <div class="membership-detail-item">
+                  <span>Tanggal Peninjauan</span>
+                  <strong id="membershipReviewedAt">-</strong>
+                </div>
+
+              </div>
+
+              <div class="membership-note">
+                <i class="fa-solid fa-shield-halved"></i>
+                <p>
+                  Status dan nomor keanggotaan dikelola oleh pengurus
+                  TARBIYAH. Halaman ini hanya menampilkan informasinya.
+                </p>
+              </div>
+
+            </section>
+
+          </div>
+
+          <!-- INFORMASI AKUN -->
+          <section class="panel profile-account-panel">
+
+            <div class="panel-heading">
+              <div class="panel-heading-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+
+              <div>
+                <h3>Informasi Akun</h3>
+                <p>Informasi dasar akun yang sedang digunakan</p>
+              </div>
+            </div>
+
+            <div class="account-information-grid">
+
+              <div class="account-information-item">
+                <span class="detail-label">ID Pengguna</span>
+                <strong id="accountUserId">-</strong>
+              </div>
+
+              <div class="account-information-item">
+                <span class="detail-label">Email Akun</span>
+                <strong id="accountEmail">-</strong>
+              </div>
+
+              <div class="account-information-item">
+                <span class="detail-label">Dibuat Pada</span>
+                <strong id="accountCreatedAt">-</strong>
+              </div>
+
+              <div class="account-information-item">
+                <span class="detail-label">Terakhir Diperbarui</span>
+                <strong id="accountUpdatedAt">-</strong>
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- FOOTER KONTEN -->
+          <footer class="profile-page-footer">
+            <p>
+              <i class="fa-solid fa-heart"></i>
+              Belajar, Bertumbuh, dan Berukhuwah.
+            </p>
+            <span>TARBIYAH — Pembelajaran Muslim</span>
+          </footer>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =====================================
+       MODAL EDIT PROFIL
+  ====================================== -->
+  <div
+    class="profile-modal"
+    id="profileEditModal"
+    aria-hidden="true"
+    hidden
+  >
+
+    <div class="profile-modal-backdrop" data-modal-close></div>
+
+    <section
+      class="profile-modal-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="profileModalTitle"
+    >
+
+      <div class="profile-modal-header">
+
+        <div>
+          <span class="profile-modal-eyebrow">PENGATURAN AKUN</span>
+          <h2 id="profileModalTitle">Edit Profil</h2>
+          <p>Perbarui informasi pribadi Anda.</p>
+        </div>
+
+        <button
+          type="button"
+          class="profile-modal-close"
+          id="closeProfileEditor"
+          aria-label="Tutup formulir"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+      </div>
+
+      <form id="profileEditForm" novalidate>
+
+        <!-- FOTO PROFIL -->
+        <div class="avatar-editor">
+
+          <div class="avatar-editor-preview" id="avatarPreview">
+            <i class="fa-solid fa-user"></i>
+          </div>
+
+          <div class="avatar-editor-controls">
+
+            <strong>Foto Profil</strong>
+
+            <p>
+              JPG, PNG, atau WEBP. Ukuran maksimal 2 MB.
+            </p>
+
+            <label for="avatarFile" class="avatar-upload-button">
+              <i class="fa-solid fa-camera"></i>
+              Pilih Foto
+            </label>
+
+            <input
+              type="file"
+              id="avatarFile"
+              name="avatar"
+              accept="image/jpeg,image/png,image/webp"
+              hidden
+            >
+
+            <span id="avatarFileName" class="avatar-file-name">
+              Belum ada foto baru dipilih
+            </span>
+
+            <button
+              type="button"
+              id="cancelAvatarSelection"
+              class="avatar-cancel-button"
+              hidden
+            >
+              Batalkan pilihan foto
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="profile-form-divider"></div>
+
+        <!-- NAMA LENGKAP -->
+        <div class="profile-form-group">
+
+          <label for="editFullName">
+            Nama Lengkap
+            <span class="required-mark">*</span>
+          </label>
+
+          <input
+            type="text"
+            id="editFullName"
+            name="full_name"
+            placeholder="Masukkan nama lengkap"
+            maxlength="100"
+            autocomplete="name"
+            required
+          >
+
+          <small class="form-help">
+            Nama lengkap wajib diisi.
+          </small>
+
+        </div>
+
+        <!-- USERNAME -->
+        <div class="profile-form-group">
+
+          <label for="editUsername">Username</label>
+
+          <div class="input-with-prefix">
+            <span>@</span>
+            <input
+              type="text"
+              id="editUsername"
+              name="username"
+              placeholder="username"
+              minlength="3"
+              maxlength="30"
+              autocomplete="username"
+            >
+          </div>
+
+          <small class="form-help">
+            Gunakan 3–30 karakter: huruf, angka, titik, atau garis bawah.
+          </small>
+
+        </div>
+
+        <!-- NOMOR TELEPON -->
+        <div class="profile-form-group">
+
+          <label for="editPhone">Nomor Telepon</label>
+
+          <input
+            type="tel"
+            id="editPhone"
+            name="phone"
+            placeholder="Contoh: 08xxxxxxxxxx"
+            maxlength="25"
+            autocomplete="tel"
+          >
+
+        </div>
+
+        <!-- BIO -->
+        <div class="profile-form-group">
+
+          <label for="editBio">Tentang Saya</label>
+
+          <textarea
+            id="editBio"
+            name="bio"
+            rows="4"
+            maxlength="500"
+            placeholder="Ceritakan sedikit tentang diri Anda..."
+          ></textarea>
+
+          <small class="form-help">
+            Maksimal 500 karakter.
+          </small>
+
+        </div>
+
+        <!-- ERROR FORM -->
+        <div
+          class="profile-form-error"
+          id="profileFormError"
+          role="alert"
+          hidden
+        >
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="profileFormErrorMessage"></span>
+        </div>
+
+        <!-- TOMBOL FORM -->
+        <div class="profile-form-actions">
+
+          <button
+            type="button"
+            class="profile-cancel-button"
+            id="cancelProfileEdit"
+          >
+            Batal
+          </button>
+
+          <button
+            type="submit"
+            class="profile-save-button"
+            id="saveProfileButton"
+          >
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Simpan Perubahan</span>
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+  </div>
+
+  <!-- =====================================
+       TOAST NOTIFIKASI
+  ====================================== -->
+  <div
+    class="profile-toast"
+    id="profileToast"
+    role="status"
+    aria-live="polite"
+    hidden
+  >
+    <span class="toast-icon" id="toastIcon">
+      <i class="fa-solid fa-circle-check"></i>
+    </span>
+    <span id="profileToastMessage">Informasi berhasil diperbarui.</span>
+  </div>
+
+  <!-- =====================================
+       JAVASCRIPT APLIKASI
+       Urutan dipertahankan agar autentikasi
+       dan pengelola tema berjalan dengan benar.
+  ====================================== -->
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Konfigurasi dan koneksi backend -->
+  <script src="./js/config.js" defer></script>
+  <script src="./js/supabase-client.js" defer></script>
+
+  <!-- Autentikasi dan proteksi halaman -->
+  <script src="./js/auth.js" defer></script>
+  <script src="./js/auth-guard.js" defer></script>
+
+  <!-- Tema dan kerangka modul -->
+  <script src="./js/theme-manager.js" defer></script>
+  <script src="./js/module-shell.js" defer></script>
+
+  <!-- Logika halaman profil -->
+  <script src="./js/profil-anggota.js" defer></script>
+
+  <!-- PWA -->
+  <script src="./js/pwa.js" defer></script>
+
+</body>
+</html>
