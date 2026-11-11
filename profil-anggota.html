@@ -486,6 +486,62 @@
 
           </div>
 
+
+          <!-- KARTU QR ANGGOTA -->
+          <section class="panel profile-feature-panel" id="memberQrPanel">
+            <div class="panel-heading">
+              <div class="panel-heading-icon membership-icon">
+                <i class="fa-solid fa-qrcode"></i>
+              </div>
+              <div>
+                <h3>Kartu QR Anggota</h3>
+                <p>Identitas digital anggota untuk proses verifikasi</p>
+              </div>
+            </div>
+            <div class="profile-feature-body">
+              <div class="member-qr-frame">
+                <div id="memberQrCode" class="member-qr-code" aria-live="polite">
+                  <i class="fa-solid fa-qrcode"></i>
+                  <span>QR belum dibuat</span>
+                </div>
+              </div>
+              <div class="member-qr-information">
+                <strong id="memberQrName">Anggota TARBIYAH</strong>
+                <span id="memberQrNumber">Nomor anggota: belum tersedia</span>
+                <p id="memberQrMessage">QR hanya dapat diterbitkan untuk keanggotaan berstatus aktif.</p>
+                <div class="profile-feature-actions">
+                  <button type="button" class="profile-feature-button" id="generateMemberQr">
+                    <i class="fa-solid fa-rotate"></i> Buat / Perbarui QR
+                  </button>
+                  <button type="button" class="profile-feature-button secondary" id="downloadMemberQr" disabled>
+                    <i class="fa-solid fa-download"></i> Simpan QR
+                  </button>
+                </div>
+                <small id="memberQrExpiry" class="profile-feature-muted"></small>
+              </div>
+            </div>
+          </section>
+
+          <!-- RIWAYAT KAJIAN DAN KEHADIRAN -->
+          <section class="panel profile-feature-panel" id="memberAttendancePanel">
+            <div class="panel-heading">
+              <div class="panel-heading-icon">
+                <i class="fa-solid fa-calendar-check"></i>
+              </div>
+              <div>
+                <h3>Riwayat Kajian & Kehadiran</h3>
+                <p>Rekam jejak partisipasi kegiatan pembelajaran</p>
+              </div>
+            </div>
+            <div id="memberAttendanceList" class="member-attendance-list" aria-live="polite">
+              <div class="profile-feature-empty">
+                <i class="fa-regular fa-calendar"></i>
+                <strong>Riwayat belum tersedia</strong>
+                <p>Riwayat kehadiran akan tampil setelah modul presensi dan tabel riwayat kajian terhubung ke database.</p>
+              </div>
+            </div>
+          </section>
+
           <!-- INFORMASI AKUN -->
           <section class="panel profile-account-panel">
 
@@ -837,6 +893,9 @@
   <!-- Tema dan kerangka modul -->
   <script src="./js/theme-manager.js" defer></script>
   <script src="./js/module-shell.js" defer></script>
+
+  <!-- Generator QR untuk menampilkan token sementara dari backend -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 
   <!-- Logika halaman profil -->
   <script src="./js/profil-anggota.js" defer></script>
