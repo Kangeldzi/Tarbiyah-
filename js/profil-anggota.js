@@ -655,6 +655,13 @@
         className: "status-rejected",
         description:
           "Pendaftaran keanggotaan Anda belum disetujui. Silakan hubungi pengurus TARBIYAH."
+      },
+
+      suspended: {
+        label: "Keanggotaan Ditangguhkan",
+        className: "status-rejected",
+        description:
+          "Keanggotaan Anda sedang ditangguhkan. Silakan hubungi pengurus TARBIYAH untuk informasi lebih lanjut."
       }
     };
 
@@ -697,11 +704,143 @@
   }
 
 
+
+  /* =======================================================
+     13A. QR ANGGOTA — TOKEN DARI EDGE FUNCTION
+     Kontrak backend: member-qr-mint
+     Backend wajib memverifikasi JWT + status active,
+     menyimpan hash token, dan mengembalikan token mentah
+     berumur pendek. Browser tidak mengakses tabel QR langsung.
+  ======================================================= */
+
+  let memberQrExpiryTimer = null;
+  let memberQrRawToken = null;
+
+  function clearMemberQr() {
+    const holder = getElement("memberQrCode");
+    if (holder) {
+      holder.replaceChildren();
+      const icon = document.createElement("i");
+      icon.className = "fa-solid fa-qrcode";
+      const label = document.createElement("span");
+      label.textContent = "QR belum dibuat";
+      holder.append(icon, label);
+    }
+    memberQrRawToken = null;
+    const download = getElement("downloadMemberQr");
+    if (download) download.disabled = true;
+    setText("memberQrExpiry", "");
+  }
+
+  function renderMemberQr(token, expiresAt) {
+    const holder = getElement("memberQrCode");
+    if (!holder || !token) return;
+    if (typeof window.QRCode !== "function") {
+      setText("memberQrMessage", "Pustaka QR belum berhasil dimuat. Muat ulang halaman dan coba kembali.");
+      return;
+    }
+    holder.replaceChildren();
+    new window.QRCode(holder, {
+      text: token,
+      width: 164,
+      height: 164,
+      colorDark: "#102a22",
+      colorLight: "#ffffff",
+      correctLevel: window.QRCode.CorrectLevel.M
+    });
+    memberQrRawToken = token;
+    const download = getElement("downloadMemberQr");
+    if (download) download.disabled = false;
+    setText("memberQrMessage", "Tunjukkan QR ini kepada petugas untuk diverifikasi. Token bersifat sementara.");
+    setText("memberQrExpiry", expiresAt ? "Berlaku sampai " + formatDateTime(expiresAt) : "QR memiliki masa berlaku terbatas.");
+    if (memberQrExpiryTimer) clearTimeout(memberQrExpiryTimer);
+    if (expiresAt) {
+      const remaining = new Date(expiresAt).getTime() - Date.now();
+      if (remaining > 0) {
+        memberQrExpiryTimer = setTimeout(() => {
+          clearMemberQr();
+          setText("memberQrMessage", "QR telah kedaluwarsa. Buat QR baru saat diperlukan.");
+        }, Math.min(remaining, 2147483647));
+      } else {
+        clearMemberQr();
+        setText("memberQrMessage", "QR telah kedaluwarsa. Buat QR baru saat diperlukan.");
+      }
+    }
+  }
+
+  async function generateMemberQr() {
+    if (!currentMembership || currentMembership.membership_status !== "active") {
+      showToast("QR hanya tersedia untuk anggota dengan status aktif.", "warning");
+      return;
+    }
+    const button = getElement("generateMemberQr");
+    if (button) button.disabled = true;
+    try {
+      const { data, error } = await supabase.functions.invoke("member-qr-mint", {
+        body: { purpose: "member_identity" }
+      });
+      if (error) throw error;
+      const token = data?.token || data?.qr_token;
+      const expiresAt = data?.expires_at || data?.expiresAt;
+      if (!token) {
+        throw new Error(data?.message || "Backend belum mengembalikan token QR.");
+      }
+      renderMemberQr(token, expiresAt);
+      showToast("QR anggota berhasil diterbitkan.", "success");
+    } catch (error) {
+      console.error("[TARBIYAH PROFILE] Gagal menerbitkan QR:", error);
+      showToast(
+        "QR belum dapat dibuat. Pastikan Edge Function member-qr-mint sudah dipasang dan mengembalikan token QR.",
+        "warning"
+      );
+      setText("memberQrMessage", "Layanan penerbit QR belum tersedia atau belum dikonfigurasi di backend.");
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
+  function downloadMemberQr() {
+    const holder = getElement("memberQrCode");
+    const canvas = holder?.querySelector("canvas");
+    const image = holder?.querySelector("img");
+    const source = canvas?.toDataURL("image/png") || image?.src;
+    if (!source) {
+      showToast("Buat QR terlebih dahulu.", "warning");
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = source;
+    link.download = "TARBIYAH-QR-Anggota.png";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  function renderMemberFeatures() {
+    setText("memberQrName",
+      currentProfile?.full_name || currentUser?.user_metadata?.full_name || "Anggota TARBIYAH");
+    setText("memberQrNumber",
+      "Nomor anggota: " + (currentMembership?.member_number || "belum tersedia"));
+    const active = currentMembership?.membership_status === "active";
+    const generate = getElement("generateMemberQr");
+    if (generate) generate.disabled = !active;
+    if (!active) {
+      clearMemberQr();
+      setText("memberQrMessage", "QR hanya dapat diterbitkan setelah status keanggotaan Anda aktif.");
+    }
+  }
+
   /* =======================================================
      14. INITIALIZE PAGE DATA
   ======================================================= */
 
   async function loadPageData() {
+
+    // Hindari data akun sebelumnya tertinggal ketika halaman dimuat ulang.
+    currentUser = null;
+    currentProfile = null;
+    currentMembership = null;
+    currentAvatarSignedUrl = null;
 
     if (elements.loading) {
       elements.loading.hidden = false;
@@ -746,6 +885,7 @@
 
       renderProfile();
       renderMembership();
+      renderMemberFeatures();
 
       await refreshAvatar();
 
@@ -1271,7 +1411,7 @@ function closeEditor(force = false) {
 
     event.preventDefault();
 
-    if (isSaving && !force) return;
+    if (isSaving) return;
 
     hideFormError();
 
@@ -1393,11 +1533,13 @@ function closeEditor(force = false) {
         ke path foto baru.
       */
 
+      let oldAvatarCleanupWarning = false;
       if (uploadedAvatarPath && oldAvatarPath) {
-
-        await cleanupOldAvatar(
-          oldAvatarPath,
-          uploadedAvatarPath
+        await cleanupOldAvatar(oldAvatarPath, uploadedAvatarPath);
+        // cleanupOldAvatar emits a warning toast when deletion fails.
+        oldAvatarCleanupWarning = Boolean(
+          elements.toast && !elements.toast.hidden &&
+          elements.toastMessage?.textContent?.includes("Foto lama")
         );
       }
 
@@ -1510,7 +1652,10 @@ function closeNotificationModal() {
   // Jangan membuka scroll jika modal edit profil
   // masih sedang terbuka.
   if (!elements.modal || elements.modal.hidden) {
-    document.body.style.overflow = previousBodyOverflow;
+    document.body.style.overflow =
+    (elements.modal && !elements.modal.hidden)
+      ? "hidden"
+      : previousBodyOverflow;
   }
 }
 
@@ -1639,6 +1784,9 @@ document.addEventListener("keydown", event => {
       );
     });
 
+    getElement("generateMemberQr")?.addEventListener("click", generateMemberQr);
+    getElement("downloadMemberQr")?.addEventListener("click", downloadMemberQr);
+
     /*
       Sidebar year
     */
@@ -1751,6 +1899,10 @@ document.addEventListener("keydown", event => {
     })
   };
 
+
+  window.addEventListener("beforeunload", () => {
+    if (memberQrExpiryTimer) clearTimeout(memberQrExpiryTimer);
+  });
 
   console.info(
     "[TARBIYAH PROFILE] Script profil anggota berhasil dimuat."
