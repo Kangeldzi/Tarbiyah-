@@ -848,7 +848,7 @@
      16. CLOSE EDIT PROFILE MODAL
   ======================================================= */
 
-  function closeEditor() {
+  function closeEditor(force = false) {
 
     if (!elements.modal) return;
 
@@ -1269,7 +1269,7 @@
 
     event.preventDefault();
 
-    if (isSaving) return;
+    if (isSaving && !force) return;
 
     hideFormError();
 
@@ -1404,12 +1404,8 @@
       */
 
       resetSelectedAvatar();
-
-      closeEditor();
-
-      showToast(
-        "Profil berhasil diperbarui.",
-        "success"
+      closeEditor(true);
+      showToast("Profil berhasil diperbarui.", "success"
       );
 
       console.info(
