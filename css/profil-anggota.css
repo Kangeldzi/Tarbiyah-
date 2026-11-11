@@ -2054,3 +2054,98 @@ html[data-theme="dark"] {
   font-size: 11px;
   line-height: 1.7;
 }
+
+/* =========================================================
+   TARBIYAH — QR ANGGOTA & RIWAYAT KEHADIRAN
+========================================================= */
+.profile-feature-panel {
+  margin-top: 20px;
+  min-width: 0;
+  max-width: 100%;
+}
+.profile-feature-body {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+}
+.member-qr-frame {
+  width: 190px;
+  min-width: 190px;
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba(16, 185, 129, .25);
+}
+.member-qr-code {
+  width: 164px;
+  min-height: 164px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #64748b;
+  text-align: center;
+  font-size: 12px;
+}
+.member-qr-code img,
+.member-qr-code canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.member-qr-code > i { font-size: 38px; color: #059669; }
+.member-qr-information {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.member-qr-information > strong { font-size: 1.05rem; }
+.member-qr-information > span { color: var(--text-secondary, #94a3b8); overflow-wrap: anywhere; }
+.member-qr-information p { margin: 0; color: var(--text-secondary, #94a3b8); line-height: 1.6; }
+.profile-feature-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 5px; }
+.profile-feature-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--primary, #059669);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.profile-feature-button.secondary {
+  color: var(--text-primary, #e2e8f0);
+  background: transparent;
+  border-color: var(--border-color, rgba(148,163,184,.25));
+}
+.profile-feature-button:disabled { opacity: .48; cursor: not-allowed; }
+.profile-feature-muted { color: var(--text-secondary, #94a3b8); }
+.member-attendance-list { min-width: 0; }
+.profile-feature-empty {
+  padding: 24px 16px;
+  border: 1px dashed var(--border-color, rgba(148,163,184,.3));
+  border-radius: 14px;
+  text-align: center;
+  color: var(--text-secondary, #94a3b8);
+}
+.profile-feature-empty > i { display: block; font-size: 28px; margin-bottom: 10px; color: var(--primary, #10b981); }
+.profile-feature-empty strong { display: block; color: var(--text-primary, inherit); margin-bottom: 6px; }
+.profile-feature-empty p { margin: 0 auto; max-width: 560px; line-height: 1.6; }
+@media (max-width: 640px) {
+  .profile-feature-body { flex-direction: column; align-items: stretch; }
+  .member-qr-frame { align-self: center; }
+  .profile-feature-actions { flex-direction: column; }
+  .profile-feature-button { width: 100%; }
+}
