@@ -1618,3 +1618,279 @@ html[data-theme="dark"] {
 /* =========================================================
    END OF TARBIYAH PROFILE STYLESHEET
 ========================================================= */
+
+
+/* =========================================================
+   TARBIYAH — PROFILE LAYOUT REFINEMENT
+   Tambahkan di PALING BAWAH profil-anggota.css
+========================================================= */
+
+/* Mencegah elemen profil melebar keluar dari kontainer */
+.profile-module,
+.profile-content,
+.profile-hero,
+.profile-hero-main,
+.profile-identity,
+.profile-panel-grid,
+.profile-info-panel,
+.membership-panel,
+.profile-account-panel {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Avatar utama: ukuran dan gambar selalu terkunci di lingkaran */
+.profile-avatar-wrap {
+  width: 104px;
+  height: 104px;
+  flex: 0 0 104px;
+}
+
+.profile-avatar {
+  width: 104px;
+  height: 104px;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.profile-avatar img,
+.topbar-avatar img,
+.sidebar-avatar img,
+.avatar-editor-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: inherit;
+}
+
+/* Foto kecil pada topbar dan sidebar */
+.topbar-avatar,
+.sidebar-avatar {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.topbar-avatar img,
+.sidebar-avatar img {
+  position: absolute;
+  inset: 0;
+}
+
+/* Identitas tidak mendorong avatar atau tombol keluar */
+.profile-hero-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.profile-identity {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.profile-identity-meta > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-identity-meta > span span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Kartu profil: tombol tetap berada di dalam hero */
+.profile-hero-action {
+  flex: 0 0 auto;
+}
+
+.profile-edit-button {
+  white-space: nowrap;
+}
+
+/* Modal: ukuran terkendali dan scroll berada di dalam dialog */
+.profile-modal {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.profile-modal-dialog {
+  box-sizing: border-box;
+  width: min(100%, 540px);
+  max-height: min(88dvh, 850px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.profile-modal-dialog form {
+  min-width: 0;
+}
+
+.avatar-editor {
+  min-width: 0;
+}
+
+.avatar-editor-preview {
+  width: 76px;
+  height: 76px;
+  flex: 0 0 76px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.avatar-editor-controls {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.profile-form-group,
+.profile-form-group input,
+.profile-form-group textarea,
+.input-with-prefix {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.input-with-prefix input {
+  width: 100%;
+}
+
+/* Tombol formulir tidak keluar dari dialog */
+.profile-form-actions {
+  position: sticky;
+  bottom: -1px;
+  z-index: 2;
+  padding: 14px 0 2px;
+  background: var(--profile-surface);
+}
+
+/* TABLET */
+@media (max-width: 1024px) {
+  .profile-hero {
+    gap: 18px;
+    padding: 24px;
+  }
+
+  .profile-hero-main {
+    gap: 18px;
+  }
+
+  .profile-avatar-wrap,
+  .profile-avatar {
+    width: 92px;
+    height: 92px;
+  }
+
+  .profile-avatar-wrap {
+    flex-basis: 92px;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .profile-hero {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .profile-hero-main {
+    width: 100%;
+    align-items: center;
+  }
+
+  .profile-avatar-wrap,
+  .profile-avatar {
+    width: 78px;
+    height: 78px;
+  }
+
+  .profile-avatar-wrap {
+    flex-basis: 78px;
+  }
+
+  .profile-hero-action {
+    width: 100%;
+  }
+
+  .profile-edit-button {
+    width: 100%;
+  }
+
+  .profile-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .profile-modal-dialog {
+    width: 100%;
+    max-width: none;
+    max-height: 92dvh;
+    border-radius: 20px 20px 0 0;
+    padding: 22px 18px max(18px, env(safe-area-inset-bottom));
+  }
+}
+
+/* HP KECIL */
+@media (max-width: 390px) {
+  .profile-hero {
+    padding: 17px;
+  }
+
+  .profile-hero-main {
+    gap: 12px;
+  }
+
+  .profile-avatar-wrap,
+  .profile-avatar {
+    width: 66px;
+    height: 66px;
+  }
+
+  .profile-avatar-wrap {
+    flex-basis: 66px;
+  }
+
+  .profile-identity h2 {
+    font-size: 16px;
+  }
+
+  .profile-identity-meta {
+    gap: 7px;
+  }
+
+  .profile-identity-meta > span {
+    font-size: 9px;
+  }
+
+  .avatar-editor {
+    align-items: flex-start;
+    gap: 11px;
+    padding: 11px;
+  }
+
+  .avatar-editor-preview {
+    width: 62px;
+    height: 62px;
+    flex-basis: 62px;
+  }
+
+  .profile-modal-dialog {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .profile-form-actions {
+    gap: 8px;
+  }
+}
+
+
