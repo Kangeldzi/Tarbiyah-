@@ -2010,3 +2010,47 @@ html[data-theme="dark"] {
     letter-spacing: 0.7px;
   }
 }
+
+
+/* =========================================================
+   MODAL NOTIFIKASI
+========================================================= */
+
+.notification-dialog {
+  max-width: 460px;
+}
+
+.notification-empty {
+  display: flex;
+  min-height: 190px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px 18px;
+  text-align: center;
+}
+
+.notification-empty-icon {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  margin-bottom: 15px;
+  place-items: center;
+  border-radius: 20px;
+  color: var(--profile-primary-light);
+  background: var(--profile-surface-soft);
+  font-size: 25px;
+}
+
+.notification-empty strong {
+  color: var(--profile-text);
+  font-size: 14px;
+}
+
+.notification-empty p {
+  max-width: 310px;
+  margin: 8px 0 0;
+  color: var(--profile-muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
