@@ -847,22 +847,24 @@
   /* =======================================================
      16. CLOSE EDIT PROFILE MODAL
   ======================================================= */
+   
+function closeEditor(force = false) {
+  if (!elements.modal) return;
 
-  function closeEditor(force = false) {
+  // Hanya nilai boolean true yang boleh memaksa penutupan.
+  // Event klik dari tombol tidak dianggap sebagai force.
+  const forceClose = force === true;
 
-    if (!elements.modal) return;
+  if (isSaving && !forceClose) return;
 
-    if (isSaving) return;
+  elements.modal.hidden = true;
+  elements.modal.setAttribute("aria-hidden", "true");
 
-    elements.modal.hidden = true;
-    elements.modal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = previousBodyOverflow;
 
-    document.body.style.overflow = previousBodyOverflow;
-
-    resetSelectedAvatar();
-    hideFormError();
-  }
-
+  resetSelectedAvatar();
+  hideFormError();
+}
 
   /* =======================================================
      17. AVATAR PREVIEW
@@ -1404,6 +1406,7 @@
       */
 
       resetSelectedAvatar();
+     // Tutup modal setelah database berhasil menyimpan profil.
       closeEditor(true);
       showToast("Profil berhasil diperbarui.", "success"
       );
@@ -1474,6 +1477,71 @@
       "click",
       openEditor
     );
+
+     
+/* =========================================
+   NOTIFICATION MODAL
+========================================= */
+
+const notificationModal =
+  getElement("notificationModal");
+
+const openNotificationButton =
+  getElement("openNotificationModal");
+
+const closeNotificationButton =
+  getElement("closeNotificationModal");
+
+function openNotificationModal() {
+  if (!notificationModal) return;
+
+  notificationModal.hidden = false;
+  notificationModal.setAttribute("aria-hidden", "false");
+
+  document.body.style.overflow = "hidden";
+}
+
+function closeNotificationModal() {
+  if (!notificationModal) return;
+
+  notificationModal.hidden = true;
+  notificationModal.setAttribute("aria-hidden", "true");
+
+  // Jangan membuka scroll jika modal edit profil
+  // masih sedang terbuka.
+  if (!elements.modal || elements.modal.hidden) {
+    document.body.style.overflow = previousBodyOverflow;
+  }
+}
+
+openNotificationButton?.addEventListener(
+  "click",
+  openNotificationModal
+);
+
+closeNotificationButton?.addEventListener(
+  "click",
+  closeNotificationModal
+);
+
+notificationModal
+  ?.querySelectorAll("[data-notification-close]")
+  .forEach(element => {
+    element.addEventListener(
+      "click",
+      closeNotificationModal
+    );
+  });
+
+document.addEventListener("keydown", event => {
+  if (
+    event.key === "Escape" &&
+    notificationModal &&
+    !notificationModal.hidden
+  ) {
+    closeNotificationModal();
+  }
+});
 
     /*
       Close modal
