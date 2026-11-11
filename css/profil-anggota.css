@@ -1894,3 +1894,119 @@ html[data-theme="dark"] {
 }
 
 
+/* =========================================================
+   FIX HEADER PROFIL — MOBILE & TABLET
+========================================================= */
+
+.app-topbar {
+  min-width: 0;
+}
+
+.topbar-left {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-heading {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.topbar-heading .topbar-eyebrow {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 9px;
+  line-height: 1.35;
+  letter-spacing: 1.3px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-heading h1 {
+  max-width: 100%;
+  margin: 0;
+  font-family: Poppins, sans-serif;
+  font-size: clamp(15px, 2vw, 20px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.35px;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.topbar-actions {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.topbar-back-button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--profile-border);
+  border-radius: 11px;
+  color: var(--profile-text);
+  background: var(--profile-surface);
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.topbar-back-button:hover {
+  color: #fff;
+  border-color: var(--profile-primary);
+  background: var(--profile-primary);
+}
+
+@media (max-width: 600px) {
+  .app-topbar {
+    gap: 8px;
+  }
+
+  .topbar-left {
+    gap: 8px;
+  }
+
+  .topbar-heading {
+    gap: 3px;
+  }
+
+  .topbar-heading .topbar-eyebrow {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .topbar-heading h1 {
+    font-size: 15px;
+    line-height: 1.2;
+    letter-spacing: -0.25px;
+  }
+
+  .topbar-back-button {
+    width: 33px;
+    height: 33px;
+    flex-basis: 33px;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar-heading h1 {
+    font-size: 13px;
+  }
+
+  .topbar-heading .topbar-eyebrow {
+    font-size: 7px;
+    letter-spacing: 0.7px;
+  }
+}
