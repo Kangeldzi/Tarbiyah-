@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Profil & Anggota — TARBIYAH</title>
+  <title>Data Profil — TARBIYAH</title>
   <meta name="description" content="Halaman profil anggota TARBIYAH — Pembelajaran Muslim.">
   <meta name="theme-color" content="#102a22">
 
@@ -96,7 +96,7 @@
 
         <a href="./profil-anggota.html" class="nav-link active" aria-current="page">
           <i class="fa-solid fa-users"></i>
-          <span>Profil & Anggota</span>
+          <span>Data Profil</span>
         </a>
 
         <a href="#" class="nav-link" data-action="placeholder">
@@ -194,9 +194,19 @@
             <i class="fa-solid fa-bars"></i>
           </button>
 
+          
+<a
+  href="./tarbiyah.html"
+  class="topbar-back-button"
+  aria-label="Kembali ke Dashboard"
+  title="Kembali ke Dashboard"
+>
+  <i class="fa-solid fa-arrow-left"></i>
+</a>
+
           <div class="topbar-heading">
             <span class="topbar-eyebrow">RUANG ANGGOTA</span>
-            <h1>Profil & Anggota</h1>
+            <h1>Data Profil</h1>
           </div>
         </div>
 
@@ -213,16 +223,20 @@
             <i class="fa-solid fa-circle-half-stroke"></i>
           </button>
 
-          <a
-            href="#"
-            class="topbar-icon-btn notification-button"
-            data-action="placeholder"
-            aria-label="Notifikasi"
-            title="Notifikasi"
-          >
-            <i class="fa-regular fa-bell"></i>
-            <span class="notification-dot"></span>
-          </a>
+          
+<button
+  type="button"
+  class="topbar-icon-btn notification-button"
+  id="openNotificationModal"
+  aria-label="Buka notifikasi"
+  aria-haspopup="dialog"
+  aria-controls="notificationModal"
+  title="Notifikasi"
+>
+  <i class="fa-regular fa-bell"></i>
+  <span class="notification-dot"></span>
+</button>
+
 
           <div class="topbar-user">
             <div class="topbar-avatar" id="topbarAvatar">
@@ -526,6 +540,58 @@
 
     </main>
   </div>
+
+  
+<!-- =====================================
+     MODAL NOTIFIKASI
+====================================== -->
+<div
+  class="profile-modal notification-modal"
+  id="notificationModal"
+  aria-hidden="true"
+  hidden
+>
+  <div
+    class="profile-modal-backdrop"
+    data-notification-close
+  ></div>
+
+  <section
+    class="profile-modal-dialog notification-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="notificationTitle"
+  >
+    <div class="profile-modal-header">
+      <div>
+        <span class="profile-modal-eyebrow">PUSAT INFORMASI</span>
+        <h2 id="notificationTitle">Notifikasi</h2>
+        <p>Informasi dan pemberitahuan TARBIYAH.</p>
+      </div>
+
+      <button
+        type="button"
+        class="profile-modal-close"
+        id="closeNotificationModal"
+        aria-label="Tutup notifikasi"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="notification-empty">
+      <div class="notification-empty-icon">
+        <i class="fa-regular fa-bell"></i>
+      </div>
+      <strong>Belum ada notifikasi</strong>
+      <p>
+        Pemberitahuan kegiatan, agenda, dan informasi
+        TARBIYAH akan ditampilkan di sini setelah
+        sistem notifikasi dihubungkan.
+      </p>
+    </div>
+  </section>
+</div>
 
   <!-- =====================================
        MODAL EDIT PROFIL
