@@ -1,3 +1,228 @@
-/* MASTER LOGO — acuan ukuran, proporsi, posisi, dan efek seluruh halaman */
-.brand-logo,.sidebar-brand img,.module-brand img,.auth-brand img,.topbar-brand img{width:var(--logo-size,42px);height:var(--logo-size,42px);flex:0 0 var(--logo-size,42px);display:block;object-fit:contain;object-position:center;border:0;border-radius:0;padding:0;background:transparent;box-shadow:none;filter:drop-shadow(0 3px 8px rgba(38,122,120,.18))}
-.sidebar-brand,.module-brand,.auth-brand,.topbar-brand{display:inline-flex;align-items:center;gap:var(--logo-gap,12px);text-decoration:none;color:inherit}
+
+/* =========================================================
+   TARBIYAH — BRAND & LOGO SYSTEM
+   File: css/brand-logo.css
+   ========================================================= */
+
+/* ---------- Brand base ---------- */
+
+.brand,
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  color: var(--text-primary, #ecfdf5);
+  text-decoration: none;
+}
+
+.brand-link {
+  cursor: pointer;
+}
+
+.brand-logo-wrap {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(16, 185, 129, .25));
+  border-radius: 14px;
+  background: linear-gradient(145deg, #d1fae5, #34d399);
+  box-shadow:
+    0 4px 14px rgba(16, 185, 129, .18),
+    inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+
+.brand-logo {
+  display: block;
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+}
+
+.brand-logo-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #064e3b;
+  font-family: var(--font-heading, "Poppins", sans-serif);
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -.05em;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.brand-name {
+  overflow: hidden;
+  color: var(--text-primary, #ecfdf5);
+  font-family: var(--font-heading, "Poppins", sans-serif);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: .055em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-description {
+  overflow: hidden;
+  color: var(--text-secondary, #9ca3af);
+  font-size: .68rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Header brand ---------- */
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.header-brand .brand-logo-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.header-brand .brand-name {
+  font-size: .95rem;
+}
+
+/* ---------- Sidebar brand ---------- */
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--border-color, rgba(148, 163, 184, .15));
+}
+
+.sidebar-brand .brand-logo-wrap {
+  width: 42px;
+  height: 42px;
+}
+
+/* ---------- Compact brand ---------- */
+
+.brand--compact {
+  gap: 9px;
+}
+
+.brand--compact .brand-logo-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.brand--compact .brand-name {
+  font-size: .85rem;
+}
+
+.brand--compact .brand-description {
+  font-size: .62rem;
+}
+
+/* ---------- Large brand ---------- */
+
+.brand--large {
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+}
+
+.brand--large .brand-logo-wrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
+}
+
+.brand--large .brand-name {
+  font-size: 1.35rem;
+}
+
+.brand--large .brand-description {
+  font-size: .76rem;
+}
+
+/* ---------- Logo interaction ---------- */
+
+.brand-link .brand-logo-wrap,
+.brand-logo-wrap.is-interactive {
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.brand-link:hover .brand-logo-wrap,
+.brand-logo-wrap.is-interactive:hover {
+  transform: translateY(-2px) rotate(-2deg);
+  border-color: var(--color-primary, #10b981);
+  box-shadow:
+    0 7px 22px rgba(16, 185, 129, .25),
+    inset 0 1px 0 rgba(255, 255, 255, .55);
+}
+
+/* ---------- Light theme ---------- */
+
+[data-theme="light"] .brand-logo-wrap {
+  border-color: rgba(5, 150, 105, .2);
+  box-shadow:
+    0 4px 14px rgba(5, 150, 105, .12),
+    inset 0 1px 0 rgba(255, 255, 255, .75);
+}
+
+[data-theme="light"] .brand-name {
+  color: var(--text-primary, #064e3b);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 480px) {
+  .brand {
+    gap: 9px;
+  }
+
+  .brand-logo-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .brand-name {
+    font-size: .9rem;
+  }
+
+  .brand-description {
+    font-size: .62rem;
+  }
+
+  .sidebar-brand {
+    padding: 15px 13px;
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo-wrap,
+  .brand-link .brand-logo-wrap {
+    transition: none !important;
+  }
+}
