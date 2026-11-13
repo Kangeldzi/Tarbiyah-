@@ -193,23 +193,69 @@
       </div>
 
       <div class="content-grid">
-        <section class="content-card" id="users">
-          <div class="card-heading">
-            <div>
-              <span class="section-kicker">MANAJEMEN</span>
-              <h3>Pengguna & Anggota</h3>
-            </div>
-            <span class="coming-badge">Dalam pengembangan</span>
-          </div>
-          <p>Kelola data pengguna terdaftar, permohonan keanggotaan, dan status anggota TARBIYAH.</p>
-          <div class="feature-preview">
-            <span>♙</span>
-            <div>
-              <strong>Manajemen Anggota</strong>
-              <small>Daftar, verifikasi, dan status keanggotaan</small>
-            </div>
-          </div>
-        </section>
+        
+<section class="content-card member-management-card" id="users">
+  <div class="member-heading">
+    <div>
+      <span class="section-kicker">MANAJEMEN PENGGUNA</span>
+      <h3>Pengguna & Anggota TARBIYAH</h3>
+      <p>Periksa profil, tinjau permohonan, dan kelola status keanggotaan.</p>
+    </div>
+    <button class="refresh-button" id="refreshMembers">↻ Perbarui</button>
+  </div>
+
+  <div class="member-toolbar">
+    <input
+      type="search"
+      id="memberSearch"
+      placeholder="Cari nama, username, nomor anggota..."
+      aria-label="Cari pengguna"
+    >
+
+    <select id="memberFilter" aria-label="Filter status anggota">
+      <option value="all">Semua status</option>
+      <option value="pending">Menunggu persetujuan</option>
+      <option value="active">Anggota aktif</option>
+      <option value="rejected">Ditolak</option>
+      <option value="suspended">Ditangguhkan</option>
+      <option value="inactive">Tidak aktif</option>
+      <option value="no_member">Belum memiliki data anggota</option>
+    </select>
+  </div>
+
+  <div class="member-summary" id="memberSummary">
+    Menyiapkan data pengguna...
+  </div>
+
+  <div class="member-table-wrap">
+    <table class="member-table">
+      <thead>
+        <tr>
+          <th>Pengguna</th>
+          <th>Nomor Anggota</th>
+          <th>Status</th>
+          <th>Tanggal Pengajuan</th>
+          <th>Tindakan</th>
+        </tr>
+      </thead>
+      <tbody id="memberTableBody">
+        <tr>
+          <td colspan="5" class="member-empty">Memuat data...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="member-mobile-list" id="memberMobileList">
+    <div class="member-empty">Memuat data...</div>
+  </div>
+
+  <p class="member-footnote">
+    Informasi yang ditampilkan mengikuti izin baca akun administrator.
+    Keputusan keanggotaan diproses melalui fungsi database Supabase.
+  </p>
+</section>
+
 
         <section class="content-card" id="roles">
           <div class="card-heading">
@@ -326,8 +372,27 @@
   </main>
 
   <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
+ 
+<div class="member-dialog-backdrop" id="memberDialog" hidden>
+  <section class="member-dialog" role="dialog" aria-modal="true" aria-labelledby="memberDialogTitle">
+    <button type="button" class="member-dialog-close" id="memberDialogClose" aria-label="Tutup">×</button>
+
+    <span class="section-kicker">TINDAKAN ADMINISTRASI</span>
+    <h3 id="memberDialogTitle">Tinjau Permohonan</h3>
+    <p id="memberDialogDescription">Periksa kembali keputusan sebelum melanjutkan.</p>
+
+    <label for="memberDecisionNote">Catatan administrator (opsional)</label>
+    <textarea id="memberDecisionNote" rows="3" maxlength="1000" placeholder="Tuliskan catatan untuk pengguna..."></textarea>
+
+    <div class="member-dialog-actions">
+      <button type="button" class="member-cancel" id="memberDialogCancel">Batal</button>
+      <button type="button" class="member-confirm" id="memberDialogConfirm">Konfirmasi</button>
+    </div>
+  </section>
+</div>
 
   <script src="./js/dashboard-admin.js" defer></script>
+  <script src="./js/member-management.js" defer></script>
   <script src="./js/pwa.js" defer></script>
 </body>
 </html>
