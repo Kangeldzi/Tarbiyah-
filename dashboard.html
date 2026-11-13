@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="id" data-theme="dark">
 <head>
@@ -6,15 +7,19 @@
   <meta name="theme-color" content="#102a22">
   <meta name="description" content="TARBIYAH — Pembelajaran Iman">
   <title>Dashboard — TARBIYAH TAUHID</title>
+
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/tarbiyah-mark.svg" type="image/svg+xml">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/dashboard.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
@@ -22,124 +27,549 @@
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
 </head>
+
 <body class="dashboard-page">
+
   <a class="skip-link" href="#mainContent">Lewati ke konten</a>
   <div class="app-backdrop" aria-hidden="true"></div>
 
+  <!-- =====================================
+       HEADER
+  ====================================== -->
   <header class="app-header">
-    <button class="icon-button mobile-menu-button" id="menuOpen" type="button" aria-label="Buka menu navigasi" aria-controls="appSidebar" aria-expanded="false">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+
+    <button
+      class="icon-button mobile-menu-button"
+      id="menuOpen"
+      type="button"
+      aria-label="Buka menu navigasi"
+      aria-controls="appSidebar"
+      aria-expanded="false"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
     </button>
+
     <a class="brand" href="./dashboard.html" aria-label="TARBIYAH Beranda">
-      <span class="brand-mark"><img src="./assets/icons/icon-192.png" alt=""></span>
-      <span class="brand-copy"><strong>TARBIYAH TAUHID</strong><small>Pembelajaran Iman</small></span>
+      <span class="brand-mark">
+        <img src="./assets/icons/icon-192.png" alt="">
+      </span>
+      <span class="brand-copy">
+        <strong>TARBIYAH TAUHID</strong>
+        <small>Pembelajaran Iman</small>
+      </span>
     </a>
+
     <form class="header-search" id="searchForm" role="search">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-      <input id="globalSearch" type="search" placeholder="Cari agenda, materi, anggota..." aria-label="Cari di TARBIYAH">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="m20 20-4-4"/>
+      </svg>
+      <input
+        id="globalSearch"
+        type="search"
+        placeholder="Cari agenda, materi, anggota..."
+        aria-label="Cari di TARBIYAH"
+      >
       <kbd>/</kbd>
     </form>
+
     <div class="header-actions">
-      <button class="icon-button" id="themeToggle" type="button" aria-label="Ganti tema" title="Ganti tema">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42"/><circle cx="12" cy="12" r="4"/></svg>
+
+      <button
+        class="icon-button"
+        id="themeToggle"
+        type="button"
+        aria-label="Ganti tema"
+        title="Ganti tema"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42m-9.88 9.88-1.42 1.42"/>
+          <circle cx="12" cy="12" r="4"/>
+        </svg>
       </button>
-      <a class="icon-button notification-button" href="./notifikasi.html" aria-label="Notifikasi">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i></i>
+
+      <a
+        class="icon-button notification-button"
+        href="./notifikasi.html"
+        aria-label="Notifikasi"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>
+        </svg>
+        <i></i>
       </a>
+
       <a class="profile-chip" href="./profil-anggota.html" aria-label="Buka profil">
-        <span class="avatar" id="userAvatar">TA</span><span class="profile-name" id="userName">Pengguna</span>
+        <span class="avatar" id="userAvatar">TA</span>
+        <span class="profile-name" id="userName">Pengguna</span>
       </a>
+
     </div>
   </header>
 
+
+  <!-- =====================================
+       LAYOUT DAN SIDEBAR
+  ====================================== -->
   <div class="app-layout">
+
     <div class="sidebar-scrim" id="sidebarScrim"></div>
+
     <aside class="app-sidebar" id="appSidebar" aria-label="Navigasi utama">
-      <div class="sidebar-topline"><span>NAVIGASI</span><button class="icon-button sidebar-close" id="menuClose" type="button" aria-label="Tutup menu">×</button></div>
-      <a class="side-link active" href="./dashboard.html"><span class="side-icon">⌂</span><span>Beranda</span></a>
-      <a class="side-link" href="./agenda-tarbiyah.html"><span class="side-icon">▦</span><span>Agenda Tarbiyah</span></a>
-      <a class="side-link" href="./pembelajaran.html"><span class="side-icon">▤</span><span>Pembelajaran</span></a>
-      <a class="side-link" href="./materi-pembelajaran.html"><span class="side-icon">◫</span><span>Materi Pembelajaran</span></a>
-      <a class="side-link" href="./berita-pengumuman.html"><span class="side-icon">▧</span><span>Berita & Pengumuman</span></a>
-      <a class="side-link" href="./presensi-tarbiyah.html"><span class="side-icon">✓</span><span>Presensi</span></a>
-      <a class="side-link" href="./galeri-foto-video.html"><span class="side-icon">▣</span><span>Galeri Foto & Video</span></a>
-      <a class="side-link" href="./diskusi-tarbiyah.html"><span class="side-icon">☷</span><span>Diskusi</span></a>
-      <a class="side-link" href="./profil-anggota.html"><span class="side-icon">♙</span><span>Anggota & Profil</span></a>
+
+      <div class="sidebar-topline">
+        <span>NAVIGASI</span>
+        <button
+          class="icon-button sidebar-close"
+          id="menuClose"
+          type="button"
+          aria-label="Tutup menu"
+        >×</button>
+      </div>
+
+      <a class="side-link active" href="./dashboard.html">
+        <span class="side-icon">⌂</span>
+        <span>Beranda</span>
+      </a>
+
+      <a class="side-link" href="./agenda-tarbiyah.html">
+        <span class="side-icon">▦</span>
+        <span>Agenda Tarbiyah</span>
+      </a>
+
+      <a class="side-link" href="./pembelajaran.html">
+        <span class="side-icon">▤</span>
+        <span>Pembelajaran</span>
+      </a>
+
+      <a class="side-link" href="./materi-pembelajaran.html">
+        <span class="side-icon">◫</span>
+        <span>Materi Pembelajaran</span>
+      </a>
+
+      <a class="side-link" href="./berita-pengumuman.html">
+        <span class="side-icon">▧</span>
+        <span>Berita & Pengumuman</span>
+      </a>
+
+      <a class="side-link" href="./presensi-tarbiyah.html">
+        <span class="side-icon">✓</span>
+        <span>Presensi</span>
+      </a>
+
+      <a class="side-link" href="./galeri-foto-video.html">
+        <span class="side-icon">▣</span>
+        <span>Galeri Foto & Video</span>
+      </a>
+
+      <a class="side-link" href="./diskusi-tarbiyah.html">
+        <span class="side-icon">☷</span>
+        <span>Diskusi</span>
+      </a>
+
+      <a class="side-link" href="./profil-anggota.html">
+        <span class="side-icon">♙</span>
+        <span>Anggota & Profil</span>
+      </a>
+
       <div class="sidebar-divider"></div>
-      <a class="side-link admin-only" id="adminLink" href="./dashboard-admin.html" hidden><span class="side-icon">⚙</span><span>Administrasi</span><em>ADMIN</em></a>
-      <a class="side-link" href="./administrasi-pengaturan.html"><span class="side-icon">⚙</span><span>Pengaturan</span></a>
+
+      <a
+        class="side-link admin-only"
+        id="adminLink"
+        href="./dashboard-admin.html"
+        hidden
+      >
+        <span class="side-icon">⚙</span>
+        <span>Administrasi</span>
+        <em>ADMIN</em>
+      </a>
+
+      <a class="side-link" href="./administrasi-pengaturan.html">
+        <span class="side-icon">⚙</span>
+        <span>Pengaturan</span>
+      </a>
+
       <div class="sidebar-spacer"></div>
+
       <div class="sidebar-user">
+
         <span class="avatar avatar-small" id="sidebarAvatar">TA</span>
-        <span><strong id="sidebarName">Pengguna</strong><small id="sidebarRole">Anggota TARBIYAH</small></span>
-        <button class="icon-button logout-mini" id="logoutMini" type="button" aria-label="Keluar">↗</button>
+
+        <span>
+          <strong id="sidebarName">Pengguna</strong>
+          <small id="sidebarRole">Anggota TARBIYAH</small>
+        </span>
+
+        <button
+          class="icon-button logout-mini"
+          id="logoutMini"
+          type="button"
+          aria-label="Keluar"
+          title="Keluar dari akun"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 17l5-5-5-5"/>
+            <path d="M15 12H3"/>
+            <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>
+          </svg>
+        </button>
+
       </div>
     </aside>
 
+
+    <!-- =====================================
+         KONTEN UTAMA
+    ====================================== -->
     <main class="main-content" id="mainContent">
+
+      <!-- WELCOME -->
       <section class="welcome-row">
-        <div><p class="eyebrow" id="todayLabel">RUANG BELAJAR & UKHUWAH</p><h1 id="welcomeTitle">Assalamu’alaikum, Sahabat Tarbiyah</h1><p class="welcome-subtitle">Mari belajar, bertumbuh, dan berukhuwah dalam kebaikan.</p></div>
+        <div>
+          <p class="eyebrow" id="todayLabel">RUANG BELAJAR & UKHUWAH</p>
+          <h1 id="welcomeTitle">Assalamu’alaikum, Sahabat Tarbiyah</h1>
+          <p class="welcome-subtitle">
+            Mari belajar, bertumbuh, dan berukhuwah dalam kebaikan.
+          </p>
+        </div>
+
         <span class="role-pill" id="rolePill">ANGGOTA</span>
       </section>
 
+
+      <!-- =====================================
+           HERO CAROUSEL
+      ====================================== -->
       <section class="hero-carousel" aria-label="Sorotan TARBIYAH">
+
         <div class="hero-slide active">
-          <div class="hero-copy"><span class="hero-kicker">TARBIYAH • PEMBELAJARAN MUSLIM</span><h2>Menuntut ilmu,<br><i>menumbuhkan ukhuwah.</i></h2><p>Ruang bersama untuk belajar, berbagi, dan menguatkan langkah dalam kebaikan.</p><a class="primary-button" href="./pembelajaran.html">Jelajahi pembelajaran <span>→</span></a></div>
-          <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="crescent">☾</div><span class="hero-star star-a">✦</span><span class="hero-star star-b">✧</span></div>
+
+          <div class="hero-copy">
+
+            <span class="hero-kicker">TARBIYAH • PEMBELAJARAN MUSLIM</span>
+
+            <h2>
+              Menuntut ilmu,<br>
+              <i>menumbuhkan ukhuwah.</i>
+            </h2>
+
+            <p>
+              Ruang bersama untuk belajar, berbagi, dan menguatkan langkah
+              dalam kebaikan.
+            </p>
+
+            <a class="primary-button hero-link" href="./pembelajaran.html">
+              <span>Jelajahi pembelajaran</span>
+              <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14M13 5l7 7-7 7"/>
+              </svg>
+            </a>
+
+          </div>
+
+          <div class="hero-art" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="crescent">☾</div>
+            <span class="hero-star star-a">✦</span>
+            <span class="hero-star star-b">✧</span>
+          </div>
+
         </div>
-        <div class="carousel-controls"><div class="carousel-dots"><button class="carousel-dot active" data-slide="0" aria-label="Slide 1"></button><button class="carousel-dot" data-slide="1" aria-label="Slide 2"></button><button class="carousel-dot" data-slide="2" aria-label="Slide 3"></button></div><span id="slideCounter">01 / 03</span></div>
+
+        <div class="carousel-controls">
+
+          <div class="carousel-dots">
+            <button class="carousel-dot active" data-slide="0" aria-label="Slide 1"></button>
+            <button class="carousel-dot" data-slide="1" aria-label="Slide 2"></button>
+            <button class="carousel-dot" data-slide="2" aria-label="Slide 3"></button>
+          </div>
+
+          <span id="slideCounter">01 / 03</span>
+
+        </div>
       </section>
 
+
+      <!-- =====================================
+           MENU TARBIYAH
+      ====================================== -->
       <section class="quick-nav-section">
-        <div class="section-heading"><div><p class="eyebrow">AKSES CEPAT</p><h2>Menu Tarbiyah</h2></div><a class="text-link" href="./module.html">Lihat semua <span>→</span></a></div>
+
+        <div class="section-heading">
+
+          <div>
+            <p class="eyebrow">AKSES CEPAT</p>
+            <h2>Menu Tarbiyah</h2>
+          </div>
+
+          <a class="text-link" href="./module.html">
+            <span>Lihat semua</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+        </div>
+
         <div class="quick-grid">
-          <a class="quick-card" href="./profil-anggota.html"><span class="quick-icon mint">♙</span><strong>Anggota</strong><small>Profil & komunitas</small></a>
-          <a class="quick-card" href="./agenda-tarbiyah.html"><span class="quick-icon amber">▦</span><strong>Agenda</strong><small>Jadwal kegiatan</small></a>
-          <a class="quick-card" href="./pembelajaran.html"><span class="quick-icon blue">▤</span><strong>Pembelajaran</strong><small>Kajian & kelas</small></a>
-          <a class="quick-card" href="./materi-pembelajaran.html"><span class="quick-icon violet">◫</span><strong>Materi</strong><small>Perpustakaan ilmu</small></a>
-          <a class="quick-card" href="./berita-pengumuman.html"><span class="quick-icon rose">▧</span><strong>Berita</strong><small>Kabar komunitas</small></a>
-          <a class="quick-card" href="./presensi-tarbiyah.html"><span class="quick-icon teal">✓</span><strong>Presensi</strong><small>Riwayat kehadiran</small></a>
+
+          <a class="quick-card" href="./profil-anggota.html">
+            <span class="quick-icon mint">♙</span>
+            <strong>Anggota</strong>
+            <small>Profil & komunitas</small>
+          </a>
+
+          <a class="quick-card" href="./agenda-tarbiyah.html">
+            <span class="quick-icon amber">▦</span>
+            <strong>Agenda</strong>
+            <small>Jadwal kegiatan</small>
+          </a>
+
+          <a class="quick-card" href="./pembelajaran.html">
+            <span class="quick-icon blue">▤</span>
+            <strong>Pembelajaran</strong>
+            <small>Kajian & kelas</small>
+          </a>
+
+          <a class="quick-card" href="./materi-pembelajaran.html">
+            <span class="quick-icon violet">◫</span>
+            <strong>Materi</strong>
+            <small>Perpustakaan ilmu</small>
+          </a>
+
+          <a class="quick-card" href="./berita-pengumuman.html">
+            <span class="quick-icon rose">▧</span>
+            <strong>Berita</strong>
+            <small>Kabar komunitas</small>
+          </a>
+
+          <a class="quick-card" href="./presensi-tarbiyah.html">
+            <span class="quick-icon teal">✓</span>
+            <strong>Presensi</strong>
+            <small>Riwayat kehadiran</small>
+          </a>
+
         </div>
       </section>
 
+
+      <!-- =====================================
+           HOLOGRAM INFORMATION
+      ====================================== -->
       <section class="hologram-panel">
-        <div class="holo-top"><span class="live-indicator"></span><span>RUANG INFORMASI TARBIYAH</span><span class="holo-tag">HOLOGRAM DISPLAY</span></div>
-        <div class="holo-content"><div><p class="eyebrow">INFORMASI TERKINI</p><h2>Terhubung dalam<br><span>ilmu dan kebaikan.</span></h2><p>Informasi agenda, pengumuman, dan aktivitas komunitas akan ditampilkan di ruang ini.</p><a href="./berita-pengumuman.html" class="holo-link">Buka pusat informasi →</a></div><div class="holo-visual"><div class="holo-ring"></div><div class="holo-core">تَرْبِيَة</div><span class="holo-cross">✧</span></div></div>
-      </section>
 
-      <section class="content-section">
-        <div class="section-heading"><div><p class="eyebrow">JANGAN LEWATKAN</p><h2>Agenda mendatang</h2></div><a class="text-link" href="./agenda-tarbiyah.html">Lihat semua <span>→</span></a></div>
-        <div class="feature-card agenda-feature"><div class="feature-date"><strong>—</strong><span>AGENDA</span></div><div class="feature-info"><strong>Temukan kegiatan Tarbiyah berikutnya</strong><p>Jelajahi jadwal kajian, pertemuan, dan kegiatan komunitas.</p></div><a class="round-arrow" href="./agenda-tarbiyah.html" aria-label="Buka agenda">→</a></div>
-      </section>
+        <div class="holo-top">
+          <span class="live-indicator"></span>
+          <span>RUANG INFORMASI TARBIYAH</span>
+          <span class="holo-tag">HOLOGRAM DISPLAY</span>
+        </div>
 
-      <section class="content-section">
-        <div class="section-heading"><div><p class="eyebrow">MOMEN KEBERSAMAAN</p><h2>Dokumentasi kegiatan</h2></div><a class="text-link" href="./galeri-foto-video.html">Lihat semua <span>→</span></a></div>
-        <div class="gallery-strip">
-          <a class="gallery-placeholder gallery-one" href="./galeri-foto-video.html"><span>GALERI TARBIYAH</span><strong>Belajar bersama</strong></a>
-          <a class="gallery-placeholder gallery-two" href="./galeri-foto-video.html"><span>GALERI TARBIYAH</span><strong>Ukhuwah & kebersamaan</strong></a>
-          <a class="gallery-placeholder gallery-three" href="./galeri-foto-video.html"><span>GALERI TARBIYAH</span><strong>Berbagi kebaikan</strong></a>
+        <div class="holo-content">
+
+          <div>
+            <p class="eyebrow">INFORMASI TERKINI</p>
+
+            <h2>
+              Terhubung dalam<br>
+              <span>ilmu dan kebaikan.</span>
+            </h2>
+
+            <p>
+              Informasi agenda, pengumuman, dan aktivitas komunitas
+              akan ditampilkan di ruang ini.
+            </p>
+
+            <a href="./berita-pengumuman.html" class="holo-link">
+              <span>Buka pusat informasi</span>
+              <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14M13 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+
+          <div class="holo-visual">
+            <div class="holo-ring"></div>
+            <div class="holo-core">تَرْبِيَة</div>
+            <span class="holo-cross">✧</span>
+          </div>
+
         </div>
       </section>
 
-      <section class="admin-banner admin-only" id="adminBanner" hidden>
-        <div><p class="eyebrow">RUANG PENGELOLA</p><h2>Panel Administrasi</h2><p>Kelola anggota, konten, agenda, dan data TARBIYAH sesuai kewenangan.</p></div>
-        <a class="primary-button" href="./dashboard-admin.html">Buka administrasi <span>→</span></a>
+
+      <!-- =====================================
+           AGENDA MENDATANG
+      ====================================== -->
+      <section class="content-section">
+
+        <div class="section-heading">
+
+          <div>
+            <p class="eyebrow">JANGAN LEWATKAN</p>
+            <h2>Agenda mendatang</h2>
+          </div>
+
+          <a class="text-link" href="./agenda-tarbiyah.html">
+            <span>Lihat semua</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+        </div>
+
+        <div class="feature-card agenda-feature">
+
+          <div class="feature-date">
+            <strong>—</strong>
+            <span>AGENDA</span>
+          </div>
+
+          <div class="feature-info">
+            <strong>Temukan kegiatan Tarbiyah berikutnya</strong>
+            <p>
+              Jelajahi jadwal kajian, pertemuan, dan kegiatan komunitas.
+            </p>
+          </div>
+
+          <a
+            class="round-arrow"
+            href="./agenda-tarbiyah.html"
+            aria-label="Buka agenda"
+          >
+            <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+        </div>
       </section>
 
-      <footer class="app-footer"><span>© <span id="currentYear"></span> TARBIYAH</span><span>Belajar, Bertumbuh, dan Berukhuwah.</span></footer>
+
+      <!-- =====================================
+           DOKUMENTASI KEGIATAN
+      ====================================== -->
+      <section class="content-section">
+
+        <div class="section-heading">
+
+          <div>
+            <p class="eyebrow">MOMEN KEBERSAMAAN</p>
+            <h2>Dokumentasi kegiatan</h2>
+          </div>
+
+          <a class="text-link" href="./galeri-foto-video.html">
+            <span>Lihat semua</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+
+        </div>
+
+        <div class="gallery-strip">
+
+          <a class="gallery-placeholder gallery-one" href="./galeri-foto-video.html">
+            <span>GALERI TARBIYAH</span>
+            <strong>Belajar bersama</strong>
+          </a>
+
+          <a class="gallery-placeholder gallery-two" href="./galeri-foto-video.html">
+            <span>GALERI TARBIYAH</span>
+            <strong>Ukhuwah & kebersamaan</strong>
+          </a>
+
+          <a class="gallery-placeholder gallery-three" href="./galeri-foto-video.html">
+            <span>GALERI TARBIYAH</span>
+            <strong>Berbagi kebaikan</strong>
+          </a>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================
+           ADMIN BANNER
+      ====================================== -->
+      <section class="admin-banner admin-only" id="adminBanner" hidden>
+
+        <div>
+          <p class="eyebrow">RUANG PENGELOLA</p>
+          <h2>Panel Administrasi</h2>
+          <p>
+            Kelola anggota, konten, agenda, dan data TARBIYAH
+            sesuai kewenangan.
+          </p>
+        </div>
+
+        <a class="primary-button admin-link-button" href="./dashboard-admin.html">
+          <span>Buka administrasi</span>
+          <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14M13 5l7 7-7 7"/>
+          </svg>
+        </a>
+
+      </section>
+
+
+      <!-- =====================================
+           FOOTER
+      ====================================== -->
+      <footer class="app-footer">
+        <span>© <span id="currentYear"></span> TARBIYAH</span>
+        <span>Belajar, Bertumbuh, dan Berukhuwah.</span>
+      </footer>
+
     </main>
   </div>
 
+
+  <!-- =====================================
+       BOTTOM NAVIGATION
+  ====================================== -->
   <nav class="bottom-nav" aria-label="Navigasi bawah">
-    <a class="bottom-link active" href="./dashboard.html"><span>⌂</span><small>Beranda</small></a>
-    <a class="bottom-link" href="./agenda-tarbiyah.html"><span>▦</span><small>Agenda</small></a>
-    <a class="bottom-link" href="./pembelajaran.html"><span>▤</span><small>Belajar</small></a>
-    <a class="bottom-link" href="./profil-anggota.html"><span>♙</span><small>Anggota</small></a>
-    <a class="bottom-link" href="./profil-anggota.html"><span>◉</span><small>Profil</small></a>
+
+    <a class="bottom-link active" href="./dashboard.html">
+      <span>⌂</span>
+      <small>Beranda</small>
+    </a>
+
+    <a class="bottom-link" href="./agenda-tarbiyah.html">
+      <span>▦</span>
+      <small>Agenda</small>
+    </a>
+
+    <a class="bottom-link" href="./pembelajaran.html">
+      <span>▤</span>
+      <small>Belajar</small>
+    </a>
+
+    <a class="bottom-link" href="./profil-anggota.html">
+      <span>♙</span>
+      <small>Anggota</small>
+    </a>
+
+    <a class="bottom-link" href="./profil-anggota.html">
+      <span>◉</span>
+      <small>Profil</small>
+    </a>
+
   </nav>
 
+
+  <!-- TOAST NOTIFICATION -->
   <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+
+  <!-- =====================================
+       DASHBOARD SCRIPTS
+  ====================================== -->
   <script src="./js/dashboard.js" defer></script>
   <script src="./js/pwa.js" defer></script>
+
 </body>
 </html>
