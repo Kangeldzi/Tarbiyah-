@@ -5,11 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="Ruang catatan dan refleksi pribadi anggota TARBIYAH.">
-  <title>Catatan Refleksi — TARBIYAH</title>
+  <meta name="description" content="Catatan dan Refleksi Pembelajaran Anggota TARBIYAH">
+  <title>Catatan & Refleksi | TARBIYAH</title>
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -21,300 +22,345 @@
   <link rel="stylesheet" href="./css/module-shell.css">
 
   <style>
+    :root {
+      --reflection-green: #10b981;
+      --reflection-muted: var(--text-muted, #94a3b8);
+      --reflection-card: var(--surface, #172b25);
+      --reflection-border: var(--border, rgba(255,255,255,.09));
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+    }
+
     .reflection-page {
-      width: min(100%, 1100px);
-      margin: 0 auto;
+      width: min(1100px, 100%);
+      margin: auto;
       padding: 24px 18px 100px;
     }
 
-    .reflection-hero {
-      position: relative;
-      overflow: hidden;
-      padding: 25px;
+    .reflection-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
       margin-bottom: 22px;
-      border-radius: 22px;
-      color: #fff;
-      background: linear-gradient(135deg, #075c43, #103b30 65%, #102a22);
-      box-shadow: 0 12px 35px rgba(0,0,0,.15);
     }
 
-    .reflection-hero::after {
-      content: "";
-      position: absolute;
-      width: 190px;
-      height: 190px;
-      top: -75px;
-      right: -55px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.07);
+    .reflection-header h1 {
+      font: 800 clamp(1.4rem, 4vw, 2rem) Poppins, sans-serif;
+      margin: 0 0 7px;
     }
 
-    .reflection-eyebrow {
-      position: relative;
-      z-index: 1;
-      display: inline-block;
-      margin-bottom: 12px;
-      color: #b8f5d8;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-    }
-
-    .reflection-hero h1 {
-      position: relative;
-      z-index: 1;
-      margin: 0 0 8px;
-      font: 700 clamp(22px, 5vw, 30px) Poppins, sans-serif;
-    }
-
-    .reflection-hero p {
-      position: relative;
-      z-index: 1;
-      max-width: 600px;
+    .reflection-header p {
+      color: var(--reflection-muted);
+      font-size: .87rem;
+      line-height: 1.6;
       margin: 0;
-      color: rgba(255,255,255,.82);
-      font-size: 14px;
-      line-height: 1.7;
+    }
+
+    .reflection-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border-radius: 30px;
+      border: 1px solid rgba(16,185,129,.25);
+      color: var(--reflection-green);
+      background: rgba(16,185,129,.08);
+      font-size: .73rem;
+      font-weight: 700;
+      margin-bottom: 12px;
     }
 
     .reflection-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr);
-      gap: 17px;
+      grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
+      gap: 18px;
       align-items: start;
     }
 
     .reflection-panel {
-      min-width: 0;
+      background: var(--reflection-card);
+      border: 1px solid var(--reflection-border);
+      border-radius: 18px;
       padding: 20px;
-      border: 1px solid var(--border-color, rgba(128,128,128,.2));
-      border-radius: 19px;
-      background: var(--card-bg, rgba(255,255,255,.04));
+      margin-bottom: 18px;
     }
 
     .reflection-panel h2 {
-      margin: 0 0 17px;
-      font: 700 17px Poppins, sans-serif;
+      font: 700 1rem Poppins, sans-serif;
+      margin: 0 0 7px;
+    }
+
+    .reflection-subtitle {
+      color: var(--reflection-muted);
+      font-size: .78rem;
+      line-height: 1.5;
+      margin: 0 0 18px;
+    }
+
+    .reflection-form {
+      display: grid;
+      gap: 13px;
     }
 
     .reflection-field {
-      margin-bottom: 15px;
+      display: grid;
+      gap: 7px;
     }
 
     .reflection-field label {
-      display: block;
-      margin-bottom: 7px;
-      font-size: 12px;
+      font-size: .79rem;
       font-weight: 700;
-      color: var(--text-secondary, #999);
     }
 
     .reflection-field input,
     .reflection-field select,
     .reflection-field textarea {
       width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border-color, #777);
+      box-sizing: border-box;
+      padding: 12px 13px;
+      border: 1px solid var(--reflection-border);
       border-radius: 11px;
+      background: transparent;
+      color: inherit;
+      font: 400 .84rem Inter, sans-serif;
       outline: none;
-      color: var(--text-primary, inherit);
-      background: var(--input-bg, transparent);
-      font: inherit;
-      font-size: 13px;
     }
 
     .reflection-field input:focus,
     .reflection-field select:focus,
     .reflection-field textarea:focus {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+      border-color: var(--reflection-green);
+      box-shadow: 0 0 0 3px rgba(16,185,129,.1);
     }
 
     .reflection-field textarea {
-      min-height: 180px;
       resize: vertical;
-      line-height: 1.7;
+      min-height: 120px;
+      line-height: 1.65;
+    }
+
+    .reflection-field select option {
+      color: #172b25;
+      background: white;
+    }
+
+    .reflection-button {
+      border: 0;
+      border-radius: 11px;
+      background: #047857;
+      color: white;
+      padding: 12px 16px;
+      font: 700 .82rem Inter, sans-serif;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .reflection-button:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .reflection-button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .reflection-button.secondary {
+      background: rgba(16,185,129,.08);
+      color: var(--reflection-green);
+      border: 1px solid rgba(16,185,129,.25);
+    }
+
+    .reflection-button.danger {
+      background: rgba(248,113,113,.09);
+      color: #f87171;
+      border: 1px solid rgba(248,113,113,.2);
+    }
+
+    .reflection-button.small {
+      padding: 8px 11px;
+      font-size: .73rem;
     }
 
     .reflection-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 9px;
-      margin-top: 7px;
     }
 
-    .reflection-button {
-      min-height: 43px;
-      padding: 0 17px;
-      border: 0;
+    .reflection-message {
+      display: none;
+      padding: 11px 13px;
       border-radius: 11px;
-      background: #087f5b;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
+      background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.2);
+      color: var(--reflection-green);
+      font-size: .78rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
-    .reflection-button.secondary {
-      border: 1px solid var(--border-color, #777);
-      background: transparent;
-      color: var(--text-primary, inherit);
+    .reflection-message.show {
+      display: block;
+    }
+
+    .reflection-message.error {
+      color: #f87171;
+      background: rgba(248,113,113,.08);
+      border-color: rgba(248,113,113,.2);
     }
 
     .reflection-list {
       display: grid;
-      gap: 11px;
+      gap: 12px;
     }
 
     .reflection-card {
-      padding: 15px;
-      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border: 1px solid var(--reflection-border);
       border-radius: 14px;
-      background: var(--card-bg, rgba(255,255,255,.03));
+      padding: 15px;
+      background: rgba(255,255,255,.02);
+    }
+
+    .reflection-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
     }
 
     .reflection-card h3 {
+      font-size: .88rem;
+      line-height: 1.4;
       margin: 0 0 7px;
-      font-size: 14px;
       overflow-wrap: anywhere;
     }
 
     .reflection-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-bottom: 9px;
-      color: var(--text-secondary, #999);
-      font-size: 11px;
+      color: var(--reflection-muted);
+      font-size: .71rem;
+      line-height: 1.6;
     }
 
     .reflection-category {
-      padding: 4px 8px;
+      display: inline-block;
+      padding: 5px 8px;
       border-radius: 20px;
-      background: rgba(16,185,129,.12);
-      color: #10b981;
+      background: rgba(16,185,129,.09);
+      color: var(--reflection-green);
+      font-size: .66rem;
       font-weight: 700;
+      white-space: nowrap;
     }
 
-    .reflection-content {
-      margin: 0;
-      color: var(--text-secondary, #999);
-      font-size: 12px;
-      line-height: 1.7;
+    .reflection-preview {
+      color: var(--reflection-muted);
+      font-size: .78rem;
+      line-height: 1.65;
+      margin: 12px 0;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
 
     .reflection-card-actions {
       display: flex;
-      gap: 8px;
-      margin-top: 13px;
-    }
-
-    .reflection-card-actions button {
-      padding: 7px 10px;
-      border: 1px solid var(--border-color, #777);
-      border-radius: 8px;
-      color: var(--text-primary, inherit);
-      background: transparent;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .reflection-card-actions .delete {
-      color: #ef7777;
+      flex-wrap: wrap;
+      gap: 7px;
+      border-top: 1px solid var(--reflection-border);
+      padding-top: 11px;
     }
 
     .reflection-empty {
-      padding: 30px 15px;
-      border: 1px dashed var(--border-color, #777);
-      border-radius: 14px;
       text-align: center;
-      color: var(--text-secondary, #999);
-      font-size: 13px;
+      padding: 30px 12px;
+      color: var(--reflection-muted);
+      font-size: .8rem;
       line-height: 1.7;
     }
 
     .reflection-empty span {
       display: block;
-      margin-bottom: 9px;
-      font-size: 30px;
+      font-size: 2rem;
+      margin-bottom: 10px;
     }
 
-    .reflection-notice {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 11px;
-      background: rgba(16,185,129,.08);
-      color: var(--text-secondary, #999);
-      font-size: 11px;
+    .reflection-tip {
+      color: var(--reflection-muted);
+      font-size: .77rem;
       line-height: 1.7;
+      border-left: 3px solid var(--reflection-green);
+      padding: 11px 13px;
+      background: rgba(16,185,129,.06);
+      border-radius: 0 10px 10px 0;
     }
 
-    .reflection-toast {
-      position: fixed;
-      z-index: 9999;
-      left: 50%;
-      bottom: 25px;
-      width: max-content;
-      max-width: calc(100% - 30px);
-      padding: 12px 17px;
-      border-radius: 12px;
-      background: #075c43;
-      color: #fff;
-      font-size: 13px;
-      box-shadow: 0 8px 25px rgba(0,0,0,.2);
-      transform: translate(-50%, 20px);
-      opacity: 0;
-      pointer-events: none;
-      transition: .25s ease;
+    .reflection-count {
+      color: var(--reflection-muted);
+      font-size: .73rem;
+      text-align: right;
     }
 
-    .reflection-toast.show {
-      transform: translate(-50%, 0);
-      opacity: 1;
-    }
-
-    @media (max-width: 760px) {
+    @media(max-width: 760px) {
       .reflection-layout {
         grid-template-columns: 1fr;
       }
+    }
 
+    @media(max-width: 520px) {
       .reflection-page {
-        padding: 16px 13px 95px;
+        padding: 19px 13px 90px;
+      }
+
+      .reflection-panel {
+        padding: 15px;
+      }
+
+      .reflection-card-top {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 
 <body>
-  <div id="app-shell">
-    <main class="reflection-page">
+  <main class="reflection-page" data-module="catatan">
 
-      <section class="reflection-hero">
-        <div class="reflection-eyebrow">✦ PERSONAL GROWTH JOURNAL</div>
-        <h1>Catatan Refleksi</h1>
+    <header class="reflection-header">
+      <div>
+        <div class="reflection-label">📖 RUANG PEMBELAJARAN PRIBADI</div>
+        <h1>Catatan & Refleksi</h1>
         <p>
-          Tuliskan pelajaran, pemikiran, dan hikmah yang Anda dapatkan
-          dari setiap kajian dan perjalanan pembelajaran.
+          Simpan pelajaran, rangkuman kajian, dan refleksi
+          perjalanan belajar Anda bersama TARBIYAH.
         </p>
-      </section>
+      </div>
+    </header>
 
-      <div class="reflection-layout">
+    <div class="reflection-layout">
 
-        <section class="reflection-panel">
-          <h2 id="formHeading">✍️ Tulis Refleksi</h2>
+      <section>
+        <div class="reflection-panel">
+          <h2 id="formHeading">✍️ Tulis Catatan Baru</h2>
+          <p class="reflection-subtitle">
+            Catatan ini ditujukan untuk akun Anda sendiri.
+          </p>
 
-          <form id="reflectionForm">
-            <input type="hidden" id="reflectionId">
+          <div class="reflection-message" id="reflectionMessage" role="status"></div>
+
+          <form class="reflection-form" id="reflectionForm">
 
             <div class="reflection-field">
-              <label for="reflectionTitle">Judul catatan</label>
+              <label for="reflectionTitle">Judul Catatan</label>
               <input
                 type="text"
                 id="reflectionTitle"
-                maxlength="100"
-                placeholder="Contoh: Hikmah dari Kajian Tauhid"
+                maxlength="150"
+                placeholder="Contoh: Pelajaran dari Kajian Tauhid"
                 required
               >
             </div>
@@ -323,68 +369,104 @@
               <label for="reflectionCategory">Kategori</label>
               <select id="reflectionCategory" required>
                 <option value="Kajian">Kajian</option>
+                <option value="Akidah">Akidah</option>
                 <option value="Akhlak">Akhlak</option>
                 <option value="Ibadah">Ibadah</option>
                 <option value="Al-Qur'an">Al-Qur'an</option>
                 <option value="Hadis">Hadis</option>
-                <option value="Kehidupan">Kehidupan</option>
+                <option value="Refleksi Pribadi">Refleksi Pribadi</option>
                 <option value="Lainnya">Lainnya</option>
               </select>
             </div>
 
             <div class="reflection-field">
-              <label for="reflectionDate">Tanggal</label>
+              <label for="reflectionDate">Tanggal Catatan</label>
               <input type="date" id="reflectionDate" required>
             </div>
 
             <div class="reflection-field">
-              <label for="reflectionContent">Isi refleksi</label>
+              <label for="reflectionContent">Isi Catatan / Refleksi</label>
               <textarea
                 id="reflectionContent"
-                maxlength="10000"
-                placeholder="Tuliskan pelajaran dan hikmah yang Anda dapatkan..."
+                maxlength="20000"
+                placeholder="Tuliskan materi, poin penting, pelajaran yang diperoleh, atau refleksi pribadi..."
                 required
               ></textarea>
+              <div class="reflection-count" id="characterCount">
+                0 / 20.000 karakter
+              </div>
             </div>
 
             <div class="reflection-actions">
-              <button class="reflection-button" type="submit" id="saveReflection">
-                Simpan Catatan
+              <button class="reflection-button" id="saveReflection" type="submit">
+                💾 Simpan Catatan
               </button>
 
               <button
                 class="reflection-button secondary"
-                type="button"
                 id="cancelEdit"
+                type="button"
                 hidden
               >
-                Batal Edit
+                Batalkan Edit
               </button>
             </div>
+
           </form>
+        </div>
 
-          <div class="reflection-notice">
-            🔒 Catatan pada versi ini disimpan di penyimpanan lokal
-            browser pada perangkat yang sedang digunakan.
+        <div class="reflection-tip">
+          <strong>Pengingat:</strong> gunakan ruang ini untuk menyimpan
+          pelajaran yang bermanfaat dan mengevaluasi perkembangan
+          pembelajaran pribadi secara berkala.
+        </div>
+      </section>
+
+      <section class="reflection-panel">
+        <div class="reflection-card-top" style="margin-bottom:16px">
+          <div>
+            <h2>📚 Catatan Saya</h2>
+            <p class="reflection-subtitle" style="margin:5px 0 0">
+              Daftar catatan yang tersimpan pada akun Anda.
+            </p>
           </div>
-        </section>
+          <span class="reflection-category" id="reflectionTotal">0 Catatan</span>
+        </div>
 
-        <section class="reflection-panel">
-          <h2>📖 Catatan Saya</h2>
-          <div class="reflection-list" id="reflectionList">
-            <div class="reflection-empty">
-              <span>📝</span>
-              Belum ada catatan refleksi.
-              Mulailah menulis catatan pertama Anda.
-            </div>
+        <div class="reflection-field" style="margin-bottom:14px">
+          <label for="reflectionSearch">Cari Catatan</label>
+          <input
+            type="search"
+            id="reflectionSearch"
+            placeholder="Cari judul atau isi catatan..."
+          >
+        </div>
+
+        <div class="reflection-field" style="margin-bottom:16px">
+          <label for="reflectionFilter">Filter Kategori</label>
+          <select id="reflectionFilter">
+            <option value="all">Semua Kategori</option>
+            <option value="Kajian">Kajian</option>
+            <option value="Akidah">Akidah</option>
+            <option value="Akhlak">Akhlak</option>
+            <option value="Ibadah">Ibadah</option>
+            <option value="Al-Qur'an">Al-Qur'an</option>
+            <option value="Hadis">Hadis</option>
+            <option value="Refleksi Pribadi">Refleksi Pribadi</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <div class="reflection-list" id="reflectionList">
+          <div class="reflection-empty">
+            <span>⏳</span>
+            Memuat catatan Anda...
           </div>
-        </section>
+        </div>
+      </section>
 
-      </div>
-    </main>
-  </div>
-
-  <div class="reflection-toast" id="reflectionToast" role="status"></div>
+    </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
@@ -400,260 +482,397 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "tarbiyah_reflection_notes_v1";
+      const CONFIG = {
+        table: "reflection_notes",
+        ownerColumn: "user_id",
+        titleColumn: "title",
+        contentColumn: "content",
+        categoryColumn: "category",
+        dateColumn: "note_date"
+      };
 
-      const $ = (id) => document.getElementById(id);
+      const $ = id => document.getElementById(id);
 
-      const form = $("reflectionForm");
-      const list = $("reflectionList");
-      const idInput = $("reflectionId");
-
+      let currentUser = null;
       let notes = [];
+      let editingId = null;
 
-      function createId() {
-        if (window.crypto && typeof window.crypto.randomUUID === "function") {
-          return window.crypto.randomUUID();
+      const getSupabase = () =>
+        window.supabaseClient ||
+        window.TARBIYAH_SUPABASE ||
+        window.TARBIYAH?.supabase ||
+        null;
+
+      function showMessage(message, isError = false) {
+        const element = $("reflectionMessage");
+        element.textContent = message;
+        element.classList.add("show");
+        element.classList.toggle("error", isError);
+      }
+
+      function hideMessage() {
+        $("reflectionMessage").classList.remove("show", "error");
+      }
+
+      function escapeText(value) {
+        return String(value ?? "");
+      }
+
+      function formatDate(value) {
+        if (!value) return "Tanggal tidak tersedia";
+
+        const date = new Date(value + "T00:00:00");
+
+        if (Number.isNaN(date.getTime())) {
+          return "Tanggal tidak tersedia";
         }
 
-        return "reflection-" + Date.now() + "-" +
-          Math.random().toString(36).slice(2, 10);
-      }
-
-      function escapeHTML(value) {
-        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;"
-        })[char]);
-      }
-
-      function showToast(message) {
-        const toast = $("reflectionToast");
-        toast.textContent = message;
-        toast.classList.add("show");
-
-        window.setTimeout(() => {
-          toast.classList.remove("show");
-        }, 2500);
-      }
-
-      function loadNotes() {
-        try {
-          const stored = localStorage.getItem(STORAGE_KEY);
-          const parsed = stored ? JSON.parse(stored) : [];
-          notes = Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-          console.error("Gagal membaca catatan refleksi:", error);
-          notes = [];
-        }
-
-        renderNotes();
-      }
-
-      function saveNotes() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-          return true;
-        } catch (error) {
-          console.error("Gagal menyimpan catatan refleksi:", error);
-          showToast("Penyimpanan gagal. Periksa ruang penyimpanan browser.");
-          return false;
-        }
-      }
-
-      function formatDate(dateString) {
-        if (!dateString) return "-";
-
-        const date = new Date(dateString + "T00:00:00");
-
-        if (Number.isNaN(date.getTime())) return dateString;
-
-        return new Intl.DateTimeFormat("id-ID", {
+        return date.toLocaleDateString("id-ID", {
           day: "numeric",
           month: "long",
           year: "numeric"
-        }).format(date);
+        });
       }
 
-      function renderNotes() {
-        if (!notes.length) {
-          list.innerHTML = `
-            <div class="reflection-empty">
-              <span>📝</span>
-              Belum ada catatan refleksi.
-              Mulailah menulis catatan pertama Anda.
-            </div>
-          `;
-          return;
-        }
+      function updateCharacterCount() {
+        const length = $("reflectionContent").value.length;
 
-        const sorted = [...notes].sort((a, b) =>
-          new Date(b.updatedAt || b.createdAt) -
-          new Date(a.updatedAt || a.createdAt)
-        );
-
-        list.innerHTML = sorted.map((note) => `
-          <article class="reflection-card">
-            <h3>${escapeHTML(note.title)}</h3>
-
-            <div class="reflection-meta">
-              <span class="reflection-category">
-                ${escapeHTML(note.category)}
-              </span>
-              <span>${escapeHTML(formatDate(note.date))}</span>
-            </div>
-
-            <p class="reflection-content">
-              ${escapeHTML(note.content)}
-            </p>
-
-            <div class="reflection-card-actions">
-              <button
-                type="button"
-                data-action="edit"
-                data-id="${escapeHTML(note.id)}"
-              >Edit</button>
-
-              <button
-                type="button"
-                class="delete"
-                data-action="delete"
-                data-id="${escapeHTML(note.id)}"
-              >Hapus</button>
-            </div>
-          </article>
-        `).join("");
+        $("characterCount").textContent =
+          `${length.toLocaleString("id-ID")} / 20.000 karakter`;
       }
 
       function resetForm() {
-        form.reset();
-        idInput.value = "";
+        $("reflectionForm").reset();
         $("reflectionDate").value =
-          new Date().toLocaleDateString("en-CA");
+          new Date().toISOString().slice(0, 10);
 
-        $("formHeading").textContent = "✍️ Tulis Refleksi";
-        $("saveReflection").textContent = "Simpan Catatan";
+        editingId = null;
+
+        $("formHeading").textContent = "✍️ Tulis Catatan Baru";
+        $("saveReflection").textContent = "💾 Simpan Catatan";
         $("cancelEdit").hidden = true;
+
+        updateCharacterCount();
       }
 
-      function handleSubmit(event) {
-        event.preventDefault();
+      function renderNotes() {
+        const list = $("reflectionList");
+        const keyword = $("reflectionSearch").value
+          .trim()
+          .toLowerCase();
 
-        const title = $("reflectionTitle").value.trim();
-        const category = $("reflectionCategory").value;
-        const date = $("reflectionDate").value;
-        const content = $("reflectionContent").value.trim();
+        const category = $("reflectionFilter").value;
 
-        if (!title || !date || !content) {
-          showToast("Lengkapi semua kolom terlebih dahulu.");
+        const filtered = notes.filter(note => {
+          const title = escapeText(note[CONFIG.titleColumn]).toLowerCase();
+          const content = escapeText(note[CONFIG.contentColumn]).toLowerCase();
+          const noteCategory = note[CONFIG.categoryColumn] || "Lainnya";
+
+          const matchesSearch =
+            title.includes(keyword) || content.includes(keyword);
+
+          const matchesCategory =
+            category === "all" || noteCategory === category;
+
+          return matchesSearch && matchesCategory;
+        });
+
+        $("reflectionTotal").textContent =
+          `${notes.length.toLocaleString("id-ID")} Catatan`;
+
+        list.replaceChildren();
+
+        if (!filtered.length) {
+          const empty = document.createElement("div");
+          empty.className = "reflection-empty";
+
+          const icon = document.createElement("span");
+          icon.textContent = notes.length ? "🔎" : "📝";
+
+          const message = document.createElement("div");
+          message.textContent = notes.length
+            ? "Tidak ada catatan yang sesuai dengan pencarian."
+            : "Belum ada catatan. Mulailah menulis catatan pertama Anda.";
+
+          empty.append(icon, message);
+          list.appendChild(empty);
           return;
         }
 
-        const now = new Date().toISOString();
-        const editingId = idInput.value;
+        filtered.forEach(note => {
+          const card = document.createElement("article");
+          card.className = "reflection-card";
 
-        if (editingId) {
-          const index = notes.findIndex((note) => note.id === editingId);
+          const top = document.createElement("div");
+          top.className = "reflection-card-top";
 
-          if (index === -1) {
-            showToast("Catatan tidak ditemukan.");
-            return;
-          }
+          const heading = document.createElement("div");
 
-          notes[index] = {
-            ...notes[index],
-            title,
-            category,
-            date,
-            content,
-            updatedAt: now
-          };
-        } else {
-          notes.push({
-            id: createId(),
-            title,
-            category,
-            date,
-            content,
-            createdAt: now,
-            updatedAt: now
-          });
-        }
+          const title = document.createElement("h3");
+          title.textContent = note[CONFIG.titleColumn] || "Tanpa Judul";
 
-        if (!saveNotes()) return;
+          const meta = document.createElement("div");
+          meta.className = "reflection-meta";
+          meta.textContent = formatDate(note[CONFIG.dateColumn]);
 
-        renderNotes();
-        resetForm();
-        showToast(editingId ? "Catatan berhasil diperbarui." : "Catatan berhasil disimpan.");
+          heading.append(title, meta);
+
+          const category = document.createElement("span");
+          category.className = "reflection-category";
+          category.textContent = note[CONFIG.categoryColumn] || "Lainnya";
+
+          top.append(heading, category);
+
+          const preview = document.createElement("p");
+          preview.className = "reflection-preview";
+
+          const content = escapeText(note[CONFIG.contentColumn]);
+          preview.textContent = content.length > 220
+            ? content.slice(0, 220) + "..."
+            : content;
+
+          const actions = document.createElement("div");
+          actions.className = "reflection-card-actions";
+
+          const editButton = document.createElement("button");
+          editButton.type = "button";
+          editButton.className = "reflection-button secondary small";
+          editButton.textContent = "✏️ Edit";
+          editButton.addEventListener("click", () => editNote(note));
+
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.className = "reflection-button danger small";
+          deleteButton.textContent = "🗑️ Hapus";
+          deleteButton.addEventListener("click", () => deleteNote(note));
+
+          actions.append(editButton, deleteButton);
+          card.append(top, preview, actions);
+          list.appendChild(card);
+        });
       }
 
-      function handleListClick(event) {
-        const button = event.target.closest("button[data-action]");
-        if (!button) return;
+      async function loadNotes() {
+        const client = getSupabase();
 
-        const id = button.dataset.id;
-        const action = button.dataset.action;
-
-        const note = notes.find((item) => item.id === id);
-        if (!note) return;
-
-        if (action === "edit") {
-          idInput.value = note.id;
-          $("reflectionTitle").value = note.title;
-          $("reflectionCategory").value = note.category;
-          $("reflectionDate").value = note.date;
-          $("reflectionContent").value = note.content;
-
-          $("formHeading").textContent = "✏️ Edit Refleksi";
-          $("saveReflection").textContent = "Simpan Perubahan";
-          $("cancelEdit").hidden = false;
-
-          $("reflectionTitle").focus();
-          window.scrollTo({ top: 0, behavior: "smooth" });
+        if (!client) {
+          showMessage("Supabase belum terhubung.", true);
+          return;
         }
 
-        if (action === "delete") {
-          const confirmed = window.confirm(
-            "Apakah Anda yakin ingin menghapus catatan ini?"
-          );
+        try {
+          const { data: authData, error: authError } =
+            await client.auth.getUser();
 
-          if (!confirmed) return;
+          if (authError) throw authError;
 
-          notes = notes.filter((item) => item.id !== id);
+          currentUser = authData?.user || null;
 
-          if (!saveNotes()) return;
+          if (!currentUser) {
+            throw new Error("Sesi login tidak ditemukan.");
+          }
 
+          const { data, error } = await client
+            .from(CONFIG.table)
+            .select("*")
+            .eq(CONFIG.ownerColumn, currentUser.id)
+            .order("created_at", { ascending: false })
+            .limit(500);
+
+          if (error) throw error;
+
+          notes = Array.isArray(data) ? data : [];
           renderNotes();
 
-          if (idInput.value === id) {
+          if (!notes.length) {
+            showMessage("Belum ada catatan yang tersimpan.");
+          } else {
+            hideMessage();
+          }
+        } catch (error) {
+          console.error("Gagal memuat catatan:", error);
+
+          notes = [];
+          renderNotes();
+
+          showMessage(
+            error.message || "Gagal memuat catatan pembelajaran.",
+            true
+          );
+        }
+      }
+
+      async function saveNote(event) {
+        event.preventDefault();
+        hideMessage();
+
+        const client = getSupabase();
+
+        if (!client || !currentUser) {
+          showMessage("Sesi pengguna belum tersedia. Silakan login kembali.", true);
+          return;
+        }
+
+        const title = $("reflectionTitle").value.trim();
+        const content = $("reflectionContent").value.trim();
+        const category = $("reflectionCategory").value;
+        const date = $("reflectionDate").value;
+
+        if (!title || !content || !date) {
+          showMessage("Lengkapi judul, tanggal, dan isi catatan.", true);
+          return;
+        }
+
+        const payload = {
+          [CONFIG.ownerColumn]: currentUser.id,
+          [CONFIG.titleColumn]: title,
+          [CONFIG.contentColumn]: content,
+          [CONFIG.categoryColumn]: category,
+          [CONFIG.dateColumn]: date
+        };
+
+        const button = $("saveReflection");
+        button.disabled = true;
+        button.textContent = "Menyimpan...";
+
+        try {
+          let result;
+
+          if (editingId) {
+            result = await client
+              .from(CONFIG.table)
+              .update(payload)
+              .eq("id", editingId)
+              .eq(CONFIG.ownerColumn, currentUser.id);
+          } else {
+            result = await client
+              .from(CONFIG.table)
+              .insert(payload);
+          }
+
+          if (result.error) throw result.error;
+
+          showMessage(
+            editingId
+              ? "Catatan berhasil diperbarui."
+              : "Catatan berhasil disimpan."
+          );
+
+          resetForm();
+          await loadNotes();
+        } catch (error) {
+          console.error("Gagal menyimpan catatan:", error);
+
+          showMessage(
+            error.message || "Catatan gagal disimpan.",
+            true
+          );
+        } finally {
+          button.disabled = false;
+          button.textContent = editingId
+            ? "💾 Perbarui Catatan"
+            : "💾 Simpan Catatan";
+        }
+      }
+
+      function editNote(note) {
+        editingId = note.id;
+
+        $("reflectionTitle").value =
+          note[CONFIG.titleColumn] || "";
+
+        $("reflectionContent").value =
+          note[CONFIG.contentColumn] || "";
+
+        $("reflectionCategory").value =
+          note[CONFIG.categoryColumn] || "Lainnya";
+
+        $("reflectionDate").value =
+          note[CONFIG.dateColumn] ||
+          new Date().toISOString().slice(0, 10);
+
+        $("formHeading").textContent = "✏️ Edit Catatan";
+        $("saveReflection").textContent = "💾 Perbarui Catatan";
+        $("cancelEdit").hidden = false;
+
+        updateCharacterCount();
+
+        $("reflectionTitle").scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+        $("reflectionTitle").focus();
+      }
+
+      async function deleteNote(note) {
+        if (!note?.id || !currentUser) return;
+
+        const confirmed = window.confirm(
+          `Hapus catatan "${note[CONFIG.titleColumn] || "Tanpa Judul"}"? Tindakan ini tidak dapat dibatalkan.`
+        );
+
+        if (!confirmed) return;
+
+        const client = getSupabase();
+
+        try {
+          const { error } = await client
+            .from(CONFIG.table)
+            .delete()
+            .eq("id", note.id)
+            .eq(CONFIG.ownerColumn, currentUser.id);
+
+          if (error) throw error;
+
+          showMessage("Catatan berhasil dihapus.");
+
+          if (editingId === note.id) {
             resetForm();
           }
 
-          showToast("Catatan berhasil dihapus.");
+          await loadNotes();
+        } catch (error) {
+          console.error("Gagal menghapus catatan:", error);
+
+          showMessage(
+            error.message || "Catatan gagal dihapus.",
+            true
+          );
         }
       }
 
-      function initialize() {
-        $("reflectionDate").value =
-          new Date().toLocaleDateString("en-CA");
+      function init() {
+        $("reflectionForm").addEventListener("submit", saveNote);
 
-        form.addEventListener("submit", handleSubmit);
-        list.addEventListener("click", handleListClick);
-        $("cancelEdit").addEventListener("click", resetForm);
+        $("reflectionSearch").addEventListener("input", renderNotes);
+        $("reflectionFilter").addEventListener("change", renderNotes);
+
+        $("reflectionContent").addEventListener(
+          "input",
+          updateCharacterCount
+        );
+
+        $("cancelEdit").addEventListener("click", () => {
+          resetForm();
+          hideMessage();
+        });
+
+        $("reflectionDate").value =
+          new Date().toISOString().slice(0, 10);
 
         loadNotes();
       }
 
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initialize);
+        document.addEventListener("DOMContentLoaded", init);
       } else {
-        initialize();
+        init();
       }
 
       window.TARBIYAH_REFLECTION = {
-        refresh: renderNotes
+        refresh: loadNotes,
+        getNotes: () => [...notes]
       };
     })();
   </script>
