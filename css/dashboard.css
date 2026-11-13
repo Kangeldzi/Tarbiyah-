@@ -120,3 +120,64 @@ html[data-theme="dark"]{--dash-bg:#0c1915;--dash-surface:#14251e;--dash-text:#ed
   }
 }
 
+
+/* =====================================================
+   TARBIYAH — HERO CAROUSEL SVG ARROW
+   ===================================================== */
+
+.hero-carousel .hero-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.hero-carousel .hero-link .hero-arrow {
+  display: block;
+  width: 21px;
+  height: 21px;
+  min-width: 21px;
+  flex: 0 0 21px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  opacity: 1;
+  overflow: visible;
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.hero-carousel .hero-link:hover .hero-arrow {
+  transform: translateX(5px);
+}
+
+.hero-carousel .hero-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
+
+@media (max-width: 480px) {
+  .hero-carousel .hero-link {
+    gap: 9px;
+  }
+
+  .hero-carousel .hero-link .hero-arrow {
+    width: 19px;
+    height: 19px;
+    min-width: 19px;
+    flex-basis: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-carousel .hero-link .hero-arrow {
+    transition: none;
+  }
+}
+
