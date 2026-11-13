@@ -1,1 +1,1001 @@
-<!doctype html><html lang="id" data-theme="light" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#267A78"><meta name="description" content="Pengelolaan aplikasi, preferensi, dan administrasi sesuai hak akses."><title>Administrasi dan Pengaturan — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/brand-logo.css"><link rel="stylesheet" href="./css/module-shell.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/module-shell.js"></script><script defer src="./js/pwa.js"></script></head><body><div class="app-shell"><aside class="app-sidebar"><a class="module-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span>TARBIYAH<small>Ruang Ilmu & Ukhuwah</small></span></a><div class="nav-caption">MENU UTAMA</div><nav class="app-nav" aria-label="Navigasi aplikasi"><a href="./dashboard.html" ><span class="nav-ico">⌂</span>Dashboard</a><a href="./profil-anggota.html" ><span class="nav-ico">◉</span>Profil & Anggota</a><a href="./agenda-tarbiyah.html" ><span class="nav-ico">▦</span>Agenda Tarbiyah</a><a href="./pembelajaran.html" ><span class="nav-ico">✧</span>Pembelajaran</a><a href="./materi-pembelajaran.html" ><span class="nav-ico">▤</span>Materi Pembelajaran</a><a href="./berita-pengumuman.html" ><span class="nav-ico">▧</span>Berita & Pengumuman</a><a href="./presensi-tarbiyah.html" ><span class="nav-ico">✓</span>Presensi Tarbiyah</a><a href="./galeri-foto-video.html" ><span class="nav-ico">▣</span>Galeri Foto & Video</a><a href="./diskusi-tarbiyah.html" ><span class="nav-ico">☷</span>Diskusi Tarbiyah</a><a href="./donasi-infaq.html" ><span class="nav-ico">♡</span>Donasi, Infaq & Shodaqoh</a><a href="./kehadiran.html" ><span class="nav-ico">◷</span>Kehadiran</a><a href="./catatan-refleksi.html" ><span class="nav-ico">✎</span>Catatan & Refleksi</a><a href="./notifikasi.html" ><span class="nav-ico">♧</span>Notifikasi</a><a href="./riwayat-aktivitas.html" ><span class="nav-ico">◷</span>Riwayat Aktivitas</a><a href="./administrasi-pengaturan.html" aria-current="page"><span class="nav-ico">⚙</span>Administrasi & Pengaturan</a></nav><div class="sidebar-foot">Ilmu · Amal · Ukhuwah<br>© <span data-year></span> TARBIYAH</div></aside><div class="mobile-scrim" data-scrim></div><main class="app-main"><header class="app-topbar"><div class="top-left"><button class="icon-btn menu-toggle" data-menu aria-label="Buka navigasi" aria-expanded="false">☰</button><div class="crumb">TARBIYAH&nbsp; / &nbsp;<b>Administrasi dan Pengaturan</b></div></div><div class="top-actions"><button class="icon-btn" data-theme-toggle aria-label="Ganti tema">◐</button><a class="icon-btn" href="./notifikasi.html" aria-label="Notifikasi" style="display:grid;place-items:center;text-decoration:none">♧</a><a class="profile-chip" href="./profil-anggota.html" aria-label="Profil">T</a></div></header><div class="module-content"><div class="module-head"><div><div class="eyebrow">RUANG TARBIYAH · MODUL</div><h1>Administrasi dan Pengaturan</h1><p>Pengelolaan aplikasi, preferensi, dan administrasi sesuai hak akses.</p></div><div class="head-actions"><button class="btn secondary" type="button" data-back>← Kembali</button><button class="btn" type="button" data-action>Pengaturan <span>↗</span></button></div></div><div class="notice"><b>Informasi pengembangan:</b> antarmuka dan navigasi modul ini sudah disiapkan. Data produksi belum ditampilkan sampai tabel dan kebijakan keamanan Supabase diverifikasi. Ini mencegah data contoh dianggap sebagai data komunitas yang sebenarnya.</div><section class="metric-grid"><article class="metric-card"><div class="metric-label">Pengaturan</div><div class="metric-value">—</div><div class="metric-hint">Menunggu data terverifikasi</div></article><article class="metric-card"><div class="metric-label">Status sinkronisasi</div><div class="metric-value" style="font-size:17px">Belum aktif</div><div class="metric-hint">Koneksi tabel belum dipetakan</div></article><article class="metric-card"><div class="metric-label">Akses akun</div><div class="metric-value" style="font-size:17px">Terproteksi</div><div class="metric-hint">Mengikuti sesi autentikasi</div></article><article class="metric-card"><div class="metric-label">Tema aplikasi</div><div class="metric-value" style="font-size:17px">Teal</div><div class="metric-hint">Mengikuti tema induk TARBIYAH</div></article></section><div class="panel-grid"><section class="panel"><h2>Konfigurasi akun</h2><p class="panel-desc">Pengelolaan aplikasi, preferensi, dan administrasi sesuai hak akses.</p><div class="toolbar"><input class="field" type="search" placeholder="Cari data..." aria-label="Cari data" disabled><button class="btn secondary" type="button" disabled>Filter</button></div><div class="empty-box"><div class="empty-icon">⚙</div><b>Belum ada data untuk ditampilkan</b><p>Menu administrasi harus dibatasi oleh peran dan RLS. Akses super admin tidak diberikan otomatis.</p></div></section><aside class="panel"><h2>Administrasi sistem</h2><p class="panel-desc">Informasi akan mengikuti data akun dan hak akses Anda.</p><div class="notice">Status integrasi: tampilan modul disiapkan. Pembacaan dan penyimpanan data menunggu verifikasi tabel, kolom, serta kebijakan RLS Supabase.</div><div class="empty-box"><div class="empty-icon">✦</div><b>Belum terhubung ke sumber data</b><p>Tidak ada data contoh atau angka rekaan yang ditampilkan.</p></div></aside></div><footer class="app-footer">TARBIYAH · Pembelajaran Muslim <span style="float:right">Versi pengembangan</span></footer></div></main></div><div class="toast" role="status" aria-live="polite" data-toast></div><script type="application/json" id="module-meta">{"key":"administrasi-pengaturan","title":"Administrasi dan Pengaturan"}</script></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Administrasi dan pengaturan aplikasi TARBIYAH.">
+  <title>Administrasi & Pengaturan — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    .settings-page {
+      width: min(100%, 1100px);
+      margin: 0 auto;
+      padding: 24px 18px 100px;
+    }
+
+    .settings-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 25px;
+      margin-bottom: 21px;
+      border-radius: 22px;
+      color: #fff;
+      background: linear-gradient(135deg, #075c43, #103b30 65%, #102a22);
+      box-shadow: 0 12px 35px rgba(0,0,0,.15);
+    }
+
+    .settings-hero::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      top: -75px;
+      right: -55px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+
+    .settings-eyebrow {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      margin-bottom: 12px;
+      color: #b8f5d8;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    .settings-hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 8px;
+      font: 700 clamp(22px, 5vw, 30px) Poppins, sans-serif;
+    }
+
+    .settings-hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0;
+      color: rgba(255,255,255,.82);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 225px minmax(0, 1fr);
+      gap: 17px;
+      align-items: start;
+    }
+
+    .settings-navigation {
+      position: sticky;
+      top: 15px;
+      display: grid;
+      gap: 7px;
+      padding: 12px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 17px;
+      background: var(--card-bg, rgba(255,255,255,.04));
+    }
+
+    .settings-nav-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 43px;
+      padding: 9px 11px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-secondary, #999);
+      text-align: left;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .settings-nav-button.active {
+      background: rgba(16,185,129,.13);
+      color: #10b981;
+    }
+
+    .settings-content {
+      min-width: 0;
+    }
+
+    .settings-section {
+      display: none;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 18px;
+      background: var(--card-bg, rgba(255,255,255,.04));
+    }
+
+    .settings-section.active {
+      display: block;
+      animation: settingsFade .2s ease;
+    }
+
+    @keyframes settingsFade {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .settings-section h2 {
+      margin: 0 0 7px;
+      font: 700 17px Poppins, sans-serif;
+    }
+
+    .settings-description {
+      margin: 0 0 19px;
+      color: var(--text-secondary, #999);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .settings-field {
+      margin-bottom: 16px;
+    }
+
+    .settings-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary, #999);
+    }
+
+    .settings-field input,
+    .settings-field textarea,
+    .settings-field select {
+      width: 100%;
+      min-height: 43px;
+      padding: 11px 12px;
+      border: 1px solid var(--border-color, #777);
+      border-radius: 11px;
+      outline: none;
+      color: var(--text-primary, inherit);
+      background: var(--input-bg, transparent);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .settings-field textarea {
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .settings-field input:focus,
+    .settings-field textarea:focus,
+    .settings-field select:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+    }
+
+    .settings-logo-preview {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 17px;
+      padding: 14px;
+      border: 1px dashed var(--border-color, #777);
+      border-radius: 13px;
+    }
+
+    .settings-logo-preview img {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      border-radius: 13px;
+      background: rgba(16,185,129,.1);
+    }
+
+    .settings-logo-preview strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .settings-logo-preview span {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-secondary, #999);
+      font-size: 11px;
+    }
+
+    .settings-button {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 10px;
+      background: #087f5b;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .settings-button.secondary {
+      border: 1px solid var(--border-color, #777);
+      background: transparent;
+      color: var(--text-primary, inherit);
+    }
+
+    .settings-button.danger {
+      background: #a83232;
+      color: #fff;
+    }
+
+    .settings-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 17px;
+    }
+
+    .settings-theme-options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .settings-theme-option {
+      padding: 14px 10px;
+      border: 1px solid var(--border-color, #777);
+      border-radius: 13px;
+      background: transparent;
+      color: var(--text-primary, inherit);
+      text-align: center;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .settings-theme-option.active {
+      border-color: #10b981;
+      background: rgba(16,185,129,.1);
+      color: #10b981;
+    }
+
+    .settings-theme-option span {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 23px;
+    }
+
+    .settings-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border-color, rgba(128,128,128,.2));
+      font-size: 12px;
+    }
+
+    .settings-info:last-child {
+      border-bottom: 0;
+    }
+
+    .settings-info span {
+      color: var(--text-secondary, #999);
+    }
+
+    .settings-status {
+      padding: 5px 9px;
+      border-radius: 30px;
+      background: rgba(16,185,129,.12);
+      color: #10b981;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .settings-status.warning {
+      background: rgba(245,158,11,.12);
+      color: #d99b25;
+    }
+
+    .settings-warning {
+      padding: 13px;
+      margin-top: 15px;
+      border-radius: 11px;
+      background: rgba(245,158,11,.09);
+      color: var(--text-secondary, #999);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .settings-toast {
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      bottom: 25px;
+      width: max-content;
+      max-width: calc(100% - 30px);
+      padding: 12px 17px;
+      border-radius: 12px;
+      background: #075c43;
+      color: #fff;
+      font-size: 13px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+    }
+
+    .settings-toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    @media (max-width: 760px) {
+      .settings-page {
+        padding: 16px 13px 95px;
+      }
+
+      .settings-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-navigation {
+        position: static;
+        display: flex;
+        overflow-x: auto;
+        gap: 6px;
+        padding: 9px;
+        scrollbar-width: thin;
+      }
+
+      .settings-nav-button {
+        flex: 0 0 auto;
+        width: auto;
+        white-space: nowrap;
+      }
+
+      .settings-section {
+        padding: 15px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .settings-theme-options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app-shell">
+    <main class="settings-page">
+
+      <section class="settings-hero">
+        <div class="settings-eyebrow">✦ TARBIYAH CONTROL CENTER</div>
+        <h1>Administrasi & Pengaturan</h1>
+        <p>
+          Kelola preferensi tampilan, identitas aplikasi,
+          dan informasi administrasi platform TARBIYAH.
+        </p>
+      </section>
+
+      <div class="settings-layout">
+
+        <nav class="settings-navigation" aria-label="Menu pengaturan">
+          <button class="settings-nav-button active" type="button" data-section="identity">
+            🏷️ Identitas Aplikasi
+          </button>
+
+          <button class="settings-nav-button" type="button" data-section="appearance">
+            🎨 Tampilan
+          </button>
+
+          <button class="settings-nav-button" type="button" data-section="account">
+            👤 Akun
+          </button>
+
+          <button class="settings-nav-button" type="button" data-section="system">
+            ⚙️ Informasi Sistem
+          </button>
+        </nav>
+
+        <div class="settings-content">
+
+          <!-- IDENTITAS APLIKASI -->
+          <section class="settings-section active" id="section-identity">
+            <h2>🏷️ Identitas Aplikasi</h2>
+            <p class="settings-description">
+              Informasi identitas dan branding platform TARBIYAH.
+            </p>
+
+            <div class="settings-logo-preview">
+              <img
+                id="logoPreview"
+                src="./assets/icons/icon-192.png"
+                alt="Logo TARBIYAH"
+              >
+              <div>
+                <strong id="previewAppName">TARBIYAH</strong>
+                <span>Logo dan identitas aplikasi</span>
+              </div>
+            </div>
+
+            <form id="identityForm">
+              <div class="settings-field">
+                <label for="appName">Nama aplikasi</label>
+                <input
+                  type="text"
+                  id="appName"
+                  maxlength="60"
+                  value="TARBIYAH"
+                  required
+                >
+              </div>
+
+              <div class="settings-field">
+                <label for="appDescription">Deskripsi aplikasi</label>
+                <textarea
+                  id="appDescription"
+                  maxlength="250"
+                >Pembelajaran Muslim dan komunitas untuk belajar, bertumbuh, dan berukhuwah.</textarea>
+              </div>
+
+              <div class="settings-field">
+                <label for="appLogo">Pilih logo baru</label>
+                <input
+                  type="file"
+                  id="appLogo"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                >
+              </div>
+
+              <div class="settings-actions">
+                <button class="settings-button" type="submit">
+                  Simpan Preferensi Lokal
+                </button>
+                <button class="settings-button secondary" type="button" id="resetIdentity">
+                  Pulihkan Tampilan Awal
+                </button>
+              </div>
+            </form>
+
+            <div class="settings-warning">
+              Pengaturan identitas pada versi ini hanya disimpan pada browser
+              perangkat administrator. Agar seluruh anggota melihat logo dan
+              nama yang sama, identitas harus disimpan di database atau
+              penyimpanan terpusat dengan akses administrator.
+            </div>
+          </section>
+
+          <!-- TAMPILAN -->
+          <section class="settings-section" id="section-appearance">
+            <h2>🎨 Preferensi Tampilan</h2>
+            <p class="settings-description">
+              Pilih mode tampilan yang nyaman untuk perangkat Anda.
+            </p>
+
+            <div class="settings-theme-options">
+              <button class="settings-theme-option" type="button" data-theme-choice="light">
+                <span>☀️</span>
+                Terang
+              </button>
+
+              <button class="settings-theme-option" type="button" data-theme-choice="dark">
+                <span>🌙</span>
+                Gelap
+              </button>
+
+              <button class="settings-theme-option" type="button" data-theme-choice="system">
+                <span>📱</span>
+                Sistem
+              </button>
+            </div>
+
+            <div class="settings-warning">
+              Pilihan tema akan diterapkan melalui theme manager TARBIYAH
+              jika modul pengelola tema tersedia.
+            </div>
+          </section>
+
+          <!-- AKUN -->
+          <section class="settings-section" id="section-account">
+            <h2>👤 Pengaturan Akun</h2>
+            <p class="settings-description">
+              Informasi dasar akun yang sedang digunakan.
+            </p>
+
+            <div class="settings-info">
+              <span>Status autentikasi</span>
+              <strong class="settings-status warning" id="authStatus">
+                Memeriksa...
+              </strong>
+            </div>
+
+            <div class="settings-info">
+              <span>Email pengguna</span>
+              <strong id="accountEmail">Belum diketahui</strong>
+            </div>
+
+            <div class="settings-info">
+              <span>ID pengguna</span>
+              <strong id="accountId">Belum diketahui</strong>
+            </div>
+
+            <div class="settings-actions">
+              <button class="settings-button secondary" type="button" id="refreshAccount">
+                Perbarui Informasi
+              </button>
+              <button class="settings-button danger" type="button" id="logoutButton">
+                Keluar dari Akun
+              </button>
+            </div>
+
+            <div class="settings-warning">
+              Pengaturan kata sandi dan email sebaiknya dilakukan melalui
+              alur autentikasi Supabase yang telah disiapkan, bukan dengan
+              mengubah data autentikasi secara langsung dari browser.
+            </div>
+          </section>
+
+          <!-- SISTEM -->
+          <section class="settings-section" id="section-system">
+            <h2>⚙️ Informasi Sistem</h2>
+            <p class="settings-description">
+              Informasi dasar aplikasi dan status komponen pada perangkat.
+            </p>
+
+            <div class="settings-info">
+              <span>Nama platform</span>
+              <strong>TARBIYAH</strong>
+            </div>
+
+            <div class="settings-info">
+              <span>Jenis aplikasi</span>
+              <strong>Progressive Web App</strong>
+            </div>
+
+            <div class="settings-info">
+              <span>Status browser</span>
+              <strong class="settings-status" id="browserStatus">Aktif</strong>
+            </div>
+
+            <div class="settings-info">
+              <span>Status koneksi internet</span>
+              <strong class="settings-status" id="networkStatus">Memeriksa...</strong>
+            </div>
+
+            <div class="settings-info">
+              <span>Service Worker</span>
+              <strong class="settings-status warning" id="swStatus">Memeriksa...</strong>
+            </div>
+
+            <div class="settings-info">
+              <span>Versi antarmuka</span>
+              <strong>1.0.0</strong>
+            </div>
+
+            <div class="settings-warning">
+              Informasi status di atas merupakan pemeriksaan sisi browser.
+              Status tersebut bukan bukti bahwa seluruh layanan backend,
+              database, dan penyimpanan Supabase berfungsi normal.
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="settings-toast" id="settingsToast" role="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const IDENTITY_KEY = "tarbiyah_app_identity_v1";
+      const $ = (id) => document.getElementById(id);
+
+      let temporaryLogoUrl = null;
+
+      function showToast(message) {
+        const toast = $("settingsToast");
+        toast.textContent = message;
+        toast.classList.add("show");
+
+        window.setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2400);
+      }
+
+      function getThemeManager() {
+        return window.TARBIYAH_THEME_MANAGER ||
+          window.TARBIYAH_THEME ||
+          window.ThemeManager ||
+          null;
+      }
+
+      function applyTheme(theme) {
+        const manager = getThemeManager();
+
+        if (manager) {
+          if (typeof manager.setTheme === "function") {
+            manager.setTheme(theme);
+          } else if (typeof manager.changeTheme === "function") {
+            manager.changeTheme(theme);
+          } else if (typeof manager.applyTheme === "function") {
+            manager.applyTheme(theme);
+          } else {
+            document.documentElement.dataset.theme = theme;
+          }
+        } else {
+          document.documentElement.dataset.theme = theme;
+        }
+
+        document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+          button.classList.toggle(
+            "active",
+            button.dataset.themeChoice === theme
+          );
+        });
+
+        showToast("Preferensi tema diperbarui.");
+      }
+
+      function loadIdentity() {
+        try {
+          const raw = localStorage.getItem(IDENTITY_KEY);
+          if (!raw) return;
+
+          const identity = JSON.parse(raw);
+
+          if (identity.name) {
+            $("appName").value = identity.name;
+            $("previewAppName").textContent = identity.name;
+          }
+
+          if (identity.description) {
+            $("appDescription").value = identity.description;
+          }
+
+          if (identity.logoData) {
+            $("logoPreview").src = identity.logoData;
+          }
+        } catch (error) {
+          console.error("Gagal membaca identitas aplikasi:", error);
+        }
+      }
+
+      function saveIdentity(event) {
+        event.preventDefault();
+
+        const name = $("appName").value.trim();
+        const description = $("appDescription").value.trim();
+
+        if (!name) {
+          showToast("Nama aplikasi wajib diisi.");
+          return;
+        }
+
+        let existing = {};
+
+        try {
+          existing = JSON.parse(
+            localStorage.getItem(IDENTITY_KEY) || "{}"
+          );
+        } catch (_) {
+          existing = {};
+        }
+
+        const identity = {
+          name,
+          description,
+          logoData: existing.logoData || null,
+          updatedAt: new Date().toISOString()
+        };
+
+        try {
+          localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity));
+
+          $("previewAppName").textContent = name;
+          showToast("Preferensi identitas disimpan di perangkat ini.");
+        } catch (error) {
+          console.error("Gagal menyimpan identitas:", error);
+          showToast("Penyimpanan gagal. Ukuran logo mungkin terlalu besar.");
+        }
+      }
+
+      function previewLogo(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const allowedTypes = [
+          "image/png",
+          "image/jpeg",
+          "image/webp",
+          "image/svg+xml"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+          showToast("Format logo tidak didukung.");
+          event.target.value = "";
+          return;
+        }
+
+        if (file.size > 1024 * 1024) {
+          showToast("Ukuran logo maksimal 1 MB.");
+          event.target.value = "";
+          return;
+        }
+
+        if (temporaryLogoUrl) {
+          URL.revokeObjectURL(temporaryLogoUrl);
+        }
+
+        temporaryLogoUrl = URL.createObjectURL(file);
+        $("logoPreview").src = temporaryLogoUrl;
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          let existing = {};
+
+          try {
+            existing = JSON.parse(
+              localStorage.getItem(IDENTITY_KEY) || "{}"
+            );
+          } catch (_) {
+            existing = {};
+          }
+
+          existing.name = $("appName").value.trim() || "TARBIYAH";
+          existing.description = $("appDescription").value.trim();
+          existing.logoData = reader.result;
+          existing.updatedAt = new Date().toISOString();
+
+          try {
+            localStorage.setItem(IDENTITY_KEY, JSON.stringify(existing));
+            showToast("Logo tersimpan pada perangkat ini.");
+          } catch (error) {
+            console.error("Gagal menyimpan logo:", error);
+            showToast("Logo terlalu besar untuk penyimpanan browser.");
+          }
+        };
+
+        reader.onerror = () => {
+          showToast("Tidak dapat membaca file logo.");
+        };
+
+        reader.readAsDataURL(file);
+      }
+
+      function resetIdentity() {
+        if (!window.confirm("Pulihkan identitas tampilan ke pengaturan awal?")) {
+          return;
+        }
+
+        localStorage.removeItem(IDENTITY_KEY);
+
+        $("appName").value = "TARBIYAH";
+        $("appDescription").value =
+          "Pembelajaran Muslim dan komunitas untuk belajar, bertumbuh, dan berukhuwah.";
+        $("previewAppName").textContent = "TARBIYAH";
+        $("logoPreview").src = "./assets/icons/icon-192.png";
+        $("appLogo").value = "";
+
+        if (temporaryLogoUrl) {
+          URL.revokeObjectURL(temporaryLogoUrl);
+          temporaryLogoUrl = null;
+        }
+
+        showToast("Identitas tampilan lokal dipulihkan.");
+      }
+
+      async function refreshAccount() {
+        const status = $("authStatus");
+        const email = $("accountEmail");
+        const id = $("accountId");
+
+        status.textContent = "Memeriksa...";
+        status.classList.add("warning");
+        email.textContent = "Belum diketahui";
+        id.textContent = "Belum diketahui";
+
+        try {
+          let session = null;
+
+          if (
+            window.TARBIYAH_AUTH &&
+            typeof window.TARBIYAH_AUTH.getSession === "function"
+          ) {
+            const result = await window.TARBIYAH_AUTH.getSession();
+
+            session = result?.data?.session ||
+              result?.session ||
+              result ||
+              null;
+          } else {
+            const client =
+              window.supabaseClient ||
+              window.TARBIYAH_SUPABASE ||
+              window.TARBIYAH?.supabase;
+
+            if (client?.auth?.getSession) {
+              const result = await client.auth.getSession();
+              session = result?.data?.session || null;
+            }
+          }
+
+          const user = session?.user || null;
+
+          if (!user) {
+            status.textContent = "Belum terdeteksi";
+            return;
+          }
+
+          status.textContent = "Sesi terdeteksi";
+          status.classList.remove("warning");
+
+          email.textContent = user.email || "Tidak tersedia";
+          id.textContent = user.id
+            ? user.id.slice(0, 8) + "..."
+            : "Tidak tersedia";
+
+        } catch (error) {
+          console.error("Pemeriksaan akun gagal:", error);
+          status.textContent = "Tidak dapat diperiksa";
+          status.classList.add("warning");
+        }
+      }
+
+      async function logout() {
+        if (!window.confirm("Apakah Anda yakin ingin keluar dari akun?")) {
+          return;
+        }
+
+        const auth = window.TARBIYAH_AUTH;
+
+        if (!auth || typeof auth.signOut !== "function") {
+          showToast("Fungsi keluar akun tidak tersedia.");
+          return;
+        }
+
+        try {
+          await auth.signOut();
+          window.location.href = "./login-register.html";
+        } catch (error) {
+          console.error("Gagal keluar:", error);
+          showToast("Tidak dapat keluar dari akun. Coba kembali.");
+        }
+      }
+
+      async function checkServiceWorker() {
+        const element = $("swStatus");
+
+        if (!("serviceWorker" in navigator)) {
+          element.textContent = "Tidak didukung";
+          element.classList.add("warning");
+          return;
+        }
+
+        try {
+          const registration = await navigator.serviceWorker.getRegistration();
+
+          if (registration) {
+            element.textContent = "Terdaftar";
+            element.classList.remove("warning");
+          } else {
+            element.textContent = "Belum terdaftar";
+            element.classList.add("warning");
+          }
+        } catch (error) {
+          element.textContent = "Tidak diketahui";
+          element.classList.add("warning");
+        }
+      }
+
+      function checkNetwork() {
+        const element = $("networkStatus");
+        const online = navigator.onLine;
+
+        element.textContent = online ? "Online" : "Offline";
+        element.classList.toggle("warning", !online);
+      }
+
+      function handleNavigation(event) {
+        const button = event.target.closest("[data-section]");
+        if (!button) return;
+
+        const sectionName = button.dataset.section;
+
+        document.querySelectorAll(".settings-nav-button").forEach((item) => {
+          item.classList.toggle("active", item === button);
+        });
+
+        document.querySelectorAll(".settings-section").forEach((section) => {
+          section.classList.toggle(
+            "active",
+            section.id === "section-" + sectionName
+          );
+        });
+      }
+
+      function initialize() {
+        loadIdentity();
+
+        document.querySelector(".settings-navigation")
+          .addEventListener("click", handleNavigation);
+
+        $("identityForm").addEventListener("submit", saveIdentity);
+        $("appLogo").addEventListener("change", previewLogo);
+        $("resetIdentity").addEventListener("click", resetIdentity);
+
+        document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+          button.addEventListener("click", () => {
+            applyTheme(button.dataset.themeChoice);
+          });
+        });
+
+        $("refreshAccount").addEventListener("click", refreshAccount);
+        $("logoutButton").addEventListener("click", logout);
+
+        checkNetwork();
+        checkServiceWorker();
+        refreshAccount();
+
+        window.addEventListener("online", checkNetwork);
+        window.addEventListener("offline", checkNetwork);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initialize);
+      } else {
+        initialize();
+      }
+
+      window.TARBIYAH_SETTINGS = {
+        refreshAccount,
+        checkNetwork,
+        checkServiceWorker
+      };
+    })();
+  </script>
+</body>
+</html>
