@@ -866,54 +866,6 @@
   }
 }
 
-
-/* ==========================================
-   TARBIYAH — PERBAIKAN TAB MASUK & DAFTAR
-   ========================================== */
-
-.auth-tabs .auth-tab {
-  position: relative !important;
-  flex: 1 1 0 !important;
-  border: 1px solid transparent !important;
-  border-radius: 12px !important;
-  background: transparent !important;
-  color: var(--text-secondary, #94a3a0) !important;
-  font-weight: 700 !important;
-  transition:
-    color .25s ease,
-    background .25s ease,
-    box-shadow .25s ease,
-    border-color .25s ease,
-    transform .25s ease !important;
-}
-
-/* Tab yang sedang aktif */
-.auth-tabs .auth-tab.active,
-.auth-tabs .auth-tab[aria-selected="true"] {
-  color: #ffffff !important;
-  background: linear-gradient(135deg, #159b68, #08764e) !important;
-  border-color: rgba(105, 235, 176, .45) !important;
-  box-shadow:
-    0 5px 18px rgba(13, 148, 89, .28),
-    inset 0 1px 0 rgba(255,255,255,.18) !important;
-  transform: translateY(-1px);
-}
-
-/* Tab yang tidak aktif */
-.auth-tabs .auth-tab:not(.active):not([aria-selected="true"]) {
-  color: var(--text-secondary, #94a3a0) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-color: transparent !important;
-  transform: none !important;
-}
-
-/* Efek sentuhan */
-.auth-tabs .auth-tab:active {
-  transform: scale(.97) !important;
-}
-
-
 /* ==========================================
    TARBIYAH — PREMIUM LOGO LIGHT ANIMATION
    Kilatan acak empat arah, durasi 3 detik
@@ -1098,6 +1050,49 @@
   .auth-heading h2 {
     animation: none !important;
   }
+}
+
+
+/* TARBIYAH — TAB AKTIF MASUK / DAFTAR */
+.auth-tabs {
+  display: flex !important;
+  gap: 8px !important;
+  padding: 5px !important;
+  border-radius: 14px !important;
+  background: rgba(120, 140, 130, .12) !important;
+}
+
+.auth-tabs #loginTab,
+.auth-tabs #registerTab {
+  flex: 1 1 50% !important;
+  min-height: 43px !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  color: var(--text-secondary, #94a3a0) !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all .25s ease !important;
+}
+
+/* Status aktif */
+.auth-tabs #loginTab.active,
+.auth-tabs #registerTab.active,
+.auth-tabs #loginTab[aria-selected="true"],
+.auth-tabs #registerTab[aria-selected="true"] {
+  color: #fff !important;
+  background: linear-gradient(135deg, #159b68, #08764e) !important;
+  border-color: rgba(110, 231, 183, .45) !important;
+  box-shadow: 0 5px 16px rgba(13, 148, 89, .28) !important;
+}
+
+/* Status tidak aktif */
+.auth-tabs #loginTab:not(.active):not([aria-selected="true"]),
+.auth-tabs #registerTab:not(.active):not([aria-selected="true"]) {
+  color: var(--text-secondary, #94a3a0) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
 }
 
   </style>
@@ -1748,6 +1743,49 @@
   });
 })();
 
-  </script>
+
+/* TARBIYAH — SINKRONISASI VISUAL TAB */
+(() => {
+  "use strict";
+
+  const loginTab = document.getElementById("loginTab");
+  const registerTab = document.getElementById("registerTab");
+
+  if (!loginTab || !registerTab) {
+    console.warn("[TARBIYAH] Tombol tab tidak ditemukan.");
+    return;
+  }
+
+  function updateActiveTab(selected) {
+    const isLogin = selected === "login";
+
+    loginTab.classList.toggle("active", isLogin);
+    registerTab.classList.toggle("active", !isLogin);
+
+    loginTab.setAttribute("aria-selected", String(isLogin));
+    registerTab.setAttribute("aria-selected", String(!isLogin));
+  }
+
+  document.addEventListener("click", (event) => {
+    const clickedTab = event.target.closest("#loginTab, #registerTab");
+
+    if (!clickedTab) return;
+
+    updateActiveTab(
+      clickedTab.id === "loginTab" ? "login" : "register"
+    );
+  });
+
+  // Sinkronkan tampilan awal
+  updateActiveTab(
+    registerTab.getAttribute("aria-selected") === "true"
+      ? "register"
+      : "login"
+  );
+
+  console.info("[TARBIYAH] Sinkronisasi tab aktif siap.");
+})();
+
+</script>
 </body>
 </html>
