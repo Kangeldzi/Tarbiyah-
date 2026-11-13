@@ -1,0 +1,333 @@
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Dashboard Administrasi TARBIYAH">
+  <title>Administrasi — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/dashboard-admin.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+</head>
+
+<body class="admin-page">
+
+  <div class="admin-scrim" id="adminScrim"></div>
+
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-brand">
+      <div class="brand-mark">T</div>
+      <div class="brand-copy">
+        <strong>TARBIYAH</strong>
+        <span>ADMINISTRATION</span>
+      </div>
+      <button class="icon-button sidebar-close" id="sidebarClose" aria-label="Tutup menu">×</button>
+    </div>
+
+    <div class="admin-profile">
+      <div class="profile-avatar" id="adminAvatar">A</div>
+      <div class="profile-copy">
+        <strong id="adminName">Memuat pengguna...</strong>
+        <span id="adminRole">Memverifikasi akses...</span>
+      </div>
+      <span class="online-dot"></span>
+    </div>
+
+    <nav class="admin-nav" aria-label="Navigasi administrasi">
+      <span class="nav-caption">MENU UTAMA</span>
+
+      <a class="admin-nav-link active" href="#overview">
+        <span class="nav-icon">▦</span>
+        <span>Ringkasan</span>
+      </a>
+
+      <a class="admin-nav-link" href="#users">
+        <span class="nav-icon">♙</span>
+        <span>Pengguna & Anggota</span>
+        <span class="nav-soon">Tahap berikutnya</span>
+      </a>
+
+      <a class="admin-nav-link" href="#roles">
+        <span class="nav-icon">♜</span>
+        <span>Manajemen Role</span>
+        <span class="nav-soon">Tahap berikutnya</span>
+      </a>
+
+      <span class="nav-caption">PENGELOLAAN KONTEN</span>
+
+      <a class="admin-nav-link" href="#agenda">
+        <span class="nav-icon">▣</span>
+        <span>Agenda & Kajian</span>
+      </a>
+
+      <a class="admin-nav-link" href="#materials">
+        <span class="nav-icon">▤</span>
+        <span>Materi Pembelajaran</span>
+      </a>
+
+      <a class="admin-nav-link" href="#gallery">
+        <span class="nav-icon">▧</span>
+        <span>Galeri Dokumentasi</span>
+      </a>
+
+      <span class="nav-caption">SISTEM</span>
+
+      <a class="admin-nav-link" href="#settings">
+        <span class="nav-icon">⚙</span>
+        <span>Pengaturan Aplikasi</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a href="./dashboard.html" class="back-dashboard">
+        <span>←</span> Kembali ke Dashboard
+      </a>
+      <button class="logout-button" id="adminLogout">
+        <span>↪</span> Keluar dari akun
+      </button>
+      <div class="sidebar-version">TARBIYAH ADMIN · v1.0.0</div>
+    </div>
+  </aside>
+
+  <main class="admin-main" id="adminMain">
+
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="icon-button menu-toggle" id="menuToggle" aria-label="Buka menu">☰</button>
+        <div>
+          <div class="breadcrumb">TARBIYAH <span>/</span> Administrasi</div>
+          <h1>Dashboard Administrasi</h1>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="icon-button theme-button" id="adminThemeToggle" aria-label="Ubah tema">◐</button>
+        <div class="topbar-identity">
+          <div class="identity-avatar" id="topAvatar">A</div>
+          <div class="identity-copy">
+            <strong id="topName">Administrator</strong>
+            <span>Super Admin</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="admin-content" id="overview">
+
+      <div class="welcome-panel">
+        <div class="welcome-content">
+          <span class="welcome-eyebrow">PUSAT KENDALI TARBIYAH</span>
+          <h2>Assalamu’alaikum, <span id="welcomeName">Administrator</span>.</h2>
+          <p>Kelola pengguna, anggota, kegiatan, dan konten pembelajaran dalam satu tempat.</p>
+          <div class="welcome-meta">
+            <span class="status-indicator"></span>
+            <span id="systemStatus">Memeriksa sistem...</span>
+          </div>
+        </div>
+        <div class="welcome-decoration" aria-hidden="true">✦</div>
+      </div>
+
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">MONITORING</span>
+          <h2>Ringkasan Sistem</h2>
+          <p>Informasi yang dibaca langsung dari database TARBIYAH.</p>
+        </div>
+        <button class="refresh-button" id="refreshStats">
+          ↻ <span>Perbarui</span>
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon emerald">♙</span>
+            <span class="stat-label">Profil Pengguna</span>
+          </div>
+          <strong class="stat-value" id="profilesCount">—</strong>
+          <span class="stat-note" id="profilesNote">Menunggu data</span>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon blue">♧</span>
+            <span class="stat-label">Data Anggota</span>
+          </div>
+          <strong class="stat-value" id="membersCount">—</strong>
+          <span class="stat-note" id="membersNote">Menunggu data</span>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon purple">♜</span>
+            <span class="stat-label">Penetapan Role</span>
+          </div>
+          <strong class="stat-value" id="userRolesCount">—</strong>
+          <span class="stat-note" id="userRolesNote">Menunggu data</span>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-top">
+            <span class="stat-icon amber">⚑</span>
+            <span class="stat-label">Jenis Role</span>
+          </div>
+          <strong class="stat-value" id="rolesCount">—</strong>
+          <span class="stat-note" id="rolesNote">Menunggu data</span>
+        </article>
+      </div>
+
+      <div class="content-grid">
+        <section class="content-card" id="users">
+          <div class="card-heading">
+            <div>
+              <span class="section-kicker">MANAJEMEN</span>
+              <h3>Pengguna & Anggota</h3>
+            </div>
+            <span class="coming-badge">Dalam pengembangan</span>
+          </div>
+          <p>Kelola data pengguna terdaftar, permohonan keanggotaan, dan status anggota TARBIYAH.</p>
+          <div class="feature-preview">
+            <span>♙</span>
+            <div>
+              <strong>Manajemen Anggota</strong>
+              <small>Daftar, verifikasi, dan status keanggotaan</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-card" id="roles">
+          <div class="card-heading">
+            <div>
+              <span class="section-kicker">OTORISASI</span>
+              <h3>Manajemen Role</h3>
+            </div>
+            <span class="coming-badge">Dalam pengembangan</span>
+          </div>
+          <p>Pengaturan hak akses berdasarkan role yang sudah tersedia di Supabase.</p>
+          <div class="role-chips">
+            <span>Super Admin</span>
+            <span>Admin</span>
+            <span>Member</span>
+            <span>Registered User</span>
+          </div>
+        </section>
+
+        <section class="content-card" id="agenda">
+          <div class="card-heading">
+            <div>
+              <span class="section-kicker">KEGIATAN</span>
+              <h3>Agenda & Kajian</h3>
+            </div>
+            <span class="coming-badge">Dalam pengembangan</span>
+          </div>
+          <p>Pengelolaan jadwal kajian, lokasi Google Maps, dan informasi kegiatan komunitas.</p>
+          <div class="feature-preview">
+            <span>▣</span>
+            <div>
+              <strong>Kalender Kegiatan</strong>
+              <small>Jadwal, lokasi, dan informasi kajian</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-card" id="materials">
+          <div class="card-heading">
+            <div>
+              <span class="section-kicker">PEMBELAJARAN</span>
+              <h3>Materi Pembelajaran</h3>
+            </div>
+            <span class="coming-badge">Dalam pengembangan</span>
+          </div>
+          <p>Pengelolaan tema, materi, berita, dan konten pembelajaran TARBIYAH.</p>
+          <div class="feature-preview">
+            <span>▤</span>
+            <div>
+              <strong>Pusat Materi</strong>
+              <small>Daftar tema dan bahan pembelajaran</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-card" id="gallery">
+          <div class="card-heading">
+            <div>
+              <span class="section-kicker">DOKUMENTASI</span>
+              <h3>Galeri Foto & Video</h3>
+            </div>
+            <span class="coming-badge">Dalam pengembangan</span>
+          </div>
+          <p>Pengelolaan dokumentasi kegiatan dan media komunitas.</p>
+          <div class="feature-preview">
+            <span>▧</span>
+            <div>
+              <strong>Galeri Dokumentasi</strong>
+              <small>Foto dan video kegiatan</small>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-card" id="settings">
+          <div class="card-heading">
+            <div>
+              <span class="section-kicker">KONFIGURASI</span>
+              <h3>Pengaturan Aplikasi</h3>
+            </div>
+            <span class="coming-badge">Dalam pengembangan</span>
+          </div>
+          <p>Pengaturan identitas aplikasi, logo, judul, dan preferensi sistem.</p>
+          <div class="feature-preview">
+            <span>⚙</span>
+            <div>
+              <strong>Identitas TARBIYAH</strong>
+              <small>Logo, nama aplikasi, dan preferensi</small>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="system-card">
+        <div class="system-heading">
+          <div>
+            <span class="section-kicker">KONEKTIVITAS</span>
+            <h3>Status Sistem</h3>
+          </div>
+          <span class="system-live"><i></i> LIVE</span>
+        </div>
+        <div class="system-list">
+          <div><span>Supabase Client</span><strong id="supabaseStatus">Memeriksa...</strong></div>
+          <div><span>Autentikasi</span><strong id="authStatus">Memeriksa...</strong></div>
+          <div><span>Role Pengguna</span><strong id="roleStatus">Memeriksa...</strong></div>
+          <div><span>Service Worker</span><strong id="workerStatus">Memeriksa...</strong></div>
+        </div>
+      </section>
+
+      <footer class="admin-footer">
+        <span>© <span id="currentYear"></span> TARBIYAH — Pembelajaran Muslim</span>
+        <span>Dikelola dengan amanah dan tanggung jawab.</span>
+      </footer>
+
+    </section>
+  </main>
+
+  <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
+
+  <script src="./js/dashboard-admin.js" defer></script>
+  <script src="./js/pwa.js" defer></script>
+</body>
+</html>
