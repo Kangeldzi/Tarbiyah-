@@ -173,10 +173,13 @@
     }
   });
 
-   let currentUserRole = null;
+
+
   // =====================================================
   // SEARCH
   // =====================================================
+
+  let currentUserRole = null;
 
   const searchRoutes = [
     ["agenda", "./agenda-tarbiyah.html"],
@@ -213,21 +216,23 @@
     );
 
     if (found) {
-  const adminRoles = ["admin", "super_admin"];
+      const adminRoles = ["admin", "super_admin"];
 
-  if (
-    found[1] === "./dashboard-admin.html" &&
-    !adminRoles.includes(currentUserRole)
-  ) {
-    toast("Anda tidak memiliki akses administrasi.");
-    return;
-  }
+      if (
+        found[1] === "./dashboard-admin.html" &&
+        !adminRoles.includes(currentUserRole)
+      ) {
+        toast("Anda tidak memiliki akses administrasi.");
+        return;
+      }
 
-  location.href = found[1];
-} else {
-  toast("Belum ditemukan menu yang cocok. Coba kata kunci lain.");
-}
+      location.href = found[1];
+    } else {
+      toast("Belum ditemukan menu yang cocok. Coba kata kunci lain.");
+    }
+  });
 
+  // Shortcut keyboard untuk membuka pencarian.
   document.addEventListener("keydown", (e) => {
     if (
       e.key === "/" &&
