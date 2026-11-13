@@ -676,6 +676,79 @@
   }
 }
 
+
+/* ==========================================
+   TARBIYAH SPLASH — TARGET CLASS ASLI
+   ========================================== */
+
+.splash-logo-frame {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  animation: logoPulse 3s ease-in-out infinite !important;
+}
+
+.splash-logo-frame::before {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: -65% -45%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    112deg,
+    transparent 39%,
+    rgba(255,255,255,0) 43%,
+    rgba(255,248,218,.22) 47%,
+    rgba(255,255,255,.98) 50%,
+    rgba(255,226,151,.60) 53%,
+    rgba(255,255,255,0) 58%,
+    transparent 62%
+  );
+  mix-blend-mode: screen;
+  transform: translate3d(-90%, 0, 0) rotate(-14deg);
+}
+
+.splash-logo-frame.shine-left::before {
+  animation: tarbiyahShineLeft 3s ease-in-out both;
+}
+
+.splash-logo-frame.shine-right::before {
+  animation: tarbiyahShineRight 3s ease-in-out both;
+}
+
+.splash-logo-frame.shine-up::before {
+  animation: tarbiyahShineUp 3s ease-in-out both;
+}
+
+.splash-logo-frame.shine-down::before {
+  animation: tarbiyahShineDown 3s ease-in-out both;
+}
+
+.splash-logo-frame img {
+  position: relative;
+  z-index: 2;
+  animation: tarbiyahLogoBlink 3s ease-in-out infinite;
+}
+
+/* Judul TARBIYAH */
+.splash-brand-name {
+  background: linear-gradient(
+    100deg,
+    #fff3cc 0%,
+    #d6b56d 30%,
+    #ffffff 50%,
+    #d6b56d 70%,
+    #fff3cc 100%
+  ) !important;
+  background-size: 220% auto !important;
+  color: transparent !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  animation: tarbiyahTextShimmer 3s linear infinite !important;
+  filter: drop-shadow(0 0 12px rgba(214,181,109,.35));
+}
+
 </style>
 </head>
 <body>
@@ -872,10 +945,18 @@
 
 
 /* ==========================================
-   TARBIYAH — RANDOM LOGO SHINE CONTROLLER
+   TARBIYAH — SPLASH RANDOM SHINE CONTROLLER
+   Target: .splash-logo-frame
    ========================================== */
 (() => {
   "use strict";
+
+  const logo = document.querySelector(".splash-logo-frame");
+
+  if (!logo) {
+    console.warn("[TARBIYAH] Elemen splash logo tidak ditemukan.");
+    return;
+  }
 
   const directions = [
     "shine-left",
@@ -884,13 +965,8 @@
     "shine-down"
   ];
 
-  const logoElements = document.querySelectorAll(
-    ".brand-mark, .auth-logo-frame"
-  );
-
-  if (!logoElements.length) return;
-
   let previousDirection = "";
+  let shineTimer = null;
 
   function playRandomShine() {
     let nextDirection;
@@ -905,23 +981,28 @@
 
     previousDirection = nextDirection;
 
-    logoElements.forEach((logo) => {
-      logo.classList.remove(...directions);
-      void logo.offsetWidth;
-      logo.classList.add(nextDirection);
-    });
+    logo.classList.remove(...directions);
+
+    // Memulai ulang animasi CSS
+    void logo.offsetWidth;
+
+    logo.classList.add(nextDirection);
   }
 
-  let shineTimer;
-
   function startShine() {
-    clearInterval(shineTimer);
+    stopShine();
+
     playRandomShine();
-    shineTimer = setInterval(playRandomShine, 3000);
+
+    // Satu arah baru setiap 3 detik
+    shineTimer = window.setInterval(playRandomShine, 3000);
   }
 
   function stopShine() {
-    clearInterval(shineTimer);
+    if (shineTimer !== null) {
+      window.clearInterval(shineTimer);
+      shineTimer = null;
+    }
   }
 
   startShine();
@@ -933,7 +1014,10 @@
       startShine();
     }
   });
+
+  console.info("[TARBIYAH] Animasi kilatan logo splash aktif.");
 })();
+
 
 </script>
 </body>
