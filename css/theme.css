@@ -595,3 +595,292 @@ html[data-theme] .bottom-nav {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* =========================================================
+   TARBIYAH — UNIVERSAL LIGHT MODE PATCH
+   Versi: 1.0
+   Tujuan:
+   - Menyatukan warna latar Light Mode.
+   - Menjaga teks tetap terbaca.
+   - Menyamakan warna kartu, panel, sidebar, tabel, dan form.
+   - Tidak mengubah tampilan Dark Mode.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. PALET UNIVERSAL LIGHT
+   --------------------------------------------------------- */
+
+html[data-theme="light"],
+html[data-theme="system"] {
+  color-scheme: light;
+
+  --ui-bg: #f3f7f5;
+  --ui-bg-soft: #eaf2ee;
+  --ui-surface: #ffffff;
+  --ui-surface-soft: #f8fbf9;
+  --ui-surface-hover: #edf5f0;
+
+  --ui-text: #18352a;
+  --ui-text-soft: #52685e;
+  --ui-muted: #77877f;
+
+  --ui-border: #dce8e1;
+  --ui-border-strong: #c7d9ce;
+
+  --ui-primary: #087a50;
+  --ui-primary-hover: #066541;
+  --ui-primary-soft: #e0f3e9;
+
+  --ui-success: #16834d;
+  --ui-warning: #b7791f;
+  --ui-danger: #c0393b;
+
+  --ui-shadow:
+    0 8px 24px rgba(25, 65, 45, 0.07);
+
+  --ui-shadow-soft:
+    0 3px 12px rgba(25, 65, 45, 0.05);
+}
+
+/* ---------------------------------------------------------
+   2. LATAR DASAR SELURUH HALAMAN
+   --------------------------------------------------------- */
+
+html[data-theme="light"] body,
+html[data-theme="system"] body {
+  background-color: var(--ui-bg);
+  color: var(--ui-text);
+}
+
+/* ---------------------------------------------------------
+   3. DASHBOARD ADMIN
+   --------------------------------------------------------- */
+
+html[data-theme="light"] .admin-page,
+html[data-theme="system"] .admin-page {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+
+html[data-theme="light"] .admin-sidebar,
+html[data-theme="system"] .admin-sidebar {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+html[data-theme="light"] .admin-main,
+html[data-theme="system"] .admin-main {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+
+html[data-theme="light"] .admin-topbar,
+html[data-theme="system"] .admin-topbar {
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+}
+
+html[data-theme="light"] .admin-content,
+html[data-theme="system"] .admin-content {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+
+html[data-theme="light"] .admin-page
+.admin-card,
+html[data-theme="light"] .admin-page
+.admin-stat-card,
+html[data-theme="light"] .admin-page
+.admin-welcome,
+html[data-theme="light"] .admin-page
+.admin-system-card,
+html[data-theme="system"] .admin-page
+.admin-card,
+html[data-theme="system"] .admin-page
+.admin-stat-card,
+html[data-theme="system"] .admin-page
+.admin-welcome,
+html[data-theme="system"] .admin-page
+.admin-system-card {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+/* ---------------------------------------------------------
+   4. KOMPONEN DASHBOARD UNIVERSAL
+   --------------------------------------------------------- */
+
+html[data-theme="light"] .app-sidebar,
+html[data-theme="light"] .bottom-nav,
+html[data-theme="light"] .quick-card,
+html[data-theme="light"] .feature-card,
+html[data-theme="light"] .side-link,
+html[data-theme="system"] .app-sidebar,
+html[data-theme="system"] .bottom-nav,
+html[data-theme="system"] .quick-card,
+html[data-theme="system"] .feature-card,
+html[data-theme="system"] .side-link {
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+}
+
+html[data-theme="light"] .app-sidebar,
+html[data-theme="light"] .bottom-nav,
+html[data-theme="system"] .app-sidebar,
+html[data-theme="system"] .bottom-nav {
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+html[data-theme="light"] .quick-card,
+html[data-theme="light"] .feature-card,
+html[data-theme="system"] .quick-card,
+html[data-theme="system"] .feature-card {
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+html[data-theme="light"] .side-link,
+html[data-theme="system"] .side-link {
+  background: transparent;
+}
+
+html[data-theme="light"] .side-link:hover,
+html[data-theme="light"] .side-link.active,
+html[data-theme="system"] .side-link:hover,
+html[data-theme="system"] .side-link.active {
+  background: var(--ui-primary-soft);
+  color: var(--ui-primary);
+}
+
+/* ---------------------------------------------------------
+   5. KARTU, PANEL, DAN AREA KONTEN UMUM
+   --------------------------------------------------------- */
+
+html[data-theme="light"] .card,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .content-card,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .dashboard-card,
+html[data-theme="system"] .card,
+html[data-theme="system"] .panel,
+html[data-theme="system"] .content-card,
+html[data-theme="system"] .stat-card,
+html[data-theme="system"] .dashboard-card {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+/* ---------------------------------------------------------
+   6. TEKS DAN JUDUL
+   --------------------------------------------------------- */
+
+html[data-theme="light"] .admin-page h1,
+html[data-theme="light"] .admin-page h2,
+html[data-theme="light"] .admin-page h3,
+html[data-theme="light"] .admin-page h4,
+html[data-theme="system"] .admin-page h1,
+html[data-theme="system"] .admin-page h2,
+html[data-theme="system"] .admin-page h3,
+html[data-theme="system"] .admin-page h4 {
+  color: var(--ui-text);
+}
+
+html[data-theme="light"] .admin-page p,
+html[data-theme="light"] .admin-page small,
+html[data-theme="light"] .admin-page .muted,
+html[data-theme="system"] .admin-page p,
+html[data-theme="system"] .admin-page small,
+html[data-theme="system"] .admin-page .muted {
+  color: var(--ui-text-soft);
+}
+
+/* ---------------------------------------------------------
+   7. INPUT, SELECT, TEXTAREA
+   --------------------------------------------------------- */
+
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea,
+html[data-theme="system"] input,
+html[data-theme="system"] select,
+html[data-theme="system"] textarea {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-color: var(--ui-border-strong);
+}
+
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder,
+html[data-theme="system"] input::placeholder,
+html[data-theme="system"] textarea::placeholder {
+  color: var(--ui-muted);
+}
+
+/* ---------------------------------------------------------
+   8. TABEL DAN DIALOG
+   --------------------------------------------------------- */
+
+html[data-theme="light"] table,
+html[data-theme="system"] table {
+  color: var(--ui-text);
+}
+
+html[data-theme="light"] th,
+html[data-theme="light"] td,
+html[data-theme="system"] th,
+html[data-theme="system"] td {
+  border-color: var(--ui-border);
+}
+
+html[data-theme="light"] .member-mobile-card,
+html[data-theme="light"] .member-dialog-content,
+html[data-theme="system"] .member-mobile-card,
+html[data-theme="system"] .member-dialog-content {
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border-color: var(--ui-border);
+}
+
+/* ---------------------------------------------------------
+   9. STATUS DAN TOMBOL
+   --------------------------------------------------------- */
+
+html[data-theme="light"] .member-status,
+html[data-theme="system"] .member-status {
+  border-color: var(--ui-border);
+}
+
+html[data-theme="light"] button,
+html[data-theme="system"] button {
+  color: inherit;
+}
+
+html[data-theme="light"] .admin-page .member-action,
+html[data-theme="system"] .admin-page .member-action {
+  border-color: var(--ui-border);
+}
+
+/* ---------------------------------------------------------
+   10. SYSTEM MODE MENGIKUTI PENGATURAN PERANGKAT
+   Hanya aktif ketika data-theme="system".
+   --------------------------------------------------------- */
+
+@media (prefers-color-scheme: light) {
+  html[data-theme="system"] {
+    color-scheme: light;
+  }
+
+  html[data-theme="system"] body {
+    background-color: var(--ui-bg);
+    color: var(--ui-text);
+  }
+}
