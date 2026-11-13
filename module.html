@@ -1,1 +1,470 @@
-<!doctype html><html lang="id" data-theme="dark" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#102a35"><title>Modul TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/module.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/module.js"></script><script defer src="./js/pwa.js"></script></head><body><header class="module-top"><a href="./dashboard.html" class="back">←</a><div><small>TARBIYAH · RUANG MODUL</small><b id="moduleCrumb">Modul</b></div><a href="./module.html?m=notifikasi" class="bell">♧</a></header><main class="module-wrap" id="moduleRoot"><section class="module-hero"><div><span class="module-kicker" id="moduleKicker">RUANG TARBIYAH</span><h1 id="moduleTitle">Memuat modul...</h1><p id="moduleDescription"></p></div><div class="module-symbol" id="moduleSymbol">✧</div></section><nav class="module-actions" id="moduleActions"><a href="./dashboard.html">Dashboard</a></nav><section class="module-content" id="moduleContent"></section><footer>© <span id="year"></span> TARBIYAH · Ilmu · Amal · Ukhuwah</footer></main><div id="moduleToast" role="status"></div></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Modul pembelajaran TARBIYAH — Pembelajaran Muslim">
+  <meta name="application-name" content="TARBIYAH">
+
+  <title>Modul TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    .module-page {
+      width: 100%;
+      min-width: 0;
+      padding-bottom: 32px;
+    }
+
+    .module-breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .82rem;
+    }
+
+    .module-breadcrumb a {
+      color: var(--color-primary, #36b58a);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .module-hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(20px, 4vw, 32px);
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(54,181,138,.18), transparent 38%),
+        var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .module-hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 12px;
+      color: var(--color-primary, #36b58a);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .module-hero h1 {
+      margin: 0 0 10px;
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      line-height: 1.3;
+    }
+
+    .module-hero p {
+      max-width: 680px;
+      margin: 0;
+      color: var(--text-secondary, #aab5af);
+      line-height: 1.7;
+    }
+
+    .module-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .module-toolbar-search {
+      display: flex;
+      flex: 1;
+      min-width: min(100%, 230px);
+      max-width: 440px;
+      gap: 8px;
+    }
+
+    .module-toolbar-search input {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .module-content {
+      min-height: 220px;
+    }
+
+    .module-content-empty {
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      padding: 28px 18px;
+      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border-radius: 17px;
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+    }
+
+    .module-content-empty-icon {
+      margin-bottom: 12px;
+      font-size: 2.2rem;
+    }
+
+    .module-content-empty h2 {
+      margin: 0 0 8px;
+      color: var(--text-primary, #fff);
+      font-size: 1.05rem;
+    }
+
+    .module-content-empty p {
+      max-width: 440px;
+      margin: 0;
+      font-size: .88rem;
+      line-height: 1.65;
+    }
+
+    .module-footer {
+      padding: 24px 0 12px;
+      margin-top: 28px;
+      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+      font-size: .78rem;
+    }
+
+    @media (max-width: 640px) {
+      .module-page {
+        padding-bottom: 90px;
+      }
+
+      .module-toolbar {
+        align-items: stretch;
+      }
+
+      .module-toolbar-search {
+        max-width: none;
+      }
+
+      .module-toolbar > .btn {
+        width: 100%;
+      }
+
+      .module-hero {
+        border-radius: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body class="auth-pending">
+
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+
+      <button
+        class="app-header-menu"
+        type="button"
+        data-sidebar-toggle
+        aria-label="Buka navigasi"
+        aria-expanded="false">
+        ☰
+      </button>
+
+      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
+        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+        <span class="brand-logo-text">
+          <strong>TARBIYAH</strong>
+          <small>Pembelajaran Muslim</small>
+        </span>
+      </a>
+
+      <div class="app-header-actions">
+
+        <button
+          type="button"
+          class="app-header-action"
+          data-theme-toggle
+          aria-label="Ganti tema"
+          title="Ganti tema">
+          ◐
+        </button>
+
+        <a
+          href="./notifikasi.html"
+          class="app-header-action notification-action"
+          aria-label="Notifikasi">
+          ♧
+          <span class="notification-count" data-notification-count>0</span>
+        </a>
+
+        <button
+          type="button"
+          class="app-header-user"
+          data-user-menu-toggle
+          aria-label="Menu akun">
+          <img
+            src="./assets/icons/icon-192.png"
+            alt="Foto profil"
+            data-user-avatar>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div
+      class="sidebar-overlay"
+      data-sidebar-overlay
+      aria-hidden="true">
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar" aria-label="Navigasi utama">
+
+      <div class="sidebar-profile">
+        <img
+          src="./assets/icons/icon-192.png"
+          alt="Foto profil anggota"
+          class="sidebar-avatar"
+          data-sidebar-avatar>
+
+        <div class="sidebar-profile-info">
+          <strong data-sidebar-user-name>Anggota TARBIYAH</strong>
+          <small data-sidebar-user-role>Anggota</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-navigation">
+
+        <p class="sidebar-nav-heading">MENU UTAMA</p>
+
+        <a href="./tarbiyah.html" data-module="dashboard" class="sidebar-nav-item">
+          <span>⌂</span>
+          <span>Beranda</span>
+        </a>
+
+        <a href="./profil-anggota.html" data-module="profil" class="sidebar-nav-item">
+          <span>♙</span>
+          <span>Profil Anggota</span>
+        </a>
+
+        <a href="./agenda-tarbiyah.html" data-module="agenda" class="sidebar-nav-item">
+          <span>▦</span>
+          <span>Agenda & Jadwal</span>
+        </a>
+
+        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
+          <span>▤</span>
+          <span>Pembelajaran</span>
+        </a>
+
+        <a href="./materi-pembelajaran.html" data-module="materi" class="sidebar-nav-item">
+          <span>▧</span>
+          <span>Materi Kajian</span>
+        </a>
+
+        <a href="./berita-pengumuman.html" data-module="berita" class="sidebar-nav-item">
+          <span>▥</span>
+          <span>Berita & Pengumuman</span>
+        </a>
+
+        <a href="./presensi-tarbiyah.html" data-module="presensi" class="sidebar-nav-item">
+          <span>✓</span>
+          <span>Presensi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">KOMUNITAS</p>
+
+        <a href="./galeri-foto-video.html" data-module="galeri" class="sidebar-nav-item">
+          <span>▣</span>
+          <span>Galeri Dokumentasi</span>
+        </a>
+
+        <a href="./diskusi-tarbiyah.html" data-module="diskusi" class="sidebar-nav-item">
+          <span>☷</span>
+          <span>Ruang Diskusi</span>
+        </a>
+
+        <a href="./donasi-infaq.html" data-module="donasi" class="sidebar-nav-item">
+          <span>♡</span>
+          <span>Infaq & Donasi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">AKUN & AKTIVITAS</p>
+
+        <a href="./kehadiran.html" data-module="kehadiran" class="sidebar-nav-item">
+          <span>◷</span>
+          <span>Riwayat Kehadiran</span>
+        </a>
+
+        <a href="./catatan-refleksi.html" data-module="catatan" class="sidebar-nav-item">
+          <span>✎</span>
+          <span>Catatan Refleksi</span>
+        </a>
+
+        <a href="./riwayat-aktivitas.html" data-module="riwayat" class="sidebar-nav-item">
+          <span>↻</span>
+          <span>Riwayat Aktivitas</span>
+        </a>
+
+        <a href="./administrasi-pengaturan.html" data-module="administrasi" class="sidebar-nav-item">
+          <span>⚙</span>
+          <span>Pengaturan</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-logout" data-logout>
+          ⇥ Keluar dari Akun
+        </button>
+
+        <small>© <span data-dashboard-year>2026</span> TARBIYAH</small>
+      </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="app-main module-page">
+
+      <div class="module-breadcrumb">
+        <a href="./tarbiyah.html">Beranda</a>
+        <span>›</span>
+        <span data-module-breadcrumb>Modul TARBIYAH</span>
+      </div>
+
+      <!-- MODULE HERO -->
+      <section class="module-hero">
+
+        <span class="module-hero-label">
+          🌿 RUANG BELAJAR & UKHUWAH
+        </span>
+
+        <h1 data-module-title>
+          Modul TARBIYAH
+        </h1>
+
+        <p data-module-description>
+          Ruang untuk belajar, bertumbuh, berbagi ilmu, dan mempererat ukhuwah Islamiyah.
+        </p>
+
+      </section>
+
+      <!-- MODULE TOOLBAR -->
+      <section class="module-toolbar">
+
+        <form class="module-toolbar-search" data-module-search-form>
+          <input
+            type="search"
+            data-module-search
+            placeholder="Cari informasi..."
+            aria-label="Cari informasi dalam modul">
+
+          <button type="submit" class="btn btn-primary">
+            Cari
+          </button>
+        </form>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-module-primary-action
+          hidden>
+          Tambah Data
+        </button>
+
+      </section>
+
+      <!-- MODULE CONTENT -->
+      <section
+        class="module-content"
+        data-module-content
+        aria-live="polite">
+
+        <div class="module-content-empty">
+          <div>
+            <div class="module-content-empty-icon">🌱</div>
+
+            <h2>Selamat Datang di Modul TARBIYAH</h2>
+
+            <p>
+              Konten modul akan ditampilkan sesuai halaman yang sedang dibuka.
+              Data akan dimuat dari sistem TARBIYAH setelah integrasi modul selesai.
+            </p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- MODULE FOOTER -->
+      <footer class="module-footer">
+        <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
+        <small>
+          © <span data-dashboard-year>2026</span> TARBIYAH — Pembelajaran Muslim
+        </small>
+      </footer>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
+
+      <a href="./tarbiyah.html" data-module="dashboard">
+        <span>⌂</span>
+        <small>Beranda</small>
+      </a>
+
+      <a href="./agenda-tarbiyah.html" data-module="agenda">
+        <span>▦</span>
+        <small>Agenda</small>
+      </a>
+
+      <a href="./materi-pembelajaran.html" data-module="materi">
+        <span>▤</span>
+        <small>Materi</small>
+      </a>
+
+      <a href="./profil-anggota.html" data-module="profil">
+        <span>♙</span>
+        <small>Profil</small>
+      </a>
+
+    </nav>
+
+  </div>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+</body>
+</html>
