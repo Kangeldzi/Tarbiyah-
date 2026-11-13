@@ -1,1 +1,469 @@
-<!doctype html><html lang="id" data-theme="light" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#267A78"><meta name="description" content="Ringkasan kehadiran pribadi dan riwayat partisipasi dalam kegiatan."><title>Kehadiran — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/brand-logo.css"><link rel="stylesheet" href="./css/module-shell.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/module-shell.js"></script><script defer src="./js/pwa.js"></script></head><body><div class="app-shell"><aside class="app-sidebar"><a class="module-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span>TARBIYAH<small>Ruang Ilmu & Ukhuwah</small></span></a><div class="nav-caption">MENU UTAMA</div><nav class="app-nav" aria-label="Navigasi aplikasi"><a href="./dashboard.html" ><span class="nav-ico">⌂</span>Dashboard</a><a href="./profil-anggota.html" ><span class="nav-ico">◉</span>Profil & Anggota</a><a href="./agenda-tarbiyah.html" ><span class="nav-ico">▦</span>Agenda Tarbiyah</a><a href="./pembelajaran.html" ><span class="nav-ico">✧</span>Pembelajaran</a><a href="./materi-pembelajaran.html" ><span class="nav-ico">▤</span>Materi Pembelajaran</a><a href="./berita-pengumuman.html" ><span class="nav-ico">▧</span>Berita & Pengumuman</a><a href="./presensi-tarbiyah.html" ><span class="nav-ico">✓</span>Presensi Tarbiyah</a><a href="./galeri-foto-video.html" ><span class="nav-ico">▣</span>Galeri Foto & Video</a><a href="./diskusi-tarbiyah.html" ><span class="nav-ico">☷</span>Diskusi Tarbiyah</a><a href="./donasi-infaq.html" ><span class="nav-ico">♡</span>Donasi, Infaq & Shodaqoh</a><a href="./kehadiran.html" aria-current="page"><span class="nav-ico">◷</span>Kehadiran</a><a href="./catatan-refleksi.html" ><span class="nav-ico">✎</span>Catatan & Refleksi</a><a href="./notifikasi.html" ><span class="nav-ico">♧</span>Notifikasi</a><a href="./riwayat-aktivitas.html" ><span class="nav-ico">◷</span>Riwayat Aktivitas</a><a href="./administrasi-pengaturan.html" ><span class="nav-ico">⚙</span>Administrasi & Pengaturan</a></nav><div class="sidebar-foot">Ilmu · Amal · Ukhuwah<br>© <span data-year></span> TARBIYAH</div></aside><div class="mobile-scrim" data-scrim></div><main class="app-main"><header class="app-topbar"><div class="top-left"><button class="icon-btn menu-toggle" data-menu aria-label="Buka navigasi" aria-expanded="false">☰</button><div class="crumb">TARBIYAH&nbsp; / &nbsp;<b>Kehadiran</b></div></div><div class="top-actions"><button class="icon-btn" data-theme-toggle aria-label="Ganti tema">◐</button><a class="icon-btn" href="./notifikasi.html" aria-label="Notifikasi" style="display:grid;place-items:center;text-decoration:none">♧</a><a class="profile-chip" href="./profil-anggota.html" aria-label="Profil">T</a></div></header><div class="module-content"><div class="module-head"><div><div class="eyebrow">RUANG TARBIYAH · MODUL</div><h1>Kehadiran</h1><p>Ringkasan kehadiran pribadi dan riwayat partisipasi dalam kegiatan.</p></div><div class="head-actions"><button class="btn secondary" type="button" data-back>← Kembali</button><button class="btn" type="button" data-action>Lihat riwayat <span>↗</span></button></div></div><div class="notice"><b>Informasi pengembangan:</b> antarmuka dan navigasi modul ini sudah disiapkan. Data produksi belum ditampilkan sampai tabel dan kebijakan keamanan Supabase diverifikasi. Ini mencegah data contoh dianggap sebagai data komunitas yang sebenarnya.</div><section class="metric-grid"><article class="metric-card"><div class="metric-label">Riwayat hadir</div><div class="metric-value">—</div><div class="metric-hint">Menunggu data terverifikasi</div></article><article class="metric-card"><div class="metric-label">Status sinkronisasi</div><div class="metric-value" style="font-size:17px">Belum aktif</div><div class="metric-hint">Koneksi tabel belum dipetakan</div></article><article class="metric-card"><div class="metric-label">Akses akun</div><div class="metric-value" style="font-size:17px">Terproteksi</div><div class="metric-hint">Mengikuti sesi autentikasi</div></article><article class="metric-card"><div class="metric-label">Tema aplikasi</div><div class="metric-value" style="font-size:17px">Teal</div><div class="metric-hint">Mengikuti tema induk TARBIYAH</div></article></section><div class="panel-grid"><section class="panel"><h2>Ringkasan saya</h2><p class="panel-desc">Ringkasan kehadiran pribadi dan riwayat partisipasi dalam kegiatan.</p><div class="toolbar"><input class="field" type="search" placeholder="Cari data..." aria-label="Cari data" disabled><button class="btn secondary" type="button" disabled>Filter</button></div><div class="empty-box"><div class="empty-icon">◷</div><b>Belum ada data untuk ditampilkan</b><p>Riwayat kehadiran akan terhubung dengan catatan presensi yang tervalidasi.</p></div></section><aside class="panel"><h2>Riwayat partisipasi</h2><p class="panel-desc">Informasi akan mengikuti data akun dan hak akses Anda.</p><div class="notice">Status integrasi: tampilan modul disiapkan. Pembacaan dan penyimpanan data menunggu verifikasi tabel, kolom, serta kebijakan RLS Supabase.</div><div class="empty-box"><div class="empty-icon">✦</div><b>Belum terhubung ke sumber data</b><p>Tidak ada data contoh atau angka rekaan yang ditampilkan.</p></div></aside></div><footer class="app-footer">TARBIYAH · Pembelajaran Muslim <span style="float:right">Versi pengembangan</span></footer></div></main></div><div class="toast" role="status" aria-live="polite" data-toast></div><script type="application/json" id="module-meta">{"key":"kehadiran","title":"Kehadiran"}</script></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Riwayat kehadiran anggota TARBIYAH.">
+  <title>Riwayat Kehadiran — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    .attendance-page {
+      width: min(100%, 1100px);
+      margin: 0 auto;
+      padding: 24px 18px 100px;
+    }
+
+    .attendance-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 25px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #075c43, #103b30 65%, #102a22);
+      color: #fff;
+      margin-bottom: 22px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.15);
+    }
+
+    .attendance-hero::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      right: -55px;
+      top: -70px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+
+    .attendance-hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 8px;
+      font: 700 clamp(22px, 5vw, 30px) Poppins, sans-serif;
+    }
+
+    .attendance-hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 580px;
+      margin: 0;
+      color: rgba(255,255,255,.8);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .attendance-eyebrow {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #b8f5d8;
+    }
+
+    .attendance-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .attendance-stat {
+      min-width: 0;
+      padding: 17px 15px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 17px;
+      background: var(--card-bg, rgba(255,255,255,.04));
+    }
+
+    .attendance-stat .stat-icon {
+      display: block;
+      font-size: 21px;
+      margin-bottom: 12px;
+    }
+
+    .attendance-stat strong {
+      display: block;
+      font: 800 25px Poppins, sans-serif;
+      color: var(--text-primary, inherit);
+    }
+
+    .attendance-stat span:last-child {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-secondary, #999);
+      font-size: 12px;
+    }
+
+    .attendance-panel {
+      padding: 19px;
+      margin-bottom: 18px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 19px;
+      background: var(--card-bg, rgba(255,255,255,.04));
+    }
+
+    .attendance-panel h2 {
+      margin: 0 0 15px;
+      font: 700 17px Poppins, sans-serif;
+    }
+
+    .attendance-filter {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .attendance-field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary, #999);
+    }
+
+    .attendance-field select,
+    .attendance-field input {
+      width: 100%;
+      min-height: 43px;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color, #777);
+      border-radius: 11px;
+      color: var(--text-primary, inherit);
+      background: var(--input-bg, transparent);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .attendance-button {
+      min-height: 43px;
+      padding: 0 17px;
+      border: 0;
+      border-radius: 11px;
+      background: #087f5b;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .attendance-button:active {
+      transform: scale(.98);
+    }
+
+    .attendance-list {
+      display: grid;
+      gap: 11px;
+    }
+
+    .attendance-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 13px;
+      padding: 15px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 15px;
+      background: var(--card-bg, rgba(255,255,255,.03));
+    }
+
+    .attendance-item-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .attendance-item-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: rgba(16,185,129,.13);
+      font-size: 20px;
+    }
+
+    .attendance-item h3 {
+      margin: 0 0 5px;
+      font-size: 14px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .attendance-item p {
+      margin: 0;
+      color: var(--text-secondary, #999);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .attendance-status {
+      flex-shrink: 0;
+      padding: 6px 10px;
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(16,185,129,.13);
+      color: #10b981;
+    }
+
+    .attendance-empty {
+      padding: 35px 15px;
+      text-align: center;
+      color: var(--text-secondary, #999);
+      border: 1px dashed var(--border-color, #777);
+      border-radius: 15px;
+      line-height: 1.7;
+      font-size: 13px;
+    }
+
+    .attendance-empty .empty-icon {
+      display: block;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .attendance-note {
+      margin-top: 14px;
+      padding: 13px;
+      border-radius: 12px;
+      background: rgba(16,185,129,.08);
+      color: var(--text-secondary, #999);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 650px) {
+      .attendance-page {
+        padding: 16px 13px 95px;
+      }
+
+      .attendance-stats {
+        gap: 8px;
+      }
+
+      .attendance-stat {
+        padding: 13px 10px;
+      }
+
+      .attendance-stat strong {
+        font-size: 21px;
+      }
+
+      .attendance-stat span:last-child {
+        font-size: 10px;
+      }
+
+      .attendance-filter {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .attendance-filter .attendance-button {
+        grid-column: 1 / -1;
+      }
+
+      .attendance-hero {
+        padding: 21px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .attendance-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .attendance-stat {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .attendance-stat .stat-icon {
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app-shell">
+    <main class="attendance-page">
+
+      <section class="attendance-hero">
+        <div class="attendance-eyebrow">✦ TARBIYAH MEMBER CENTER</div>
+        <h1>Riwayat Kehadiran</h1>
+        <p>
+          Pantau perjalanan keikutsertaan Anda dalam kegiatan,
+          kajian, dan pembelajaran bersama komunitas TARBIYAH.
+        </p>
+      </section>
+
+      <section class="attendance-stats" aria-label="Ringkasan kehadiran">
+        <article class="attendance-stat">
+          <span class="stat-icon">📚</span>
+          <strong id="totalActivities">—</strong>
+          <span>Total kegiatan</span>
+        </article>
+
+        <article class="attendance-stat">
+          <span class="stat-icon">✅</span>
+          <strong id="totalPresent">—</strong>
+          <span>Hadir</span>
+        </article>
+
+        <article class="attendance-stat">
+          <span class="stat-icon">📊</span>
+          <strong id="attendanceRate">—</strong>
+          <span>Persentase kehadiran</span>
+        </article>
+      </section>
+
+      <section class="attendance-panel">
+        <h2>🔎 Filter Riwayat</h2>
+
+        <div class="attendance-filter">
+          <div class="attendance-field">
+            <label for="attendanceMonth">Bulan</label>
+            <select id="attendanceMonth">
+              <option value="">Semua bulan</option>
+              <option value="01">Januari</option>
+              <option value="02">Februari</option>
+              <option value="03">Maret</option>
+              <option value="04">April</option>
+              <option value="05">Mei</option>
+              <option value="06">Juni</option>
+              <option value="07">Juli</option>
+              <option value="08">Agustus</option>
+              <option value="09">September</option>
+              <option value="10">Oktober</option>
+              <option value="11">November</option>
+              <option value="12">Desember</option>
+            </select>
+          </div>
+
+          <div class="attendance-field">
+            <label for="attendanceYear">Tahun</label>
+            <select id="attendanceYear">
+              <option value="">Semua tahun</option>
+            </select>
+          </div>
+
+          <button class="attendance-button" id="filterAttendance" type="button">
+            Terapkan Filter
+          </button>
+        </div>
+      </section>
+
+      <section class="attendance-panel">
+        <h2>📋 Daftar Kehadiran</h2>
+
+        <div class="attendance-list" id="attendanceList">
+          <div class="attendance-empty">
+            <span class="empty-icon">🗓️</span>
+            Riwayat kehadiran akan ditampilkan setelah
+            data presensi terhubung dengan database TARBIYAH.
+          </div>
+        </div>
+
+        <div class="attendance-note">
+          <strong>Informasi:</strong> Data kehadiran harus berasal dari
+          catatan presensi kegiatan yang tersimpan di database.
+          Halaman ini tidak membuat atau mengarang riwayat kehadiran.
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (id) => document.getElementById(id);
+
+      const monthSelect = $("attendanceMonth");
+      const yearSelect = $("attendanceYear");
+
+      function populateYears() {
+        const currentYear = new Date().getFullYear();
+
+        for (let year = currentYear; year >= currentYear - 8; year--) {
+          const option = document.createElement("option");
+          option.value = String(year);
+          option.textContent = String(year);
+          yearSelect.appendChild(option);
+        }
+      }
+
+      function showEmptyState(message) {
+        $("attendanceList").innerHTML = `
+          <div class="attendance-empty">
+            <span class="empty-icon">🗓️</span>
+            ${message}
+          </div>
+        `;
+      }
+
+      function applyFilter() {
+        /*
+          Integrasi filter akan menggunakan data riwayat
+          dari tabel presensi Supabase pada tahap integrasi backend.
+        */
+        showEmptyState(
+          "Belum ada data kehadiran yang tersedia untuk filter ini."
+        );
+      }
+
+      function initialize() {
+        populateYears();
+
+        $("totalActivities").textContent = "—";
+        $("totalPresent").textContent = "—";
+        $("attendanceRate").textContent = "—";
+
+        $("filterAttendance").addEventListener("click", applyFilter);
+
+        monthSelect.addEventListener("change", applyFilter);
+        yearSelect.addEventListener("change", applyFilter);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initialize);
+      } else {
+        initialize();
+      }
+
+      window.TARBIYAH_ATTENDANCE_HISTORY = {
+        refresh: applyFilter
+      };
+    })();
+  </script>
+</body>
+</html>
