@@ -569,6 +569,303 @@
         animation-duration: 0.01ms !important;
       }
     }
+
+
+/* =========================================================
+   TARBIYAH — AUTH UI REFINEMENT
+   Perbaikan identitas, checkbox, tab, dan tombol tema
+   ========================================================= */
+
+/* 1. Susunan utama: identitas di atas formulir */
+.auth-container {
+  display: flex !important;
+  flex-direction: column;
+  width: 100%;
+  max-width: 540px;
+  min-height: auto;
+  margin-inline: auto;
+  border-radius: 24px;
+}
+
+.auth-visual {
+  min-height: auto;
+  padding: 30px 28px 16px;
+  text-align: center;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(52, 211, 153, .19),
+      transparent 70%
+    ),
+    linear-gradient(145deg, #0b382a, #102a22 75%);
+}
+
+.auth-visual-content {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* 2. Logo dan nama TARBIYAH */
+.auth-logo-frame {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 13px;
+  border-radius: 21px;
+}
+
+.auth-logo-frame img {
+  width: 54px;
+  height: 54px;
+}
+
+.auth-visual h1 {
+  margin: 0 0 8px;
+  font-size: clamp(25px, 5vw, 31px);
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-align: center;
+}
+
+.auth-visual p {
+  max-width: 390px;
+  margin: 0 auto;
+  font-size: 12.5px;
+  line-height: 1.75;
+  text-align: center;
+}
+
+.auth-feature-list {
+  display: none;
+}
+
+/* 3. Formulir */
+.auth-wrapper {
+  width: 100%;
+  min-height: auto;
+  padding: 20px 34px 30px;
+}
+
+.auth-heading {
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.auth-heading h2,
+.auth-heading p {
+  text-align: center;
+}
+
+/* 4. Tab Masuk dan Daftar */
+.auth-tabs {
+  width: 100%;
+  padding: 5px;
+  gap: 6px;
+  border: 1px solid var(--border-color, rgba(110,231,183,.18));
+  border-radius: 14px;
+}
+
+.auth-tab {
+  min-height: 43px;
+  border-radius: 10px;
+  color: var(--text-secondary, #a7c8ba);
+  background: transparent;
+  transition:
+    color .22s ease,
+    background .22s ease,
+    box-shadow .22s ease,
+    transform .22s ease;
+}
+
+.auth-tab.active,
+.auth-tab[aria-selected="true"] {
+  color: #fff !important;
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  box-shadow: 0 4px 13px rgba(16,185,129,.22);
+}
+
+.auth-tab:not(.active):not([aria-selected="true"]) {
+  color: var(--text-secondary, #a7c8ba);
+  background: transparent;
+  box-shadow: none;
+}
+
+/* 5. Checkbox persetujuan */
+.auth-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  margin: 5px 0 18px;
+  font-size: 11.5px;
+  line-height: 1.65;
+  cursor: pointer;
+}
+
+.auth-terms input[type="checkbox"] {
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  display: block;
+  flex: 0 0 17px;
+  width: 17px !important;
+  min-width: 17px;
+  max-width: 17px;
+  height: 17px;
+  min-height: 17px !important;
+  margin: 2px 0 0;
+  padding: 0;
+  accent-color: #10b981;
+  cursor: pointer;
+}
+
+.auth-terms span {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+/* 6. Tombol tema */
+.auth-theme-button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-color, rgba(110,231,183,.22));
+  border-radius: 14px;
+  background: var(--bg-card, #102a22);
+  color: var(--text-primary, #f0fdf4);
+  font-size: 19px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  transition:
+    transform .2s ease,
+    background .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.auth-theme-button:hover {
+  transform: translateY(-2px);
+  border-color: #10b981;
+  box-shadow: 0 5px 17px rgba(16,185,129,.2);
+}
+
+.auth-theme-button:active {
+  transform: scale(.95);
+}
+
+.auth-theme-button:focus-visible,
+.auth-tab:focus-visible {
+  outline: 3px solid rgba(16,185,129,.35);
+  outline-offset: 3px;
+}
+
+/* 7. Tema terang */
+[data-theme="light"] .auth-visual {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(16,185,129,.13), transparent 70%),
+    linear-gradient(145deg, #e6f8ef, #f2fbf5 75%);
+}
+
+[data-theme="light"] .auth-visual h1 {
+  color: #075c42;
+}
+
+[data-theme="light"] .auth-visual p {
+  color: #376b57;
+}
+
+[data-theme="light"] .auth-theme-button {
+  background: #ffffff;
+  color: #075c42;
+  border-color: rgba(5,150,105,.2);
+}
+
+/* 8. Mobile */
+@media (max-width: 760px) {
+  .auth-page {
+    justify-content: flex-start;
+    padding: max(15px, env(safe-area-inset-top)) 14px
+             max(20px, env(safe-area-inset-bottom));
+  }
+
+  .auth-topbar {
+    max-width: 540px;
+    margin-bottom: 14px;
+  }
+
+  .auth-container {
+    max-width: 480px;
+    border-radius: 21px;
+  }
+
+  .auth-visual {
+    display: block;
+    padding: 24px 20px 12px;
+  }
+
+  .auth-logo-frame {
+    width: 65px;
+    height: 65px;
+    margin-bottom: 11px;
+    border-radius: 18px;
+  }
+
+  .auth-logo-frame img {
+    width: 47px;
+    height: 47px;
+  }
+
+  .auth-visual h1 {
+    font-size: 25px;
+  }
+
+  .auth-visual p {
+    max-width: 350px;
+    font-size: 11.5px;
+  }
+
+  .auth-wrapper {
+    padding: 19px 22px 25px;
+  }
+
+  .auth-heading {
+    margin-bottom: 19px;
+  }
+}
+
+@media (max-width: 360px) {
+  .auth-page {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .auth-visual {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .auth-wrapper {
+    padding-left: 17px;
+    padding-right: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-container,
+  .auth-tab,
+  .auth-theme-button {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
   </style>
 </head>
 
