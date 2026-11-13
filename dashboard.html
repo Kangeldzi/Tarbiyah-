@@ -5,16 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="Dashboard TARBIYAH — Pembelajaran Muslim">
-  <meta name="application-name" content="TARBIYAH">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <title>Dashboard — TARBIYAH</title>
+  <meta name="description" content="Panel Administrasi TARBIYAH — Pembelajaran Muslim">
+  <title>Administrasi Admin | TARBIYAH</title>
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,592 +18,571 @@
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
-  <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
-  <link rel="stylesheet" href="./css/dashboard.css">
 
   <style>
-    .dashboard-page {
-      width: 100%;
-      min-width: 0;
+    :root {
+      --admin-green: #10b981;
+      --admin-green-dark: #047857;
+      --admin-card: var(--surface, #172b25);
+      --admin-border: var(--border, rgba(255,255,255,.09));
+      --admin-muted: var(--text-muted, #94a3b8);
     }
 
-    .dashboard-page .dashboard-welcome {
+    body {
+      font-family: Inter, sans-serif;
+    }
+
+    .admin-page {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 24px 18px 100px;
+    }
+
+    .admin-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
       margin-bottom: 24px;
     }
 
-    .dashboard-page .dashboard-section {
-      margin-top: 26px;
+    .admin-heading h1 {
+      font: 800 clamp(1.4rem, 4vw, 2rem) Poppins, sans-serif;
+      margin: 0 0 6px;
     }
 
-    .dashboard-page .dashboard-section-header {
+    .admin-heading p {
+      color: var(--admin-muted);
+      margin: 0;
+      font-size: .9rem;
+    }
+
+    .admin-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border: 1px solid rgba(16,185,129,.3);
+      color: var(--admin-green);
+      background: rgba(16,185,129,.08);
+      border-radius: 30px;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+
+    .admin-label::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: currentColor;
+      border-radius: 50%;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .admin-stat {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-border);
+      border-radius: 16px;
+      padding: 18px;
+      min-width: 0;
+    }
+
+    .admin-stat-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(16,185,129,.12);
+      font-size: 1.15rem;
+      margin-bottom: 13px;
+    }
+
+    .admin-stat small {
+      display: block;
+      color: var(--admin-muted);
+      font-size: .78rem;
+      margin-bottom: 6px;
+    }
+
+    .admin-stat strong {
+      font-size: 1.55rem;
+      font-weight: 800;
+      font-family: Poppins, sans-serif;
+    }
+
+    .admin-panel {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-border);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .admin-panel-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 17px;
     }
 
-    .dashboard-page .dashboard-section-header h2 {
+    .admin-panel-header h2 {
       margin: 0;
-      font-family: "Poppins", sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
+      font: 700 1rem Poppins, sans-serif;
     }
 
-    .dashboard-page .dashboard-section-header a {
-      color: var(--color-primary, #36b58a);
-      font-size: .82rem;
-      font-weight: 600;
-      text-decoration: none;
+    .admin-panel-header p {
+      color: var(--admin-muted);
+      font-size: .8rem;
+      margin: 5px 0 0;
     }
 
-    .dashboard-page .dashboard-shortcuts {
+    .admin-actions {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
 
-    .dashboard-page .dashboard-shortcut {
+    .admin-action {
+      border: 1px solid var(--admin-border);
+      background: rgba(255,255,255,.025);
+      border-radius: 14px;
+      padding: 15px;
+      text-align: left;
+      color: inherit;
+      cursor: pointer;
+      transition: .2s ease;
       min-width: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      padding: 17px 10px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
-      border-radius: 16px;
-      background: var(--surface-color, rgba(255,255,255,.04));
-      color: var(--text-primary, #fff);
-      text-align: center;
-      text-decoration: none;
-      transition: transform .2s ease, border-color .2s ease;
     }
 
-    .dashboard-page .dashboard-shortcut:hover {
-      transform: translateY(-3px);
-      border-color: var(--color-primary, #36b58a);
+    .admin-action:hover {
+      border-color: var(--admin-green);
+      transform: translateY(-2px);
+      background: rgba(16,185,129,.06);
     }
 
-    .dashboard-page .dashboard-shortcut-icon {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border-radius: 13px;
-      background: rgba(54,181,138,.13);
-      font-size: 1.3rem;
-    }
-
-    .dashboard-page .dashboard-shortcut span:last-child {
-      font-size: .78rem;
-      font-weight: 600;
-    }
-
-    .dashboard-page .dashboard-empty {
-      padding: 22px 16px;
-      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
-      border-radius: 15px;
-      color: var(--text-secondary, #aaa);
-      text-align: center;
-      font-size: .88rem;
-    }
-
-    .dashboard-page .dashboard-empty-icon {
+    .admin-action .action-icon {
+      font-size: 1.35rem;
       display: block;
-      margin-bottom: 8px;
-      font-size: 1.6rem;
+      margin-bottom: 10px;
     }
 
-    .dashboard-page .dashboard-search {
+    .admin-action strong {
+      display: block;
+      font-size: .88rem;
+      margin-bottom: 5px;
+    }
+
+    .admin-action span:last-child {
+      color: var(--admin-muted);
+      font-size: .75rem;
+      line-height: 1.5;
+    }
+
+    .admin-export-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .export-item {
       display: flex;
-      gap: 8px;
-      width: min(100%, 420px);
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
     }
 
-    .dashboard-page .dashboard-search input {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .dashboard-page .dashboard-search button {
+    .export-item input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--admin-green);
       flex-shrink: 0;
     }
 
-    @media (max-width: 640px) {
-      .dashboard-page .dashboard-shortcuts {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 8px;
-      }
+    .export-item label {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
 
-      .dashboard-page .dashboard-shortcut {
-        padding: 13px 5px;
-        border-radius: 13px;
-      }
+    .export-item strong {
+      display: block;
+      font-size: .85rem;
+    }
 
-      .dashboard-page .dashboard-shortcut-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 1.1rem;
-      }
+    .export-item small {
+      display: block;
+      color: var(--admin-muted);
+      font-size: .73rem;
+      margin-top: 3px;
+    }
 
-      .dashboard-page .dashboard-shortcut span:last-child {
-        font-size: .68rem;
-      }
+    .admin-button {
+      border: 0;
+      border-radius: 11px;
+      background: var(--admin-green-dark);
+      color: white;
+      padding: 11px 16px;
+      font: 700 .82rem Inter, sans-serif;
+      cursor: pointer;
+      transition: .2s ease;
+    }
 
-      .dashboard-page .dashboard-search {
-        width: 100%;
+    .admin-button:hover {
+      background: var(--admin-green);
+      transform: translateY(-1px);
+    }
+
+    .admin-button.secondary {
+      color: var(--admin-green);
+      border: 1px solid rgba(16,185,129,.35);
+      background: rgba(16,185,129,.08);
+    }
+
+    .admin-button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .admin-notice {
+      color: var(--admin-muted);
+      font-size: .78rem;
+      line-height: 1.6;
+      margin-top: 13px;
+    }
+
+    .admin-status {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.2);
+      color: var(--admin-green);
+      font-size: .82rem;
+      line-height: 1.5;
+      margin-top: 13px;
+      display: none;
+      overflow-wrap: anywhere;
+    }
+
+    .admin-status.show {
+      display: block;
+    }
+
+    .admin-status.error {
+      color: #f87171;
+      background: rgba(248,113,113,.08);
+      border-color: rgba(248,113,113,.2);
+    }
+
+    .admin-table-wrap {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    .admin-table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 480px;
+      font-size: .8rem;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .admin-table th {
+      color: var(--admin-muted);
+      font-weight: 600;
+    }
+
+    .admin-table td {
+      color: inherit;
+    }
+
+    .admin-empty {
+      color: var(--admin-muted);
+      text-align: center;
+      padding: 22px 10px;
+      font-size: .82rem;
+    }
+
+    .admin-security {
+      border-left: 3px solid var(--admin-green);
+      padding: 12px 14px;
+      background: rgba(16,185,129,.06);
+      border-radius: 0 10px 10px 0;
+      color: var(--admin-muted);
+      font-size: .8rem;
+      line-height: 1.65;
+    }
+
+    .admin-security strong {
+      color: var(--admin-green);
+    }
+
+    @media (max-width: 850px) {
+      .admin-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 360px) {
-      .dashboard-page .dashboard-shortcuts {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    @media (max-width: 520px) {
+      .admin-page {
+        padding: 19px 13px 90px;
+      }
+
+      .admin-panel {
+        padding: 15px;
+      }
+
+      .admin-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-stat {
+        padding: 14px;
+      }
+
+      .admin-stat strong {
+        font-size: 1.3rem;
       }
     }
   </style>
 </head>
 
-<body class="auth-pending">
-
-  <div class="app-shell">
-
-    <!-- HEADER -->
-    <header class="app-header">
-      <button
-        class="app-header-menu"
-        type="button"
-        data-sidebar-toggle
-        aria-label="Buka navigasi"
-        aria-expanded="false">
-        ☰
-      </button>
-
-      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
-        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-        <span class="brand-logo-text">
-          <strong>TARBIYAH</strong>
-          <small>Pembelajaran Muslim</small>
-        </span>
-      </a>
-
-      <div class="app-header-actions">
-        <button
-          type="button"
-          class="app-header-action"
-          data-theme-toggle
-          aria-label="Ganti tema"
-          title="Ganti tema">
-          ◐
-        </button>
-
-        <a
-          href="./notifikasi.html"
-          class="app-header-action notification-action"
-          aria-label="Notifikasi">
-          ♧
-          <span class="notification-count" data-notification-count>0</span>
-        </a>
-
-        <button
-          type="button"
-          class="app-header-user"
-          data-user-menu-toggle
-          aria-label="Menu akun">
-          <img
-            src="./assets/icons/icon-192.png"
-            alt="Foto profil"
-            data-user-avatar>
-        </button>
+<body>
+  <main class="admin-page" data-module="administrasi">
+    <header class="admin-header">
+      <div class="admin-heading">
+        <div class="admin-label">PANEL ADMINISTRATOR</div>
+        <h1>Administrasi TARBIYAH</h1>
+        <p>Pengelolaan sistem, data, dan aktivitas pembelajaran Muslim.</p>
       </div>
+      <button class="admin-button secondary" id="adminRefresh" type="button">
+        ↻ Perbarui
+      </button>
     </header>
 
-    <!-- SIDEBAR OVERLAY -->
-    <div
-      class="sidebar-overlay"
-      data-sidebar-overlay
-      aria-hidden="true">
-    </div>
-
-    <!-- SIDEBAR -->
-    <aside class="app-sidebar" aria-label="Navigasi utama">
-
-      <div class="sidebar-profile">
-        <img
-          src="./assets/icons/icon-192.png"
-          alt="Foto profil anggota"
-          class="sidebar-avatar"
-          data-sidebar-avatar>
-
-        <div class="sidebar-profile-info">
-          <strong data-sidebar-user-name>Anggota TARBIYAH</strong>
-          <small data-sidebar-user-role>Anggota</small>
-        </div>
-      </div>
-
-      <nav class="sidebar-navigation">
-
-        <p class="sidebar-nav-heading">MENU UTAMA</p>
-
-        <a href="./tarbiyah.html" data-module="dashboard" class="sidebar-nav-item">
-          <span>⌂</span>
-          <span>Beranda</span>
-        </a>
-
-        <a href="./profil-anggota.html" data-module="profil" class="sidebar-nav-item">
-          <span>♙</span>
-          <span>Profil Anggota</span>
-        </a>
-
-        <a href="./agenda-tarbiyah.html" data-module="agenda" class="sidebar-nav-item">
-          <span>▦</span>
-          <span>Agenda & Jadwal</span>
-        </a>
-
-        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
-          <span>▤</span>
-          <span>Pembelajaran</span>
-        </a>
-
-        <a href="./materi-pembelajaran.html" data-module="materi" class="sidebar-nav-item">
-          <span>▧</span>
-          <span>Materi Kajian</span>
-        </a>
-
-        <a href="./presensi-tarbiyah.html" data-module="presensi" class="sidebar-nav-item">
-          <span>✓</span>
-          <span>Presensi</span>
-        </a>
-
-        <p class="sidebar-nav-heading">KOMUNITAS</p>
-
-        <a href="./galeri-foto-video.html" data-module="galeri" class="sidebar-nav-item">
-          <span>▣</span>
-          <span>Galeri Dokumentasi</span>
-        </a>
-
-        <a href="./diskusi-tarbiyah.html" data-module="diskusi" class="sidebar-nav-item">
-          <span>☷</span>
-          <span>Ruang Diskusi</span>
-        </a>
-
-        <a href="./berita-pengumuman.html" data-module="berita" class="sidebar-nav-item">
-          <span>▥</span>
-          <span>Berita & Pengumuman</span>
-        </a>
-
-        <a href="./donasi-infaq.html" data-module="donasi" class="sidebar-nav-item">
-          <span>♡</span>
-          <span>Infaq & Donasi</span>
-        </a>
-
-        <p class="sidebar-nav-heading">AKUN & AKTIVITAS</p>
-
-        <a href="./kehadiran.html" data-module="kehadiran" class="sidebar-nav-item">
-          <span>◷</span>
-          <span>Riwayat Kehadiran</span>
-        </a>
-
-        <a href="./catatan-refleksi.html" data-module="catatan" class="sidebar-nav-item">
-          <span>✎</span>
-          <span>Catatan Refleksi</span>
-        </a>
-
-        <a href="./riwayat-aktivitas.html" data-module="riwayat" class="sidebar-nav-item">
-          <span>↻</span>
-          <span>Riwayat Aktivitas</span>
-        </a>
-
-        <a href="./administrasi-pengaturan.html" data-module="administrasi" class="sidebar-nav-item">
-          <span>⚙</span>
-          <span>Pengaturan</span>
-        </a>
-
-      </nav>
-
-      <div class="sidebar-footer">
-        <button type="button" class="sidebar-logout" data-logout>
-          ⇥ Keluar dari Akun
-        </button>
-        <small>© <span data-dashboard-year>2026</span> TARBIYAH</small>
-      </div>
-
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="app-main dashboard-page">
-
-      <!-- WELCOME -->
-      <section class="dashboard-welcome">
-        <div class="dashboard-welcome-content">
-          <span class="dashboard-eyebrow">RUANG BELAJAR & UKHUWAH</span>
-
-          <h1>
-            Assalamu'alaikum,
-            <span data-greeting-name>Saudaraku</span>
-          </h1>
-
-          <p>
-            Selamat datang di ruang belajar, bertumbuh, dan berukhuwah.
-          </p>
-
-          <div class="dashboard-date" data-dashboard-date>
-            Memuat tanggal...
-          </div>
-        </div>
-      </section>
-
-      <!-- SEARCH -->
-      <section class="dashboard-section" aria-label="Pencarian">
-        <form class="dashboard-search" data-dashboard-search-form>
-          <input
-            type="search"
-            placeholder="Cari agenda, materi, berita..."
-            aria-label="Cari konten TARBIYAH"
-            data-dashboard-search>
-          <button type="submit" class="btn btn-primary">
-            Cari
-          </button>
-        </form>
-      </section>
-
-      <!-- QUICK ACCESS -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Akses Cepat</h2>
-        </div>
-
-        <div class="dashboard-shortcuts">
-
-          <a href="./agenda-tarbiyah.html" class="dashboard-shortcut">
-            <span class="dashboard-shortcut-icon">📅</span>
-            <span>Agenda</span>
-          </a>
-
-          <a href="./materi-pembelajaran.html" class="dashboard-shortcut">
-            <span class="dashboard-shortcut-icon">📚</span>
-            <span>Materi</span>
-          </a>
-
-          <a href="./presensi-tarbiyah.html" class="dashboard-shortcut">
-            <span class="dashboard-shortcut-icon">✅</span>
-            <span>Presensi</span>
-          </a>
-
-          <a href="./profil-anggota.html" class="dashboard-shortcut">
-            <span class="dashboard-shortcut-icon">👤</span>
-            <span>Profil</span>
-          </a>
-
-        </div>
-      </section>
-
-      <!-- STATISTICS -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Ringkasan TARBIYAH</h2>
-        </div>
-
-        <div class="dashboard-stats">
-
-          <article class="dashboard-stat-card">
-            <div class="dashboard-stat-icon">👥</div>
-            <div class="dashboard-stat-content">
-              <span>Anggota</span>
-              <strong data-stat-members>—</strong>
-            </div>
-          </article>
-
-          <article class="dashboard-stat-card">
-            <div class="dashboard-stat-icon">📅</div>
-            <div class="dashboard-stat-content">
-              <span>Agenda</span>
-              <strong data-stat-agenda>—</strong>
-            </div>
-          </article>
-
-          <article class="dashboard-stat-card">
-            <div class="dashboard-stat-icon">📖</div>
-            <div class="dashboard-stat-content">
-              <span>Materi</span>
-              <strong data-stat-materials>—</strong>
-            </div>
-          </article>
-
-          <article class="dashboard-stat-card">
-            <div class="dashboard-stat-icon">✓</div>
-            <div class="dashboard-stat-content">
-              <span>Kehadiran Saya</span>
-              <strong data-stat-attendance>—</strong>
-            </div>
-          </article>
-
-        </div>
-      </section>
-
-      <!-- CAROUSEL -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Informasi & Inspirasi</h2>
-        </div>
-
-        <div class="dashboard-carousel">
-          <div class="dashboard-carousel-track" data-carousel-track>
-            <div class="dashboard-empty">
-              <span class="dashboard-empty-icon">🌿</span>
-              Informasi TARBIYAH akan ditampilkan di sini.
-            </div>
-          </div>
-
-          <div class="dashboard-carousel-controls">
-            <button
-              type="button"
-              data-carousel-prev
-              aria-label="Slide sebelumnya">
-              ‹
-            </button>
-
-            <div data-carousel-dots></div>
-
-            <button
-              type="button"
-              data-carousel-next
-              aria-label="Slide berikutnya">
-              ›
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- MEMBERS -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Anggota TARBIYAH</h2>
-          <a href="./profil-anggota.html">Lihat profil</a>
-        </div>
-
-        <div class="dashboard-members" data-dashboard-members>
-          <div class="dashboard-empty">
-            <span class="dashboard-empty-icon">👥</span>
-            Data anggota akan ditampilkan setelah terhubung dengan database.
-          </div>
-        </div>
-      </section>
-
-      <!-- AGENDA -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Jadwal & Agenda</h2>
-          <a href="./agenda-tarbiyah.html">Lihat semua</a>
-        </div>
-
-        <div class="dashboard-agenda" data-dashboard-agenda>
-          <div class="dashboard-empty">
-            <span class="dashboard-empty-icon">📅</span>
-            Belum ada agenda yang ditampilkan.
-          </div>
-        </div>
-      </section>
-
-      <!-- TOPICS -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Daftar Judul Tema</h2>
-          <a href="./materi-pembelajaran.html">Lihat semua</a>
-        </div>
-
-        <div class="dashboard-topics" data-dashboard-topics>
-          <div class="dashboard-empty">
-            <span class="dashboard-empty-icon">📚</span>
-            Daftar tema pembelajaran akan ditampilkan di sini.
-          </div>
-        </div>
-      </section>
-
-      <!-- NEWS -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Berita & Pengumuman</h2>
-          <a href="./berita-pengumuman.html">Lihat semua</a>
-        </div>
-
-        <div class="dashboard-news" data-dashboard-news>
-          <div class="dashboard-empty">
-            <span class="dashboard-empty-icon">📰</span>
-            Belum ada berita atau pengumuman.
-          </div>
-        </div>
-      </section>
-
-      <!-- GALLERY -->
-      <section class="dashboard-section">
-        <div class="dashboard-section-header">
-          <h2>Dokumentasi Kegiatan</h2>
-          <a href="./galeri-foto-video.html">Buka galeri</a>
-        </div>
-
-        <div class="dashboard-gallery" data-dashboard-gallery>
-          <div class="dashboard-empty">
-            <span class="dashboard-empty-icon">📷</span>
-            Dokumentasi foto dan video akan ditampilkan di sini.
-          </div>
-        </div>
-      </section>
-
-      <!-- FOOTER -->
-      <footer class="dashboard-footer">
-        <div class="brand-logo brand-logo-compact">
-          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-          <span class="brand-logo-text">
-            <strong>TARBIYAH</strong>
-            <small>Pembelajaran Muslim</small>
-          </span>
-        </div>
-
-        <p>
-          Belajar, Bertumbuh, dan Berukhuwah.
-        </p>
-
-        <small>
-          © <span data-dashboard-year>2026</span> TARBIYAH. Seluruh hak cipta dilindungi.
-        </small>
-      </footer>
-
-    </main>
-
-    <!-- MOBILE BOTTOM NAVIGATION -->
-    <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
-
-      <a href="./tarbiyah.html" data-module="dashboard">
-        <span>⌂</span>
-        <small>Beranda</small>
-      </a>
-
-      <a href="./agenda-tarbiyah.html" data-module="agenda">
-        <span>▦</span>
+    <section class="admin-stats" aria-label="Ringkasan administrasi">
+      <article class="admin-stat">
+        <div class="admin-stat-icon">👥</div>
+        <small>Anggota</small>
+        <strong id="statMembers">—</strong>
+      </article>
+      <article class="admin-stat">
+        <div class="admin-stat-icon">📅</div>
         <small>Agenda</small>
-      </a>
-
-      <a href="./materi-pembelajaran.html" data-module="materi">
-        <span>▤</span>
+        <strong id="statAgendas">—</strong>
+      </article>
+      <article class="admin-stat">
+        <div class="admin-stat-icon">📚</div>
         <small>Materi</small>
-      </a>
+        <strong id="statMaterials">—</strong>
+      </article>
+      <article class="admin-stat">
+        <div class="admin-stat-icon">📰</div>
+        <small>Berita</small>
+        <strong id="statNews">—</strong>
+      </article>
+    </section>
 
-      <a href="./profil-anggota.html" data-module="profil">
-        <span>♙</span>
-        <small>Profil</small>
-      </a>
+    <section class="admin-panel">
+      <div class="admin-panel-header">
+        <div>
+          <h2>⚙️ Akses Administrasi</h2>
+          <p>Pintasan menuju halaman pengelolaan TARBIYAH.</p>
+        </div>
+      </div>
 
-    </nav>
+      <div class="admin-actions">
+        <button class="admin-action" type="button" data-go="./administrasi-pengaturan.html">
+          <span class="action-icon">🛠️</span>
+          <strong>Pengaturan Aplikasi</strong>
+          <span>Identitas aplikasi, tema, dan informasi sistem.</span>
+        </button>
 
-  </div>
+        <button class="admin-action" type="button" data-go="./profil-anggota.html">
+          <span class="action-icon">👤</span>
+          <strong>Profil Anggota</strong>
+          <span>Melihat profil dan informasi anggota.</span>
+        </button>
 
-  <!-- SUPABASE -->
+        <button class="admin-action" type="button" data-go="./agenda-tarbiyah.html">
+          <span class="action-icon">🗓️</span>
+          <strong>Agenda Tarbiyah</strong>
+          <span>Melihat jadwal dan kegiatan pembelajaran.</span>
+        </button>
+
+        <button class="admin-action" type="button" data-go="./galeri-foto-video.html">
+          <span class="action-icon">🖼️</span>
+          <strong>Galeri Dokumentasi</strong>
+          <span>Melihat dokumentasi foto dan video kegiatan.</span>
+        </button>
+
+        <button class="admin-action" type="button" data-go="./berita-pengumuman.html">
+          <span class="action-icon">📢</span>
+          <strong>Berita dan Pengumuman</strong>
+          <span>Melihat informasi dan pengumuman komunitas.</span>
+        </button>
+
+        <button class="admin-action" type="button" data-go="./presensi-tarbiyah.html">
+          <span class="action-icon">✅</span>
+          <strong>Presensi Tarbiyah</strong>
+          <span>Melihat halaman kehadiran kegiatan.</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel-header">
+        <div>
+          <h2>📊 Ekspor Data</h2>
+          <p>Pilih tabel yang ingin diekspor menjadi file CSV.</p>
+        </div>
+      </div>
+
+      <div class="admin-export-list">
+        <div class="export-item">
+          <input type="checkbox" id="exportMembers" value="members" checked>
+          <label for="exportMembers">
+            <strong>Data Anggota</strong>
+            <small>Tabel members</small>
+          </label>
+        </div>
+
+        <div class="export-item">
+          <input type="checkbox" id="exportAgendas" value="agendas" checked>
+          <label for="exportAgendas">
+            <strong>Data Agenda</strong>
+            <small>Tabel agendas</small>
+          </label>
+        </div>
+
+        <div class="export-item">
+          <input type="checkbox" id="exportMaterials" value="materials" checked>
+          <label for="exportMaterials">
+            <strong>Data Materi Pembelajaran</strong>
+            <small>Tabel materials</small>
+          </label>
+        </div>
+
+        <div class="export-item">
+          <input type="checkbox" id="exportNews" value="news" checked>
+          <label for="exportNews">
+            <strong>Data Berita</strong>
+            <small>Tabel news</small>
+          </label>
+        </div>
+
+        <div class="export-item">
+          <input type="checkbox" id="exportAttendance" value="attendance" checked>
+          <label for="exportAttendance">
+            <strong>Data Kehadiran</strong>
+            <small>Tabel attendance</small>
+          </label>
+        </div>
+
+        <div class="export-item">
+          <input type="checkbox" id="exportGallery" value="gallery">
+          <label for="exportGallery">
+            <strong>Data Galeri</strong>
+            <small>Tabel gallery</small>
+          </label>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+        <button class="admin-button" type="button" id="exportSelected">
+          ⬇ Ekspor Data Terpilih
+        </button>
+        <button class="admin-button secondary" type="button" id="selectAllExport">
+          Pilih Semua
+        </button>
+      </div>
+
+      <div class="admin-status" id="exportStatus" role="status"></div>
+
+      <p class="admin-notice">
+        Ekspor hanya mengambil data yang dapat diakses oleh akun yang sedang
+        login sesuai aturan keamanan Supabase. Data file Storage seperti foto
+        dan video tidak ikut diunduh; yang diekspor adalah metadata tabelnya.
+      </p>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel-header">
+        <div>
+          <h2>🖥️ Status Sistem</h2>
+          <p>Informasi koneksi aplikasi pada perangkat ini.</p>
+        </div>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <tbody>
+            <tr>
+              <th>Supabase Client</th>
+              <td id="systemSupabase">Memeriksa...</td>
+            </tr>
+            <tr>
+              <th>Status Login</th>
+              <td id="systemAuth">Memeriksa...</td>
+            </tr>
+            <tr>
+              <th>Service Worker</th>
+              <td id="systemWorker">Memeriksa...</td>
+            </tr>
+            <tr>
+              <th>Koneksi Internet</th>
+              <td id="systemNetwork">Memeriksa...</td>
+            </tr>
+            <tr>
+              <th>Waktu Pemeriksaan</th>
+              <td id="systemTime">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-panel">
+      <div class="admin-panel-header">
+        <div>
+          <h2>🛡️ Keamanan Administrasi</h2>
+          <p>Catatan penting untuk pengelolaan data TARBIYAH.</p>
+        </div>
+      </div>
+
+      <div class="admin-security">
+        <strong>Perhatian:</strong> halaman ini adalah antarmuka administrasi,
+        bukan pengganti sistem otorisasi administrator. Hak akses admin harus
+        divalidasi di sisi server menggunakan Supabase RLS atau mekanisme
+        otorisasi backend. Jangan menyimpan Supabase service_role key di
+        JavaScript browser.
+      </div>
+    </section>
+
+    <div class="admin-status" id="adminMessage" role="status"></div>
+  </main>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- APPLICATION SCRIPTS -->
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
@@ -616,8 +590,361 @@
   <script src="./js/theme-manager.js"></script>
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
-  <script src="./js/dashboard.js"></script>
   <script src="./js/pwa.js"></script>
 
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (id) => document.getElementById(id);
+
+      /*
+       * Konfigurasi nama tabel.
+       * Sesuaikan setelah struktur database Supabase TARBIYAH
+       * ditetapkan dan diverifikasi.
+       */
+      const TABLES = {
+        members: "members",
+        agendas: "agendas",
+        materials: "materials",
+        news: "news",
+        attendance: "attendance",
+        gallery: "gallery"
+      };
+
+      const LABELS = {
+        members: "Anggota",
+        agendas: "Agenda",
+        materials: "Materi",
+        news: "Berita",
+        attendance: "Kehadiran",
+        gallery: "Galeri"
+      };
+
+      const getSupabase = () =>
+        window.supabaseClient ||
+        window.TARBIYAH_SUPABASE ||
+        window.TARBIYAH?.supabase ||
+        null;
+
+      const showStatus = (element, message, isError = false) => {
+        if (!element) return;
+        element.textContent = message;
+        element.classList.add("show");
+        element.classList.toggle("error", isError);
+      };
+
+      const setText = (id, value) => {
+        const element = $(id);
+        if (element) element.textContent = value;
+      };
+
+      const formatCSV = (rows) => {
+        if (!Array.isArray(rows) || rows.length === 0) return "";
+
+        const columns = [...new Set(rows.flatMap(row => Object.keys(row)))];
+
+        const escapeCSV = (value) => {
+          if (value === null || value === undefined) return "";
+          let text = typeof value === "object"
+            ? JSON.stringify(value)
+            : String(value);
+
+          // Melindungi spreadsheet dari formula injection.
+          if (/^[\s]*[=+\-@]/.test(text)) {
+            text = "'" + text;
+          }
+
+          return '"' + text.replace(/"/g, '""') + '"';
+        };
+
+        const header = columns.map(escapeCSV).join(",");
+        const body = rows.map(row =>
+          columns.map(column => escapeCSV(row[column])).join(",")
+        );
+
+        return "\uFEFF" + [header, ...body].join("\r\n");
+      };
+
+      const downloadCSV = (filename, rows) => {
+        const csv = formatCSV(rows);
+        if (!csv) return false;
+
+        const blob = new Blob([csv], {
+          type: "text/csv;charset=utf-8;"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return true;
+      };
+
+      async function getCurrentSession() {
+        const client = getSupabase();
+        if (!client) return null;
+
+        const { data, error } = await client.auth.getSession();
+        if (error) throw error;
+
+        return data?.session || null;
+      }
+
+      async function countTable(tableName) {
+        const client = getSupabase();
+
+        const { count, error } = await client
+          .from(tableName)
+          .select("*", { count: "exact", head: true });
+
+        if (error) throw error;
+        return Number(count || 0);
+      }
+
+      async function refreshStats() {
+        const client = getSupabase();
+
+        if (!client) {
+          ["statMembers", "statAgendas", "statMaterials", "statNews"]
+            .forEach(id => setText(id, "—"));
+          return;
+        }
+
+        const targets = [
+          ["statMembers", TABLES.members],
+          ["statAgendas", TABLES.agendas],
+          ["statMaterials", TABLES.materials],
+          ["statNews", TABLES.news]
+        ];
+
+        await Promise.all(targets.map(async ([elementId, table]) => {
+          try {
+            const count = await countTable(table);
+            setText(elementId, count.toLocaleString("id-ID"));
+          } catch (error) {
+            console.warn("Tidak dapat membaca tabel:", table, error);
+            setText(elementId, "—");
+          }
+        }));
+      }
+
+      async function refreshSystem() {
+        const client = getSupabase();
+
+        setText(
+          "systemSupabase",
+          client ? "Client tersedia" : "Belum terhubung"
+        );
+
+        setText(
+          "systemNetwork",
+          navigator.onLine ? "Online" : "Offline"
+        );
+
+        setText(
+          "systemWorker",
+          "serviceWorker" in navigator
+            ? "Didukung browser"
+            : "Tidak didukung"
+        );
+
+        try {
+          const session = await getCurrentSession();
+          setText(
+            "systemAuth",
+            session ? "Login aktif" : "Belum login"
+          );
+        } catch (error) {
+          setText("systemAuth", "Tidak dapat diperiksa");
+        }
+
+        setText(
+          "systemTime",
+          new Date().toLocaleString("id-ID")
+        );
+      }
+
+      async function exportSelected() {
+        const button = $("exportSelected");
+        const status = $("exportStatus");
+
+        const selected = [
+          ...document.querySelectorAll(
+            ".admin-export-list input[type='checkbox']:checked"
+          )
+        ].map(input => input.value);
+
+        if (!selected.length) {
+          showStatus(status, "Pilih minimal satu jenis data.", true);
+          return;
+        }
+
+        const client = getSupabase();
+
+        if (!client) {
+          showStatus(
+            status,
+            "Supabase belum terhubung. Periksa konfigurasi aplikasi.",
+            true
+          );
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Sedang mengambil data...";
+
+        const results = [];
+        const errors = [];
+
+        try {
+          const session = await getCurrentSession();
+
+          if (!session) {
+            throw new Error("Sesi login tidak ditemukan. Silakan login kembali.");
+          }
+
+          for (const key of selected) {
+            const tableName = TABLES[key];
+
+            if (!tableName) continue;
+
+            const { data, error } = await client
+              .from(tableName)
+              .select("*")
+              .limit(10000);
+
+            if (error) {
+              errors.push(`${LABELS[key]}: ${error.message}`);
+              continue;
+            }
+
+            if (data && data.length > 0) {
+              results.push({
+                key,
+                rows: data
+              });
+            } else {
+              results.push({
+                key,
+                rows: []
+              });
+            }
+          }
+
+          let downloaded = 0;
+
+          for (const result of results) {
+            if (!result.rows.length) continue;
+
+            const date = new Date().toISOString().slice(0, 10);
+            const filename = `tarbiyah-${result.key}-${date}.csv`;
+
+            if (downloadCSV(filename, result.rows)) {
+              downloaded++;
+            }
+          }
+
+          const emptyCount = results.filter(
+            result => result.rows.length === 0
+          ).length;
+
+          let message = `Proses selesai. ${downloaded} file berhasil disiapkan.`;
+
+          if (emptyCount) {
+            message += ` ${emptyCount} tabel tidak memiliki data yang dapat diekspor.`;
+          }
+
+          if (errors.length) {
+            message += " Beberapa tabel gagal dibaca: " + errors.join(" | ");
+          }
+
+          showStatus(status, message, errors.length > 0);
+        } catch (error) {
+          console.error("Ekspor TARBIYAH gagal:", error);
+          showStatus(
+            status,
+            error.message || "Terjadi kesalahan saat mengekspor data.",
+            true
+          );
+        } finally {
+          button.disabled = false;
+          button.textContent = "⬇ Ekspor Data Terpilih";
+        }
+      }
+
+      function initNavigation() {
+        document.querySelectorAll("[data-go]").forEach(button => {
+          button.addEventListener("click", () => {
+            const destination = button.getAttribute("data-go");
+            if (destination) window.location.href = destination;
+          });
+        });
+      }
+
+      function initSelectAll() {
+        $("selectAllExport")?.addEventListener("click", () => {
+          const boxes = [
+            ...document.querySelectorAll(
+              ".admin-export-list input[type='checkbox']"
+            )
+          ];
+
+          const allChecked = boxes.every(box => box.checked);
+          boxes.forEach(box => {
+            box.checked = !allChecked;
+          });
+
+          $("selectAllExport").textContent =
+            allChecked ? "Pilih Semua" : "Batalkan Pilihan";
+        });
+      }
+
+      async function init() {
+        initNavigation();
+        initSelectAll();
+
+        $("exportSelected")?.addEventListener(
+          "click",
+          exportSelected
+        );
+
+        $("adminRefresh")?.addEventListener("click", async () => {
+          await refreshStats();
+          await refreshSystem();
+          showStatus(
+            $("adminMessage"),
+            "Informasi administrasi berhasil diperbarui."
+          );
+        });
+
+        await refreshStats();
+        await refreshSystem();
+
+        window.addEventListener("online", refreshSystem);
+        window.addEventListener("offline", refreshSystem);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
+
+      window.TARBIYAH_ADMIN = {
+        refresh: async () => {
+          await refreshStats();
+          await refreshSystem();
+        },
+        exportSelected
+      };
+    })();
+  </script>
 </body>
 </html>
