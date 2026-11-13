@@ -1,39 +1,623 @@
-<!doctype html>
-<html lang="id" data-theme="dark" class="auth-check-pending">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#267A78"><meta name="description" content="TARBIYAH — ruang belajar, bertumbuh, dan berukhuwah.">
-<title>Dashboard Utama — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/dashboard.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/dashboard.js"></script><script defer src="./js/pwa.js"></script>
-  <link rel="stylesheet" href="./css/brand-logo.css">
 
-  <!-- ERUDA MOBILE DEBUG CONSOLE -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-  console.log("TARBIYAH DEBUG CONSOLE AKTIF");
-</script>
-  
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Dashboard TARBIYAH — Pembelajaran Muslim">
+  <meta name="application-name" content="TARBIYAH">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <title>Dashboard — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+  <link rel="stylesheet" href="./css/dashboard.css">
+
+  <style>
+    .dashboard-page {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .dashboard-page .dashboard-welcome {
+      margin-bottom: 24px;
+    }
+
+    .dashboard-page .dashboard-section {
+      margin-top: 26px;
+    }
+
+    .dashboard-page .dashboard-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .dashboard-page .dashboard-section-header h2 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .dashboard-page .dashboard-section-header a {
+      color: var(--color-primary, #36b58a);
+      font-size: .82rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .dashboard-page .dashboard-shortcuts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .dashboard-page .dashboard-shortcut {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 17px 10px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 16px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-primary, #fff);
+      text-align: center;
+      text-decoration: none;
+      transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .dashboard-page .dashboard-shortcut:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-primary, #36b58a);
+    }
+
+    .dashboard-page .dashboard-shortcut-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(54,181,138,.13);
+      font-size: 1.3rem;
+    }
+
+    .dashboard-page .dashboard-shortcut span:last-child {
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    .dashboard-page .dashboard-empty {
+      padding: 22px 16px;
+      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border-radius: 15px;
+      color: var(--text-secondary, #aaa);
+      text-align: center;
+      font-size: .88rem;
+    }
+
+    .dashboard-page .dashboard-empty-icon {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.6rem;
+    }
+
+    .dashboard-page .dashboard-search {
+      display: flex;
+      gap: 8px;
+      width: min(100%, 420px);
+    }
+
+    .dashboard-page .dashboard-search input {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .dashboard-page .dashboard-search button {
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .dashboard-page .dashboard-shortcuts {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .dashboard-page .dashboard-shortcut {
+        padding: 13px 5px;
+        border-radius: 13px;
+      }
+
+      .dashboard-page .dashboard-shortcut-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+      }
+
+      .dashboard-page .dashboard-shortcut span:last-child {
+        font-size: .68rem;
+      }
+
+      .dashboard-page .dashboard-search {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .dashboard-page .dashboard-shortcuts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
 </head>
-<body class="dashboard-page">
-<div class="app-frame">
-<aside class="sidebar" id="sidebar"><a class="sidebar-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span><b>TARBIYAH</b><small>Ruang Ilmu & Ukhuwah</small></span></a>
-<div class="side-label">RUANG TARBIYAH</div><nav class="side-nav" aria-label="Navigasi utama"><a class="nav-link active" href="./dashboard.html"><span>⌂</span> Dashboard</a><a class="nav-link" href="./profil-anggota.html"><span>◉</span> Profil & Anggota</a><a class="nav-link" href="./agenda-tarbiyah.html"><span>▦</span> Agenda Tarbiyah</a><a class="nav-link" href="./pembelajaran.html"><span>✧</span> Pembelajaran</a><a class="nav-link" href="./materi-pembelajaran.html"><span>▤</span> Materi Pembelajaran</a><a class="nav-link" href="./berita-pengumuman.html"><span>▧</span> Berita & Pengumuman</a><a class="nav-link" href="./presensi-tarbiyah.html"><span>✓</span> Presensi Tarbiyah</a><a class="nav-link" href="./galeri-foto-video.html"><span>▧</span> Galeri</a></nav>
-<div class="sidebar-bottom"><div class="side-note"><span>✦</span><b>Belajar • Bertumbuh</b><p>Menjaga ilmu, menguatkan amal, merawat ukhuwah.</p></div><button class="side-logout" id="logoutButton" type="button">↗ Keluar akun</button></div></aside>
-<div class="sidebar-scrim" id="sidebarScrim"></div>
-<main class="main-area"><header class="topbar"><button class="icon-button menu-toggle" id="menuToggle" aria-label="Buka menu" aria-expanded="false">☰</button><div class="brand-crumb">TARBIYAH <span>/</span> <b>Dashboard</b></div><div class="top-actions"><button class="icon-button" id="themeToggle" aria-label="Ganti tema">◐</button><a class="icon-button" href="./notifikasi.html" aria-label="Notifikasi">♧</a><a class="avatar-button" id="profileButton" href="./profil-anggota.html" aria-label="Profil akun">T</a></div></header>
-<div class="page-content">
-<section class="welcome-row"><div><p class="eyebrow">ASSALAMU'ALAIKUM WARAHMATULLAHI WABARAKATUH</p><h1>Selamat datang, <span id="greetingName">Sahabat</span>.</h1><p class="welcome-subtitle">Semoga hari ini menjadi langkah baik untuk menambah ilmu dan manfaat.</p></div><div class="date-chip"><small>HARI INI</small><b id="todayLabel">Memuat tanggal...</b></div></section>
-<section class="hero-carousel" aria-label="Sorotan TARBIYAH"><article class="hero-slide active"><div class="hero-copy"><span class="hero-tag">TARBIYAH · RUANG BERTUMBUH</span><h2>Perjalanan ilmu,<br><em>dimulai dari langkah kecil.</em></h2><p>Temukan ruang belajar, majelis ilmu, dan komunitas yang saling menguatkan.</p><a class="hero-link" href="./pembelajaran.html">Jelajahi ruang belajar <b>↗</b></a></div><div class="hero-visual visual-mosque"><div class="moon"></div><div class="dome"></div><div class="minaret m1"></div><div class="minaret m2"></div><div class="horizon"></div></div></article>
-<article class="hero-slide"><div class="hero-copy"><span class="hero-tag">MAJELIS ILMU</span><h2>Luangkan waktu<br><em>untuk terus bertumbuh.</em></h2><p>Temukan agenda kajian dan persiapkan diri untuk hadir dalam majelis kebaikan.</p><a class="hero-link" href="./agenda-tarbiyah.html">Lihat jadwal kajian <b>↗</b></a></div><div class="hero-visual visual-orbit"><div class="orbit o1"></div><div class="orbit o2"></div><div class="orbit-core">عِلْمٌ</div></div></article>
-<article class="hero-slide"><div class="hero-copy"><span class="hero-tag">UKHUWAH & KEPEDULIAN</span><h2>Bertumbuh bersama,<br><em>bermanfaat untuk sesama.</em></h2><p>Bangun hubungan baik melalui ilmu, partisipasi, dan kepedulian.</p><a class="hero-link" href="./profil-anggota.html">Kenali komunitas <b>↗</b></a></div><div class="hero-visual visual-glow"><div class="glow-disc">✦</div><span>ILMU · AMAL · UKHUWAH</span></div></article>
-<div class="carousel-controls"><div class="carousel-dots"><button class="dot active" data-go-slide="0" aria-label="Sorotan 1"></button><button class="dot" data-go-slide="1" aria-label="Sorotan 2"></button><button class="dot" data-go-slide="2" aria-label="Sorotan 3"></button></div><div><button class="carousel-arrow" id="prevSlide" aria-label="Sebelumnya">‹</button><button class="carousel-arrow" id="nextSlide" aria-label="Berikutnya">›</button></div></div></section>
-<section class="quick-section"><div class="section-heading"><div><span class="section-kicker">AKSES CEPAT</span><h2>Jelajahi TARBIYAH</h2><p>Pilih ruang yang ingin kamu kunjungi.</p></div><button class="view-all" id="toggleModules" aria-expanded="false">Semua menu <span>＋</span></button></div><div class="quick-grid" id="quickGrid">
-<a class="quick-card q-teal" href="./profil-anggota.html"><span class="quick-icon">◉</span><b>Profil & Anggota</b><small>Kenali komunitas</small></a><a class="quick-card q-gold" href="./agenda-tarbiyah.html"><span class="quick-icon">▦</span><b>Agenda Tarbiyah</b><small>Jadwal kegiatan</small></a><a class="quick-card q-blue" href="./pembelajaran.html"><span class="quick-icon">✧</span><b>Pembelajaran</b><small>Ruang menuntut ilmu</small></a><a class="quick-card q-violet" href="./materi-pembelajaran.html"><span class="quick-icon">▤</span><b>Materi</b><small>Kumpulan pengetahuan</small></a><a class="quick-card q-rose" href="./presensi-tarbiyah.html"><span class="quick-icon">✓</span><b>Presensi Tarbiyah</b><small>Catat kehadiran</small></a><a class="quick-card q-amber" href="./berita-pengumuman.html"><span class="quick-icon">▧</span><b>Berita</b><small>Kabar komunitas</small></a>
-<a class="quick-card q-blue extra-module" href="./galeri-foto-video.html"><span class="quick-icon">▣</span><b>Galeri Foto & Video</b><small>Dokumentasi</small></a><a class="quick-card q-violet extra-module" href="./diskusi-tarbiyah.html"><span class="quick-icon">☷</span><b>Diskusi Tarbiyah</b><small>Berbagi gagasan</small></a><a class="quick-card q-rose extra-module" href="./donasi-infaq.html"><span class="quick-icon">♡</span><b>Donasi, Infaq & Shodaqoh</b><small>Kepedulian bersama</small></a><a class="quick-card q-teal extra-module" href="./kehadiran.html"><span class="quick-icon">✓</span><b>Kehadiran</b><small>Riwayat partisipasi</small></a><a class="quick-card q-gold extra-module" href="./catatan-refleksi.html"><span class="quick-icon">✎</span><b>Catatan Pribadi</b><small>Refleksi dan jurnal</small></a><a class="quick-card q-blue extra-module" href="./notifikasi.html"><span class="quick-icon">♧</span><b>Notifikasi</b><small>Pemberitahuan</small></a><a class="quick-card q-violet extra-module" href="./riwayat-aktivitas.html"><span class="quick-icon">◷</span><b>Riwayat Aktivitas</b><small>Jejak kegiatan</small></a><a class="quick-card q-amber extra-module" href="./administrasi-pengaturan.html"><span class="quick-icon">⚙</span><b>Administrasi</b><small>Pengaturan sistem</small></a></div></section>
-<section class="mini-feature"><div class="mini-feature-copy"><span class="hero-tag">RUANG REFLEKSI</span><h2>Berhenti sejenak,<br><em>maknai setiap pelajaran.</em></h2><p>Catat hal baik yang dipelajari dan rencanakan amal yang ingin dijaga.</p><a href="./catatan-refleksi.html">Buka catatan pribadi ↗</a></div><div class="mini-feature-art"><div class="book-shape">✧</div><span>CATATAN KEBAIKAN</span></div></section>
-<section class="dashboard-lower"><article class="info-panel"><div class="panel-title"><div><span class="section-kicker">AGENDA TERDEKAT</span><h2>Jadwal Tarbiyah</h2></div><a href="./agenda-tarbiyah.html">Lihat semua ↗</a></div><div class="empty-state"><span>▦</span><b>Belum ada agenda ditampilkan</b><p>Jadwal akan muncul setelah data agenda terhubung.</p></div></article><article class="info-panel"><div class="panel-title"><div><span class="section-kicker">KABAR KOMUNITAS</span><h2>Informasi terbaru</h2></div><a href="./berita-pengumuman.html">Lihat semua ↗</a></div><div class="empty-state"><span>✧</span><b>Ruang informasi TARBIYAH</b><p>Pengumuman dan berita akan ditampilkan di sini.</p></div></article></section>
-<footer class="dashboard-footer"><span>© <span id="footerYear"></span> TARBIYAH</span><span>Ilmu · Amal · Ukhuwah</span></footer></div></main></div><div class="toast-message" id="dashboardToast" role="status" aria-live="polite"></div>
-</body></html>
+
+<body class="auth-pending">
+
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <button
+        class="app-header-menu"
+        type="button"
+        data-sidebar-toggle
+        aria-label="Buka navigasi"
+        aria-expanded="false">
+        ☰
+      </button>
+
+      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
+        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+        <span class="brand-logo-text">
+          <strong>TARBIYAH</strong>
+          <small>Pembelajaran Muslim</small>
+        </span>
+      </a>
+
+      <div class="app-header-actions">
+        <button
+          type="button"
+          class="app-header-action"
+          data-theme-toggle
+          aria-label="Ganti tema"
+          title="Ganti tema">
+          ◐
+        </button>
+
+        <a
+          href="./notifikasi.html"
+          class="app-header-action notification-action"
+          aria-label="Notifikasi">
+          ♧
+          <span class="notification-count" data-notification-count>0</span>
+        </a>
+
+        <button
+          type="button"
+          class="app-header-user"
+          data-user-menu-toggle
+          aria-label="Menu akun">
+          <img
+            src="./assets/icons/icon-192.png"
+            alt="Foto profil"
+            data-user-avatar>
+        </button>
+      </div>
+    </header>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div
+      class="sidebar-overlay"
+      data-sidebar-overlay
+      aria-hidden="true">
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar" aria-label="Navigasi utama">
+
+      <div class="sidebar-profile">
+        <img
+          src="./assets/icons/icon-192.png"
+          alt="Foto profil anggota"
+          class="sidebar-avatar"
+          data-sidebar-avatar>
+
+        <div class="sidebar-profile-info">
+          <strong data-sidebar-user-name>Anggota TARBIYAH</strong>
+          <small data-sidebar-user-role>Anggota</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-navigation">
+
+        <p class="sidebar-nav-heading">MENU UTAMA</p>
+
+        <a href="./tarbiyah.html" data-module="dashboard" class="sidebar-nav-item">
+          <span>⌂</span>
+          <span>Beranda</span>
+        </a>
+
+        <a href="./profil-anggota.html" data-module="profil" class="sidebar-nav-item">
+          <span>♙</span>
+          <span>Profil Anggota</span>
+        </a>
+
+        <a href="./agenda-tarbiyah.html" data-module="agenda" class="sidebar-nav-item">
+          <span>▦</span>
+          <span>Agenda & Jadwal</span>
+        </a>
+
+        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
+          <span>▤</span>
+          <span>Pembelajaran</span>
+        </a>
+
+        <a href="./materi-pembelajaran.html" data-module="materi" class="sidebar-nav-item">
+          <span>▧</span>
+          <span>Materi Kajian</span>
+        </a>
+
+        <a href="./presensi-tarbiyah.html" data-module="presensi" class="sidebar-nav-item">
+          <span>✓</span>
+          <span>Presensi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">KOMUNITAS</p>
+
+        <a href="./galeri-foto-video.html" data-module="galeri" class="sidebar-nav-item">
+          <span>▣</span>
+          <span>Galeri Dokumentasi</span>
+        </a>
+
+        <a href="./diskusi-tarbiyah.html" data-module="diskusi" class="sidebar-nav-item">
+          <span>☷</span>
+          <span>Ruang Diskusi</span>
+        </a>
+
+        <a href="./berita-pengumuman.html" data-module="berita" class="sidebar-nav-item">
+          <span>▥</span>
+          <span>Berita & Pengumuman</span>
+        </a>
+
+        <a href="./donasi-infaq.html" data-module="donasi" class="sidebar-nav-item">
+          <span>♡</span>
+          <span>Infaq & Donasi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">AKUN & AKTIVITAS</p>
+
+        <a href="./kehadiran.html" data-module="kehadiran" class="sidebar-nav-item">
+          <span>◷</span>
+          <span>Riwayat Kehadiran</span>
+        </a>
+
+        <a href="./catatan-refleksi.html" data-module="catatan" class="sidebar-nav-item">
+          <span>✎</span>
+          <span>Catatan Refleksi</span>
+        </a>
+
+        <a href="./riwayat-aktivitas.html" data-module="riwayat" class="sidebar-nav-item">
+          <span>↻</span>
+          <span>Riwayat Aktivitas</span>
+        </a>
+
+        <a href="./administrasi-pengaturan.html" data-module="administrasi" class="sidebar-nav-item">
+          <span>⚙</span>
+          <span>Pengaturan</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-logout" data-logout>
+          ⇥ Keluar dari Akun
+        </button>
+        <small>© <span data-dashboard-year>2026</span> TARBIYAH</small>
+      </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main dashboard-page">
+
+      <!-- WELCOME -->
+      <section class="dashboard-welcome">
+        <div class="dashboard-welcome-content">
+          <span class="dashboard-eyebrow">RUANG BELAJAR & UKHUWAH</span>
+
+          <h1>
+            Assalamu'alaikum,
+            <span data-greeting-name>Saudaraku</span>
+          </h1>
+
+          <p>
+            Selamat datang di ruang belajar, bertumbuh, dan berukhuwah.
+          </p>
+
+          <div class="dashboard-date" data-dashboard-date>
+            Memuat tanggal...
+          </div>
+        </div>
+      </section>
+
+      <!-- SEARCH -->
+      <section class="dashboard-section" aria-label="Pencarian">
+        <form class="dashboard-search" data-dashboard-search-form>
+          <input
+            type="search"
+            placeholder="Cari agenda, materi, berita..."
+            aria-label="Cari konten TARBIYAH"
+            data-dashboard-search>
+          <button type="submit" class="btn btn-primary">
+            Cari
+          </button>
+        </form>
+      </section>
+
+      <!-- QUICK ACCESS -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Akses Cepat</h2>
+        </div>
+
+        <div class="dashboard-shortcuts">
+
+          <a href="./agenda-tarbiyah.html" class="dashboard-shortcut">
+            <span class="dashboard-shortcut-icon">📅</span>
+            <span>Agenda</span>
+          </a>
+
+          <a href="./materi-pembelajaran.html" class="dashboard-shortcut">
+            <span class="dashboard-shortcut-icon">📚</span>
+            <span>Materi</span>
+          </a>
+
+          <a href="./presensi-tarbiyah.html" class="dashboard-shortcut">
+            <span class="dashboard-shortcut-icon">✅</span>
+            <span>Presensi</span>
+          </a>
+
+          <a href="./profil-anggota.html" class="dashboard-shortcut">
+            <span class="dashboard-shortcut-icon">👤</span>
+            <span>Profil</span>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- STATISTICS -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Ringkasan TARBIYAH</h2>
+        </div>
+
+        <div class="dashboard-stats">
+
+          <article class="dashboard-stat-card">
+            <div class="dashboard-stat-icon">👥</div>
+            <div class="dashboard-stat-content">
+              <span>Anggota</span>
+              <strong data-stat-members>—</strong>
+            </div>
+          </article>
+
+          <article class="dashboard-stat-card">
+            <div class="dashboard-stat-icon">📅</div>
+            <div class="dashboard-stat-content">
+              <span>Agenda</span>
+              <strong data-stat-agenda>—</strong>
+            </div>
+          </article>
+
+          <article class="dashboard-stat-card">
+            <div class="dashboard-stat-icon">📖</div>
+            <div class="dashboard-stat-content">
+              <span>Materi</span>
+              <strong data-stat-materials>—</strong>
+            </div>
+          </article>
+
+          <article class="dashboard-stat-card">
+            <div class="dashboard-stat-icon">✓</div>
+            <div class="dashboard-stat-content">
+              <span>Kehadiran Saya</span>
+              <strong data-stat-attendance>—</strong>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- CAROUSEL -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Informasi & Inspirasi</h2>
+        </div>
+
+        <div class="dashboard-carousel">
+          <div class="dashboard-carousel-track" data-carousel-track>
+            <div class="dashboard-empty">
+              <span class="dashboard-empty-icon">🌿</span>
+              Informasi TARBIYAH akan ditampilkan di sini.
+            </div>
+          </div>
+
+          <div class="dashboard-carousel-controls">
+            <button
+              type="button"
+              data-carousel-prev
+              aria-label="Slide sebelumnya">
+              ‹
+            </button>
+
+            <div data-carousel-dots></div>
+
+            <button
+              type="button"
+              data-carousel-next
+              aria-label="Slide berikutnya">
+              ›
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MEMBERS -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Anggota TARBIYAH</h2>
+          <a href="./profil-anggota.html">Lihat profil</a>
+        </div>
+
+        <div class="dashboard-members" data-dashboard-members>
+          <div class="dashboard-empty">
+            <span class="dashboard-empty-icon">👥</span>
+            Data anggota akan ditampilkan setelah terhubung dengan database.
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENDA -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Jadwal & Agenda</h2>
+          <a href="./agenda-tarbiyah.html">Lihat semua</a>
+        </div>
+
+        <div class="dashboard-agenda" data-dashboard-agenda>
+          <div class="dashboard-empty">
+            <span class="dashboard-empty-icon">📅</span>
+            Belum ada agenda yang ditampilkan.
+          </div>
+        </div>
+      </section>
+
+      <!-- TOPICS -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Daftar Judul Tema</h2>
+          <a href="./materi-pembelajaran.html">Lihat semua</a>
+        </div>
+
+        <div class="dashboard-topics" data-dashboard-topics>
+          <div class="dashboard-empty">
+            <span class="dashboard-empty-icon">📚</span>
+            Daftar tema pembelajaran akan ditampilkan di sini.
+          </div>
+        </div>
+      </section>
+
+      <!-- NEWS -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Berita & Pengumuman</h2>
+          <a href="./berita-pengumuman.html">Lihat semua</a>
+        </div>
+
+        <div class="dashboard-news" data-dashboard-news>
+          <div class="dashboard-empty">
+            <span class="dashboard-empty-icon">📰</span>
+            Belum ada berita atau pengumuman.
+          </div>
+        </div>
+      </section>
+
+      <!-- GALLERY -->
+      <section class="dashboard-section">
+        <div class="dashboard-section-header">
+          <h2>Dokumentasi Kegiatan</h2>
+          <a href="./galeri-foto-video.html">Buka galeri</a>
+        </div>
+
+        <div class="dashboard-gallery" data-dashboard-gallery>
+          <div class="dashboard-empty">
+            <span class="dashboard-empty-icon">📷</span>
+            Dokumentasi foto dan video akan ditampilkan di sini.
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="dashboard-footer">
+        <div class="brand-logo brand-logo-compact">
+          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+          <span class="brand-logo-text">
+            <strong>TARBIYAH</strong>
+            <small>Pembelajaran Muslim</small>
+          </span>
+        </div>
+
+        <p>
+          Belajar, Bertumbuh, dan Berukhuwah.
+        </p>
+
+        <small>
+          © <span data-dashboard-year>2026</span> TARBIYAH. Seluruh hak cipta dilindungi.
+        </small>
+      </footer>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
+
+      <a href="./tarbiyah.html" data-module="dashboard">
+        <span>⌂</span>
+        <small>Beranda</small>
+      </a>
+
+      <a href="./agenda-tarbiyah.html" data-module="agenda">
+        <span>▦</span>
+        <small>Agenda</small>
+      </a>
+
+      <a href="./materi-pembelajaran.html" data-module="materi">
+        <span>▤</span>
+        <small>Materi</small>
+      </a>
+
+      <a href="./profil-anggota.html" data-module="profil">
+        <span>♙</span>
+        <small>Profil</small>
+      </a>
+
+    </nav>
+
+  </div>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/dashboard.js"></script>
+  <script src="./js/pwa.js"></script>
+
+</body>
+</html>
