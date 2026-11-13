@@ -1,1 +1,709 @@
-<!doctype html><html lang="id" data-theme="light" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#267A78"><meta name="description" content="Kalender kegiatan, jadwal kajian, lokasi, dan konfirmasi kehadiran."><title>Agenda Tarbiyah — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/brand-logo.css"><link rel="stylesheet" href="./css/module-shell.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/module-shell.js"></script><script defer src="./js/pwa.js"></script></head><body><div class="app-shell"><aside class="app-sidebar"><a class="module-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span>TARBIYAH<small>Ruang Ilmu & Ukhuwah</small></span></a><div class="nav-caption">MENU UTAMA</div><nav class="app-nav" aria-label="Navigasi aplikasi"><a href="./dashboard.html" ><span class="nav-ico">⌂</span>Dashboard</a><a href="./profil-anggota.html" ><span class="nav-ico">◉</span>Profil & Anggota</a><a href="./agenda-tarbiyah.html" aria-current="page"><span class="nav-ico">▦</span>Agenda Tarbiyah</a><a href="./pembelajaran.html" ><span class="nav-ico">✧</span>Pembelajaran</a><a href="./materi-pembelajaran.html" ><span class="nav-ico">▤</span>Materi Pembelajaran</a><a href="./berita-pengumuman.html" ><span class="nav-ico">▧</span>Berita & Pengumuman</a><a href="./presensi-tarbiyah.html" ><span class="nav-ico">✓</span>Presensi Tarbiyah</a><a href="./galeri-foto-video.html" ><span class="nav-ico">▣</span>Galeri Foto & Video</a><a href="./diskusi-tarbiyah.html" ><span class="nav-ico">☷</span>Diskusi Tarbiyah</a><a href="./donasi-infaq.html" ><span class="nav-ico">♡</span>Donasi, Infaq & Shodaqoh</a><a href="./kehadiran.html" ><span class="nav-ico">◷</span>Kehadiran</a><a href="./catatan-refleksi.html" ><span class="nav-ico">✎</span>Catatan & Refleksi</a><a href="./notifikasi.html" ><span class="nav-ico">♧</span>Notifikasi</a><a href="./riwayat-aktivitas.html" ><span class="nav-ico">◷</span>Riwayat Aktivitas</a><a href="./administrasi-pengaturan.html" ><span class="nav-ico">⚙</span>Administrasi & Pengaturan</a></nav><div class="sidebar-foot">Ilmu · Amal · Ukhuwah<br>© <span data-year></span> TARBIYAH</div></aside><div class="mobile-scrim" data-scrim></div><main class="app-main"><header class="app-topbar"><div class="top-left"><button class="icon-btn menu-toggle" data-menu aria-label="Buka navigasi" aria-expanded="false">☰</button><div class="crumb">TARBIYAH&nbsp; / &nbsp;<b>Agenda Tarbiyah</b></div></div><div class="top-actions"><button class="icon-btn" data-theme-toggle aria-label="Ganti tema">◐</button><a class="icon-btn" href="./notifikasi.html" aria-label="Notifikasi" style="display:grid;place-items:center;text-decoration:none">♧</a><a class="profile-chip" href="./profil-anggota.html" aria-label="Profil">T</a></div></header><div class="module-content"><div class="module-head"><div><div class="eyebrow">RUANG TARBIYAH · MODUL</div><h1>Agenda Tarbiyah</h1><p>Kalender kegiatan, jadwal kajian, lokasi, dan konfirmasi kehadiran.</p></div><div class="head-actions"><button class="btn secondary" type="button" data-back>← Kembali</button><button class="btn" type="button" data-action>Buat agenda <span>↗</span></button></div></div><div class="notice"><b>Informasi pengembangan:</b> antarmuka dan navigasi modul ini sudah disiapkan. Data produksi belum ditampilkan sampai tabel dan kebijakan keamanan Supabase diverifikasi. Ini mencegah data contoh dianggap sebagai data komunitas yang sebenarnya.</div><section class="metric-grid"><article class="metric-card"><div class="metric-label">Agenda mendatang</div><div class="metric-value">—</div><div class="metric-hint">Menunggu data terverifikasi</div></article><article class="metric-card"><div class="metric-label">Status sinkronisasi</div><div class="metric-value" style="font-size:17px">Belum aktif</div><div class="metric-hint">Koneksi tabel belum dipetakan</div></article><article class="metric-card"><div class="metric-label">Akses akun</div><div class="metric-value" style="font-size:17px">Terproteksi</div><div class="metric-hint">Mengikuti sesi autentikasi</div></article><article class="metric-card"><div class="metric-label">Tema aplikasi</div><div class="metric-value" style="font-size:17px">Teal</div><div class="metric-hint">Mengikuti tema induk TARBIYAH</div></article></section><div class="panel-grid"><section class="panel"><h2>Kalender kegiatan</h2><p class="panel-desc">Kalender kegiatan, jadwal kajian, lokasi, dan konfirmasi kehadiran.</p><div class="toolbar"><input class="field" type="search" placeholder="Cari data..." aria-label="Cari data" disabled><button class="btn secondary" type="button" disabled>Filter</button></div><div class="empty-box"><div class="empty-icon">▦</div><b>Belum ada data untuk ditampilkan</b><p>Agenda dan lokasi kegiatan akan tampil setelah tabel agenda dikonfigurasi dan dihubungkan.</p></div></section><aside class="panel"><h2>Daftar agenda</h2><p class="panel-desc">Informasi akan mengikuti data akun dan hak akses Anda.</p><div class="notice">Status integrasi: tampilan modul disiapkan. Pembacaan dan penyimpanan data menunggu verifikasi tabel, kolom, serta kebijakan RLS Supabase.</div><div class="empty-box"><div class="empty-icon">✦</div><b>Belum terhubung ke sumber data</b><p>Tidak ada data contoh atau angka rekaan yang ditampilkan.</p></div></aside></div><footer class="app-footer">TARBIYAH · Pembelajaran Muslim <span style="float:right">Versi pengembangan</span></footer></div></main></div><div class="toast" role="status" aria-live="polite" data-toast></div><script type="application/json" id="module-meta">{"key":"agenda-tarbiyah","title":"Agenda Tarbiyah"}</script></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Agenda dan jadwal kegiatan TARBIYAH — Pembelajaran Muslim">
+  <meta name="application-name" content="TARBIYAH">
+
+  <title>Agenda & Jadwal — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    .agenda-page {
+      width: 100%;
+      min-width: 0;
+      padding-bottom: 35px;
+    }
+
+    .agenda-hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(22px, 4vw, 34px);
+      margin-bottom: 22px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 90% 15%, rgba(54,181,138,.2), transparent 38%),
+        var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .agenda-eyebrow {
+      color: var(--color-primary, #36b58a);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+    }
+
+    .agenda-hero h1 {
+      margin: 10px 0;
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .agenda-hero p {
+      max-width: 650px;
+      margin: 0;
+      color: var(--text-secondary, #aab5af);
+      line-height: 1.7;
+    }
+
+    .agenda-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .agenda-search {
+      display: flex;
+      flex: 1;
+      min-width: min(100%, 230px);
+      max-width: 440px;
+      gap: 8px;
+    }
+
+    .agenda-search input {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .agenda-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .agenda-filter {
+      padding: 9px 14px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 30px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-secondary, #aab5af);
+      font: inherit;
+      font-size: .8rem;
+      cursor: pointer;
+    }
+
+    .agenda-filter[aria-pressed="true"] {
+      border-color: var(--color-primary, #36b58a);
+      background: rgba(54,181,138,.13);
+      color: var(--color-primary, #36b58a);
+    }
+
+    .agenda-section {
+      margin-top: 25px;
+    }
+
+    .agenda-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .agenda-section-heading h2 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: 1.05rem;
+    }
+
+    .agenda-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .agenda-empty {
+      padding: 28px 18px;
+      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border-radius: 17px;
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .agenda-empty-icon {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+
+    .agenda-calendar {
+      padding: 18px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 17px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .agenda-calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .agenda-calendar-header h3 {
+      margin: 0;
+      font-size: .95rem;
+    }
+
+    .agenda-calendar-nav {
+      display: flex;
+      gap: 7px;
+    }
+
+    .agenda-calendar-nav button {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-primary, #fff);
+      cursor: pointer;
+    }
+
+    .agenda-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .agenda-calendar-day {
+      display: grid;
+      min-height: 38px;
+      place-items: center;
+      border-radius: 9px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .78rem;
+    }
+
+    .agenda-calendar-day.heading {
+      min-height: 30px;
+      color: var(--text-primary, #fff);
+      font-weight: 700;
+    }
+
+    .agenda-calendar-day.today {
+      background: rgba(54,181,138,.17);
+      color: var(--color-primary, #36b58a);
+      font-weight: 800;
+    }
+
+    .agenda-calendar-day.has-event {
+      border: 1px solid var(--color-primary, #36b58a);
+      color: var(--color-primary, #36b58a);
+    }
+
+    .agenda-location {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .82rem;
+    }
+
+    .agenda-location a {
+      color: var(--color-primary, #36b58a);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .agenda-detail-panel {
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 17px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .agenda-detail-panel h3 {
+      margin-top: 0;
+    }
+
+    .agenda-detail-content {
+      color: var(--text-secondary, #aab5af);
+      font-size: .88rem;
+      line-height: 1.7;
+    }
+
+    .agenda-footer {
+      padding: 24px 0 12px;
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+      font-size: .78rem;
+    }
+
+    @media (max-width: 640px) {
+      .agenda-page {
+        padding-bottom: 90px;
+      }
+
+      .agenda-toolbar,
+      .agenda-search {
+        width: 100%;
+        max-width: none;
+      }
+
+      .agenda-toolbar > .btn {
+        width: 100%;
+      }
+
+      .agenda-calendar {
+        padding: 12px 8px;
+      }
+
+      .agenda-calendar-grid {
+        gap: 3px;
+      }
+
+      .agenda-calendar-day {
+        min-height: 35px;
+        font-size: .72rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="auth-pending">
+
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+
+      <button
+        class="app-header-menu"
+        type="button"
+        data-sidebar-toggle
+        aria-label="Buka navigasi"
+        aria-expanded="false">
+        ☰
+      </button>
+
+      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
+        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+        <span class="brand-logo-text">
+          <strong>TARBIYAH</strong>
+          <small>Pembelajaran Muslim</small>
+        </span>
+      </a>
+
+      <div class="app-header-actions">
+
+        <button
+          type="button"
+          class="app-header-action"
+          data-theme-toggle
+          aria-label="Ganti tema">
+          ◐
+        </button>
+
+        <a
+          href="./notifikasi.html"
+          class="app-header-action notification-action"
+          aria-label="Notifikasi">
+          ♧
+          <span class="notification-count" data-notification-count>0</span>
+        </a>
+
+        <button
+          type="button"
+          class="app-header-user"
+          data-user-menu-toggle
+          aria-label="Menu akun">
+          <img
+            src="./assets/icons/icon-192.png"
+            alt="Foto profil"
+            data-user-avatar>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div
+      class="sidebar-overlay"
+      data-sidebar-overlay
+      aria-hidden="true">
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar" aria-label="Navigasi utama">
+
+      <div class="sidebar-profile">
+        <img
+          src="./assets/icons/icon-192.png"
+          alt="Foto profil anggota"
+          class="sidebar-avatar"
+          data-sidebar-avatar>
+
+        <div class="sidebar-profile-info">
+          <strong data-sidebar-user-name>Anggota TARBIYAH</strong>
+          <small data-sidebar-user-role>Anggota</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-navigation">
+
+        <p class="sidebar-nav-heading">MENU UTAMA</p>
+
+        <a href="./tarbiyah.html" data-module="dashboard" class="sidebar-nav-item">
+          <span>⌂</span>
+          <span>Beranda</span>
+        </a>
+
+        <a href="./profil-anggota.html" data-module="profil" class="sidebar-nav-item">
+          <span>♙</span>
+          <span>Profil Anggota</span>
+        </a>
+
+        <a href="./agenda-tarbiyah.html" data-module="agenda" class="sidebar-nav-item">
+          <span>▦</span>
+          <span>Agenda & Jadwal</span>
+        </a>
+
+        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
+          <span>▤</span>
+          <span>Pembelajaran</span>
+        </a>
+
+        <a href="./materi-pembelajaran.html" data-module="materi" class="sidebar-nav-item">
+          <span>▧</span>
+          <span>Materi Kajian</span>
+        </a>
+
+        <a href="./berita-pengumuman.html" data-module="berita" class="sidebar-nav-item">
+          <span>▥</span>
+          <span>Berita & Pengumuman</span>
+        </a>
+
+        <a href="./presensi-tarbiyah.html" data-module="presensi" class="sidebar-nav-item">
+          <span>✓</span>
+          <span>Presensi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">KOMUNITAS</p>
+
+        <a href="./galeri-foto-video.html" data-module="galeri" class="sidebar-nav-item">
+          <span>▣</span>
+          <span>Galeri Dokumentasi</span>
+        </a>
+
+        <a href="./diskusi-tarbiyah.html" data-module="diskusi" class="sidebar-nav-item">
+          <span>☷</span>
+          <span>Ruang Diskusi</span>
+        </a>
+
+        <a href="./donasi-infaq.html" data-module="donasi" class="sidebar-nav-item">
+          <span>♡</span>
+          <span>Infaq & Donasi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">AKUN & AKTIVITAS</p>
+
+        <a href="./kehadiran.html" data-module="kehadiran" class="sidebar-nav-item">
+          <span>◷</span>
+          <span>Riwayat Kehadiran</span>
+        </a>
+
+        <a href="./catatan-refleksi.html" data-module="catatan" class="sidebar-nav-item">
+          <span>✎</span>
+          <span>Catatan Refleksi</span>
+        </a>
+
+        <a href="./riwayat-aktivitas.html" data-module="riwayat" class="sidebar-nav-item">
+          <span>↻</span>
+          <span>Riwayat Aktivitas</span>
+        </a>
+
+        <a href="./administrasi-pengaturan.html" data-module="administrasi" class="sidebar-nav-item">
+          <span>⚙</span>
+          <span>Pengaturan</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-logout" data-logout>
+          ⇥ Keluar dari Akun
+        </button>
+        <small>© <span data-dashboard-year>2026</span> TARBIYAH</small>
+      </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main agenda-page">
+
+      <div class="module-breadcrumb">
+        <a href="./tarbiyah.html">Beranda</a>
+        <span>›</span>
+        <span>Agenda & Jadwal</span>
+      </div>
+
+      <!-- HERO -->
+      <section class="agenda-hero">
+        <span class="agenda-eyebrow">🌿 KEGIATAN & UKHUWAH</span>
+
+        <h1>Agenda & Jadwal TARBIYAH</h1>
+
+        <p>
+          Temukan jadwal kajian, kegiatan pembelajaran, pertemuan anggota,
+          dan agenda kebersamaan komunitas TARBIYAH.
+        </p>
+      </section>
+
+      <!-- TOOLBAR -->
+      <section class="agenda-toolbar">
+
+        <form class="agenda-search" data-agenda-search-form>
+          <input
+            type="search"
+            placeholder="Cari nama atau lokasi kegiatan..."
+            aria-label="Cari agenda"
+            data-agenda-search>
+
+          <button type="submit" class="btn btn-primary">
+            Cari
+          </button>
+        </form>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-agenda-create
+          hidden>
+          + Tambah Agenda
+        </button>
+
+      </section>
+
+      <!-- FILTER -->
+      <section class="agenda-filters" aria-label="Filter agenda">
+
+        <button
+          type="button"
+          class="agenda-filter"
+          data-agenda-filter="all"
+          aria-pressed="true">
+          Semua
+        </button>
+
+        <button
+          type="button"
+          class="agenda-filter"
+          data-agenda-filter="upcoming"
+          aria-pressed="false">
+          Akan Datang
+        </button>
+
+        <button
+          type="button"
+          class="agenda-filter"
+          data-agenda-filter="ongoing"
+          aria-pressed="false">
+          Berlangsung
+        </button>
+
+        <button
+          type="button"
+          class="agenda-filter"
+          data-agenda-filter="finished"
+          aria-pressed="false">
+          Selesai
+        </button>
+
+      </section>
+
+      <!-- CALENDAR -->
+      <section class="agenda-section">
+
+        <div class="agenda-section-heading">
+          <h2>Kalender Kegiatan</h2>
+        </div>
+
+        <div class="agenda-calendar">
+
+          <div class="agenda-calendar-header">
+            <h3 data-agenda-calendar-title>Kalender</h3>
+
+            <div class="agenda-calendar-nav">
+              <button
+                type="button"
+                data-agenda-calendar-prev
+                aria-label="Bulan sebelumnya">
+                ‹
+              </button>
+
+              <button
+                type="button"
+                data-agenda-calendar-next
+                aria-label="Bulan berikutnya">
+                ›
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="agenda-calendar-grid"
+            data-agenda-calendar-grid
+            aria-label="Tanggal kalender">
+
+            <div class="agenda-calendar-day heading">Min</div>
+            <div class="agenda-calendar-day heading">Sen</div>
+            <div class="agenda-calendar-day heading">Sel</div>
+            <div class="agenda-calendar-day heading">Rab</div>
+            <div class="agenda-calendar-day heading">Kam</div>
+            <div class="agenda-calendar-day heading">Jum</div>
+            <div class="agenda-calendar-day heading">Sab</div>
+
+            <div class="agenda-calendar-day" style="grid-column: 1 / -1">
+              Kalender akan dimuat setelah modul agenda diaktifkan.
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- UPCOMING EVENTS -->
+      <section class="agenda-section">
+
+        <div class="agenda-section-heading">
+          <h2>Agenda Mendatang</h2>
+        </div>
+
+        <div class="agenda-list" data-agenda-list>
+
+          <div class="agenda-empty">
+            <span class="agenda-empty-icon">📅</span>
+            <strong>Belum ada agenda yang ditampilkan.</strong>
+            <br>
+            Agenda kegiatan akan muncul setelah data tersedia di database.
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- SELECTED DATE / EVENT DETAIL -->
+      <section
+        class="agenda-detail-panel"
+        data-agenda-detail
+        hidden>
+
+        <h3 data-agenda-detail-title>Detail Agenda</h3>
+
+        <div
+          class="agenda-detail-content"
+          data-agenda-detail-content>
+        </div>
+
+        <div class="agenda-location" data-agenda-detail-location></div>
+
+      </section>
+
+      <!-- LOCATION INFORMATION -->
+      <section class="agenda-section">
+
+        <div class="agenda-section-heading">
+          <h2>Informasi Lokasi Kegiatan</h2>
+        </div>
+
+        <div class="agenda-detail-panel">
+
+          <h3>Petunjuk Lokasi</h3>
+
+          <p class="agenda-detail-content">
+            Lokasi kegiatan akan dicantumkan pada setiap agenda.
+            Jika pengelola menyediakan koordinat atau alamat lokasi,
+            anggota dapat membuka petunjuk arah melalui Google Maps.
+          </p>
+
+          <div class="agenda-location" data-agenda-general-location>
+            <span>📍</span>
+            <span>Lokasi mengikuti informasi masing-masing agenda.</span>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="agenda-footer">
+        <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
+        <small>
+          © <span data-dashboard-year>2026</span> TARBIYAH — Pembelajaran Muslim
+        </small>
+      </footer>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
+
+      <a href="./tarbiyah.html" data-module="dashboard">
+        <span>⌂</span>
+        <small>Beranda</small>
+      </a>
+
+      <a href="./agenda-tarbiyah.html" data-module="agenda">
+        <span>▦</span>
+        <small>Agenda</small>
+      </a>
+
+      <a href="./materi-pembelajaran.html" data-module="materi">
+        <span>▤</span>
+        <small>Materi</small>
+      </a>
+
+      <a href="./profil-anggota.html" data-module="profil">
+        <span>♙</span>
+        <small>Profil</small>
+      </a>
+
+    </nav>
+
+  </div>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+</body>
+</html>
