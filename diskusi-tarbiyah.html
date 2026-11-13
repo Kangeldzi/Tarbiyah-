@@ -1,1 +1,515 @@
-<!doctype html><html lang="id" data-theme="light" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#267A78"><meta name="description" content="Ruang bertukar gagasan, bertanya, dan berdiskusi dengan anggota."><title>Diskusi Tarbiyah — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/brand-logo.css"><link rel="stylesheet" href="./css/module-shell.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/module-shell.js"></script><script defer src="./js/pwa.js"></script></head><body><div class="app-shell"><aside class="app-sidebar"><a class="module-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span>TARBIYAH<small>Ruang Ilmu & Ukhuwah</small></span></a><div class="nav-caption">MENU UTAMA</div><nav class="app-nav" aria-label="Navigasi aplikasi"><a href="./dashboard.html" ><span class="nav-ico">⌂</span>Dashboard</a><a href="./profil-anggota.html" ><span class="nav-ico">◉</span>Profil & Anggota</a><a href="./agenda-tarbiyah.html" ><span class="nav-ico">▦</span>Agenda Tarbiyah</a><a href="./pembelajaran.html" ><span class="nav-ico">✧</span>Pembelajaran</a><a href="./materi-pembelajaran.html" ><span class="nav-ico">▤</span>Materi Pembelajaran</a><a href="./berita-pengumuman.html" ><span class="nav-ico">▧</span>Berita & Pengumuman</a><a href="./presensi-tarbiyah.html" ><span class="nav-ico">✓</span>Presensi Tarbiyah</a><a href="./galeri-foto-video.html" ><span class="nav-ico">▣</span>Galeri Foto & Video</a><a href="./diskusi-tarbiyah.html" aria-current="page"><span class="nav-ico">☷</span>Diskusi Tarbiyah</a><a href="./donasi-infaq.html" ><span class="nav-ico">♡</span>Donasi, Infaq & Shodaqoh</a><a href="./kehadiran.html" ><span class="nav-ico">◷</span>Kehadiran</a><a href="./catatan-refleksi.html" ><span class="nav-ico">✎</span>Catatan & Refleksi</a><a href="./notifikasi.html" ><span class="nav-ico">♧</span>Notifikasi</a><a href="./riwayat-aktivitas.html" ><span class="nav-ico">◷</span>Riwayat Aktivitas</a><a href="./administrasi-pengaturan.html" ><span class="nav-ico">⚙</span>Administrasi & Pengaturan</a></nav><div class="sidebar-foot">Ilmu · Amal · Ukhuwah<br>© <span data-year></span> TARBIYAH</div></aside><div class="mobile-scrim" data-scrim></div><main class="app-main"><header class="app-topbar"><div class="top-left"><button class="icon-btn menu-toggle" data-menu aria-label="Buka navigasi" aria-expanded="false">☰</button><div class="crumb">TARBIYAH&nbsp; / &nbsp;<b>Diskusi Tarbiyah</b></div></div><div class="top-actions"><button class="icon-btn" data-theme-toggle aria-label="Ganti tema">◐</button><a class="icon-btn" href="./notifikasi.html" aria-label="Notifikasi" style="display:grid;place-items:center;text-decoration:none">♧</a><a class="profile-chip" href="./profil-anggota.html" aria-label="Profil">T</a></div></header><div class="module-content"><div class="module-head"><div><div class="eyebrow">RUANG TARBIYAH · MODUL</div><h1>Diskusi Tarbiyah</h1><p>Ruang bertukar gagasan, bertanya, dan berdiskusi dengan anggota.</p></div><div class="head-actions"><button class="btn secondary" type="button" data-back>← Kembali</button><button class="btn" type="button" data-action>Buat diskusi <span>↗</span></button></div></div><div class="notice"><b>Informasi pengembangan:</b> antarmuka dan navigasi modul ini sudah disiapkan. Data produksi belum ditampilkan sampai tabel dan kebijakan keamanan Supabase diverifikasi. Ini mencegah data contoh dianggap sebagai data komunitas yang sebenarnya.</div><section class="metric-grid"><article class="metric-card"><div class="metric-label">Diskusi aktif</div><div class="metric-value">—</div><div class="metric-hint">Menunggu data terverifikasi</div></article><article class="metric-card"><div class="metric-label">Status sinkronisasi</div><div class="metric-value" style="font-size:17px">Belum aktif</div><div class="metric-hint">Koneksi tabel belum dipetakan</div></article><article class="metric-card"><div class="metric-label">Akses akun</div><div class="metric-value" style="font-size:17px">Terproteksi</div><div class="metric-hint">Mengikuti sesi autentikasi</div></article><article class="metric-card"><div class="metric-label">Tema aplikasi</div><div class="metric-value" style="font-size:17px">Teal</div><div class="metric-hint">Mengikuti tema induk TARBIYAH</div></article></section><div class="panel-grid"><section class="panel"><h2>Topik diskusi</h2><p class="panel-desc">Ruang bertukar gagasan, bertanya, dan berdiskusi dengan anggota.</p><div class="toolbar"><input class="field" type="search" placeholder="Cari data..." aria-label="Cari data" disabled><button class="btn secondary" type="button" disabled>Filter</button></div><div class="empty-box"><div class="empty-icon">☷</div><b>Belum ada data untuk ditampilkan</b><p>Diskusi dan balasan akan diambil dari tabel komunitas setelah rancangan RLS disetujui.</p></div></section><aside class="panel"><h2>Percakapan terbaru</h2><p class="panel-desc">Informasi akan mengikuti data akun dan hak akses Anda.</p><div class="notice">Status integrasi: tampilan modul disiapkan. Pembacaan dan penyimpanan data menunggu verifikasi tabel, kolom, serta kebijakan RLS Supabase.</div><div class="empty-box"><div class="empty-icon">✦</div><b>Belum terhubung ke sumber data</b><p>Tidak ada data contoh atau angka rekaan yang ditampilkan.</p></div></aside></div><footer class="app-footer">TARBIYAH · Pembelajaran Muslim <span style="float:right">Versi pengembangan</span></footer></div></main></div><div class="toast" role="status" aria-live="polite" data-toast></div><script type="application/json" id="module-meta">{"key":"diskusi-tarbiyah","title":"Diskusi Tarbiyah"}</script></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Ruang diskusi dan berbagi ilmu anggota TARBIYAH.">
+  <title>Diskusi Tarbiyah — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    .discussion-hero {
+      padding: 27px;
+      margin-bottom: 22px;
+      border-radius: 22px;
+      color: #fff;
+      background: linear-gradient(130deg, #075b43, #123c31 60%, #102a22);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .discussion-hero::after {
+      content: "❞";
+      position: absolute;
+      right: 24px;
+      bottom: -85px;
+      font-size: 230px;
+      opacity: .08;
+      pointer-events: none;
+    }
+
+    .discussion-hero h1 {
+      font-family: Poppins, sans-serif;
+      font-size: clamp(24px, 4vw, 34px);
+      margin: 0 0 9px;
+    }
+
+    .discussion-hero p {
+      max-width: 620px;
+      color: #d8eee5;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .discussion-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .discussion-search,
+    .discussion-filter {
+      padding: 13px 15px;
+      border: 1px solid var(--border-color, #355347);
+      border-radius: 12px;
+      background: var(--surface-color, #18372d);
+      color: var(--text-color, #fff);
+      font: inherit;
+      outline: none;
+    }
+
+    .discussion-search {
+      flex: 1 1 220px;
+      min-width: 0;
+    }
+
+    .discussion-filter {
+      min-width: 155px;
+    }
+
+    .discussion-search:focus,
+    .discussion-filter:focus {
+      border-color: #20b486;
+      box-shadow: 0 0 0 3px rgba(32,180,134,.13);
+    }
+
+    .discussion-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(260px, .7fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .discussion-panel {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--border-color, #355347);
+      border-radius: 17px;
+      background: var(--card-bg, var(--surface-color, #18372d));
+    }
+
+    .discussion-panel h2 {
+      font-family: Poppins, sans-serif;
+      font-size: 17px;
+      margin: 0 0 15px;
+    }
+
+    .discussion-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .discussion-card {
+      padding: 15px;
+      border: 1px solid var(--border-color, #355347);
+      border-radius: 13px;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .discussion-card:hover {
+      border-color: #20b486;
+      transform: translateY(-2px);
+    }
+
+    .discussion-card h3 {
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 8px;
+    }
+
+    .discussion-card p {
+      color: var(--muted-color, #aabbb3);
+      font-size: 12px;
+      line-height: 1.7;
+      margin: 0 0 12px;
+    }
+
+    .discussion-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      font-size: 11px;
+      color: var(--muted-color, #aabbb3);
+    }
+
+    .discussion-tag {
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: rgba(32,180,134,.13);
+      color: #39d6a5;
+    }
+
+    .discussion-open {
+      border: 0;
+      background: transparent;
+      color: #39d6a5;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 9px 0 0;
+      cursor: pointer;
+    }
+
+    .discussion-empty {
+      padding: 25px 12px;
+      border: 1px dashed var(--border-color, #355347);
+      border-radius: 12px;
+      color: var(--muted-color, #aabbb3);
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .discussion-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .discussion-field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .discussion-field label {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .discussion-field input,
+    .discussion-field select,
+    .discussion-field textarea {
+      width: 100%;
+      min-width: 0;
+      padding: 12px 13px;
+      border: 1px solid var(--border-color, #355347);
+      border-radius: 11px;
+      background: var(--surface-color, #18372d);
+      color: var(--text-color, #fff);
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .discussion-field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .discussion-field input:focus,
+    .discussion-field select:focus,
+    .discussion-field textarea:focus {
+      border-color: #20b486;
+      box-shadow: 0 0 0 3px rgba(32,180,134,.12);
+    }
+
+    .discussion-submit {
+      border: 0;
+      border-radius: 11px;
+      padding: 13px 16px;
+      color: #fff;
+      background: linear-gradient(135deg, #07865f, #16a779);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .discussion-submit:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .discussion-message {
+      min-height: 20px;
+      font-size: 12px;
+      color: var(--muted-color, #aabbb3);
+      line-height: 1.6;
+    }
+
+    .discussion-detail {
+      display: none;
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--border-color, #355347);
+      border-radius: 16px;
+      background: var(--card-bg, var(--surface-color, #18372d));
+    }
+
+    .discussion-detail.is-visible {
+      display: block;
+    }
+
+    .discussion-detail h2 {
+      font-family: Poppins, sans-serif;
+      font-size: 18px;
+      margin: 0 0 10px;
+    }
+
+    .discussion-detail-content {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .discussion-detail-meta {
+      font-size: 11px;
+      color: var(--muted-color, #aabbb3);
+      margin-bottom: 13px;
+    }
+
+    .discussion-close {
+      border: 1px solid var(--border-color, #355347);
+      border-radius: 9px;
+      padding: 7px 11px;
+      background: transparent;
+      color: var(--text-color, #fff);
+      cursor: pointer;
+    }
+
+    .discussion-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    @media(max-width: 760px) {
+      .discussion-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .discussion-hero {
+        padding: 21px;
+      }
+
+      .discussion-panel {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-shell" data-module-shell>
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-header">
+        <a href="./tarbiyah.html" class="brand-logo">
+          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+          <span>TARBIYAH</span>
+        </a>
+        <button type="button" data-sidebar-close aria-label="Tutup menu">×</button>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Navigasi utama">
+        <a href="./tarbiyah.html">Dashboard</a>
+        <a href="./profil-anggota.html">Profil Anggota</a>
+        <a href="./agenda-tarbiyah.html">Agenda Tarbiyah</a>
+        <a href="./pembelajaran.html">Pembelajaran</a>
+        <a href="./berita-pengumuman.html">Berita & Pengumuman</a>
+        <a href="./presensi-tarbiyah.html">Presensi</a>
+        <a href="./galeri-foto-video.html">Galeri</a>
+        <a href="./diskusi-tarbiyah.html" class="active">Diskusi</a>
+        <a href="./notifikasi.html">Notifikasi</a>
+      </nav>
+    </aside>
+
+    <div class="sidebar-overlay" data-sidebar-overlay></div>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button type="button" data-sidebar-toggle aria-label="Buka menu">☰</button>
+
+        <div class="topbar-title">
+          <strong>Diskusi Tarbiyah</strong>
+          <small>Berbagi pemikiran dan mempererat ukhuwah</small>
+        </div>
+
+        <div class="topbar-actions">
+          <button type="button" data-theme-toggle aria-label="Ganti tema">◐</button>
+          <a href="./notifikasi.html" aria-label="Notifikasi">♧</a>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <section class="discussion-hero">
+          <h1>Ruang Diskusi</h1>
+          <p>
+            Tempat anggota bertukar gagasan, bertanya, berbagi pengalaman,
+            dan saling mengingatkan dalam kebaikan dengan adab dan rasa hormat.
+          </p>
+        </section>
+
+        <form class="discussion-toolbar" data-discussion-search-form>
+          <input
+            class="discussion-search"
+            type="search"
+            name="q"
+            placeholder="Cari topik diskusi..."
+            aria-label="Cari topik diskusi"
+            data-discussion-search
+          >
+
+          <select
+            class="discussion-filter"
+            aria-label="Filter kategori diskusi"
+            data-discussion-category
+          >
+            <option value="">Semua kategori</option>
+            <option value="aqidah">Aqidah</option>
+            <option value="ibadah">Ibadah</option>
+            <option value="akhlak">Akhlak</option>
+            <option value="keluarga">Keluarga</option>
+            <option value="sosial">Sosial</option>
+            <option value="umum">Umum</option>
+          </select>
+        </form>
+
+        <div class="discussion-layout">
+          <section class="discussion-panel">
+            <h2>Topik Diskusi</h2>
+
+            <div class="discussion-list" data-discussion-list>
+              <div class="discussion-empty">
+                Belum ada topik diskusi.
+                Topik akan ditampilkan setelah data diskusi
+                terhubung dengan backend TARBIYAH.
+              </div>
+            </div>
+          </section>
+
+          <aside class="discussion-panel">
+            <h2>Buat Topik Baru</h2>
+
+            <form class="discussion-form" data-discussion-form>
+              <div class="discussion-field">
+                <label for="discussion-title">Judul Topik</label>
+                <input
+                  id="discussion-title"
+                  name="title"
+                  type="text"
+                  maxlength="150"
+                  placeholder="Tuliskan judul diskusi..."
+                  required
+                >
+              </div>
+
+              <div class="discussion-field">
+                <label for="discussion-category">Kategori</label>
+                <select id="discussion-category" name="category" required>
+                  <option value="">Pilih kategori</option>
+                  <option value="aqidah">Aqidah</option>
+                  <option value="ibadah">Ibadah</option>
+                  <option value="akhlak">Akhlak</option>
+                  <option value="keluarga">Keluarga</option>
+                  <option value="sosial">Sosial</option>
+                  <option value="umum">Umum</option>
+                </select>
+              </div>
+
+              <div class="discussion-field">
+                <label for="discussion-content">Isi Diskusi</label>
+                <textarea
+                  id="discussion-content"
+                  name="content"
+                  maxlength="10000"
+                  placeholder="Ceritakan pertanyaan atau gagasan Anda..."
+                  required
+                ></textarea>
+              </div>
+
+              <button class="discussion-submit" type="submit">
+                Buat Topik Diskusi
+              </button>
+
+              <div class="discussion-message" data-discussion-message aria-live="polite">
+                Pengiriman topik akan diaktifkan setelah integrasi backend selesai.
+              </div>
+            </form>
+          </aside>
+        </div>
+
+        <section class="discussion-detail" data-discussion-detail aria-live="polite">
+          <div class="discussion-detail-header">
+            <h2 data-discussion-detail-title>Detail Diskusi</h2>
+            <button class="discussion-close" type="button" data-discussion-close>
+              Tutup
+            </button>
+          </div>
+
+          <div class="discussion-detail-meta" data-discussion-detail-meta></div>
+          <div class="discussion-detail-content" data-discussion-detail-content></div>
+        </section>
+      </section>
+
+      <footer class="app-footer">
+        <p>© <span data-current-year></span> TARBIYAH — Pembelajaran Muslim</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const year = document.querySelector("[data-current-year]");
+      if (year) {
+        year.textContent = new Date().getFullYear();
+      }
+
+      const searchForm = document.querySelector("[data-discussion-search-form]");
+      if (searchForm) {
+        searchForm.addEventListener("submit", event => {
+          event.preventDefault();
+        });
+      }
+
+      const discussionForm = document.querySelector("[data-discussion-form]");
+      const message = document.querySelector("[data-discussion-message]");
+
+      if (discussionForm) {
+        discussionForm.addEventListener("submit", event => {
+          event.preventDefault();
+
+          if (message) {
+            message.textContent =
+              "Topik belum dikirim. Sistem penyimpanan dan autentikasi diskusi perlu diaktifkan terlebih dahulu.";
+          }
+        });
+      }
+
+      const detail = document.querySelector("[data-discussion-detail]");
+      const closeButton = document.querySelector("[data-discussion-close]");
+
+      if (closeButton && detail) {
+        closeButton.addEventListener("click", () => {
+          detail.classList.remove("is-visible");
+        });
+      }
+    })();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+</body>
+</html>
