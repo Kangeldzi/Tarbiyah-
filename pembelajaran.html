@@ -1,1 +1,642 @@
-<!doctype html><html lang="id" data-theme="light" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#267A78"><meta name="description" content="Pusat pembelajaran untuk menemukan materi dan melanjutkan proses belajar."><title>Pembelajaran — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/brand-logo.css"><link rel="stylesheet" href="./css/module-shell.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/module-shell.js"></script><script defer src="./js/pwa.js"></script></head><body><div class="app-shell"><aside class="app-sidebar"><a class="module-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span>TARBIYAH<small>Ruang Ilmu & Ukhuwah</small></span></a><div class="nav-caption">MENU UTAMA</div><nav class="app-nav" aria-label="Navigasi aplikasi"><a href="./dashboard.html" ><span class="nav-ico">⌂</span>Dashboard</a><a href="./profil-anggota.html" ><span class="nav-ico">◉</span>Profil & Anggota</a><a href="./agenda-tarbiyah.html" ><span class="nav-ico">▦</span>Agenda Tarbiyah</a><a href="./pembelajaran.html" aria-current="page"><span class="nav-ico">✧</span>Pembelajaran</a><a href="./materi-pembelajaran.html" ><span class="nav-ico">▤</span>Materi Pembelajaran</a><a href="./berita-pengumuman.html" ><span class="nav-ico">▧</span>Berita & Pengumuman</a><a href="./presensi-tarbiyah.html" ><span class="nav-ico">✓</span>Presensi Tarbiyah</a><a href="./galeri-foto-video.html" ><span class="nav-ico">▣</span>Galeri Foto & Video</a><a href="./diskusi-tarbiyah.html" ><span class="nav-ico">☷</span>Diskusi Tarbiyah</a><a href="./donasi-infaq.html" ><span class="nav-ico">♡</span>Donasi, Infaq & Shodaqoh</a><a href="./kehadiran.html" ><span class="nav-ico">◷</span>Kehadiran</a><a href="./catatan-refleksi.html" ><span class="nav-ico">✎</span>Catatan & Refleksi</a><a href="./notifikasi.html" ><span class="nav-ico">♧</span>Notifikasi</a><a href="./riwayat-aktivitas.html" ><span class="nav-ico">◷</span>Riwayat Aktivitas</a><a href="./administrasi-pengaturan.html" ><span class="nav-ico">⚙</span>Administrasi & Pengaturan</a></nav><div class="sidebar-foot">Ilmu · Amal · Ukhuwah<br>© <span data-year></span> TARBIYAH</div></aside><div class="mobile-scrim" data-scrim></div><main class="app-main"><header class="app-topbar"><div class="top-left"><button class="icon-btn menu-toggle" data-menu aria-label="Buka navigasi" aria-expanded="false">☰</button><div class="crumb">TARBIYAH&nbsp; / &nbsp;<b>Pembelajaran</b></div></div><div class="top-actions"><button class="icon-btn" data-theme-toggle aria-label="Ganti tema">◐</button><a class="icon-btn" href="./notifikasi.html" aria-label="Notifikasi" style="display:grid;place-items:center;text-decoration:none">♧</a><a class="profile-chip" href="./profil-anggota.html" aria-label="Profil">T</a></div></header><div class="module-content"><div class="module-head"><div><div class="eyebrow">RUANG TARBIYAH · MODUL</div><h1>Pembelajaran</h1><p>Pusat pembelajaran untuk menemukan materi dan melanjutkan proses belajar.</p></div><div class="head-actions"><button class="btn secondary" type="button" data-back>← Kembali</button><button class="btn" type="button" data-action>Jelajahi materi <span>↗</span></button></div></div><div class="notice"><b>Informasi pengembangan:</b> antarmuka dan navigasi modul ini sudah disiapkan. Data produksi belum ditampilkan sampai tabel dan kebijakan keamanan Supabase diverifikasi. Ini mencegah data contoh dianggap sebagai data komunitas yang sebenarnya.</div><section class="metric-grid"><article class="metric-card"><div class="metric-label">Jalur belajar</div><div class="metric-value">—</div><div class="metric-hint">Menunggu data terverifikasi</div></article><article class="metric-card"><div class="metric-label">Status sinkronisasi</div><div class="metric-value" style="font-size:17px">Belum aktif</div><div class="metric-hint">Koneksi tabel belum dipetakan</div></article><article class="metric-card"><div class="metric-label">Akses akun</div><div class="metric-value" style="font-size:17px">Terproteksi</div><div class="metric-hint">Mengikuti sesi autentikasi</div></article><article class="metric-card"><div class="metric-label">Tema aplikasi</div><div class="metric-value" style="font-size:17px">Teal</div><div class="metric-hint">Mengikuti tema induk TARBIYAH</div></article></section><div class="panel-grid"><section class="panel"><h2>Lanjutkan belajar</h2><p class="panel-desc">Pusat pembelajaran untuk menemukan materi dan melanjutkan proses belajar.</p><div class="toolbar"><input class="field" type="search" placeholder="Cari data..." aria-label="Cari data" disabled><button class="btn secondary" type="button" disabled>Filter</button></div><div class="empty-box"><div class="empty-icon">✧</div><b>Belum ada data untuk ditampilkan</b><p>Daftar jalur belajar akan ditampilkan setelah konten pembelajaran terhubung.</p></div></section><aside class="panel"><h2>Jelajahi topik</h2><p class="panel-desc">Informasi akan mengikuti data akun dan hak akses Anda.</p><div class="notice">Status integrasi: tampilan modul disiapkan. Pembacaan dan penyimpanan data menunggu verifikasi tabel, kolom, serta kebijakan RLS Supabase.</div><div class="empty-box"><div class="empty-icon">✦</div><b>Belum terhubung ke sumber data</b><p>Tidak ada data contoh atau angka rekaan yang ditampilkan.</p></div></aside></div><footer class="app-footer">TARBIYAH · Pembelajaran Muslim <span style="float:right">Versi pengembangan</span></footer></div></main></div><div class="toast" role="status" aria-live="polite" data-toast></div><script type="application/json" id="module-meta">{"key":"pembelajaran","title":"Pembelajaran"}</script></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Program pembelajaran Islam TARBIYAH">
+  <meta name="application-name" content="TARBIYAH">
+
+  <title>Pembelajaran — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    .learning-page {
+      width: 100%;
+      min-width: 0;
+      padding-bottom: 35px;
+    }
+
+    .learning-hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(22px, 4vw, 34px);
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(54,181,138,.2), transparent 38%),
+        var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .learning-eyebrow {
+      color: var(--color-primary, #36b58a);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+    }
+
+    .learning-hero h1 {
+      margin: 10px 0;
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .learning-hero p {
+      max-width: 680px;
+      margin: 0;
+      color: var(--text-secondary, #aab5af);
+      line-height: 1.7;
+    }
+
+    .learning-search {
+      display: flex;
+      width: min(100%, 480px);
+      gap: 8px;
+      margin: 22px 0;
+    }
+
+    .learning-search input {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .learning-section {
+      margin-top: 28px;
+    }
+
+    .learning-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .learning-section-heading h2 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: 1.08rem;
+    }
+
+    .learning-section-heading a {
+      color: var(--color-primary, #36b58a);
+      font-size: .82rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .learning-category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .learning-category {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      padding: 17px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 15px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-primary, #fff);
+      text-align: left;
+      text-decoration: none;
+      transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .learning-category:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-primary, #36b58a);
+    }
+
+    .learning-category-icon {
+      display: grid;
+      width: 43px;
+      height: 43px;
+      flex-shrink: 0;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(54,181,138,.13);
+      font-size: 1.35rem;
+    }
+
+    .learning-category strong {
+      display: block;
+      font-size: .87rem;
+    }
+
+    .learning-category small {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .73rem;
+    }
+
+    .learning-list {
+      display: grid;
+      gap: 13px;
+    }
+
+    .learning-empty {
+      padding: 28px 18px;
+      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border-radius: 17px;
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .learning-empty-icon {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+
+    .learning-progress-card {
+      padding: 20px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 17px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .learning-progress-card h3 {
+      margin: 0 0 8px;
+      font-size: .95rem;
+    }
+
+    .learning-progress-card p {
+      margin: 0;
+      color: var(--text-secondary, #aab5af);
+      font-size: .85rem;
+      line-height: 1.7;
+    }
+
+    .learning-progress-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .learning-footer {
+      padding: 24px 0 12px;
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+      font-size: .78rem;
+    }
+
+    @media (max-width: 760px) {
+      .learning-category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .learning-page {
+        padding-bottom: 90px;
+      }
+
+      .learning-search {
+        width: 100%;
+      }
+
+      .learning-category {
+        padding: 13px 10px;
+        gap: 9px;
+      }
+
+      .learning-category-icon {
+        width: 37px;
+        height: 37px;
+        font-size: 1.1rem;
+      }
+
+      .learning-category strong {
+        font-size: .78rem;
+      }
+
+      .learning-category small {
+        font-size: .68rem;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .learning-category-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body class="auth-pending">
+
+  <div class="app-shell">
+
+    <!-- HEADER -->
+    <header class="app-header">
+
+      <button
+        class="app-header-menu"
+        type="button"
+        data-sidebar-toggle
+        aria-label="Buka navigasi"
+        aria-expanded="false">
+        ☰
+      </button>
+
+      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
+        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+        <span class="brand-logo-text">
+          <strong>TARBIYAH</strong>
+          <small>Pembelajaran Muslim</small>
+        </span>
+      </a>
+
+      <div class="app-header-actions">
+
+        <button
+          type="button"
+          class="app-header-action"
+          data-theme-toggle
+          aria-label="Ganti tema">
+          ◐
+        </button>
+
+        <a
+          href="./notifikasi.html"
+          class="app-header-action notification-action"
+          aria-label="Notifikasi">
+          ♧
+          <span class="notification-count" data-notification-count>0</span>
+        </a>
+
+        <button
+          type="button"
+          class="app-header-user"
+          data-user-menu-toggle
+          aria-label="Menu akun">
+          <img
+            src="./assets/icons/icon-192.png"
+            alt="Foto profil"
+            data-user-avatar>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div
+      class="sidebar-overlay"
+      data-sidebar-overlay
+      aria-hidden="true">
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar" aria-label="Navigasi utama">
+
+      <div class="sidebar-profile">
+        <img
+          src="./assets/icons/icon-192.png"
+          alt="Foto profil anggota"
+          class="sidebar-avatar"
+          data-sidebar-avatar>
+
+        <div class="sidebar-profile-info">
+          <strong data-sidebar-user-name>Anggota TARBIYAH</strong>
+          <small data-sidebar-user-role>Anggota</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-navigation">
+
+        <p class="sidebar-nav-heading">MENU UTAMA</p>
+
+        <a href="./tarbiyah.html" data-module="dashboard" class="sidebar-nav-item">
+          <span>⌂</span>
+          <span>Beranda</span>
+        </a>
+
+        <a href="./profil-anggota.html" data-module="profil" class="sidebar-nav-item">
+          <span>♙</span>
+          <span>Profil Anggota</span>
+        </a>
+
+        <a href="./agenda-tarbiyah.html" data-module="agenda" class="sidebar-nav-item">
+          <span>▦</span>
+          <span>Agenda & Jadwal</span>
+        </a>
+
+        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
+          <span>▤</span>
+          <span>Pembelajaran</span>
+        </a>
+
+        <a href="./materi-pembelajaran.html" data-module="materi" class="sidebar-nav-item">
+          <span>▧</span>
+          <span>Materi Kajian</span>
+        </a>
+
+        <a href="./berita-pengumuman.html" data-module="berita" class="sidebar-nav-item">
+          <span>▥</span>
+          <span>Berita & Pengumuman</span>
+        </a>
+
+        <a href="./presensi-tarbiyah.html" data-module="presensi" class="sidebar-nav-item">
+          <span>✓</span>
+          <span>Presensi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">KOMUNITAS</p>
+
+        <a href="./galeri-foto-video.html" data-module="galeri" class="sidebar-nav-item">
+          <span>▣</span>
+          <span>Galeri Dokumentasi</span>
+        </a>
+
+        <a href="./diskusi-tarbiyah.html" data-module="diskusi" class="sidebar-nav-item">
+          <span>☷</span>
+          <span>Ruang Diskusi</span>
+        </a>
+
+        <a href="./donasi-infaq.html" data-module="donasi" class="sidebar-nav-item">
+          <span>♡</span>
+          <span>Infaq & Donasi</span>
+        </a>
+
+        <p class="sidebar-nav-heading">AKUN & AKTIVITAS</p>
+
+        <a href="./kehadiran.html" data-module="kehadiran" class="sidebar-nav-item">
+          <span>◷</span>
+          <span>Riwayat Kehadiran</span>
+        </a>
+
+        <a href="./catatan-refleksi.html" data-module="catatan" class="sidebar-nav-item">
+          <span>✎</span>
+          <span>Catatan Refleksi</span>
+        </a>
+
+        <a href="./riwayat-aktivitas.html" data-module="riwayat" class="sidebar-nav-item">
+          <span>↻</span>
+          <span>Riwayat Aktivitas</span>
+        </a>
+
+        <a href="./administrasi-pengaturan.html" data-module="administrasi" class="sidebar-nav-item">
+          <span>⚙</span>
+          <span>Pengaturan</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="sidebar-logout" data-logout>
+          ⇥ Keluar dari Akun
+        </button>
+
+        <small>© <span data-dashboard-year>2026</span> TARBIYAH</small>
+      </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main learning-page">
+
+      <div class="module-breadcrumb">
+        <a href="./tarbiyah.html">Beranda</a>
+        <span>›</span>
+        <span>Pembelajaran</span>
+      </div>
+
+      <!-- HERO -->
+      <section class="learning-hero">
+
+        <span class="learning-eyebrow">📖 ILMU & PEMBINAAN DIRI</span>
+
+        <h1>Ruang Pembelajaran TARBIYAH</h1>
+
+        <p>
+          Tempat menambah ilmu, memperdalam pemahaman Islam,
+          membangun kebiasaan baik, dan bertumbuh bersama dalam ukhuwah.
+        </p>
+
+      </section>
+
+      <!-- SEARCH -->
+      <form class="learning-search" data-learning-search-form>
+
+        <input
+          type="search"
+          placeholder="Cari program atau pembelajaran..."
+          aria-label="Cari pembelajaran"
+          data-learning-search>
+
+        <button type="submit" class="btn btn-primary">
+          Cari
+        </button>
+
+      </form>
+
+      <!-- CATEGORIES -->
+      <section class="learning-section">
+
+        <div class="learning-section-heading">
+          <h2>Kategori Pembelajaran</h2>
+        </div>
+
+        <div class="learning-category-grid">
+
+          <a href="./materi-pembelajaran.html?category=akidah" class="learning-category">
+            <span class="learning-category-icon">🌙</span>
+            <span>
+              <strong>Akidah & Tauhid</strong>
+              <small>Dasar keimanan</small>
+            </span>
+          </a>
+
+          <a href="./materi-pembelajaran.html?category=ibadah" class="learning-category">
+            <span class="learning-category-icon">🕌</span>
+            <span>
+              <strong>Fikih Ibadah</strong>
+              <small>Panduan beribadah</small>
+            </span>
+          </a>
+
+          <a href="./materi-pembelajaran.html?category=quran" class="learning-category">
+            <span class="learning-category-icon">📖</span>
+            <span>
+              <strong>Al-Qur'an</strong>
+              <small>Tilawah & tadabbur</small>
+            </span>
+          </a>
+
+          <a href="./materi-pembelajaran.html?category=hadis" class="learning-category">
+            <span class="learning-category-icon">📚</span>
+            <span>
+              <strong>Hadis</strong>
+              <small>Belajar sunnah</small>
+            </span>
+          </a>
+
+          <a href="./materi-pembelajaran.html?category=akhlak" class="learning-category">
+            <span class="learning-category-icon">🌱</span>
+            <span>
+              <strong>Akhlak & Adab</strong>
+              <small>Pembinaan karakter</small>
+            </span>
+          </a>
+
+          <a href="./materi-pembelajaran.html?category=sejarah" class="learning-category">
+            <span class="learning-category-icon">🏛️</span>
+            <span>
+              <strong>Sejarah Islam</strong>
+              <small>Sirah & peradaban</small>
+            </span>
+          </a>
+
+        </div>
+
+      </section>
+
+      <!-- PROGRAMS -->
+      <section class="learning-section">
+
+        <div class="learning-section-heading">
+          <h2>Program Pembelajaran</h2>
+          <a href="./agenda-tarbiyah.html">Lihat jadwal</a>
+        </div>
+
+        <div class="learning-list" data-learning-programs>
+
+          <div class="learning-empty">
+            <span class="learning-empty-icon">🌿</span>
+            <strong>Program pembelajaran akan ditampilkan di sini.</strong>
+            <br>
+            Informasi program akan dimuat dari database TARBIYAH.
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- MATERIALS -->
+      <section class="learning-section">
+
+        <div class="learning-section-heading">
+          <h2>Materi Terbaru</h2>
+          <a href="./materi-pembelajaran.html">Lihat semua materi</a>
+        </div>
+
+        <div class="learning-list" data-learning-materials>
+
+          <div class="learning-empty">
+            <span class="learning-empty-icon">📚</span>
+            Belum ada materi yang ditampilkan.
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- MEMBER PROGRESS -->
+      <section class="learning-section">
+
+        <div class="learning-section-heading">
+          <h2>Perkembangan Pembelajaran Saya</h2>
+        </div>
+
+        <div class="learning-progress-card">
+
+          <h3>Perjalanan Menuntut Ilmu</h3>
+
+          <p>
+            Pantau aktivitas pembelajaran, kajian yang telah diikuti,
+            dan riwayat kehadiran melalui halaman profil anggota.
+          </p>
+
+          <div class="learning-progress-links">
+
+            <a href="./profil-anggota.html" class="btn btn-primary">
+              Lihat Profil Saya
+            </a>
+
+            <a href="./kehadiran.html" class="btn btn-secondary">
+              Riwayat Kehadiran
+            </a>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="learning-footer">
+        <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
+        <small>
+          © <span data-dashboard-year>2026</span> TARBIYAH — Pembelajaran Muslim
+        </small>
+      </footer>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
+
+      <a href="./tarbiyah.html" data-module="dashboard">
+        <span>⌂</span>
+        <small>Beranda</small>
+      </a>
+
+      <a href="./agenda-tarbiyah.html" data-module="agenda">
+        <span>▦</span>
+        <small>Agenda</small>
+      </a>
+
+      <a href="./materi-pembelajaran.html" data-module="materi">
+        <span>▤</span>
+        <small>Materi</small>
+      </a>
+
+      <a href="./profil-anggota.html" data-module="profil">
+        <span>♙</span>
+        <small>Profil</small>
+      </a>
+
+    </nav>
+
+  </div>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+</body>
+</html>
