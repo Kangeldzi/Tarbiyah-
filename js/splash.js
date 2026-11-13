@@ -148,89 +148,92 @@
     });
   }
 
-  
 function setReady(message) {
   const elements = getElements();
 
   state.ready = true;
 
   if (elements.loading) {
-    setText(
-      elements.loading,
-      message || "Alhamdulillah, ruang belajar siap."
-    );
+    elements.loading.textContent =
+      message || "Alhamdulillah, ruang belajar siap.";
 
     elements.loading.classList.remove(
       CONFIG.classes.loading
     );
   }
 
-  /*
-   * PATCH:
-   * Jika tombol tidak ditemukan di HTML,
-   * buat tombol secara otomatis.
-   */
-  let button = elements.button;
+  // Cari tombol yang sudah ada.
+  let button = document.querySelector(
+    '[data-splash-enter]'
+  );
 
-  if (!button && elements.container) {
+  // Jika belum ada, buat tombol baru.
+  if (!button) {
     button = document.createElement("button");
 
     button.type = "button";
-    button.className = "splash-enter";
-    button.setAttribute("data-splash-enter", "");
     button.textContent = "Masuk Sekarang →";
+    button.setAttribute("data-splash-enter", "");
     button.setAttribute(
       "aria-label",
       "Masuk ke halaman login TARBIYAH"
     );
 
-    if (elements.loading) {
-      elements.loading.insertAdjacentElement(
-        "afterend",
-        button
-      );
-    } else {
+    button.className = "splash-enter";
+
+    // Masukkan ke dalam splash jika tersedia.
+    if (elements.container) {
       elements.container.appendChild(button);
+    } else {
+      // Cadangan: masukkan langsung ke body.
+      document.body.appendChild(button);
     }
 
     console.info(
-      "[TARBIYAH SPLASH] Tombol masuk dibuat otomatis."
+      "[TARBIYAH SPLASH] Tombol berhasil dibuat."
     );
   }
 
-  /*
-   * Pastikan tombol benar-benar terlihat.
-   */
-  if (button) {
-    button.hidden = false;
-    button.disabled = false;
+  // Paksa tombol terlihat.
+  button.hidden = false;
+  button.disabled = false;
 
-    button.removeAttribute("aria-disabled");
-    button.classList.remove("is-loading");
+  button.removeAttribute("aria-disabled");
+  button.classList.remove("is-loading");
 
-    button.style.display = "inline-flex";
-    button.style.alignItems = "center";
-    button.style.justifyContent = "center";
-    button.style.gap = "8px";
-    button.style.visibility = "visible";
-    button.style.opacity = "1";
-    button.style.margin = "28px auto 0";
-    button.style.padding = "15px 28px";
-    button.style.minHeight = "50px";
-    button.style.border = "1px solid #6ee7b7";
-    button.style.borderRadius = "14px";
-    button.style.background = "#10b981";
-    button.style.color = "#06251a";
-    button.style.fontWeight = "800";
-    button.style.fontSize = "15px";
-    button.style.cursor = "pointer";
-    button.style.position = "relative";
-    button.style.zIndex = "20";
-  }
+  const styles = {
+    display: "inline-flex",
+    visibility: "visible",
+    opacity: "1",
+    position: "relative",
+    zIndex: "99999",
+    margin: "28px auto",
+    padding: "15px 28px",
+    minHeight: "50px",
+    border: "2px solid #6ee7b7",
+    borderRadius: "14px",
+    background: "#10b981",
+    color: "#06251a",
+    fontSize: "15px",
+    fontWeight: "800",
+    cursor: "pointer"
+  };
+
+  Object.entries(styles).forEach(([key, value]) => {
+    button.style.setProperty(
+      key.replace(/[A-Z]/g, m => "-" + m.toLowerCase()),
+      value,
+      "important"
+    );
+  });
 
   dispatch("tarbiyah:splash-ready", {
-    buttonAvailable: Boolean(button)
+    buttonAvailable: true
   });
+
+  console.info(
+    "[TARBIYAH SPLASH] Tombol Masuk Sekarang siap."
+  );
 }
 
 
