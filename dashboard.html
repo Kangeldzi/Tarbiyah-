@@ -20,6 +20,28 @@
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/dashboard.css">
 
+  
+<script>
+window.addEventListener("error", function (event) {
+  if (
+    event.message &&
+    event.message.includes("SyntaxError")
+  ) {
+    console.error("========== TARBIYAH ERROR TRACKER ==========");
+    console.error("PESAN:", event.message);
+    console.error("FILE:", event.filename || "Tidak diketahui");
+    console.error("BARIS:", event.lineno || "Tidak diketahui");
+    console.error("KOLOM:", event.colno || "Tidak diketahui");
+    console.error("ERROR:", event.error || "Tidak tersedia");
+    console.error("============================================");
+  }
+}, true);
+
+window.addEventListener("unhandledrejection", function (event) {
+  console.error("[TARBIYAH PROMISE ERROR]", event.reason);
+});
+</script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
