@@ -1,0 +1,122 @@
+
+/* =========================================================
+   TARBIYAH — PAGE NAVIGATION STYLE
+   File: css/page-navigation.css
+
+   Mengatur tampilan:
+   - Tombol Kembali
+   - Tombol Beranda
+   - Ikon navigasi
+   - Efek hover, sentuh, dan fokus
+   ========================================================= */
+
+.tarbiyah-page-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 18px;
+  font-family: inherit;
+}
+
+/* Tampilan dasar tombol */
+.tarbiyah-page-nav__button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 43px;
+  padding: 10px 16px;
+
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  border-radius: 13px;
+
+  background: rgba(16, 185, 129, 0.09);
+  color: inherit;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.2;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+/* Efek saat diarahkan */
+.tarbiyah-page-nav__button:hover {
+  background: rgba(16, 185, 129, 0.17);
+  border-color: rgba(16, 185, 129, 0.58);
+  transform: translateY(-2px);
+}
+
+/* Efek ketika disentuh */
+.tarbiyah-page-nav__button:active {
+  transform: scale(0.97);
+}
+
+/* Aksesibilitas keyboard */
+.tarbiyah-page-nav__button:focus-visible {
+  outline: 3px solid rgba(16, 185, 129, 0.30);
+  outline-offset: 3px;
+}
+
+/* Ikon tombol */
+.tarbiyah-page-nav__icon {
+  display: inline-grid;
+  place-items: center;
+
+  width: 20px;
+  height: 20px;
+
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Teks tombol */
+.tarbiyah-page-nav__label {
+  white-space: nowrap;
+}
+
+/* Tombol Beranda */
+.tarbiyah-page-nav__button--home {
+  background: rgba(16, 185, 129, 0.14);
+}
+
+/* Tampilan HP */
+@media (max-width: 480px) {
+  .tarbiyah-page-nav {
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .tarbiyah-page-nav__button {
+    min-height: 41px;
+    padding: 9px 13px;
+    font-size: 13px;
+    border-radius: 11px;
+  }
+
+  .tarbiyah-page-nav__icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+/* Menghormati pengaturan pengurangan animasi */
+@media (prefers-reduced-motion: reduce) {
+  .tarbiyah-page-nav__button {
+    transition: none;
+  }
+}
