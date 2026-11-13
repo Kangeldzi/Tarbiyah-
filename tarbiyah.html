@@ -1,49 +1,1379 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#102a22"><title>Dashboard — TARBIYAH</title>
-  <link rel="icon" href="./assets/icons/tarbiyah-mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- ERUDA DEBUG CONSOLE - SEMENTARA UNTUK AUDIT -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-  console.log("TARBIYAH DEBUG CONSOLE AKTIF");
-</script>
-  <script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#102a22">
+  <meta name="color-scheme" content="dark light">
+
+  <meta
+    name="description"
+    content="Dashboard anggota TARBIYAH — Pembelajaran Muslim."
+  >
+
+  <title>Dashboard — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+  <link rel="stylesheet" href="./css/dashboard.css">
+
   <style>
-    body{min-height:100vh;display:grid;place-items:center;padding:22px;background:var(--bg,#102a22);color:var(--text,#f4f5ed);font-family:Inter,system-ui,sans-serif}
-    .placeholder{width:min(100%,620px);padding:clamp(25px,5vw,48px);border:1px solid rgba(210,220,210,.18);border-radius:24px;background:rgba(30,60,45,.35);text-align:center}
-    .placeholder img{width:76px;height:76px}.placeholder h1{font-family:Poppins,sans-serif}.placeholder p{line-height:1.8;opacity:.8}.pill{display:inline-block;padding:7px 12px;border-radius:99px;background:rgba(54,145,102,.2);color:#8bd4ac;font-size:12px}
-    button{margin:8px;padding:12px 20px;border:0;border-radius:10px;background:#2e8b68;color:white;font-weight:700;cursor:pointer}
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .dashboard-main {
+      width: 100%;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 25px clamp(15px, 3vw, 32px) 100px;
+    }
+
+    .dashboard-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-heading h1 {
+      margin: 0 0 7px;
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 800;
+    }
+
+    .dashboard-heading p {
+      margin: 0;
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .dashboard-date {
+      padding: 10px 14px;
+      border: 1px solid var(--border-color, rgba(110,231,183,.16));
+      border-radius: 12px;
+      background: var(--bg-card, #102a22);
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .dashboard-welcome {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid rgba(110, 231, 183, 0.2);
+      border-radius: 22px;
+      margin-bottom: 25px;
+      background:
+        radial-gradient(
+          circle at 90% 15%,
+          rgba(110, 231, 183, 0.18),
+          transparent 34%
+        ),
+        linear-gradient(120deg, #0b382a, #102a22);
+      color: #ecfdf5;
+    }
+
+    .dashboard-welcome::after {
+      content: "✦";
+      position: absolute;
+      right: 7%;
+      top: 12%;
+      font-size: clamp(65px, 12vw, 120px);
+      color: rgba(167, 243, 208, 0.12);
+      pointer-events: none;
+    }
+
+    .dashboard-welcome-content {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+    }
+
+    .dashboard-welcome-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 15px;
+      color: #a7f3d0;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .dashboard-welcome h2 {
+      margin: 0 0 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(21px, 4vw, 31px);
+      line-height: 1.35;
+    }
+
+    .dashboard-welcome p {
+      max-width: 560px;
+      margin: 0;
+      color: #c6e7d8;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .dashboard-welcome-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .dashboard-welcome-actions a {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 15px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .dashboard-primary-link {
+      background: #10b981;
+      color: #ffffff;
+    }
+
+    .dashboard-secondary-link {
+      border: 1px solid rgba(167, 243, 208, 0.3);
+      color: #ecfdf5;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .dashboard-section {
+      margin-top: 29px;
+    }
+
+    .dashboard-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .dashboard-section-heading h2 {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .dashboard-section-heading a {
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .dashboard-section-description {
+      margin: -7px 0 15px;
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .dashboard-stat-card {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--border-color, rgba(110,231,183,.16));
+      border-radius: 16px;
+      background: var(--bg-card, #102a22);
+    }
+
+    .dashboard-stat-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      margin-bottom: 13px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      font-size: 18px;
+    }
+
+    .dashboard-stat-label {
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .dashboard-stat-value {
+      display: block;
+      margin-top: 5px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 23px;
+      font-weight: 800;
+      color: var(--text-primary, #ecfdf5);
+    }
+
+    .dashboard-carousel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-color, rgba(110,231,183,.16));
+      border-radius: 18px;
+      background: var(--bg-card, #102a22);
+    }
+
+    .dashboard-carousel-track {
+      display: flex;
+      transition: transform 0.45s ease;
+    }
+
+    .dashboard-slide {
+      position: relative;
+      flex: 0 0 100%;
+      min-height: 210px;
+      display: flex;
+      align-items: center;
+      padding: clamp(22px, 4vw, 36px);
+      background:
+        radial-gradient(
+          circle at 85% 20%,
+          rgba(52, 211, 153, 0.17),
+          transparent 35%
+        ),
+        linear-gradient(120deg, #0b382a, #102a22);
+      color: #ecfdf5;
+    }
+
+    .dashboard-slide-content {
+      max-width: 600px;
+    }
+
+    .dashboard-slide-tag {
+      display: inline-block;
+      padding: 6px 9px;
+      border-radius: 7px;
+      margin-bottom: 12px;
+      background: rgba(52, 211, 153, 0.13);
+      color: #a7f3d0;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+    }
+
+    .dashboard-slide h3 {
+      margin: 0 0 9px;
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(19px, 3vw, 26px);
+    }
+
+    .dashboard-slide p {
+      max-width: 480px;
+      margin: 0;
+      color: #c6e7d8;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .dashboard-carousel-controls {
+      position: absolute;
+      right: 18px;
+      bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dashboard-carousel-controls button {
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(167, 243, 208, 0.3);
+      border-radius: 9px;
+      background: rgba(0, 0, 0, 0.15);
+      color: white;
+      cursor: pointer;
+    }
+
+    .dashboard-carousel-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .dashboard-carousel-dots button {
+      width: 7px;
+      height: 7px;
+      padding: 0;
+      border: 0;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+    }
+
+    .dashboard-carousel-dots button.active {
+      width: 19px;
+      background: #6ee7b7;
+    }
+
+    .dashboard-content-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .dashboard-panel {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--border-color, rgba(110,231,183,.16));
+      border-radius: 16px;
+      background: var(--bg-card, #102a22);
+    }
+
+    .dashboard-panel h3 {
+      margin: 0 0 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+    }
+
+    .dashboard-panel p {
+      margin: 0;
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .dashboard-panel-link {
+      display: inline-flex;
+      margin-top: 14px;
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .dashboard-quick-links {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .dashboard-quick-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 17px 10px;
+      border: 1px solid var(--border-color, rgba(110,231,183,.16));
+      border-radius: 15px;
+      background: var(--bg-card, #102a22);
+      color: var(--text-primary, #ecfdf5);
+      text-align: center;
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .dashboard-quick-link:hover {
+      transform: translateY(-3px);
+      border-color: rgba(52, 211, 153, 0.5);
+    }
+
+    .dashboard-quick-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      font-size: 19px;
+    }
+
+    .dashboard-quick-link span:last-child {
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .dashboard-empty {
+      padding: 23px 15px;
+      border: 1px dashed var(--border-color, rgba(110,231,183,.2));
+      border-radius: 13px;
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 12px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .dashboard-footer {
+      padding: 25px 15px;
+      color: var(--text-muted, #78998a);
+      font-size: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 1000px) {
+      .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dashboard-quick-links {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 650px) {
+      .dashboard-main {
+        padding: 20px 14px 95px;
+      }
+
+      .dashboard-header-row {
+        align-items: flex-start;
+      }
+
+      .dashboard-date {
+        font-size: 10px;
+      }
+
+      .dashboard-content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-quick-links {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .dashboard-quick-link {
+        padding: 13px 5px;
+        border-radius: 12px;
+      }
+
+      .dashboard-quick-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+      }
+
+      .dashboard-quick-link span:last-child {
+        font-size: 9px;
+      }
+
+      .dashboard-stat-card {
+        padding: 14px;
+      }
+
+      .dashboard-stat-value {
+        font-size: 20px;
+      }
+
+      .dashboard-slide {
+        min-height: 230px;
+        padding-bottom: 58px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .dashboard-quick-links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
   </style>
 </head>
-<body>
-  <main class="placeholder">
-    <img src="./assets/icons/tarbiyah-mark.svg" alt="Logo TARBIYAH">
-    <p class="pill">TAHAP 2 — AUTENTIKASI</p>
-    <h1>Alhamdulillah, Anda berhasil masuk.</h1>
-    <p id="welcomeText">Memeriksa sesi akun...</p>
-    <p>Ini adalah halaman sementara untuk menguji alur login. Dashboard lengkap akan dibangun pada Tahap 3.</p>
-    <button id="logoutButton" type="button">Keluar dari akun</button>
-  </main>
+
+<body class="auth-pending">
+
+  <!-- AUTHENTICATION GUARD -->
+  <div class="app-shell" data-app-shell>
+
+    <!-- HEADER -->
+    <header class="app-header">
+
+      <div class="app-header-left">
+
+        <button
+          type="button"
+          class="sidebar-toggle"
+          data-sidebar-toggle
+          aria-label="Buka navigasi"
+          aria-expanded="false"
+        >
+          ☰
+        </button>
+
+        <a href="./tarbiyah.html" class="brand-logo">
+          <img
+            src="./assets/icons/icon-192.png"
+            alt="TARBIYAH"
+            width="36"
+            height="36"
+          >
+
+          <span>
+            <strong>TARBIYAH</strong>
+            <small>Pembelajaran Muslim</small>
+          </span>
+        </a>
+
+      </div>
+
+
+      <div class="app-header-actions">
+
+        <form
+          class="dashboard-search"
+          data-dashboard-search-form
+          role="search"
+        >
+          <input
+            type="search"
+            placeholder="Cari menu..."
+            aria-label="Cari menu"
+            data-dashboard-search
+          >
+
+          <button type="submit" aria-label="Cari">
+            ⌕
+          </button>
+        </form>
+
+
+        <a
+          href="./notifikasi.html"
+          class="header-icon-button"
+          aria-label="Notifikasi"
+          title="Notifikasi"
+        >
+          ♧
+          <span data-notification-count hidden>0</span>
+        </a>
+
+
+        <button
+          type="button"
+          class="header-icon-button"
+          data-theme-toggle
+          aria-label="Ganti tema"
+          title="Ganti tema"
+        >
+          ◐
+        </button>
+
+
+        <button
+          type="button"
+          class="header-user-button"
+          data-user-menu-toggle
+          aria-expanded="false"
+        >
+          <span class="header-user-avatar" data-user-avatar>
+            T
+          </span>
+
+          <span class="header-user-name" data-user-name>
+            Anggota
+          </span>
+
+          <span aria-hidden="true">⌄</span>
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- SIDEBAR OVERLAY -->
+    <div
+      class="sidebar-overlay"
+      data-sidebar-overlay
+      hidden
+    ></div>
+
+
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar" data-sidebar>
+
+      <div class="sidebar-profile">
+
+        <div class="sidebar-profile-avatar" data-sidebar-avatar>
+          T
+        </div>
+
+        <div class="sidebar-profile-info">
+          <strong data-sidebar-user-name>
+            Anggota TARBIYAH
+          </strong>
+
+          <small data-sidebar-user-role>
+            Anggota
+          </small>
+        </div>
+
+      </div>
+
+
+      <nav class="sidebar-navigation" aria-label="Navigasi utama">
+
+        <div class="sidebar-nav-label">
+          MENU UTAMA
+        </div>
+
+        <a
+          href="./tarbiyah.html"
+          class="sidebar-link active"
+          data-module="dashboard"
+          aria-current="page"
+        >
+          <span>⌂</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a
+          href="./profil-anggota.html"
+          class="sidebar-link"
+          data-module="profil"
+        >
+          <span>♙</span>
+          <span>Profil Anggota</span>
+        </a>
+
+        <a
+          href="./agenda-tarbiyah.html"
+          class="sidebar-link"
+          data-module="agenda"
+        >
+          <span>▦</span>
+          <span>Agenda & Jadwal</span>
+        </a>
+
+        <a
+          href="./pembelajaran.html"
+          class="sidebar-link"
+          data-module="pembelajaran"
+        >
+          <span>▤</span>
+          <span>Pembelajaran</span>
+        </a>
+
+        <a
+          href="./materi-pembelajaran.html"
+          class="sidebar-link"
+          data-module="materi"
+        >
+          <span>▧</span>
+          <span>Materi Kajian</span>
+        </a>
+
+        <div class="sidebar-nav-label">
+          KOMUNITAS
+        </div>
+
+        <a
+          href="./berita-pengumuman.html"
+          class="sidebar-link"
+          data-module="berita"
+        >
+          <span>▣</span>
+          <span>Berita & Pengumuman</span>
+        </a>
+
+        <a
+          href="./presensi-tarbiyah.html"
+          class="sidebar-link"
+          data-module="presensi"
+        >
+          <span>✓</span>
+          <span>Presensi</span>
+        </a>
+
+        <a
+          href="./galeri-foto-video.html"
+          class="sidebar-link"
+          data-module="galeri"
+        >
+          <span>▧</span>
+          <span>Galeri Foto & Video</span>
+        </a>
+
+        <a
+          href="./diskusi-tarbiyah.html"
+          class="sidebar-link"
+          data-module="diskusi"
+        >
+          <span>☷</span>
+          <span>Ruang Diskusi</span>
+        </a>
+
+        <a
+          href="./donasi-infaq.html"
+          class="sidebar-link"
+          data-module="donasi"
+        >
+          <span>♡</span>
+          <span>Donasi & Infaq</span>
+        </a>
+
+        <div class="sidebar-nav-label">
+          AKTIVITAS SAYA
+        </div>
+
+        <a
+          href="./kehadiran.html"
+          class="sidebar-link"
+          data-module="kehadiran"
+        >
+          <span>◷</span>
+          <span>Riwayat Kehadiran</span>
+        </a>
+
+        <a
+          href="./catatan-refleksi.html"
+          class="sidebar-link"
+          data-module="catatan"
+        >
+          <span>✎</span>
+          <span>Catatan & Refleksi</span>
+        </a>
+
+        <a
+          href="./riwayat-aktivitas.html"
+          class="sidebar-link"
+          data-module="riwayat"
+        >
+          <span>↺</span>
+          <span>Riwayat Aktivitas</span>
+        </a>
+
+        <div class="sidebar-nav-label">
+          PENGATURAN
+        </div>
+
+        <a
+          href="./administrasi-pengaturan.html"
+          class="sidebar-link"
+          data-module="administrasi"
+        >
+          <span>⚙</span>
+          <span>Pengaturan</span>
+        </a>
+
+      </nav>
+
+
+      <div class="sidebar-bottom">
+
+        <button
+          type="button"
+          class="sidebar-link sidebar-logout"
+          data-logout
+        >
+          <span>↪</span>
+          <span>Keluar dari Akun</span>
+        </button>
+
+        <div class="sidebar-version">
+          TARBIYAH · Pembelajaran Muslim
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main">
+
+      <div class="dashboard-main">
+
+        <!-- PAGE HEADING -->
+        <section class="dashboard-header-row">
+
+          <div class="dashboard-heading">
+
+            <h1>
+              Dashboard
+            </h1>
+
+            <p>
+              Assalamu'alaikum, selamat datang kembali di TARBIYAH.
+            </p>
+
+          </div>
+
+          <div class="dashboard-date" data-dashboard-date>
+            Memuat tanggal...
+          </div>
+
+        </section>
+
+
+        <!-- WELCOME -->
+        <section class="dashboard-welcome">
+
+          <div class="dashboard-welcome-content">
+
+            <div class="dashboard-welcome-label">
+              ✦ RUANG BELAJAR & UKHUWAH
+            </div>
+
+            <h2>
+              Assalamu'alaikum,
+              <span data-greeting-name>Saudaraku</span>.
+            </h2>
+
+            <p>
+              Mari terus belajar, memperbaiki diri,
+              memperkuat ukhuwah, dan menumbuhkan
+              kebaikan bersama.
+            </p>
+
+            <div class="dashboard-welcome-actions">
+
+              <a
+                href="./pembelajaran.html"
+                class="dashboard-primary-link"
+              >
+                Mulai Belajar →
+              </a>
+
+              <a
+                href="./agenda-tarbiyah.html"
+                class="dashboard-secondary-link"
+              >
+                Lihat Agenda
+              </a>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- QUICK LINKS -->
+        <section class="dashboard-section">
+
+          <div class="dashboard-section-heading">
+            <h2>Akses Cepat</h2>
+          </div>
+
+          <div class="dashboard-quick-links">
+
+            <a
+              href="./profil-anggota.html"
+              class="dashboard-quick-link"
+            >
+              <span class="dashboard-quick-icon">♙</span>
+              <span>Profil Saya</span>
+            </a>
+
+            <a
+              href="./agenda-tarbiyah.html"
+              class="dashboard-quick-link"
+            >
+              <span class="dashboard-quick-icon">▦</span>
+              <span>Agenda</span>
+            </a>
+
+            <a
+              href="./presensi-tarbiyah.html"
+              class="dashboard-quick-link"
+            >
+              <span class="dashboard-quick-icon">✓</span>
+              <span>Presensi</span>
+            </a>
+
+            <a
+              href="./galeri-foto-video.html"
+              class="dashboard-quick-link"
+            >
+              <span class="dashboard-quick-icon">▧</span>
+              <span>Dokumentasi</span>
+            </a>
+
+          </div>
+
+        </section>
+
+
+        <!-- CAROUSEL -->
+        <section class="dashboard-section">
+
+          <div class="dashboard-section-heading">
+            <h2>Informasi TARBIYAH</h2>
+          </div>
+
+          <div
+            class="dashboard-carousel"
+            data-dashboard-carousel
+          >
+
+            <div
+              class="dashboard-carousel-track"
+              data-carousel-track
+            >
+
+              <article class="dashboard-slide">
+
+                <div class="dashboard-slide-content">
+
+                  <span class="dashboard-slide-tag">
+                    TARBIYAH
+                  </span>
+
+                  <h3>
+                    Belajar dan Bertumbuh Bersama
+                  </h3>
+
+                  <p>
+                    Jadikan ilmu sebagai jalan untuk
+                    memperbaiki diri dan memberikan
+                    manfaat bagi sesama.
+                  </p>
+
+                </div>
+
+              </article>
+
+
+              <article class="dashboard-slide">
+
+                <div class="dashboard-slide-content">
+
+                  <span class="dashboard-slide-tag">
+                    KEGIATAN
+                  </span>
+
+                  <h3>
+                    Ikuti Agenda dan Kajian
+                  </h3>
+
+                  <p>
+                    Temukan jadwal kegiatan, materi kajian,
+                    dan kesempatan untuk bertumbuh bersama.
+                  </p>
+
+                </div>
+
+              </article>
+
+
+              <article class="dashboard-slide">
+
+                <div class="dashboard-slide-content">
+
+                  <span class="dashboard-slide-tag">
+                    UKHUWAH
+                  </span>
+
+                  <h3>
+                    Perkuat Persaudaraan
+                  </h3>
+
+                  <p>
+                    Bangun kebersamaan melalui pembelajaran,
+                    kepedulian, dan aktivitas komunitas.
+                  </p>
+
+                </div>
+
+              </article>
+
+            </div>
+
+
+            <div class="dashboard-carousel-controls">
+
+              <button
+                type="button"
+                data-carousel-prev
+                aria-label="Slide sebelumnya"
+              >
+                ‹
+              </button>
+
+              <div
+                class="dashboard-carousel-dots"
+                data-carousel-dots
+              >
+                <button
+                  type="button"
+                  class="active"
+                  data-carousel-dot="0"
+                  aria-label="Slide 1"
+                ></button>
+
+                <button
+                  type="button"
+                  data-carousel-dot="1"
+                  aria-label="Slide 2"
+                ></button>
+
+                <button
+                  type="button"
+                  data-carousel-dot="2"
+                  aria-label="Slide 3"
+                ></button>
+              </div>
+
+              <button
+                type="button"
+                data-carousel-next
+                aria-label="Slide berikutnya"
+              >
+                ›
+              </button>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- STATISTIK -->
+        <section class="dashboard-section">
+
+          <div class="dashboard-section-heading">
+            <h2>Ringkasan TARBIYAH</h2>
+          </div>
+
+          <p class="dashboard-section-description">
+            Ringkasan informasi yang tersedia sesuai hak akses akun.
+          </p>
+
+          <div class="dashboard-stats">
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-icon">♙</div>
+
+              <span class="dashboard-stat-label">
+                Anggota Terdaftar
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                data-stat-members
+              >
+                —
+              </strong>
+
+            </article>
+
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-icon">▦</div>
+
+              <span class="dashboard-stat-label">
+                Agenda Mendatang
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                data-stat-agenda
+              >
+                —
+              </strong>
+
+            </article>
+
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-icon">▤</div>
+
+              <span class="dashboard-stat-label">
+                Materi Pembelajaran
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                data-stat-materials
+              >
+                —
+              </strong>
+
+            </article>
+
+
+            <article class="dashboard-stat-card">
+
+              <div class="dashboard-stat-icon">✓</div>
+
+              <span class="dashboard-stat-label">
+                Kehadiran Saya
+              </span>
+
+              <strong
+                class="dashboard-stat-value"
+                data-stat-attendance
+              >
+                —
+              </strong>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- ANGGOTA DAN AGENDA -->
+        <section class="dashboard-section">
+
+          <div class="dashboard-section-heading">
+            <h2>Aktivitas Komunitas</h2>
+          </div>
+
+          <div class="dashboard-content-grid">
+
+            <article class="dashboard-panel">
+
+              <h3>Anggota TARBIYAH</h3>
+
+              <p>
+                Informasi anggota dan komunitas TARBIYAH
+                sesuai hak akses yang diberikan.
+              </p>
+
+              <a
+                href="./profil-anggota.html"
+                class="dashboard-panel-link"
+              >
+                Lihat Profil Anggota →
+              </a>
+
+            </article>
+
+
+            <article class="dashboard-panel">
+
+              <h3>Jadwal Agenda TARBIYAH</h3>
+
+              <p>
+                Temukan jadwal kajian, kegiatan,
+                waktu pelaksanaan, dan lokasi kegiatan.
+              </p>
+
+              <a
+                href="./agenda-tarbiyah.html"
+                class="dashboard-panel-link"
+              >
+                Lihat Semua Agenda →
+              </a>
+
+            </article>
+
+          </div>
+
+        </section>
+
+
+        <!-- DAFTAR TEMA -->
+        <section class="dashboard-section">
+
+          <div class="dashboard-section-heading">
+
+            <h2>Daftar Judul Tema</h2>
+
+            <a href="./materi-pembelajaran.html">
+              Semua Materi →
+            </a>
+
+          </div>
+
+          <div
+            class="dashboard-empty"
+            data-dashboard-topics
+          >
+            Materi pembelajaran akan ditampilkan
+            setelah data tersedia.
+          </div>
+
+        </section>
+
+
+        <!-- BERITA -->
+        <section class="dashboard-section">
+
+          <div class="dashboard-section-heading">
+
+            <h2>Berita & Pengumuman</h2>
+
+            <a href="./berita-pengumuman.html">
+              Lihat Semua →
+            </a>
+
+          </div>
+
+          <div
+            class="dashboard-empty"
+            data-dashboard-news
+          >
+            Belum ada berita atau pengumuman untuk ditampilkan.
+          </div>
+
+        </section>
+
+
+        <!-- GALERI -->
+        <section class="dashboard-section">
+
+          <div class="dashboard-section-heading">
+
+            <h2>Dokumentasi Kegiatan</h2>
+
+            <a href="./galeri-foto-video.html">
+              Buka Galeri →
+            </a>
+
+          </div>
+
+          <div
+            class="dashboard-empty"
+            data-dashboard-gallery
+          >
+            Dokumentasi foto dan video akan ditampilkan
+            setelah tersedia.
+          </div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+        <footer class="dashboard-footer">
+          TARBIYAH — Pembelajaran Muslim
+          <br>
+          Belajar, Bertumbuh, dan Berukhuwah.
+          <br>
+          © <span data-dashboard-year>2026</span>
+        </footer>
+
+      </div>
+
+    </main>
+
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav
+      class="mobile-bottom-nav"
+      aria-label="Navigasi bawah"
+    >
+
+      <a
+        href="./tarbiyah.html"
+        class="mobile-nav-item active"
+        data-module="dashboard"
+        aria-current="page"
+      >
+        <span>⌂</span>
+        <small>Beranda</small>
+      </a>
+
+      <a
+        href="./agenda-tarbiyah.html"
+        class="mobile-nav-item"
+        data-module="agenda"
+      >
+        <span>▦</span>
+        <small>Agenda</small>
+      </a>
+
+      <a
+        href="./pembelajaran.html"
+        class="mobile-nav-item"
+        data-module="pembelajaran"
+      >
+        <span>▤</span>
+        <small>Belajar</small>
+      </a>
+
+      <a
+        href="./profil-anggota.html"
+        class="mobile-nav-item"
+        data-module="profil"
+      >
+        <span>♙</span>
+        <small>Profil</small>
+      </a>
+
+    </nav>
+
+  </div>
+
+
+  <!-- SCRIPT: URUTAN PEMUATAN -->
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/dashboard.js"></script>
+  <script src="./js/pwa.js"></script>
+
   <script>
-    window.addEventListener("DOMContentLoaded", async () => {
-      const welcome = document.getElementById("welcomeText");
-      try {
-        const result = await window.TARBIYAH_AUTH.getSession();
-        if (!result.configured || !result.session) { location.replace("./login-register.html"); return; }
-        const user = result.session.user;
-        welcome.textContent = "Akun aktif: " + (user.user_metadata?.full_name || user.email || "Anggota TARBIYAH");
-      } catch (e) { welcome.textContent = "Sesi belum dapat diperiksa. Silakan masuk kembali."; }
-      document.getElementById("logoutButton").addEventListener("click", async () => {
-        const button = document.getElementById("logoutButton"); button.disabled = true; button.textContent = "Keluar...";
-        try { await window.TARBIYAH_AUTH.signOut(); location.replace("./login-register.html"); }
-        catch (e) { button.disabled = false; button.textContent = "Keluar dari akun"; alert(e.message || "Gagal keluar."); }
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+      const year = document.querySelector('[data-dashboard-year]');
+
+      if (year) {
+        year.textContent = new Date().getFullYear();
+      }
     });
   </script>
+
 </body>
 </html>
