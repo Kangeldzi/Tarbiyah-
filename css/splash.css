@@ -218,53 +218,56 @@
 
 /* ---------- Enter button ---------- */
 
-.splash-enter {
+
+.splash-enter,
+[data-splash-enter] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+
   min-height: 50px;
-  margin-top: 30px;
-  padding: 0 28px;
-  border: 1px solid rgba(167, 243, 208, .55);
-  border-radius: 999px;
-  color: #052e22;
-  background: linear-gradient(135deg, #a7f3d0, #34d399);
-  box-shadow:
-    0 8px 28px rgba(16, 185, 129, .22),
-    inset 0 1px 0 rgba(255, 255, 255, .55);
-  font: inherit;
-  font-size: .9rem;
+  margin: 28px auto;
+  padding: 15px 28px;
+
+  border: 2px solid #6ee7b7;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #6ee7b7,
+    #10b981
+  );
+
+  color: #06251a;
+  font-family: inherit;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: .02em;
+
   cursor: pointer;
-  transition:
-    transform .25s ease,
-    box-shadow .25s ease,
-    filter .25s ease;
+  visibility: visible;
+  opacity: 1;
+
+  box-shadow: 0 8px 30px rgba(16, 185, 129, .25);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.splash-enter:hover {
-  transform: translateY(-3px);
-  filter: brightness(1.06);
-  box-shadow:
-    0 12px 36px rgba(16, 185, 129, .35),
-    inset 0 1px 0 rgba(255, 255, 255, .65);
+.splash-enter:hover,
+[data-splash-enter]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(16, 185, 129, .4);
 }
 
-.splash-enter:active {
-  transform: translateY(0) scale(.98);
-}
-
-.splash-enter:focus-visible {
-  outline: 3px solid #d1fae5;
-  outline-offset: 5px;
+.splash-enter:active,
+[data-splash-enter]:active {
+  transform: scale(.97);
 }
 
 .splash-enter[hidden],
-.splash-loading[hidden] {
+[data-splash-enter][hidden] {
   display: none !important;
 }
+
 
 /* ---------- Optional footer ---------- */
 
