@@ -6,3 +6,117 @@ html[data-theme="dark"]{--dash-bg:#0c1915;--dash-surface:#14251e;--dash-text:#ed
 @media(max-width:760px){.app-header{height:64px;padding:0 13px;gap:10px}.mobile-menu-button{display:grid;flex:0 0 38px}.brand{min-width:0;gap:8px}.brand-mark{width:36px;height:36px;border-radius:11px}.brand-mark img{width:29px;height:29px}.brand-copy strong{font-size:13px}.brand-copy small{font-size:8px}.header-search{display:none}.header-actions{gap:2px}.header-actions>.icon-button{width:35px;height:35px}.profile-chip{border:0;padding:0}.profile-chip .avatar{width:32px;height:32px}.profile-name{display:none}.app-sidebar{position:fixed;z-index:60;left:0;top:0;bottom:0;width:min(290px,84vw);min-height:100dvh;transform:translateX(-105%);transition:transform .25s ease;box-shadow:20px 0 50px rgba(0,0,0,.16);padding-top:22px}.app-sidebar.open{transform:translateX(0)}.sidebar-close{display:grid;font-size:24px}.sidebar-scrim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:55}.sidebar-scrim.show{display:block}.main-content{width:100%;padding:24px 16px 100px}.welcome-row{margin-bottom:18px}.welcome-row h1{font-size:21px}.welcome-subtitle{font-size:10px}.role-pill{font-size:8px;padding:7px 9px}.hero-carousel{min-height:270px;border-radius:19px}.hero-slide{min-height:245px;padding:25px 22px}.hero-copy{max-width:75%}.hero-copy h2{font-size:29px}.hero-copy p{font-size:10px}.hero-art{right:-55px;opacity:.45;transform:translateY(-50%) scale(.78)}.carousel-controls{left:22px;right:22px;bottom:13px}.quick-nav-section,.content-section,.hologram-panel{margin-top:27px}.quick-grid{gap:9px}.quick-card{min-height:105px;padding:12px;border-radius:13px}.quick-card strong{font-size:10px}.quick-card small{font-size:8px}.quick-icon{width:31px;height:31px;font-size:17px}.section-heading h2{font-size:17px}.hologram-panel{padding:17px;border-radius:17px}.holo-content{min-height:175px}.holo-visual{width:105px;transform:scale(.75);margin-right:-18px}.holo-content h2{font-size:23px}.holo-content p:not(.eyebrow){font-size:9px}.holo-tag{font-size:7px}.gallery-strip{gap:8px}.gallery-placeholder{min-height:115px;padding:10px}.gallery-placeholder strong{font-size:10px}.gallery-placeholder span{font-size:7px}.app-footer{font-size:8px;margin-top:28px;margin-bottom:10px}.bottom-nav{display:flex;position:fixed;z-index:40;left:10px;right:10px;bottom:calc(9px + env(safe-area-inset-bottom));height:64px;padding:6px 5px;background:var(--dash-surface);border:1px solid var(--dash-line);border-radius:19px;box-shadow:0 10px 35px rgba(0,0,0,.13);justify-content:space-around}.bottom-link{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--dash-muted);border-radius:12px}.bottom-link span{font-size:19px;line-height:1}.bottom-link small{font-size:8px;font-weight:700}.bottom-link.active{color:var(--dash-green);background:#e7f5ec}.admin-banner{align-items:flex-start;flex-direction:column}.admin-banner .primary-button{margin-top:0}}
 @media(max-width:390px){.brand-copy small{display:none}.welcome-row h1{font-size:18px}.role-pill{display:none}.quick-grid{gap:7px}.quick-card{padding:10px}.quick-card strong{font-size:9px}.quick-card small{font-size:7px}.holo-visual{display:none}.gallery-strip{grid-template-columns:1fr 1fr}.gallery-three{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* ==========================================
+   TARBIYAH — MODERN SVG ARROW ICON
+   Dashboard utama
+========================================== */
+
+.arrow-icon {
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+  flex: 0 0 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+  transition:
+    transform .25s ease,
+    opacity .25s ease;
+}
+
+/* Slideshow CTA */
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  transition: color .25s ease;
+}
+
+.hero-link .arrow-icon {
+  color: #e7cb8c;
+}
+
+.hero-link:hover .arrow-icon {
+  transform: translateX(5px);
+}
+
+/* Overview cards */
+.overview-card > .arrow-holder {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d6b56d35;
+  border-radius: 50%;
+  color: var(--gold-500);
+  background: #d6b56d0d;
+  transition:
+    background .25s ease,
+    border-color .25s ease,
+    transform .25s ease;
+}
+
+.overview-card > .arrow-holder .arrow-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.overview-card:hover > .arrow-holder {
+  background: #d6b56d20;
+  border-color: #d6b56d88;
+  transform: translateX(3px);
+}
+
+/* Panel links: Lihat semua / Jelajahi */
+.panel-heading .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: color .25s ease;
+}
+
+.panel-heading .text-link .arrow-icon {
+  width: 15px;
+  height: 15px;
+  color: currentColor;
+}
+
+.panel-heading .text-link:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+/* Mobile adjustment */
+@media (max-width: 480px) {
+  .arrow-icon {
+    width: 15px;
+    height: 15px;
+    flex-basis: 15px;
+  }
+
+  .hero-link {
+    gap: 8px;
+  }
+
+  .overview-card > .arrow-holder {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .arrow-icon,
+  .overview-card > .arrow-holder {
+    transition: none;
+  }
+}
+
