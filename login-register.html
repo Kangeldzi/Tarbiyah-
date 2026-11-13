@@ -1,114 +1,1157 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="Masuk atau daftar akun TARBIYAH.">
-  <title>Masuk & Daftar — TARBIYAH</title>
-  <link rel="icon" href="./assets/icons/icon-192.png" type="image/png">
+  <meta name="color-scheme" content="dark light">
+
+  <meta
+    name="description"
+    content="Masuk atau daftar akun TARBIYAH — Pembelajaran Muslim."
+  >
+
+  <title>Masuk / Daftar — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- CSS -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/authentication.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(16, 185, 129, 0.13),
+          transparent 32%
+        ),
+        radial-gradient(
+          circle at 90% 90%,
+          rgba(52, 211, 153, 0.08),
+          transparent 30%
+        ),
+        var(--bg-primary, #081c17);
+      color: var(--text-primary, #f0fdf4);
+    }
+
+    .auth-page {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding:
+        max(22px, env(safe-area-inset-top))
+        18px
+        max(22px, env(safe-area-inset-bottom));
+    }
+
+    .auth-topbar {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 auto 24px;
+    }
+
+    .auth-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary, #a7c8ba);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .auth-back-link:hover {
+      color: #34d399;
+    }
+
+    .auth-theme-button {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border-color, rgba(110,231,183,.18));
+      border-radius: 12px;
+      background: var(--bg-card, #102a22);
+      color: var(--text-primary, #f0fdf4);
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 1080px;
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      align-items: stretch;
+      overflow: hidden;
+      border: 1px solid var(--border-color, rgba(110,231,183,.18));
+      border-radius: 26px;
+      background: var(--bg-card, #102a22);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.24);
+    }
+
+    .auth-visual {
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 50% 35%,
+          rgba(52, 211, 153, 0.2),
+          transparent 45%
+        ),
+        linear-gradient(145deg, #0b382a, #102a22 70%);
+    }
+
+    .auth-visual::before,
+    .auth-visual::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(110, 231, 183, 0.12);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .auth-visual::before {
+      width: 390px;
+      height: 390px;
+      top: -100px;
+      right: -180px;
+    }
+
+    .auth-visual::after {
+      width: 280px;
+      height: 280px;
+      bottom: -120px;
+      left: -100px;
+    }
+
+    .auth-visual-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-logo-frame {
+      width: 88px;
+      height: 88px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 30px;
+      border: 1px solid rgba(110, 231, 183, 0.25);
+      border-radius: 24px;
+      background: rgba(16, 185, 129, 0.12);
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.16);
+    }
+
+    .auth-logo-frame img {
+      width: 62px;
+      height: 62px;
+      object-fit: contain;
+    }
+
+    .auth-visual h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(27px, 4vw, 38px);
+      line-height: 1.3;
+      margin: 0 0 16px;
+      color: #ecfdf5;
+    }
+
+    .auth-visual p {
+      max-width: 390px;
+      color: #b4d4c5;
+      font-size: 14px;
+      line-height: 1.9;
+      margin: 0;
+    }
+
+    .auth-feature-list {
+      display: grid;
+      gap: 17px;
+      margin-top: 38px;
+    }
+
+    .auth-feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #d1fae5;
+      font-size: 13px;
+    }
+
+    .auth-feature-icon {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: rgba(52, 211, 153, 0.12);
+      color: #6ee7b7;
+    }
+
+    .auth-wrapper {
+      padding: 42px clamp(22px, 5vw, 54px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .auth-heading {
+      margin-bottom: 26px;
+    }
+
+    .auth-heading h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 25px;
+      font-weight: 700;
+      margin: 0 0 9px;
+    }
+
+    .auth-heading p {
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 5px;
+      margin-bottom: 25px;
+      border-radius: 13px;
+      background: var(--bg-secondary, rgba(255,255,255,.05));
+    }
+
+    .auth-tab {
+      min-height: 42px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-secondary, #a7c8ba);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .auth-tab.active,
+    .auth-tab[aria-selected="true"] {
+      color: #ffffff;
+      background: #059669;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);
+    }
+
+    .auth-form {
+      width: 100%;
+    }
+
+    .auth-form[hidden] {
+      display: none !important;
+    }
+
+    .auth-field {
+      margin-bottom: 17px;
+    }
+
+    .auth-field label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-primary, #ecfdf5);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .auth-field input {
+      width: 100%;
+      min-height: 47px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-color, rgba(110,231,183,.2));
+      border-radius: 11px;
+      background: var(--bg-input, rgba(255,255,255,.04));
+      color: var(--text-primary, #f0fdf4);
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .auth-field input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+    }
+
+    .auth-field input::placeholder {
+      color: var(--text-muted, #78998a);
+    }
+
+    .auth-password-wrap {
+      position: relative;
+    }
+
+    .auth-password-wrap input {
+      padding-right: 48px;
+    }
+
+    .auth-password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary, #a7c8ba);
+      cursor: pointer;
+    }
+
+    .auth-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 5px 0 20px;
+      font-size: 12px;
+    }
+
+    .auth-remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--text-secondary, #a7c8ba);
+    }
+
+    .auth-remember input,
+    .auth-terms input {
+      accent-color: #10b981;
+    }
+
+    .auth-link {
+      color: #34d399;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-link:hover {
+      text-decoration: underline;
+    }
+
+    .auth-submit {
+      width: 100%;
+      min-height: 49px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.18);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .auth-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(16, 185, 129, 0.3);
+    }
+
+    .auth-submit:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+    }
+
+    .auth-terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin: 4px 0 20px;
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .auth-alert {
+      display: none;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 11px;
+      background: rgba(16, 185, 129, 0.08);
+      color: var(--text-primary, #ecfdf5);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .auth-alert:not(:empty) {
+      display: block;
+    }
+
+    .auth-alert[data-type="error"] {
+      border-color: rgba(248, 113, 113, 0.35);
+      background: rgba(248, 113, 113, 0.08);
+    }
+
+    .auth-alert[data-type="success"] {
+      border-color: rgba(52, 211, 153, 0.35);
+      background: rgba(52, 211, 153, 0.08);
+    }
+
+    .auth-bottom {
+      margin-top: 23px;
+      text-align: center;
+      color: var(--text-secondary, #a7c8ba);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .auth-bottom button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #34d399;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--text-muted, #78998a);
+      font-size: 10px;
+    }
+
+    .auth-pending {
+      visibility: hidden;
+    }
+
+    @media (max-width: 760px) {
+      .auth-page {
+        justify-content: flex-start;
+        padding-top: max(18px, env(safe-area-inset-top));
+      }
+
+      .auth-topbar {
+        margin-bottom: 15px;
+      }
+
+      .auth-container {
+        max-width: 480px;
+        grid-template-columns: 1fr;
+        border-radius: 21px;
+      }
+
+      .auth-visual {
+        min-height: auto;
+        padding: 25px 24px;
+      }
+
+      .auth-logo-frame {
+        width: 58px;
+        height: 58px;
+        border-radius: 17px;
+        margin-bottom: 15px;
+      }
+
+      .auth-logo-frame img {
+        width: 42px;
+        height: 42px;
+      }
+
+      .auth-visual h1 {
+        font-size: 23px;
+        margin-bottom: 8px;
+      }
+
+      .auth-visual p {
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .auth-feature-list {
+        display: none;
+      }
+
+      .auth-wrapper {
+        padding: 29px 23px 30px;
+      }
+
+      .auth-heading {
+        margin-bottom: 21px;
+      }
+
+      .auth-heading h2 {
+        font-size: 22px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .auth-wrapper {
+        padding-left: 17px;
+        padding-right: 17px;
+      }
+
+      .auth-options {
+        font-size: 11px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="auth-page">
+
+    <!-- TOP BAR -->
+    <div class="auth-topbar">
+
+      <a href="./index.html" class="auth-back-link">
+        <span aria-hidden="true">←</span>
+        <span>Kembali ke Beranda</span>
+      </a>
+
+      <button
+        type="button"
+        class="auth-theme-button"
+        data-theme-toggle
+        aria-label="Ganti tema"
+        title="Ganti tema"
+      >
+        ◐
+      </button>
+
+    </div>
+
+
+    <!-- AUTH CONTAINER -->
+    <section class="auth-container">
+
+      <!-- VISUAL PANEL -->
+      <aside class="auth-visual">
+
+        <div class="auth-visual-content">
+
+          <div class="auth-logo-frame">
+            <img
+              src="./assets/icons/icon-192.png"
+              alt="Logo TARBIYAH"
+              width="62"
+              height="62"
+            >
+          </div>
+
+          <h1>
+            TARBIYAH
+          </h1>
+
+          <p>
+            Ruang belajar, kajian, dan ukhuwah untuk
+            membangun ilmu, memperkuat iman, serta
+            menumbuhkan kebaikan bersama.
+          </p>
+
+          <div class="auth-feature-list">
+
+            <div class="auth-feature">
+              <span class="auth-feature-icon">✦</span>
+              <span>Pembelajaran dan materi keislaman</span>
+            </div>
+
+            <div class="auth-feature">
+              <span class="auth-feature-icon">◷</span>
+              <span>Agenda kajian dan kegiatan</span>
+            </div>
+
+            <div class="auth-feature">
+              <span class="auth-feature-icon">♧</span>
+              <span>Komunitas dan ukhuwah Muslim</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </aside>
+
+
+      <!-- FORM PANEL -->
+      <div class="auth-wrapper">
+
+        <header class="auth-heading">
+
+          <h2 id="formTitle">
+            Selamat Datang
+          </h2>
+
+          <p id="formSubtitle">
+            Masuk ke akun TARBIYAH untuk melanjutkan
+            perjalanan belajar dan bertumbuh.
+          </p>
+
+        </header>
+
+
+        <!-- TAB LOGIN / REGISTER -->
+        <div
+          class="auth-tabs"
+          role="tablist"
+          aria-label="Pilihan autentikasi"
+        >
+
+          <button
+            type="button"
+            class="auth-tab active"
+            id="loginTab"
+            role="tab"
+            aria-selected="true"
+            aria-controls="loginForm"
+          >
+            Masuk
+          </button>
+
+          <button
+            type="button"
+            class="auth-tab"
+            id="registerTab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="registerForm"
+          >
+            Daftar
+          </button>
+
+        </div>
+
+
+        <!-- NOTIFIKASI AUTH -->
+        <div
+          class="auth-alert"
+          id="authAlert"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+
+        <!-- ==========================================
+             FORM LOGIN
+        =========================================== -->
+
+        <form
+          id="loginForm"
+          class="auth-form"
+          autocomplete="on"
+          novalidate
+        >
+
+          <div class="auth-field">
+
+            <label for="loginEmail">
+              Alamat Email
+            </label>
+
+            <input
+              type="email"
+              id="loginEmail"
+              name="email"
+              placeholder="nama@email.com"
+              autocomplete="username"
+              inputmode="email"
+              required
+            >
+
+          </div>
+
+
+          <div class="auth-field">
+
+            <label for="loginPassword">
+              Kata Sandi
+            </label>
+
+            <div class="auth-password-wrap">
+
+              <input
+                type="password"
+                id="loginPassword"
+                name="password"
+                placeholder="Masukkan kata sandi"
+                autocomplete="current-password"
+                required
+              >
+
+              <button
+                type="button"
+                class="auth-password-toggle"
+                data-toggle="loginPassword"
+                aria-label="Tampilkan kata sandi"
+              >
+                ◉
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="auth-options">
+
+            <label class="auth-remember">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                name="remember"
+              >
+              <span>Ingat saya</span>
+            </label>
+
+            <a
+              href="#forgot"
+              class="auth-link"
+              data-forgot
+            >
+              Lupa kata sandi?
+            </a>
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="auth-submit"
+            id="loginSubmit"
+          >
+            Masuk ke TARBIYAH
+            <span aria-hidden="true">→</span>
+          </button>
+
+        </form>
+
+
+        <!-- ==========================================
+             FORM REGISTER
+        =========================================== -->
+
+        <form
+          id="registerForm"
+          class="auth-form"
+          autocomplete="on"
+          novalidate
+          hidden
+        >
+
+          <div class="auth-field">
+
+            <label for="registerName">
+              Nama Lengkap
+            </label>
+
+            <input
+              type="text"
+              id="registerName"
+              name="fullName"
+              placeholder="Masukkan nama lengkap"
+              autocomplete="name"
+              maxlength="100"
+              required
+            >
+
+          </div>
+
+
+          <div class="auth-field">
+
+            <label for="registerEmail">
+              Alamat Email
+            </label>
+
+            <input
+              type="email"
+              id="registerEmail"
+              name="email"
+              placeholder="nama@email.com"
+              autocomplete="email"
+              inputmode="email"
+              required
+            >
+
+          </div>
+
+
+          <div class="auth-field">
+
+            <label for="registerPassword">
+              Buat Kata Sandi
+            </label>
+
+            <div class="auth-password-wrap">
+
+              <input
+                type="password"
+                id="registerPassword"
+                name="password"
+                placeholder="Minimal 8 karakter"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              >
+
+              <button
+                type="button"
+                class="auth-password-toggle"
+                data-toggle="registerPassword"
+                aria-label="Tampilkan kata sandi"
+              >
+                ◉
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="auth-field">
+
+            <label for="registerConfirm">
+              Konfirmasi Kata Sandi
+            </label>
+
+            <div class="auth-password-wrap">
+
+              <input
+                type="password"
+                id="registerConfirm"
+                name="confirmPassword"
+                placeholder="Ulangi kata sandi"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              >
+
+              <button
+                type="button"
+                class="auth-password-toggle"
+                data-toggle="registerConfirm"
+                aria-label="Tampilkan kata sandi"
+              >
+                ◉
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <label class="auth-terms">
+
+            <input
+              type="checkbox"
+              id="acceptTerms"
+              name="acceptTerms"
+              required
+            >
+
+            <span>
+              Saya menyetujui ketentuan penggunaan dan
+              kebijakan privasi aplikasi TARBIYAH.
+            </span>
+
+          </label>
+
+
+          <button
+            type="submit"
+            class="auth-submit"
+            id="registerSubmit"
+          >
+            Buat Akun TARBIYAH
+            <span aria-hidden="true">→</span>
+          </button>
+
+        </form>
+
+
+        <!-- ==========================================
+             FORM LUPA PASSWORD
+        =========================================== -->
+
+        <form
+          id="forgotForm"
+          class="auth-form"
+          autocomplete="on"
+          novalidate
+          hidden
+        >
+
+          <div class="auth-field">
+
+            <label for="forgotEmail">
+              Alamat Email Terdaftar
+            </label>
+
+            <input
+              type="email"
+              id="forgotEmail"
+              name="email"
+              placeholder="nama@email.com"
+              autocomplete="email"
+              inputmode="email"
+              required
+            >
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="auth-submit"
+            id="forgotSubmit"
+          >
+            Kirim Link Pemulihan
+            <span aria-hidden="true">→</span>
+          </button>
+
+
+          <div class="auth-bottom">
+
+            <a
+              href="#login"
+              class="auth-link"
+              data-back-login
+            >
+              ← Kembali ke halaman masuk
+            </a>
+
+          </div>
+
+        </form>
+
+
+        <!-- ==========================================
+             FORM PASSWORD BARU
+        =========================================== -->
+
+        <form
+          id="recoveryForm"
+          class="auth-form"
+          autocomplete="on"
+          novalidate
+          hidden
+        >
+
+          <div class="auth-field">
+
+            <label for="newPassword">
+              Kata Sandi Baru
+            </label>
+
+            <div class="auth-password-wrap">
+
+              <input
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                placeholder="Masukkan kata sandi baru"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              >
+
+              <button
+                type="button"
+                class="auth-password-toggle"
+                data-toggle="newPassword"
+                aria-label="Tampilkan kata sandi"
+              >
+                ◉
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="auth-field">
+
+            <label for="newPasswordConfirm">
+              Konfirmasi Kata Sandi Baru
+            </label>
+
+            <div class="auth-password-wrap">
+
+              <input
+                type="password"
+                id="newPasswordConfirm"
+                name="confirmNewPassword"
+                placeholder="Ulangi kata sandi baru"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              >
+
+              <button
+                type="button"
+                class="auth-password-toggle"
+                data-toggle="newPasswordConfirm"
+                aria-label="Tampilkan kata sandi"
+              >
+                ◉
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="auth-submit"
+            id="recoverySubmit"
+          >
+            Simpan Kata Sandi Baru
+            <span aria-hidden="true">→</span>
+          </button>
+
+        </form>
+
+
+        <!-- BOTTOM SWITCH -->
+        <div class="auth-bottom" id="authBottom">
+
+          Belum memiliki akun?
+
+          <button
+            type="button"
+            data-switch-register
+          >
+            Daftar sekarang
+          </button>
+
+        </div>
+
+
+        <footer class="auth-footer">
+          TARBIYAH ©
+          <span id="currentYear">2026</span>
+          · Pembelajaran Muslim
+        </footer>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================================================
+       JAVASCRIPT
+  ================================================= -->
+
+  <!-- Supabase SDK -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <!-- Konfigurasi dan Supabase Client -->
   <script defer src="./js/config.js"></script>
   <script defer src="./js/supabase-client.js"></script>
+
+  <!-- Tema -->
   <script defer src="./js/theme-manager.js"></script>
+
+  <!-- Autentikasi -->
   <script defer src="./js/auth.js"></script>
+
+  <!-- Pengelola Halaman Autentikasi -->
   <script defer src="./js/auth-page.js"></script>
+
+  <!-- PWA -->
   <script defer src="./js/pwa.js"></script>
-  <link rel="stylesheet" href="./css/brand-logo.css">
-</head>
-<body class="auth-page">
-  <main class="auth-layout">
-    <aside class="auth-aside">
-      <a class="auth-brand" href="./index.html" aria-label="Kembali ke beranda TARBIYAH">
-        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-        <span>TARBIYAH TAUHID</span>
-      </a>
-      <div class="aside-content">
-        <span class="aside-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
-        <p class="aside-eyebrow">RUANG TARBIYAH & PENINGKATAN IMAN</p>
-        <h1>Berawal dari Tarbiyah,<br><em>bertumbuh dalam keimanan.</em></h1>
-        <p class="aside-description">Satu ruang untuk belajar, mengikuti kajian, berbagi manfaat, dan menguatkan ukhuwah.</p>
-        <div class="aside-points">
-          <span><i>✦</i> Pembelajaran dan materi</span>
-          <span><i>✦</i> Kajian dan agenda komunitas</span>
-          <span><i>✦</i> Diskusi dan dokumentasi</span>
-        </div>
-      </div>
-      <div class="aside-footer">TARBIYAH <b>•</b> DAKWAH <b>•</b> BERAMAL</div>
-      <div class="aside-glow aside-glow-one"></div><div class="aside-glow aside-glow-two"></div>
-    </aside>
 
-    <section class="auth-main">
-      <header class="auth-topbar">
-        <a class="mobile-brand" href="./index.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"> TARBIYAH TAUHID</a>
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ganti tema" title="Ganti tema">◐</button>
-      </header>
 
-      <div class="auth-card">
-        <div class="auth-heading">
-          <div class="auth-mini-mark"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"></div>
-          <p class="auth-overline">ASSALAMU'ALAIKUM</p>
-          <h2 id="formTitle">Selamat datang kembali</h2>
-          <p id="formSubtitle">Masuk untuk melanjutkan perjalanan keimanan Anda.</p>
-        </div>
+  <!-- Tahun Otomatis -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const year = document.getElementById('currentYear');
 
-        <div class="auth-tabs" id="authTabs" role="tablist" aria-label="Pilih masuk atau daftar">
-          <button class="auth-tab active" id="loginTab" type="button" role="tab" aria-selected="true">Masuk</button>
-          <button class="auth-tab" id="registerTab" type="button" role="tab" aria-selected="false">Buat Akun</button>
-        </div>
+      if (year) {
+        year.textContent = new Date().getFullYear();
+      }
+    });
+  </script>
 
-        <div class="auth-alert" id="authAlert" role="status" aria-live="polite" hidden></div>
-
-        <form id="loginForm" class="auth-form" novalidate>
-          <label for="loginEmail">Alamat email</label>
-          <div class="field-wrap"><span class="field-icon">✉</span><input id="loginEmail" name="email" type="email" autocomplete="email" placeholder="nama@email.com" required></div>
-          <div class="label-line"><label for="loginPassword">Kata sandi</label><button class="text-action" type="button" data-forgot> Lupa kata sandi? </button></div>
-          <div class="field-wrap"><span class="field-icon">⌑</span><input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required minlength="6"><button class="password-toggle" type="button" data-toggle="loginPassword" aria-label="Tampilkan kata sandi">◉</button></div>
-          <button class="submit-button" type="submit"><span>Masuk ke TARBIYAH</span><b>↗</b></button>
-        </form>
-
-        <form id="registerForm" class="auth-form" hidden novalidate>
-          <label for="registerName">Nama lengkap</label>
-          <div class="field-wrap"><span class="field-icon">♙</span><input id="registerName" name="fullName" type="text" autocomplete="name" placeholder="Nama lengkap Anda" required maxlength="80"></div>
-          <label for="registerEmail">Alamat email</label>
-          <div class="field-wrap"><span class="field-icon">✉</span><input id="registerEmail" name="email" type="email" autocomplete="email" placeholder="nama@email.com" required></div>
-          <label for="registerPassword">Kata sandi</label>
-          <div class="field-wrap"><span class="field-icon">⌑</span><input id="registerPassword" name="password" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" required minlength="8"><button class="password-toggle" type="button" data-toggle="registerPassword" aria-label="Tampilkan kata sandi">◉</button></div>
-          <label for="registerConfirm">Ulangi kata sandi</label>
-          <div class="field-wrap"><span class="field-icon">⌑</span><input id="registerConfirm" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Ulangi kata sandi" required minlength="8"><button class="password-toggle" type="button" data-toggle="registerConfirm" aria-label="Tampilkan kata sandi">◉</button></div>
-          <label class="terms-check"><input id="acceptTerms" type="checkbox" required><span>Saya menyetujui ketentuan penggunaan dan kebijakan privasi TARBIYAH.</span></label>
-          <button class="submit-button" type="submit"><span>Buat Akun TARBIYAH</span><b>↗</b></button>
-        </form>
-
-        <form id="forgotForm" class="auth-form" hidden novalidate>
-          <p class="form-note">Masukkan email akun Anda. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi.</p>
-          <label for="forgotEmail">Alamat email</label>
-          <div class="field-wrap"><span class="field-icon">✉</span><input id="forgotEmail" type="email" autocomplete="email" placeholder="nama@email.com" required></div>
-          <button class="submit-button" type="submit"><span>Kirim Tautan Pemulihan</span><b>↗</b></button>
-          <button class="back-action" type="button" data-back-login>← Kembali ke halaman masuk</button>
-        </form>
-
-        <form id="recoveryForm" class="auth-form" hidden novalidate>
-          <p class="form-note">Buat kata sandi baru untuk akun Anda.</p>
-          <label for="newPassword">Kata sandi baru</label>
-          <div class="field-wrap"><span class="field-icon">⌑</span><input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Minimal 8 karakter" required><button class="password-toggle" type="button" data-toggle="newPassword" aria-label="Tampilkan kata sandi">◉</button></div>
-          <label for="newPasswordConfirm">Ulangi kata sandi baru</label>
-          <div class="field-wrap"><span class="field-icon">⌑</span><input id="newPasswordConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="Ulangi kata sandi" required><button class="password-toggle" type="button" data-toggle="newPasswordConfirm" aria-label="Tampilkan kata sandi">◉</button></div>
-          <button class="submit-button" type="submit"><span>Simpan Kata Sandi Baru</span><b>↗</b></button>
-        </form>
-
-        <div class="auth-bottom" id="authBottom">Belum memiliki akun? <button type="button" data-switch-register>Daftar sekarang</button></div>
-        <a class="back-home" href="./index.html">← Kembali ke halaman utama</a>
-      </div>
-      <footer class="auth-copyright">© <span id="currentYear"></span> TAUHID. Tarbiyah, Dakwah, dan Beramal.</footer>
-    </section>
-  </main>
 </body>
 </html>
