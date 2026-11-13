@@ -148,30 +148,91 @@
     });
   }
 
-  function setReady(message) {
-    const elements = getElements();
+  
+function setReady(message) {
+  const elements = getElements();
 
-    state.ready = true;
+  state.ready = true;
+
+  if (elements.loading) {
+    setText(
+      elements.loading,
+      message || "Alhamdulillah, ruang belajar siap."
+    );
+
+    elements.loading.classList.remove(
+      CONFIG.classes.loading
+    );
+  }
+
+  /*
+   * PATCH:
+   * Jika tombol tidak ditemukan di HTML,
+   * buat tombol secara otomatis.
+   */
+  let button = elements.button;
+
+  if (!button && elements.container) {
+    button = document.createElement("button");
+
+    button.type = "button";
+    button.className = "splash-enter";
+    button.setAttribute("data-splash-enter", "");
+    button.textContent = "Masuk Sekarang →";
+    button.setAttribute(
+      "aria-label",
+      "Masuk ke halaman login TARBIYAH"
+    );
 
     if (elements.loading) {
-      setText(
-        elements.loading,
-        message || "Alhamdulillah, ruang belajar siap."
+      elements.loading.insertAdjacentElement(
+        "afterend",
+        button
       );
-
-      elements.loading.classList.remove(
-        CONFIG.classes.loading
-      );
+    } else {
+      elements.container.appendChild(button);
     }
 
-    if (elements.button) {
-      elements.button.disabled = false;
-      elements.button.removeAttribute("aria-disabled");
-      elements.button.hidden = false;
-    }
-
-    dispatch("tarbiyah:splash-ready", {});
+    console.info(
+      "[TARBIYAH SPLASH] Tombol masuk dibuat otomatis."
+    );
   }
+
+  /*
+   * Pastikan tombol benar-benar terlihat.
+   */
+  if (button) {
+    button.hidden = false;
+    button.disabled = false;
+
+    button.removeAttribute("aria-disabled");
+    button.classList.remove("is-loading");
+
+    button.style.display = "inline-flex";
+    button.style.alignItems = "center";
+    button.style.justifyContent = "center";
+    button.style.gap = "8px";
+    button.style.visibility = "visible";
+    button.style.opacity = "1";
+    button.style.margin = "28px auto 0";
+    button.style.padding = "15px 28px";
+    button.style.minHeight = "50px";
+    button.style.border = "1px solid #6ee7b7";
+    button.style.borderRadius = "14px";
+    button.style.background = "#10b981";
+    button.style.color = "#06251a";
+    button.style.fontWeight = "800";
+    button.style.fontSize = "15px";
+    button.style.cursor = "pointer";
+    button.style.position = "relative";
+    button.style.zIndex = "20";
+  }
+
+  dispatch("tarbiyah:splash-ready", {
+    buttonAvailable: Boolean(button)
+  });
+}
+
 
   /* ==========================================================
      6. ANIMASI PROGRESS
