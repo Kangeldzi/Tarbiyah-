@@ -173,6 +173,7 @@
     }
   });
 
+   let currentUserRole = null;
   // =====================================================
   // SEARCH
   // =====================================================
@@ -212,11 +213,20 @@
     );
 
     if (found) {
-      location.href = found[1];
-    } else {
-      toast("Belum ditemukan menu yang cocok. Coba kata kunci lain.");
-    }
-  });
+  const adminRoles = ["admin", "super_admin"];
+
+  if (
+    found[1] === "./dashboard-admin.html" &&
+    !adminRoles.includes(currentUserRole)
+  ) {
+    toast("Anda tidak memiliki akses administrasi.");
+    return;
+  }
+
+  location.href = found[1];
+} else {
+  toast("Belum ditemukan menu yang cocok. Coba kata kunci lain.");
+}
 
   document.addEventListener("keydown", (e) => {
     if (
@@ -230,100 +240,258 @@
     }
   });
 
+  
   // =====================================================
-  // USER IDENTITY & ROLE
+  // USER IDENTITY & ROLE — SUPABASE DATABASE
   // =====================================================
 
-  async function resolveSession() {
-    const clients = [
-      window.supabaseClient,
-      window.TARBIYAH_SUPABASE,
-      window.supabase
-    ];
+  const ROLE_CONFIG = {
+    table: "user_roles",
+    relation: "roles",
+    userIdColumn: "user_id",
+    roleNameColumn: "name"
+  };
 
-    const client = clients.find(
-      (c) => c?.auth?.getSession
-    );
+  const ROLE_INFO = {
+    super_admin: {
+      label: "SUPER ADMIN",
+      description: "Super Administrator",
+      admin: true
+    },
+    admin: {
+      label: "ADMIN",
+      description: "Administrator TARBIYAH",
+      admin: true
+    },
+    member: {
+      label: "ANGGOTA",
+      description: "Anggota TARBIYAH",
+      admin: false
+    },
+    registered_user: {
+      label: "PENGGUNA TERDAFTAR",
+      description: "Pengguna Terdaftar",
+      admin: false
+    }
+  };
 
-    if (!client) return null;
-
-    const { data, error } = await client.auth.getSession();
-
-    if (error) {
-      console.warn("[TARBIYAH] Session check:", error.message);
+  function getSupabaseClient() {
+    if (
+      window.TARBIYAH_BACKEND_READY &&
+      window.tarbiyahSupabase
+    ) {
+      return window.tarbiyahSupabase;
     }
 
-    return data?.session || null;
+    throw new Error(
+      "Client Supabase TARBIYAH belum tersedia."
+    );
   }
 
-  function isAdmin(user) {
-    const meta = user?.app_metadata || {};
-    const userMeta = user?.user_metadata || {};
+  async function resolveSession() {
+    // Gunakan status Auth Guard apabila sudah tersedia.
+    const guardedSession = window.TARBIYAH_SESSION;
 
-    const role = String(
-      meta.role ||
-      userMeta.role ||
-      userMeta.account_role ||
-      ""
-    ).toLowerCase();
+    if (guardedSession?.ready) {
+      return guardedSession.session || null;
+    }
 
-    return (
-      ["super_admin", "superadmin", "admin"].includes(role) ||
-      meta.is_super_admin === true ||
-      userMeta.is_super_admin === true
-    );
+    const auth = window.TARBIYAH_AUTH;
+
+    if (typeof auth?.getSession !== "function") {
+      throw new Error(
+        "Modul TARBIYAH_AUTH belum tersedia."
+      );
+    }
+
+    const result = await auth.getSession();
+
+    if (result?.configured === false) {
+      throw new Error(
+        "Backend Supabase belum dikonfigurasi."
+      );
+    }
+
+    if (result?.error) {
+      throw result.error;
+    }
+
+    return result?.session ||
+      result?.data?.session ||
+      null;
+  }
+
+  function normalizeRoleName(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase();
+  }
+
+  async function fetchUserRoles(userId) {
+    const supabase = getSupabaseClient();
+
+    const { data, error } = await supabase
+      .from(ROLE_CONFIG.table)
+      .select("role_id, roles(name)")
+      .eq(ROLE_CONFIG.userIdColumn, userId);
+
+    if (error) {
+      throw error;
+    }
+
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    return data
+      .map(row => {
+        const relation = row.roles;
+
+        // Relasi Supabase dapat berbentuk objek
+        // atau array, bergantung pada relasinya.
+        const roleRecord = Array.isArray(relation)
+          ? relation[0]
+          : relation;
+
+        return normalizeRoleName(
+          roleRecord?.[ROLE_CONFIG.roleNameColumn]
+        );
+      })
+      .filter(Boolean);
+  }
+
+  function selectPrimaryRole(roles) {
+    const priority = [
+      "super_admin",
+      "admin",
+      "member",
+      "registered_user"
+    ];
+
+    return priority.find(role =>
+      roles.includes(role)
+    ) || null;
+  }
+
+  function renderUserRole(role) {
+    const info = ROLE_INFO[role];
+
+    const admin = Boolean(info?.admin);
+
+    // Selalu sembunyikan terlebih dahulu.
+    // Hak administrasi hanya diberikan jika role
+    // berhasil dibaca dan dikenali.
+    if ($("adminLink")) {
+      $("adminLink").hidden = !admin;
+    }
+
+    if ($("adminBanner")) {
+      $("adminBanner").hidden = !admin;
+    }
+
+    if ($("rolePill")) {
+      $("rolePill").textContent =
+        info?.label || "ROLE BELUM DITETAPKAN";
+    }
+
+    if ($("sidebarRole")) {
+      $("sidebarRole").textContent =
+        info?.description || "Role belum ditetapkan";
+    }
+
+    currentUserRole = role;
+
+    window.TARBIYAH_USER_ROLE = {
+      ready: Boolean(role),
+      name: role,
+      isAdmin: admin,
+      isSuperAdmin: role === "super_admin"
+    };
   }
 
   async function hydrateUser() {
     const session = await resolveSession();
 
-    if (!session?.user) return;
+    if (!session?.user) {
+      throw new Error(
+        "Sesi pengguna tidak ditemukan."
+      );
+    }
 
     const user = session.user;
 
     const name =
       user.user_metadata?.full_name ||
+      user.user_metadata?.display_name ||
       user.user_metadata?.name ||
       user.email?.split("@")[0] ||
       "Pengguna";
 
     const initials = name
+      .trim()
       .split(/\s+/)
+      .filter(Boolean)
       .slice(0, 2)
-      .map((s) => s[0])
+      .map(part => part.charAt(0))
       .join("")
       .toUpperCase();
 
-    ["userName", "sidebarName"].forEach((id) => {
-      if ($(id)) $(id).textContent = name;
+    ["userName", "sidebarName"].forEach(id => {
+      if ($(id)) {
+        $(id).textContent = name;
+      }
     });
 
-    ["userAvatar", "sidebarAvatar"].forEach((id) => {
-      if ($(id)) $(id).textContent = initials;
+    ["userAvatar", "sidebarAvatar"].forEach(id => {
+      if ($(id)) {
+        $(id).textContent = initials;
+      }
     });
-
-    const admin = isAdmin(user);
-
-    if ($("rolePill")) {
-      $("rolePill").textContent =
-        admin ? "SUPER ADMIN" : "ANGGOTA";
-    }
-
-    if ($("sidebarRole")) {
-      $("sidebarRole").textContent =
-        admin ? "Super Administrator" : "Anggota TARBIYAH";
-    }
-
-    if (admin) {
-      if ($("adminLink")) $("adminLink").hidden = false;
-      if ($("adminBanner")) $("adminBanner").hidden = false;
-    }
 
     if ($("welcomeTitle")) {
       $("welcomeTitle").textContent =
         `Assalamu’alaikum, ${name}`;
     }
+
+    // Role hanya dibaca dari database.
+    // Metadata akun tidak digunakan sebagai otorisasi.
+    renderUserRole(null);
+
+    try {
+      const roles = await fetchUserRoles(user.id);
+      const primaryRole = selectPrimaryRole(roles);
+
+      renderUserRole(primaryRole);
+
+      if (!primaryRole) {
+        console.warn(
+          "[TARBIYAH] Pengguna belum memiliki role yang dikenali."
+        );
+
+        toast(
+          "Role akun belum ditetapkan. Hubungi administrator."
+        );
+      } else {
+        console.info(
+          "[TARBIYAH] Role pengguna berhasil dimuat:",
+          primaryRole
+        );
+      }
+
+    } catch (error) {
+      renderUserRole(null);
+
+      console.error(
+        "[TARBIYAH] Gagal membaca role pengguna:",
+        error
+      );
+
+      toast(
+        "Identitas akun berhasil dimuat, tetapi role belum dapat dibaca."
+      );
+    }
   }
+
 
   // =====================================================
   // LOGOUT
