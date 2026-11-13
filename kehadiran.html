@@ -5,14 +5,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="Riwayat kehadiran anggota TARBIYAH.">
-  <title>Riwayat Kehadiran — TARBIYAH</title>
+  <meta name="description" content="Riwayat Kehadiran Anggota TARBIYAH">
+  <title>Riwayat Kehadiran | TARBIYAH</title>
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
@@ -20,150 +22,146 @@
   <link rel="stylesheet" href="./css/module-shell.css">
 
   <style>
+    :root {
+      --attendance-green: #10b981;
+      --attendance-muted: var(--text-muted, #94a3b8);
+      --attendance-card: var(--surface, #172b25);
+      --attendance-border: var(--border, rgba(255,255,255,.09));
+    }
+
+    body {
+      font-family: Inter, sans-serif;
+    }
+
     .attendance-page {
-      width: min(100%, 1100px);
-      margin: 0 auto;
+      width: min(1100px, 100%);
+      margin: auto;
       padding: 24px 18px 100px;
     }
 
-    .attendance-hero {
-      position: relative;
-      overflow: hidden;
-      padding: 25px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #075c43, #103b30 65%, #102a22);
-      color: #fff;
+    .attendance-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
       margin-bottom: 22px;
-      box-shadow: 0 12px 35px rgba(0,0,0,.15);
     }
 
-    .attendance-hero::after {
-      content: "";
-      position: absolute;
-      width: 190px;
-      height: 190px;
-      right: -55px;
-      top: -70px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.07);
+    .attendance-header h1 {
+      font: 800 clamp(1.4rem, 4vw, 2rem) Poppins, sans-serif;
+      margin: 0 0 7px;
     }
 
-    .attendance-hero h1 {
-      position: relative;
-      z-index: 1;
-      margin: 0 0 8px;
-      font: 700 clamp(22px, 5vw, 30px) Poppins, sans-serif;
-    }
-
-    .attendance-hero p {
-      position: relative;
-      z-index: 1;
-      max-width: 580px;
+    .attendance-header p {
+      color: var(--attendance-muted);
       margin: 0;
-      color: rgba(255,255,255,.8);
-      line-height: 1.7;
-      font-size: 14px;
+      font-size: .88rem;
+      line-height: 1.6;
     }
 
-    .attendance-eyebrow {
+    .attendance-badge {
       display: inline-flex;
-      gap: 7px;
       align-items: center;
+      gap: 7px;
+      color: var(--attendance-green);
+      background: rgba(16,185,129,.09);
+      border: 1px solid rgba(16,185,129,.25);
+      border-radius: 30px;
+      padding: 7px 11px;
+      font-size: .73rem;
+      font-weight: 700;
       margin-bottom: 12px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      color: #b8f5d8;
     }
 
-    .attendance-stats {
+    .attendance-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: currentColor;
+      border-radius: 50%;
+    }
+
+    .attendance-summary {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      gap: 13px;
       margin-bottom: 22px;
     }
 
-    .attendance-stat {
-      min-width: 0;
-      padding: 17px 15px;
-      border: 1px solid var(--border-color, rgba(128,128,128,.2));
-      border-radius: 17px;
-      background: var(--card-bg, rgba(255,255,255,.04));
+    .summary-card {
+      background: var(--attendance-card);
+      border: 1px solid var(--attendance-border);
+      border-radius: 16px;
+      padding: 17px;
     }
 
-    .attendance-stat .stat-icon {
-      display: block;
-      font-size: 21px;
-      margin-bottom: 12px;
+    .summary-icon {
+      font-size: 1.35rem;
+      margin-bottom: 11px;
     }
 
-    .attendance-stat strong {
+    .summary-card small {
+      color: var(--attendance-muted);
       display: block;
-      font: 800 25px Poppins, sans-serif;
-      color: var(--text-primary, inherit);
+      font-size: .75rem;
+      margin-bottom: 5px;
     }
 
-    .attendance-stat span:last-child {
-      display: block;
-      margin-top: 4px;
-      color: var(--text-secondary, #999);
-      font-size: 12px;
+    .summary-card strong {
+      font: 800 1.55rem Poppins, sans-serif;
     }
 
     .attendance-panel {
+      background: var(--attendance-card);
+      border: 1px solid var(--attendance-border);
+      border-radius: 18px;
       padding: 19px;
       margin-bottom: 18px;
-      border: 1px solid var(--border-color, rgba(128,128,128,.2));
-      border-radius: 19px;
-      background: var(--card-bg, rgba(255,255,255,.04));
     }
 
-    .attendance-panel h2 {
-      margin: 0 0 15px;
-      font: 700 17px Poppins, sans-serif;
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 17px;
     }
 
-    .attendance-filter {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 10px;
-      align-items: end;
+    .panel-heading h2 {
+      font: 700 1rem Poppins, sans-serif;
+      margin: 0;
     }
 
-    .attendance-field label {
-      display: block;
-      margin-bottom: 7px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-secondary, #999);
+    .panel-heading p {
+      color: var(--attendance-muted);
+      font-size: .77rem;
+      margin: 5px 0 0;
     }
 
-    .attendance-field select,
-    .attendance-field input {
-      width: 100%;
-      min-height: 43px;
+    .attendance-filters {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-bottom: 17px;
+    }
+
+    .attendance-filters input,
+    .attendance-filters select {
+      min-width: 0;
+      border: 1px solid var(--attendance-border);
+      border-radius: 10px;
       padding: 10px 12px;
-      border: 1px solid var(--border-color, #777);
-      border-radius: 11px;
-      color: var(--text-primary, inherit);
-      background: var(--input-bg, transparent);
+      color: inherit;
+      background: transparent;
       font: inherit;
-      font-size: 13px;
+      font-size: .8rem;
     }
 
-    .attendance-button {
-      min-height: 43px;
-      padding: 0 17px;
-      border: 0;
-      border-radius: 11px;
-      background: #087f5b;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .attendance-button:active {
-      transform: scale(.98);
+    .attendance-filters input {
+      flex: 1;
+      min-width: 160px;
     }
 
     .attendance-list {
@@ -173,224 +171,277 @@
 
     .attendance-item {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      align-items: flex-start;
       gap: 13px;
-      padding: 15px;
-      border: 1px solid var(--border-color, rgba(128,128,128,.2));
-      border-radius: 15px;
-      background: var(--card-bg, rgba(255,255,255,.03));
+      padding: 14px;
+      border: 1px solid var(--attendance-border);
+      border-radius: 13px;
     }
 
-    .attendance-item-main {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .attendance-date {
+      width: 49px;
+      min-width: 49px;
+      padding: 8px 4px;
+      text-align: center;
+      border-radius: 11px;
+      background: rgba(16,185,129,.1);
+      color: var(--attendance-green);
+    }
+
+    .attendance-date strong {
+      display: block;
+      font: 800 1.1rem Poppins, sans-serif;
+    }
+
+    .attendance-date small {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .attendance-info {
+      flex: 1;
       min-width: 0;
     }
 
-    .attendance-item-icon {
-      display: grid;
-      place-items: center;
-      flex: 0 0 42px;
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
-      background: rgba(16,185,129,.13);
-      font-size: 20px;
+    .attendance-info h3 {
+      font-size: .88rem;
+      margin: 1px 0 6px;
+      line-height: 1.4;
     }
 
-    .attendance-item h3 {
-      margin: 0 0 5px;
-      font-size: 14px;
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-
-    .attendance-item p {
-      margin: 0;
-      color: var(--text-secondary, #999);
-      font-size: 12px;
+    .attendance-info p {
+      color: var(--attendance-muted);
+      font-size: .75rem;
       line-height: 1.6;
+      margin: 0;
     }
 
     .attendance-status {
-      flex-shrink: 0;
-      padding: 6px 10px;
+      display: inline-block;
       border-radius: 30px;
-      font-size: 11px;
-      font-weight: 800;
-      background: rgba(16,185,129,.13);
-      color: #10b981;
+      padding: 5px 9px;
+      font-size: .68rem;
+      font-weight: 700;
+      white-space: nowrap;
+      background: rgba(16,185,129,.1);
+      color: var(--attendance-green);
+      margin-top: 8px;
+    }
+
+    .attendance-status.absent {
+      background: rgba(248,113,113,.1);
+      color: #f87171;
+    }
+
+    .attendance-status.permission {
+      background: rgba(251,191,36,.1);
+      color: #fbbf24;
     }
 
     .attendance-empty {
-      padding: 35px 15px;
       text-align: center;
-      color: var(--text-secondary, #999);
-      border: 1px dashed var(--border-color, #777);
-      border-radius: 15px;
+      padding: 35px 15px;
+      color: var(--attendance-muted);
+      font-size: .83rem;
       line-height: 1.7;
-      font-size: 13px;
     }
 
-    .attendance-empty .empty-icon {
+    .attendance-empty span {
       display: block;
-      font-size: 32px;
+      font-size: 2rem;
       margin-bottom: 10px;
     }
 
+    .attendance-progress {
+      height: 9px;
+      background: rgba(148,163,184,.15);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .attendance-progress > div {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #059669, #34d399);
+      border-radius: inherit;
+      transition: width .4s ease;
+    }
+
     .attendance-note {
-      margin-top: 14px;
-      padding: 13px;
-      border-radius: 12px;
+      font-size: .76rem;
+      line-height: 1.65;
+      color: var(--attendance-muted);
+      margin-top: 12px;
+    }
+
+    .attendance-message {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 11px;
+      margin-bottom: 15px;
+      font-size: .8rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
       background: rgba(16,185,129,.08);
-      color: var(--text-secondary, #999);
-      font-size: 12px;
-      line-height: 1.7;
+      color: var(--attendance-green);
+      border: 1px solid rgba(16,185,129,.2);
     }
 
-    @media (max-width: 650px) {
+    .attendance-message.show {
+      display: block;
+    }
+
+    .attendance-message.error {
+      background: rgba(248,113,113,.08);
+      color: #f87171;
+      border-color: rgba(248,113,113,.2);
+    }
+
+    .attendance-button {
+      border: 0;
+      background: #047857;
+      color: white;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: 700 .78rem Inter, sans-serif;
+      cursor: pointer;
+    }
+
+    .attendance-button:hover {
+      background: #059669;
+    }
+
+    @media(max-width: 650px) {
       .attendance-page {
-        padding: 16px 13px 95px;
+        padding: 19px 13px 90px;
       }
 
-      .attendance-stats {
-        gap: 8px;
+      .attendance-summary {
+        gap: 9px;
       }
 
-      .attendance-stat {
-        padding: 13px 10px;
+      .summary-card {
+        padding: 12px;
       }
 
-      .attendance-stat strong {
-        font-size: 21px;
+      .summary-card strong {
+        font-size: 1.25rem;
       }
 
-      .attendance-stat span:last-child {
-        font-size: 10px;
+      .attendance-panel {
+        padding: 14px;
       }
 
-      .attendance-filter {
-        grid-template-columns: 1fr 1fr;
+      .attendance-item {
+        gap: 10px;
+        padding: 11px;
       }
 
-      .attendance-filter .attendance-button {
-        grid-column: 1 / -1;
-      }
-
-      .attendance-hero {
-        padding: 21px;
+      .attendance-status {
+        display: table;
       }
     }
 
-    @media (max-width: 380px) {
-      .attendance-stats {
+    @media(max-width: 370px) {
+      .attendance-summary {
         grid-template-columns: 1fr;
-      }
-
-      .attendance-stat {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .attendance-stat .stat-icon {
-        margin: 0;
       }
     }
   </style>
 </head>
 
 <body>
-  <div id="app-shell">
-    <main class="attendance-page">
+  <main class="attendance-page" data-module="kehadiran">
 
-      <section class="attendance-hero">
-        <div class="attendance-eyebrow">✦ TARBIYAH MEMBER CENTER</div>
+    <header class="attendance-header">
+      <div>
+        <div class="attendance-badge">REKAM JEJAK KEGIATAN</div>
         <h1>Riwayat Kehadiran</h1>
         <p>
-          Pantau perjalanan keikutsertaan Anda dalam kegiatan,
-          kajian, dan pembelajaran bersama komunitas TARBIYAH.
+          Lihat perjalanan keikutsertaan Anda dalam kajian,
+          pembelajaran, dan kegiatan TARBIYAH.
         </p>
-      </section>
+      </div>
+      <button class="attendance-button" id="refreshAttendance" type="button">
+        ↻ Perbarui
+      </button>
+    </header>
 
-      <section class="attendance-stats" aria-label="Ringkasan kehadiran">
-        <article class="attendance-stat">
-          <span class="stat-icon">📚</span>
-          <strong id="totalActivities">—</strong>
-          <span>Total kegiatan</span>
-        </article>
+    <section class="attendance-summary">
+      <article class="summary-card">
+        <div class="summary-icon">📚</div>
+        <small>Total Kegiatan</small>
+        <strong id="totalActivities">—</strong>
+      </article>
 
-        <article class="attendance-stat">
-          <span class="stat-icon">✅</span>
-          <strong id="totalPresent">—</strong>
-          <span>Hadir</span>
-        </article>
+      <article class="summary-card">
+        <div class="summary-icon">✅</div>
+        <small>Hadir</small>
+        <strong id="totalPresent">—</strong>
+      </article>
 
-        <article class="attendance-stat">
-          <span class="stat-icon">📊</span>
-          <strong id="attendanceRate">—</strong>
-          <span>Persentase kehadiran</span>
-        </article>
-      </section>
+      <article class="summary-card">
+        <div class="summary-icon">📈</div>
+        <small>Persentase Kehadiran</small>
+        <strong id="attendancePercentage">—</strong>
+      </article>
+    </section>
 
-      <section class="attendance-panel">
-        <h2>🔎 Filter Riwayat</h2>
-
-        <div class="attendance-filter">
-          <div class="attendance-field">
-            <label for="attendanceMonth">Bulan</label>
-            <select id="attendanceMonth">
-              <option value="">Semua bulan</option>
-              <option value="01">Januari</option>
-              <option value="02">Februari</option>
-              <option value="03">Maret</option>
-              <option value="04">April</option>
-              <option value="05">Mei</option>
-              <option value="06">Juni</option>
-              <option value="07">Juli</option>
-              <option value="08">Agustus</option>
-              <option value="09">September</option>
-              <option value="10">Oktober</option>
-              <option value="11">November</option>
-              <option value="12">Desember</option>
-            </select>
-          </div>
-
-          <div class="attendance-field">
-            <label for="attendanceYear">Tahun</label>
-            <select id="attendanceYear">
-              <option value="">Semua tahun</option>
-            </select>
-          </div>
-
-          <button class="attendance-button" id="filterAttendance" type="button">
-            Terapkan Filter
-          </button>
+    <section class="attendance-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>📊 Tingkat Kehadiran</h2>
+          <p>Persentase kehadiran dari catatan yang tersedia.</p>
         </div>
-      </section>
+      </div>
 
-      <section class="attendance-panel">
-        <h2>📋 Daftar Kehadiran</h2>
+      <div class="attendance-progress">
+        <div id="attendanceProgressBar"></div>
+      </div>
 
-        <div class="attendance-list" id="attendanceList">
-          <div class="attendance-empty">
-            <span class="empty-icon">🗓️</span>
-            Riwayat kehadiran akan ditampilkan setelah
-            data presensi terhubung dengan database TARBIYAH.
-          </div>
+      <p class="attendance-note" id="attendanceProgressText">
+        Menunggu data kehadiran...
+      </p>
+    </section>
+
+    <section class="attendance-panel">
+      <div class="panel-heading">
+        <div>
+          <h2>🗓️ Riwayat Kegiatan</h2>
+          <p>Daftar kehadiran kajian dan kegiatan Anda.</p>
         </div>
+      </div>
 
-        <div class="attendance-note">
-          <strong>Informasi:</strong> Data kehadiran harus berasal dari
-          catatan presensi kegiatan yang tersimpan di database.
-          Halaman ini tidak membuat atau mengarang riwayat kehadiran.
+      <div class="attendance-message" id="attendanceMessage" role="status"></div>
+
+      <div class="attendance-filters">
+        <input
+          type="search"
+          id="attendanceSearch"
+          placeholder="Cari nama kegiatan..."
+          aria-label="Cari kegiatan"
+        >
+
+        <select id="attendanceFilter" aria-label="Filter status">
+          <option value="all">Semua Status</option>
+          <option value="hadir">Hadir</option>
+          <option value="izin">Izin</option>
+          <option value="sakit">Sakit</option>
+          <option value="alpa">Tidak Hadir</option>
+        </select>
+      </div>
+
+      <div class="attendance-list" id="attendanceList">
+        <div class="attendance-empty">
+          <span>⏳</span>
+          Memuat riwayat kehadiran...
         </div>
-      </section>
+      </div>
+    </section>
 
-    </main>
-  </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
@@ -406,62 +457,302 @@
     (() => {
       "use strict";
 
-      const $ = (id) => document.getElementById(id);
+      const CONFIG = {
+        table: "attendance",
+        userColumn: "user_id",
+        agendaColumn: "agenda_id",
+        dateColumn: "attendance_date",
+        statusColumn: "status",
+        titleColumn: "activity_name"
+      };
 
-      const monthSelect = $("attendanceMonth");
-      const yearSelect = $("attendanceYear");
+      const $ = id => document.getElementById(id);
 
-      function populateYears() {
-        const currentYear = new Date().getFullYear();
+      let attendanceRecords = [];
 
-        for (let year = currentYear; year >= currentYear - 8; year--) {
-          const option = document.createElement("option");
-          option.value = String(year);
-          option.textContent = String(year);
-          yearSelect.appendChild(option);
+      const getSupabase = () =>
+        window.supabaseClient ||
+        window.TARBIYAH_SUPABASE ||
+        window.TARBIYAH?.supabase ||
+        null;
+
+      function showMessage(message, isError = false) {
+        const element = $("attendanceMessage");
+        element.textContent = message;
+        element.classList.add("show");
+        element.classList.toggle("error", isError);
+      }
+
+      function normalizeStatus(status) {
+        const value = String(status || "").toLowerCase().trim();
+
+        if (["hadir", "present", "attended"].includes(value)) {
+          return "hadir";
         }
+
+        if (["izin", "permission"].includes(value)) {
+          return "izin";
+        }
+
+        if (["sakit", "sick"].includes(value)) {
+          return "sakit";
+        }
+
+        if (["alpa", "absent", "tidak hadir"].includes(value)) {
+          return "alpa";
+        }
+
+        return value || "lainnya";
       }
 
-      function showEmptyState(message) {
-        $("attendanceList").innerHTML = `
-          <div class="attendance-empty">
-            <span class="empty-icon">🗓️</span>
-            ${message}
-          </div>
-        `;
+      function statusLabel(status) {
+        const labels = {
+          hadir: "Hadir",
+          izin: "Izin",
+          sakit: "Sakit",
+          alpa: "Tidak Hadir"
+        };
+
+        return labels[status] || status;
       }
 
-      function applyFilter() {
-        /*
-          Integrasi filter akan menggunakan data riwayat
-          dari tabel presensi Supabase pada tahap integrasi backend.
-        */
-        showEmptyState(
-          "Belum ada data kehadiran yang tersedia untuk filter ini."
+      function statusClass(status) {
+        if (status === "alpa") return "absent";
+        if (status === "izin" || status === "sakit") return "permission";
+        return "";
+      }
+
+      function safeDate(value) {
+        if (!value) return null;
+
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+
+      function dateParts(value) {
+        const date = safeDate(value);
+
+        if (!date) {
+          return {
+            day: "--",
+            month: "—",
+            full: "Tanggal tidak tersedia"
+          };
+        }
+
+        return {
+          day: date.toLocaleDateString("id-ID", { day: "2-digit" }),
+          month: date.toLocaleDateString("id-ID", { month: "short" }),
+          full: date.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          })
+        };
+      }
+
+      function getActivityName(record) {
+        return (
+          record[CONFIG.titleColumn] ||
+          record.activity_title ||
+          record.title ||
+          record.agenda?.title ||
+          record.agenda?.name ||
+          "Kegiatan TARBIYAH"
         );
       }
 
-      function initialize() {
-        populateYears();
+      function renderSummary(records) {
+        const total = records.length;
+        const present = records.filter(
+          item => normalizeStatus(item[CONFIG.statusColumn]) === "hadir"
+        ).length;
 
-        $("totalActivities").textContent = "—";
-        $("totalPresent").textContent = "—";
-        $("attendanceRate").textContent = "—";
+        const percentage = total
+          ? Math.round((present / total) * 100)
+          : 0;
 
-        $("filterAttendance").addEventListener("click", applyFilter);
+        $("totalActivities").textContent = total.toLocaleString("id-ID");
+        $("totalPresent").textContent = present.toLocaleString("id-ID");
+        $("attendancePercentage").textContent = `${percentage}%`;
 
-        monthSelect.addEventListener("change", applyFilter);
-        yearSelect.addEventListener("change", applyFilter);
+        $("attendanceProgressBar").style.width = `${percentage}%`;
+
+        $("attendanceProgressText").textContent = total
+          ? `${present} dari ${total} kegiatan tercatat sebagai hadir.`
+          : "Belum ada catatan kehadiran.";
+      }
+
+      function renderRecords() {
+        const list = $("attendanceList");
+        const keyword = $("attendanceSearch").value.trim().toLowerCase();
+        const filter = $("attendanceFilter").value;
+
+        const filtered = attendanceRecords.filter(record => {
+          const name = getActivityName(record).toLowerCase();
+          const status = normalizeStatus(record[CONFIG.statusColumn]);
+
+          const matchesKeyword = name.includes(keyword);
+          const matchesStatus = filter === "all" || status === filter;
+
+          return matchesKeyword && matchesStatus;
+        });
+
+        list.replaceChildren();
+
+        if (!filtered.length) {
+          const empty = document.createElement("div");
+          empty.className = "attendance-empty";
+
+          const icon = document.createElement("span");
+          icon.textContent = "📭";
+
+          const text = document.createElement("div");
+          text.textContent = attendanceRecords.length
+            ? "Tidak ada kegiatan yang sesuai dengan pencarian atau filter."
+            : "Belum ada riwayat kehadiran yang dapat ditampilkan.";
+
+          empty.append(icon, text);
+          list.appendChild(empty);
+          return;
+        }
+
+        filtered.forEach(record => {
+          const date = dateParts(
+            record[CONFIG.dateColumn] ||
+            record.created_at ||
+            record.date
+          );
+
+          const status = normalizeStatus(record[CONFIG.statusColumn]);
+
+          const item = document.createElement("article");
+          item.className = "attendance-item";
+
+          const dateBox = document.createElement("div");
+          dateBox.className = "attendance-date";
+
+          const day = document.createElement("strong");
+          day.textContent = date.day;
+
+          const month = document.createElement("small");
+          month.textContent = date.month;
+
+          dateBox.append(day, month);
+
+          const info = document.createElement("div");
+          info.className = "attendance-info";
+
+          const title = document.createElement("h3");
+          title.textContent = getActivityName(record);
+
+          const detail = document.createElement("p");
+          const location =
+            record.location ||
+            record.agenda?.location ||
+            "";
+
+          detail.textContent = location
+            ? `${date.full} · ${location}`
+            : date.full;
+
+          const badge = document.createElement("span");
+          badge.className = `attendance-status ${statusClass(status)}`;
+          badge.textContent = statusLabel(status);
+
+          info.append(title, detail, badge);
+          item.append(dateBox, info);
+          list.appendChild(item);
+        });
+      }
+
+      async function loadAttendance() {
+        const client = getSupabase();
+
+        if (!client) {
+          attendanceRecords = [];
+          renderSummary([]);
+          renderRecords();
+          showMessage(
+            "Supabase belum terhubung. Periksa konfigurasi koneksi aplikasi.",
+            true
+          );
+          return;
+        }
+
+        try {
+          const { data: authData, error: authError } =
+            await client.auth.getUser();
+
+          if (authError) throw authError;
+
+          const user = authData?.user;
+
+          if (!user) {
+            throw new Error("Sesi login tidak ditemukan. Silakan login kembali.");
+          }
+
+          const { data, error } = await client
+            .from(CONFIG.table)
+            .select("*")
+            .eq(CONFIG.userColumn, user.id)
+            .order(CONFIG.dateColumn, { ascending: false })
+            .limit(500);
+
+          if (error) throw error;
+
+          attendanceRecords = Array.isArray(data) ? data : [];
+
+          renderSummary(attendanceRecords);
+          renderRecords();
+
+          showMessage(
+            attendanceRecords.length
+              ? "Riwayat kehadiran berhasil dimuat."
+              : "Belum ada riwayat kehadiran untuk akun ini."
+          );
+        } catch (error) {
+          console.error("Gagal memuat riwayat kehadiran:", error);
+
+          attendanceRecords = [];
+          renderSummary([]);
+          renderRecords();
+
+          showMessage(
+            error.message || "Terjadi kesalahan saat memuat kehadiran.",
+            true
+          );
+        }
+      }
+
+      function init() {
+        $("refreshAttendance").addEventListener(
+          "click",
+          loadAttendance
+        );
+
+        $("attendanceSearch").addEventListener(
+          "input",
+          renderRecords
+        );
+
+        $("attendanceFilter").addEventListener(
+          "change",
+          renderRecords
+        );
+
+        loadAttendance();
       }
 
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initialize);
+        document.addEventListener("DOMContentLoaded", init);
       } else {
-        initialize();
+        init();
       }
 
-      window.TARBIYAH_ATTENDANCE_HISTORY = {
-        refresh: applyFilter
+      window.TARBIYAH_ATTENDANCE = {
+        refresh: loadAttendance,
+        getRecords: () => [...attendanceRecords]
       };
     })();
   </script>
