@@ -1,67 +1,688 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah.">
-  <title>TAUHID — Tarbiyah, Berdakwah, dan Beramal</title>
+  <meta name="color-scheme" content="dark light">
+
+  <meta
+    name="description"
+    content="TARBIYAH — Platform pembelajaran, kajian, dan komunitas Muslim. Belajar, Bertumbuh, dan Berukhuwah."
+  >
+
+  <meta name="application-name" content="TARBIYAH">
+
+  <title>TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah</title>
+
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./assets/icons/icon-512.png" type="image/png">
+
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <!-- Preconnect Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- CSS -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
-  <link rel="stylesheet" href="./css/splash.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="./js/config.js"></script>
-  <script defer src="./js/supabase-client.js"></script>
-  <script defer src="./js/theme-manager.js"></script>
-  <script defer src="./js/auth.js"></script>
-  <script defer src="./js/splash.js"></script>
-  <script defer src="./js/pwa.js"></script>
   <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/splash.css">
+
+  <!-- Splash Page Specific Styles -->
+  <style>
+    :root {
+      --splash-bg: #081c17;
+      --splash-primary: #10b981;
+      --splash-secondary: #34d399;
+      --splash-text: #f0fdf4;
+      --splash-muted: #a7c8ba;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: var(--splash-bg);
+      color: var(--splash-text);
+    }
+
+    .splash-page {
+      position: relative;
+      display: flex;
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding:
+        max(24px, env(safe-area-inset-top))
+        20px
+        max(24px, env(safe-area-inset-bottom));
+      box-sizing: border-box;
+      isolation: isolate;
+      background:
+        radial-gradient(
+          circle at 50% 40%,
+          rgba(16, 185, 129, 0.16),
+          transparent 36%
+        ),
+        radial-gradient(
+          circle at 15% 15%,
+          rgba(52, 211, 153, 0.09),
+          transparent 30%
+        ),
+        linear-gradient(
+          145deg,
+          #071812,
+          #102a22 55%,
+          #06150f
+        );
+    }
+
+    .splash-glow {
+      position: absolute;
+      width: min(85vw, 520px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.12);
+      filter: blur(80px);
+      z-index: -1;
+      animation: splashGlow 5s ease-in-out infinite alternate;
+    }
+
+    .splash-orbit {
+      position: absolute;
+      width: min(85vw, 430px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(110, 231, 183, 0.12);
+      border-radius: 50%;
+      animation: splashOrbit 24s linear infinite;
+      pointer-events: none;
+    }
+
+    .splash-orbit::before,
+    .splash-orbit::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(110, 231, 183, 0.08);
+      border-radius: 50%;
+      inset: 12%;
+    }
+
+    .splash-orbit::after {
+      inset: 24%;
+    }
+
+    .splash-content {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      animation: splashAppear 1s ease both;
+    }
+
+    .splash-brand {
+      margin-bottom: 34px;
+    }
+
+    .splash-logo-frame {
+      width: 116px;
+      height: 116px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 25px;
+      border-radius: 32px;
+      border: 1px solid rgba(110, 231, 183, 0.28);
+      background: rgba(16, 185, 129, 0.10);
+      box-shadow:
+        0 0 35px rgba(16, 185, 129, 0.20),
+        inset 0 0 25px rgba(52, 211, 153, 0.08);
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+
+    .splash-logo-frame img {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.35));
+    }
+
+    .splash-brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(30px, 8vw, 42px);
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      color: #ecfdf5;
+      text-shadow: 0 0 24px rgba(52, 211, 153, 0.30);
+      margin: 0;
+    }
+
+    .splash-brand-caption {
+      margin-top: 10px;
+      color: #6ee7b7;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+    }
+
+    .splash-divider {
+      width: 68px;
+      height: 3px;
+      border-radius: 10px;
+      margin: 0 auto 24px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        #34d399,
+        transparent
+      );
+      box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
+    }
+
+    .splash-tagline {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(19px, 5vw, 25px);
+      line-height: 1.5;
+      font-weight: 600;
+      color: #f0fdf4;
+      margin: 0 0 12px;
+    }
+
+    .splash-description {
+      max-width: 360px;
+      color: var(--splash-muted);
+      font-size: 13px;
+      line-height: 1.8;
+      margin: 0 auto;
+    }
+
+    .splash-loading-area {
+      width: min(100%, 280px);
+      margin-top: 42px;
+    }
+
+    .splash-loading-text {
+      display: block;
+      color: #a7c8ba;
+      font-size: 11px;
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .splash-progress-track {
+      width: 100%;
+      height: 4px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.10);
+      overflow: hidden;
+    }
+
+    .splash-progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(
+        90deg,
+        #059669,
+        #6ee7b7
+      );
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.7);
+      transition: width 0.25s ease;
+    }
+
+    .splash-enter-button {
+      width: min(100%, 280px);
+      min-height: 52px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 30px;
+      padding: 14px 24px;
+      border: 1px solid rgba(167, 243, 208, 0.4);
+      border-radius: 15px;
+      background: linear-gradient(
+        135deg,
+        #059669,
+        #10b981
+      );
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow:
+        0 8px 28px rgba(16, 185, 129, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(12px);
+      transition:
+        opacity 0.35s ease,
+        transform 0.35s ease,
+        visibility 0.35s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .splash-enter-button.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .splash-enter-button:hover {
+      box-shadow:
+        0 10px 35px rgba(16, 185, 129, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .splash-enter-button:active {
+      transform: scale(0.98);
+    }
+
+    .splash-enter-button:focus-visible {
+      outline: 3px solid #a7f3d0;
+      outline-offset: 4px;
+    }
+
+    .splash-enter-button:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    .splash-enter-arrow {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .splash-footer {
+      position: absolute;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: 16px;
+      right: 16px;
+      text-align: center;
+      color: rgba(167, 200, 186, 0.55);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      z-index: 2;
+    }
+
+    .splash-overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(3, 12, 8, 0.82);
+      backdrop-filter: blur(12px);
+      z-index: 20;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+    }
+
+    .splash-overlay.is-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .splash-overlay-card {
+      width: min(100%, 340px);
+      padding: 28px 22px;
+      border: 1px solid rgba(110, 231, 183, 0.25);
+      border-radius: 20px;
+      background: #102a22;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .splash-overlay-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .splash-overlay-title {
+      color: #ecfdf5;
+      font-family: 'Poppins', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+
+    .splash-overlay-message {
+      color: #a7c8ba;
+      font-size: 12px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .splash-overlay-close {
+      margin-top: 20px;
+      padding: 10px 22px;
+      border: 0;
+      border-radius: 10px;
+      background: #059669;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @keyframes splashAppear {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes logoPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 25px rgba(16, 185, 129, 0.16),
+          inset 0 0 20px rgba(52, 211, 153, 0.06);
+      }
+
+      50% {
+        box-shadow:
+          0 0 45px rgba(16, 185, 129, 0.34),
+          inset 0 0 28px rgba(52, 211, 153, 0.14);
+      }
+    }
+
+    @keyframes splashGlow {
+      from {
+        transform: scale(0.85);
+        opacity: 0.55;
+      }
+
+      to {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+    }
+
+    @keyframes splashOrbit {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .splash-logo-frame {
+        width: 100px;
+        height: 100px;
+        border-radius: 28px;
+      }
+
+      .splash-logo-frame img {
+        width: 66px;
+        height: 66px;
+      }
+
+      .splash-brand {
+        margin-bottom: 26px;
+      }
+
+      .splash-loading-area {
+        margin-top: 32px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
-<body class="splash-page">
-  <main class="splash-shell">
-    <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
-    <div class="star-field" aria-hidden="true"></div>
-    <section class="brand-stage" aria-label="TARBIYAH">
-      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-      <div class="brand-aura"></div>
-      <div class="brand-mark" id="brandMark">
-        <img id="brandLogo" src="./assets/icons/icon-512.png" alt="Logo TARBIYAH">
+
+<body>
+
+  <!-- ================================================
+       SPLASH SCREEN
+  ================================================= -->
+
+  <main class="splash-page" data-splash>
+
+    <div class="splash-glow" aria-hidden="true"></div>
+    <div class="splash-orbit" aria-hidden="true"></div>
+
+    <section class="splash-content">
+
+      <!-- IDENTITAS APLIKASI -->
+      <div class="splash-brand">
+
+        <div class="splash-logo-frame">
+          <img
+            src="./assets/icons/icon-192.png"
+            alt="Logo TARBIYAH"
+            width="76"
+            height="76"
+            data-splash-logo
+          >
+        </div>
+
+        <h1
+          class="splash-brand-name"
+          data-splash-title
+        >
+          TARBIYAH
+        </h1>
+
+        <div class="splash-brand-caption">
+          PEMBELAJARAN MUSLIM
+        </div>
+
       </div>
-      <p class="brand-kicker">RUANG BELAJAR & PENINGKATAN IMAN</p>
-      <h1 class="brand-title" id="brandTitle">TAUHID</h1>
-      <p class="brand-tagline">Tarbiyah, Berdakwah, dan Beramal.</p>
-      <div class="loading-line" aria-label="Memuat aplikasi"><span></span></div>
-      <p class="loading-caption" id="loadingCaption">Menyiapkan ruang keimanan...</p>
-    </section>
-    <section class="welcome-card" id="welcomeCard" aria-labelledby="welcomeTitle" hidden>
-      <div class="welcome-symbol">بِسْمِ اللَّهِ</div>
-      <p class="eyebrow">SELAMAT DATANG</p>
-      <h2 id="welcomeTitle">Assalamu'alaikum!</h2>
-      <p class="welcome-copy">Temukan ruang untuk belajar, berbagi ilmu, mengikuti kajian, dan bertumbuh bersama dalam kebaikan.</p>
-      <button class="button button-primary" id="enterButton" type="button">
-        Masuk Sekarang <span aria-hidden="true">↗</span>
+
+      <div class="splash-divider"></div>
+
+      <!-- TAGLINE -->
+      <h2 class="splash-tagline">
+        Belajar, Bertumbuh,<br>
+        dan Berukhuwah.
+      </h2>
+
+      <p class="splash-description" data-splash-tagline>
+        Ruang belajar dan ukhuwah untuk membangun
+        ilmu, memperkuat iman, dan menumbuhkan
+        kebaikan bersama.
+      </p>
+
+      <!-- LOADING -->
+      <div class="splash-loading-area">
+
+        <span
+          class="splash-loading-text"
+          data-splash-loading
+          aria-live="polite"
+        >
+          Menyiapkan ruang kebaikan...
+        </span>
+
+        <div
+          class="splash-progress-track"
+          role="progressbar"
+          aria-label="Persiapan aplikasi"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          data-splash-progress-track
+        >
+          <div
+            class="splash-progress-fill"
+            data-splash-progress
+          ></div>
+        </div>
+
+      </div>
+
+      <!-- TOMBOL MASUK -->
+      <button
+        type="button"
+        class="splash-enter-button"
+        data-splash-enter
+      >
+        <span>Masuk Sekarang</span>
+        <span class="splash-enter-arrow" aria-hidden="true">
+          →
+        </span>
       </button>
-      <button class="button button-quiet" id="aboutButton" type="button">Pelajari Aplikasi</button>
-      <p class="welcome-foot">Tarbiyah • Dakwah • Amaliyah</p>
+
     </section>
-    <div class="toast" id="appToast" role="status" aria-live="polite"></div>
-    <footer class="splash-footer"><span id="footerBrand">TARBIYAH TAUHID</span><span>Platform Pembelajaran Muslim</span></footer>
+
+    <!-- FOOTER -->
+    <footer class="splash-footer">
+      TARBIYAH © <span data-current-year>2026</span>
+      · PEMBELAJARAN MUSLIM
+    </footer>
+
   </main>
-  <dialog class="about-dialog" id="aboutDialog">
-    <form method="dialog">
-      <button class="dialog-close" aria-label="Tutup">×</button>
-      <p class="eyebrow">TENTANG TARBIYAH</p>
-      <h2>Belajar dalam kebersamaan.</h2>
-      <p>TARBIYAH menghadirkan pembelajaran Islam, kajian, agenda komunitas, ruang diskusi, dokumentasi, dan informasi kegiatan dalam satu aplikasi.</p>
-      <button class="button button-primary" value="close">Mengerti</button>
-    </form>
-  </dialog>
+
+
+  <!-- ================================================
+       NOTIFIKASI / OVERLAY
+  ================================================= -->
+
+  <div
+    class="splash-overlay"
+    data-splash-overlay
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="splash-overlay-title"
+    aria-describedby="splash-overlay-message"
+  >
+
+    <div class="splash-overlay-card">
+
+      <div class="splash-overlay-icon" aria-hidden="true">
+        ✨
+      </div>
+
+      <h2
+        class="splash-overlay-title"
+        id="splash-overlay-title"
+      >
+        Selamat Datang
+      </h2>
+
+      <p
+        class="splash-overlay-message"
+        id="splash-overlay-message"
+      >
+        Selamat datang di ruang belajar dan ukhuwah TARBIYAH.
+      </p>
+
+      <button
+        type="button"
+        class="splash-overlay-close"
+        data-splash-overlay-close
+      >
+        Mengerti
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================
+       SCRIPT APLIKASI
+  ================================================= -->
+
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/splash.js"></script>
+  <script src="./js/pwa.js"></script>
+
+  <!-- Tahun otomatis dan penanganan overlay -->
+  <script>
+    (() => {
+      'use strict';
+
+      const yearElement =
+        document.querySelector('[data-current-year]');
+
+      if (yearElement) {
+        yearElement.textContent =
+          new Date().getFullYear();
+      }
+
+      const overlay =
+        document.querySelector('[data-splash-overlay]');
+
+      const closeButton =
+        document.querySelector('[data-splash-overlay-close]');
+
+      if (overlay && closeButton) {
+        closeButton.addEventListener('click', () => {
+          overlay.classList.remove('is-visible');
+        });
+
+        overlay.addEventListener('click', (event) => {
+          if (event.target === overlay) {
+            overlay.classList.remove('is-visible');
+          }
+        });
+      }
+    })();
+  </script>
+
 </body>
 </html>
