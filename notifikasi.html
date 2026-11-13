@@ -1,1 +1,710 @@
-<!doctype html><html lang="id" data-theme="light" class="auth-check-pending"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#267A78"><meta name="description" content="Pemberitahuan terkait agenda, materi, komunitas, dan aktivitas akun."><title>Notifikasi — TARBIYAH</title><link rel="manifest" href="./manifest.json"><link rel="icon" href="./assets/icons/icon-192.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="./css/variables.css"><link rel="stylesheet" href="./css/global.css"><link rel="stylesheet" href="./css/theme.css"><link rel="stylesheet" href="./css/brand-logo.css"><link rel="stylesheet" href="./css/module-shell.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="./js/config.js"></script><script defer src="./js/supabase-client.js"></script><script defer src="./js/auth.js"></script><script defer src="./js/auth-guard.js"></script><script defer src="./js/theme-manager.js"></script><script defer src="./js/module-shell.js"></script><script defer src="./js/pwa.js"></script></head><body><div class="app-shell"><aside class="app-sidebar"><a class="module-brand" href="./dashboard.html"><img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH"><span>TARBIYAH<small>Ruang Ilmu & Ukhuwah</small></span></a><div class="nav-caption">MENU UTAMA</div><nav class="app-nav" aria-label="Navigasi aplikasi"><a href="./dashboard.html" ><span class="nav-ico">⌂</span>Dashboard</a><a href="./profil-anggota.html" ><span class="nav-ico">◉</span>Profil & Anggota</a><a href="./agenda-tarbiyah.html" ><span class="nav-ico">▦</span>Agenda Tarbiyah</a><a href="./pembelajaran.html" ><span class="nav-ico">✧</span>Pembelajaran</a><a href="./materi-pembelajaran.html" ><span class="nav-ico">▤</span>Materi Pembelajaran</a><a href="./berita-pengumuman.html" ><span class="nav-ico">▧</span>Berita & Pengumuman</a><a href="./presensi-tarbiyah.html" ><span class="nav-ico">✓</span>Presensi Tarbiyah</a><a href="./galeri-foto-video.html" ><span class="nav-ico">▣</span>Galeri Foto & Video</a><a href="./diskusi-tarbiyah.html" ><span class="nav-ico">☷</span>Diskusi Tarbiyah</a><a href="./donasi-infaq.html" ><span class="nav-ico">♡</span>Donasi, Infaq & Shodaqoh</a><a href="./kehadiran.html" ><span class="nav-ico">◷</span>Kehadiran</a><a href="./catatan-refleksi.html" ><span class="nav-ico">✎</span>Catatan & Refleksi</a><a href="./notifikasi.html" aria-current="page"><span class="nav-ico">♧</span>Notifikasi</a><a href="./riwayat-aktivitas.html" ><span class="nav-ico">◷</span>Riwayat Aktivitas</a><a href="./administrasi-pengaturan.html" ><span class="nav-ico">⚙</span>Administrasi & Pengaturan</a></nav><div class="sidebar-foot">Ilmu · Amal · Ukhuwah<br>© <span data-year></span> TARBIYAH</div></aside><div class="mobile-scrim" data-scrim></div><main class="app-main"><header class="app-topbar"><div class="top-left"><button class="icon-btn menu-toggle" data-menu aria-label="Buka navigasi" aria-expanded="false">☰</button><div class="crumb">TARBIYAH&nbsp; / &nbsp;<b>Notifikasi</b></div></div><div class="top-actions"><button class="icon-btn" data-theme-toggle aria-label="Ganti tema">◐</button><a class="icon-btn" href="./notifikasi.html" aria-label="Notifikasi" style="display:grid;place-items:center;text-decoration:none">♧</a><a class="profile-chip" href="./profil-anggota.html" aria-label="Profil">T</a></div></header><div class="module-content"><div class="module-head"><div><div class="eyebrow">RUANG TARBIYAH · MODUL</div><h1>Notifikasi</h1><p>Pemberitahuan terkait agenda, materi, komunitas, dan aktivitas akun.</p></div><div class="head-actions"><button class="btn secondary" type="button" data-back>← Kembali</button><button class="btn" type="button" data-action>Periksa notifikasi <span>↗</span></button></div></div><div class="notice"><b>Informasi pengembangan:</b> antarmuka dan navigasi modul ini sudah disiapkan. Data produksi belum ditampilkan sampai tabel dan kebijakan keamanan Supabase diverifikasi. Ini mencegah data contoh dianggap sebagai data komunitas yang sebenarnya.</div><section class="metric-grid"><article class="metric-card"><div class="metric-label">Pemberitahuan</div><div class="metric-value">—</div><div class="metric-hint">Menunggu data terverifikasi</div></article><article class="metric-card"><div class="metric-label">Status sinkronisasi</div><div class="metric-value" style="font-size:17px">Belum aktif</div><div class="metric-hint">Koneksi tabel belum dipetakan</div></article><article class="metric-card"><div class="metric-label">Akses akun</div><div class="metric-value" style="font-size:17px">Terproteksi</div><div class="metric-hint">Mengikuti sesi autentikasi</div></article><article class="metric-card"><div class="metric-label">Tema aplikasi</div><div class="metric-value" style="font-size:17px">Teal</div><div class="metric-hint">Mengikuti tema induk TARBIYAH</div></article></section><div class="panel-grid"><section class="panel"><h2>Kotak masuk</h2><p class="panel-desc">Pemberitahuan terkait agenda, materi, komunitas, dan aktivitas akun.</p><div class="toolbar"><input class="field" type="search" placeholder="Cari data..." aria-label="Cari data" disabled><button class="btn secondary" type="button" disabled>Filter</button></div><div class="empty-box"><div class="empty-icon">♧</div><b>Belum ada data untuk ditampilkan</b><p>Notifikasi akan muncul setelah sumber notifikasi dan mekanisme pengirimannya tersedia.</p></div></section><aside class="panel"><h2>Riwayat notifikasi</h2><p class="panel-desc">Informasi akan mengikuti data akun dan hak akses Anda.</p><div class="notice">Status integrasi: tampilan modul disiapkan. Pembacaan dan penyimpanan data menunggu verifikasi tabel, kolom, serta kebijakan RLS Supabase.</div><div class="empty-box"><div class="empty-icon">✦</div><b>Belum terhubung ke sumber data</b><p>Tidak ada data contoh atau angka rekaan yang ditampilkan.</p></div></aside></div><footer class="app-footer">TARBIYAH · Pembelajaran Muslim <span style="float:right">Versi pengembangan</span></footer></div></main></div><div class="toast" role="status" aria-live="polite" data-toast></div><script type="application/json" id="module-meta">{"key":"notifikasi","title":"Notifikasi"}</script></body></html>
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Pusat notifikasi dan pemberitahuan TARBIYAH.">
+  <title>Notifikasi — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    .notification-page {
+      width: min(100%, 1050px);
+      margin: 0 auto;
+      padding: 24px 18px 100px;
+    }
+
+    .notification-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-radius: 22px;
+      color: #fff;
+      background: linear-gradient(135deg, #075c43, #103b30 65%, #102a22);
+      box-shadow: 0 12px 35px rgba(0,0,0,.15);
+    }
+
+    .notification-hero::after {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      top: -75px;
+      right: -55px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+
+    .notification-eyebrow {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      margin-bottom: 12px;
+      color: #b8f5d8;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+
+    .notification-hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 8px;
+      font: 700 clamp(22px, 5vw, 30px) Poppins, sans-serif;
+    }
+
+    .notification-hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0;
+      color: rgba(255,255,255,.82);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .notification-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .notification-summary-card {
+      padding: 17px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 16px;
+      background: var(--card-bg, rgba(255,255,255,.04));
+    }
+
+    .notification-summary-card strong {
+      display: block;
+      font: 800 25px Poppins, sans-serif;
+      color: var(--text-primary, inherit);
+    }
+
+    .notification-summary-card span {
+      display: block;
+      margin-top: 4px;
+      color: var(--text-secondary, #999);
+      font-size: 12px;
+    }
+
+    .notification-panel {
+      padding: 19px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 19px;
+      background: var(--card-bg, rgba(255,255,255,.04));
+    }
+
+    .notification-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 17px;
+    }
+
+    .notification-toolbar h2 {
+      margin: 0;
+      font: 700 17px Poppins, sans-serif;
+    }
+
+    .notification-toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .notification-action {
+      min-height: 37px;
+      padding: 0 12px;
+      border: 1px solid var(--border-color, #777);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-primary, inherit);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .notification-action.primary {
+      border-color: #087f5b;
+      background: #087f5b;
+      color: #fff;
+    }
+
+    .notification-filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 5px;
+      scrollbar-width: thin;
+    }
+
+    .notification-filter {
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 0 13px;
+      border: 1px solid var(--border-color, #777);
+      border-radius: 30px;
+      background: transparent;
+      color: var(--text-secondary, #999);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .notification-filter.active {
+      border-color: #087f5b;
+      background: rgba(16,185,129,.13);
+      color: #10b981;
+    }
+
+    .notification-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .notification-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px;
+      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-radius: 14px;
+      background: var(--card-bg, rgba(255,255,255,.025));
+      transition: border-color .2s, background .2s;
+    }
+
+    .notification-item.unread {
+      border-color: rgba(16,185,129,.45);
+      background: rgba(16,185,129,.055);
+    }
+
+    .notification-icon {
+      display: grid;
+      place-items: center;
+      flex: 0 0 43px;
+      width: 43px;
+      height: 43px;
+      border-radius: 13px;
+      background: rgba(16,185,129,.13);
+      font-size: 20px;
+    }
+
+    .notification-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notification-content h3 {
+      margin: 0 0 5px;
+      font-size: 13px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .notification-content p {
+      margin: 0;
+      color: var(--text-secondary, #999);
+      font-size: 12px;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    .notification-time {
+      display: block;
+      margin-top: 8px;
+      color: var(--text-secondary, #999);
+      font-size: 10px;
+    }
+
+    .notification-item-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .notification-item-actions button {
+      padding: 6px 8px;
+      border: 1px solid var(--border-color, #777);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary, #999);
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .notification-item-actions button.delete {
+      color: #ef7777;
+    }
+
+    .notification-empty {
+      padding: 35px 15px;
+      border: 1px dashed var(--border-color, #777);
+      border-radius: 14px;
+      text-align: center;
+      color: var(--text-secondary, #999);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .notification-empty span {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .notification-toast {
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      bottom: 25px;
+      width: max-content;
+      max-width: calc(100% - 30px);
+      padding: 12px 17px;
+      border-radius: 12px;
+      background: #075c43;
+      color: #fff;
+      font-size: 13px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+    }
+
+    .notification-toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    @media (max-width: 650px) {
+      .notification-page {
+        padding: 16px 13px 95px;
+      }
+
+      .notification-hero {
+        padding: 21px;
+      }
+
+      .notification-panel {
+        padding: 14px;
+      }
+
+      .notification-toolbar {
+        align-items: flex-start;
+      }
+
+      .notification-item {
+        gap: 9px;
+        padding: 12px;
+      }
+
+      .notification-icon {
+        flex-basis: 37px;
+        width: 37px;
+        height: 37px;
+        font-size: 18px;
+      }
+
+      .notification-item-actions {
+        flex-direction: row;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app-shell">
+    <main class="notification-page">
+
+      <section class="notification-hero">
+        <div class="notification-eyebrow">✦ TARBIYAH MEMBER CENTER</div>
+        <h1>Pusat Notifikasi</h1>
+        <p>
+          Dapatkan informasi mengenai agenda, kajian, pembelajaran,
+          aktivitas komunitas, dan pemberitahuan penting TARBIYAH.
+        </p>
+      </section>
+
+      <section class="notification-summary">
+        <article class="notification-summary-card">
+          <strong id="notificationTotal">0</strong>
+          <span>Total notifikasi</span>
+        </article>
+
+        <article class="notification-summary-card">
+          <strong id="notificationUnread">0</strong>
+          <span>Belum dibaca</span>
+        </article>
+      </section>
+
+      <section class="notification-panel">
+        <div class="notification-toolbar">
+          <h2>🔔 Pemberitahuan Anda</h2>
+
+          <div class="notification-toolbar-actions">
+            <button
+              type="button"
+              class="notification-action primary"
+              id="markAllRead"
+            >
+              Tandai semua dibaca
+            </button>
+
+            <button
+              type="button"
+              class="notification-action"
+              id="clearAll"
+            >
+              Hapus semua
+            </button>
+          </div>
+        </div>
+
+        <div class="notification-filters" aria-label="Filter notifikasi">
+          <button class="notification-filter active" data-filter="all" type="button">
+            Semua
+          </button>
+
+          <button class="notification-filter" data-filter="unread" type="button">
+            Belum dibaca
+          </button>
+
+          <button class="notification-filter" data-filter="agenda" type="button">
+            Agenda
+          </button>
+
+          <button class="notification-filter" data-filter="kajian" type="button">
+            Kajian
+          </button>
+
+          <button class="notification-filter" data-filter="system" type="button">
+            Sistem
+          </button>
+        </div>
+
+        <div class="notification-list" id="notificationList">
+          <div class="notification-empty">
+            <span>🔔</span>
+            Belum ada notifikasi.
+            Pemberitahuan akan muncul di halaman ini setelah tersedia.
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div class="notification-toast" id="notificationToast" role="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const STORAGE_KEY = "tarbiyah_notifications_v1";
+      const $ = (id) => document.getElementById(id);
+
+      let notifications = [];
+      let activeFilter = "all";
+
+      const CATEGORY_INFO = {
+        agenda: { icon: "📅", label: "Agenda" },
+        kajian: { icon: "📚", label: "Kajian" },
+        system: { icon: "⚙️", label: "Sistem" },
+        general: { icon: "🔔", label: "Umum" }
+      };
+
+      function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        })[char]);
+      }
+
+      function showToast(message) {
+        const toast = $("notificationToast");
+        toast.textContent = message;
+        toast.classList.add("show");
+
+        window.setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2300);
+      }
+
+      function loadNotifications() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          const parsed = raw ? JSON.parse(raw) : [];
+
+          notifications = Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          console.error("Gagal membaca notifikasi:", error);
+          notifications = [];
+        }
+
+        render();
+      }
+
+      function saveNotifications() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
+          return true;
+        } catch (error) {
+          console.error("Gagal menyimpan notifikasi:", error);
+          showToast("Tidak dapat menyimpan perubahan.");
+          return false;
+        }
+      }
+
+      function formatTime(value) {
+        if (!value) return "-";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) return "-";
+
+        return new Intl.DateTimeFormat("id-ID", {
+          dateStyle: "medium",
+          timeStyle: "short"
+        }).format(date);
+      }
+
+      function getFilteredNotifications() {
+        if (activeFilter === "all") return notifications;
+
+        if (activeFilter === "unread") {
+          return notifications.filter((item) => !item.read);
+        }
+
+        return notifications.filter((item) => item.category === activeFilter);
+      }
+
+      function render() {
+        const unreadCount = notifications.filter((item) => !item.read).length;
+
+        $("notificationTotal").textContent = notifications.length;
+        $("notificationUnread").textContent = unreadCount;
+
+        const filtered = getFilteredNotifications();
+
+        if (!filtered.length) {
+          $("notificationList").innerHTML = `
+            <div class="notification-empty">
+              <span>🔔</span>
+              Tidak ada notifikasi pada kategori ini.
+            </div>
+          `;
+          return;
+        }
+
+        const sorted = [...filtered].sort((a, b) =>
+          new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        $("notificationList").innerHTML = sorted.map((item) => {
+          const category = CATEGORY_INFO[item.category] || CATEGORY_INFO.general;
+
+          return `
+            <article class="notification-item ${item.read ? "" : "unread"}">
+              <div class="notification-icon" aria-hidden="true">
+                ${category.icon}
+              </div>
+
+              <div class="notification-content">
+                <h3>${escapeHTML(item.title)}</h3>
+                <p>${escapeHTML(item.message)}</p>
+                <span class="notification-time">
+                  ${escapeHTML(formatTime(item.createdAt))}
+                  · ${escapeHTML(category.label)}
+                </span>
+              </div>
+
+              <div class="notification-item-actions">
+                ${
+                  item.read
+                    ? ""
+                    : `<button type="button" data-action="read" data-id="${escapeHTML(item.id)}">Dibaca</button>`
+                }
+
+                <button
+                  type="button"
+                  class="delete"
+                  data-action="delete"
+                  data-id="${escapeHTML(item.id)}"
+                >Hapus</button>
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      function markAllRead() {
+        if (!notifications.some((item) => !item.read)) {
+          showToast("Semua notifikasi sudah dibaca.");
+          return;
+        }
+
+        notifications = notifications.map((item) => ({
+          ...item,
+          read: true
+        }));
+
+        if (!saveNotifications()) return;
+
+        render();
+        showToast("Semua notifikasi ditandai sudah dibaca.");
+      }
+
+      function clearAll() {
+        if (!notifications.length) {
+          showToast("Belum ada notifikasi untuk dihapus.");
+          return;
+        }
+
+        if (!window.confirm("Hapus seluruh notifikasi pada perangkat ini?")) {
+          return;
+        }
+
+        notifications = [];
+
+        if (!saveNotifications()) return;
+
+        render();
+        showToast("Semua notifikasi berhasil dihapus.");
+      }
+
+      function handleItemAction(event) {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const id = button.dataset.id;
+        const action = button.dataset.action;
+
+        if (action === "read") {
+          notifications = notifications.map((item) =>
+            item.id === id ? { ...item, read: true } : item
+          );
+
+          if (!saveNotifications()) return;
+
+          render();
+          showToast("Notifikasi ditandai sudah dibaca.");
+        }
+
+        if (action === "delete") {
+          notifications = notifications.filter((item) => item.id !== id);
+
+          if (!saveNotifications()) return;
+
+          render();
+          showToast("Notifikasi dihapus.");
+        }
+      }
+
+      function handleFilter(event) {
+        const button = event.target.closest("[data-filter]");
+        if (!button) return;
+
+        activeFilter = button.dataset.filter;
+
+        document.querySelectorAll(".notification-filter").forEach((item) => {
+          item.classList.toggle("active", item === button);
+        });
+
+        render();
+      }
+
+      function initialize() {
+        $("markAllRead").addEventListener("click", markAllRead);
+        $("clearAll").addEventListener("click", clearAll);
+
+        $("notificationList").addEventListener("click", handleItemAction);
+
+        document.querySelector(".notification-filters")
+          .addEventListener("click", handleFilter);
+
+        loadNotifications();
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initialize);
+      } else {
+        initialize();
+      }
+
+      /*
+        API ini disiapkan untuk integrasi notifikasi dari
+        agenda, kajian, dan sistem Supabase pada tahap berikutnya.
+      */
+      window.TARBIYAH_NOTIFICATIONS = {
+        refresh: render,
+
+        add(notification) {
+          if (!notification || !notification.title || !notification.message) {
+            throw new Error("Judul dan isi notifikasi wajib diisi.");
+          }
+
+          const allowedCategories = [
+            "agenda", "kajian", "system", "general"
+          ];
+
+          const category = allowedCategories.includes(notification.category)
+            ? notification.category
+            : "general";
+
+          notifications.push({
+            id: window.crypto?.randomUUID?.() ||
+              "notification-" + Date.now(),
+            title: String(notification.title),
+            message: String(notification.message),
+            category,
+            read: false,
+            createdAt: new Date().toISOString()
+          });
+
+          if (!saveNotifications()) return false;
+
+          render();
+          return true;
+        },
+
+        markAllRead
+      };
+    })();
+  </script>
+</body>
+</html>
