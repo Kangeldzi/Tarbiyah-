@@ -884,3 +884,209 @@ html[data-theme="system"] .admin-page .member-action {
     color: var(--ui-text);
   }
 }
+
+
+/* =========================================================
+   TARBIYAH — MAIN DASHBOARD LIGHT MODE FIX
+   Patch 2 — dashboard.html
+   ========================================================= */
+
+/* 1. Latar utama dashboard */
+
+html[data-theme="light"] body.dashboard-page,
+html[data-theme="system"] body.dashboard-page {
+  background: #f3f7f5 !important;
+  color: #18352a !important;
+  background-image: none;
+}
+
+/* 2. Area konten utama */
+
+html[data-theme="light"] .dashboard-page main,
+html[data-theme="light"] .dashboard-page .main-content,
+html[data-theme="light"] .dashboard-page .dashboard-content,
+html[data-theme="light"] .dashboard-page .page-content,
+html[data-theme="system"] .dashboard-page main,
+html[data-theme="system"] .dashboard-page .main-content,
+html[data-theme="system"] .dashboard-page .dashboard-content,
+html[data-theme="system"] .dashboard-page .page-content {
+  background-color: #f3f7f5;
+  color: #18352a;
+}
+
+/* 3. Sidebar hamburger */
+
+html[data-theme="light"] .app-sidebar,
+html[data-theme="system"] .app-sidebar {
+  background: #ffffff !important;
+  color: #18352a !important;
+  border-color: #dce8e1 !important;
+  box-shadow: 0 8px 25px rgba(25, 65, 45, .10);
+}
+
+html[data-theme="light"] .app-sidebar a,
+html[data-theme="light"] .app-sidebar button,
+html[data-theme="light"] .app-sidebar .side-link,
+html[data-theme="system"] .app-sidebar a,
+html[data-theme="system"] .app-sidebar button,
+html[data-theme="system"] .app-sidebar .side-link {
+  color: #294b3c !important;
+}
+
+html[data-theme="light"] .app-sidebar .side-link:hover,
+html[data-theme="light"] .app-sidebar .side-link.active,
+html[data-theme="system"] .app-sidebar .side-link:hover,
+html[data-theme="system"] .app-sidebar .side-link.active {
+  background: #e0f3e9 !important;
+  color: #087a50 !important;
+}
+
+html[data-theme="light"] .app-sidebar h1,
+html[data-theme="light"] .app-sidebar h2,
+html[data-theme="light"] .app-sidebar h3,
+html[data-theme="light"] .app-sidebar p,
+html[data-theme="light"] .app-sidebar span,
+html[data-theme="system"] .app-sidebar h1,
+html[data-theme="system"] .app-sidebar h2,
+html[data-theme="system"] .app-sidebar h3,
+html[data-theme="system"] .app-sidebar p,
+html[data-theme="system"] .app-sidebar span {
+  color: inherit;
+}
+
+/* 4. Tombol hamburger dan tombol navigasi */
+
+html[data-theme="light"] .menu-toggle,
+html[data-theme="light"] .hamburger,
+html[data-theme="light"] .sidebar-toggle,
+html[data-theme="system"] .menu-toggle,
+html[data-theme="system"] .hamburger,
+html[data-theme="system"] .sidebar-toggle {
+  color: #18352a !important;
+  background: #ffffff;
+  border-color: #dce8e1;
+}
+
+html[data-theme="light"] .menu-toggle svg,
+html[data-theme="light"] .hamburger svg,
+html[data-theme="system"] .menu-toggle svg,
+html[data-theme="system"] .hamburger svg {
+  color: #18352a;
+  stroke: currentColor;
+}
+
+/* 5. Kartu dashboard */
+
+html[data-theme="light"] .quick-card,
+html[data-theme="light"] .feature-card,
+html[data-theme="light"] .dashboard-card,
+html[data-theme="system"] .quick-card,
+html[data-theme="system"] .feature-card,
+html[data-theme="system"] .dashboard-card {
+  background: #ffffff !important;
+  color: #18352a !important;
+  border: 1px solid #dce8e1;
+  box-shadow: 0 4px 16px rgba(25, 65, 45, .06);
+}
+
+html[data-theme="light"] .quick-card *,
+html[data-theme="light"] .feature-card *,
+html[data-theme="system"] .quick-card *,
+html[data-theme="system"] .feature-card * {
+  color: inherit;
+}
+
+/* 6. Slideshow / Carousel
+   Berlaku untuk nama class carousel yang umum digunakan.
+   Selector spesifik HTML akan disesuaikan jika diperlukan. */
+
+html[data-theme="light"] .carousel,
+html[data-theme="light"] .hero-carousel,
+html[data-theme="light"] .carousel-container,
+html[data-theme="system"] .carousel,
+html[data-theme="system"] .hero-carousel,
+html[data-theme="system"] .carousel-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+html[data-theme="light"] .carousel-caption,
+html[data-theme="light"] .slide-content,
+html[data-theme="light"] .carousel-content,
+html[data-theme="light"] .hero-content,
+html[data-theme="system"] .carousel-caption,
+html[data-theme="system"] .slide-content,
+html[data-theme="system"] .carousel-content,
+html[data-theme="system"] .hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .75);
+}
+
+html[data-theme="light"] .carousel-caption h1,
+html[data-theme="light"] .carousel-caption h2,
+html[data-theme="light"] .carousel-caption h3,
+html[data-theme="light"] .slide-content h1,
+html[data-theme="light"] .slide-content h2,
+html[data-theme="light"] .slide-content h3,
+html[data-theme="light"] .carousel-content h1,
+html[data-theme="light"] .carousel-content h2,
+html[data-theme="light"] .carousel-content h3,
+html[data-theme="system"] .carousel-caption h1,
+html[data-theme="system"] .carousel-caption h2,
+html[data-theme="system"] .carousel-caption h3,
+html[data-theme="system"] .slide-content h1,
+html[data-theme="system"] .slide-content h2,
+html[data-theme="system"] .slide-content h3 {
+  color: #ffffff !important;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+html[data-theme="light"] .carousel-caption p,
+html[data-theme="light"] .slide-content p,
+html[data-theme="light"] .carousel-content p,
+html[data-theme="system"] .carousel-caption p,
+html[data-theme="system"] .slide-content p,
+html[data-theme="system"] .carousel-content p {
+  color: #ffffff !important;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+/* 7. Lapisan gelap transparan agar teks di atas foto terbaca */
+
+html[data-theme="light"] .carousel-caption::before,
+html[data-theme="light"] .slide-content::before,
+html[data-theme="light"] .carousel-content::before,
+html[data-theme="system"] .carousel-caption::before,
+html[data-theme="system"] .slide-content::before,
+html[data-theme="system"] .carousel-content::before {
+  pointer-events: none;
+}
+
+/* 8. Slideshow tidak boleh membuat teks saling bertumpuk */
+
+html[data-theme="light"] .carousel-caption *,
+html[data-theme="light"] .slide-content *,
+html[data-theme="light"] .carousel-content *,
+html[data-theme="system"] .carousel-caption *,
+html[data-theme="system"] .slide-content *,
+html[data-theme="system"] .carousel-content * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 9. Navigasi bawah */
+
+html[data-theme="light"] .bottom-nav,
+html[data-theme="system"] .bottom-nav {
+  background: rgba(255, 255, 255, .97) !important;
+  color: #18352a !important;
+  border-color: #dce8e1 !important;
+}
+
+/* 10. Pastikan Dark Mode tidak terkena patch ini */
