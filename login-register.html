@@ -1682,7 +1682,72 @@
         year.textContent = new Date().getFullYear();
       }
     });
-  </script>
 
+
+/* ==========================================
+   TARBIYAH — RANDOM LOGO SHINE CONTROLLER
+   ========================================== */
+(() => {
+  "use strict";
+
+  const directions = [
+    "shine-left",
+    "shine-right",
+    "shine-up",
+    "shine-down"
+  ];
+
+  const logoElements = document.querySelectorAll(
+    ".brand-mark, .auth-logo-frame"
+  );
+
+  if (!logoElements.length) return;
+
+  let previousDirection = "";
+
+  function playRandomShine() {
+    let nextDirection;
+
+    do {
+      nextDirection =
+        directions[Math.floor(Math.random() * directions.length)];
+    } while (
+      directions.length > 1 &&
+      nextDirection === previousDirection
+    );
+
+    previousDirection = nextDirection;
+
+    logoElements.forEach((logo) => {
+      logo.classList.remove(...directions);
+      void logo.offsetWidth;
+      logo.classList.add(nextDirection);
+    });
+  }
+
+  let shineTimer;
+
+  function startShine() {
+    clearInterval(shineTimer);
+    playRandomShine();
+    shineTimer = setInterval(playRandomShine, 3000);
+  }
+
+  function stopShine() {
+    clearInterval(shineTimer);
+  }
+
+  startShine();
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopShine();
+    } else {
+      startShine();
+    }
+  });
+})();
+
+  </script>
 </body>
 </html>
