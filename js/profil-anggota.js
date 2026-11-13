@@ -4,219 +4,175 @@
    File: js/profil-anggota.js
 
    Fitur:
-   1. Membaca profil pengguna dari tabel profiles
-   2. Membaca keanggotaan dari tabel members
-   3. Menampilkan foto profil dari private Storage
-   4. Mengedit informasi profil
-   5. Mengunggah dan mengganti foto profil
-   6. Validasi formulir dan file foto
-   7. Menangani error Supabase
-   8. Tidak membuat profil secara manual
-   9. Tidak mengubah status keanggotaan
+   1. Memuat sesi dan data profil anggota
+   2. Menampilkan identitas anggota
+   3. Memperbarui informasi profil
+   4. Mengunggah foto profil ke Supabase Storage
+   5. Menghapus foto profil lama setelah update berhasil
+   6. Membuat QR anggota melalui Edge Function
+   7. Menampilkan riwayat dan ringkasan kehadiran
+   8. Menangani modal dan notifikasi halaman profil
 
-   Backend:
-   - window.tarbiyahSupabase
-   - window.TARBIYAH_SESSION
-   - window.TARBIYAH_AUTH
+   Catatan:
+   Sesuaikan PROFILE_CONFIG dengan skema tabel Supabase
+   TARBIYAH yang digunakan pada proyek.
+   ========================================================= */
 
-   Database:
-   - profiles
-   - members
-
-   Storage:
-   - avatar (PRIVATE)
-========================================================= */
-
-(() => {
+(function () {
   "use strict";
 
-  /* =======================================================
-     01. KONFIGURASI
-  ======================================================= */
+  if (window.__TARBIYAH_PROFILE_INITIALIZED__) return;
+  window.__TARBIYAH_PROFILE_INITIALIZED__ = true;
 
-  const CONFIG = {
+  /* =======================================================
+     1. KONFIGURASI
+     ======================================================= */
+
+  const PROFILE_CONFIG = {
+    table: "members",
+    userIdColumn: "user_id",
+
+    // Bucket Supabase Storage untuk foto anggota.
     avatarBucket: "avatar",
+
+    // Edge Function untuk membuat QR anggota.
+    qrFunction: "member-qr-mint",
+
+    // Batas ukuran foto: 2 MB.
     maxAvatarSize: 2 * 1024 * 1024,
-    signedUrlExpiry: 60 * 60,
 
     allowedAvatarTypes: [
       "image/jpeg",
       "image/png",
       "image/webp"
-    ]
+    ],
+
+    // Masa berlaku signed URL foto privat.
+    signedUrlSeconds: 3600,
+
+    // Kolom yang diizinkan untuk diperbarui.
+    editableFields: [
+      "full_name",
+      "phone",
+      "address",
+      "birth_date",
+      "gender",
+      "bio"
+    ],
+
+    // Nama kolom foto profil.
+    avatarColumn: "avatar_path"
   };
 
-  let supabase = null;
-  let currentUser = null;
-  let currentProfile = null;
-  let currentMembership = null;
+  /*
+   * Konfigurasi dapat ditimpa sebelum file ini dimuat:
+   *
+   * window.TARBIYAH_PROFILE_CONFIG = {
+   *   table: "nama_tabel_profil",
+   *   userIdColumn: "user_id"
+   * };
+   */
 
-  let selectedAvatarFile = null;
-  let selectedAvatarPreviewUrl = null;
-  let currentAvatarSignedUrl = null;
+  const CONFIG = Object.assign(
+    {},
+    PROFILE_CONFIG,
+    window.TARBIYAH_PROFILE_CONFIG || {}
+  );
 
-  let isInitialized = false;
-  let isSaving = false;
-  let previousBodyOverflow = "";
-
-  let toastTimer = null;
-
-
-  /* =======================================================
-     02. DOM HELPER
-  ======================================================= */
-
-  const $ = (selector) => document.querySelector(selector);
-
-  function getElement(id) {
-    return document.getElementById(id);
-  }
-
-  function setText(id, value) {
-    const element = getElement(id);
-
-    if (element) {
-      element.textContent = value ?? "";
-    }
-  }
-
-  function showElement(element) {
-    if (element) {
-      element.hidden = false;
-    }
-  }
-
-  function hideElement(element) {
-    if (element) {
-      element.hidden = true;
-    }
-  }
-
-
-  /* =======================================================
-     03. ELEMENT REFERENCES
-  ======================================================= */
-
-  const elements = {
-    loading: getElement("profileLoading"),
-    content: getElement("profileContent"),
-
-    alert: getElement("profileAlert"),
-    alertMessage: getElement("profileAlertMessage"),
-
-    modal: getElement("profileEditModal"),
-    form: getElement("profileEditForm"),
-
-    openEditor: getElement("openProfileEditor"),
-    openEditorSecondary: getElement("openProfileEditorSecondary"),
-    closeEditor: getElement("closeProfileEditor"),
-    cancelEditor: getElement("cancelProfileEdit"),
-
-    fullName: getElement("editFullName"),
-    username: getElement("editUsername"),
-    phone: getElement("editPhone"),
-    bio: getElement("editBio"),
-
-    avatarFile: getElement("avatarFile"),
-    avatarPreview: getElement("avatarPreview"),
-    avatarFileName: getElement("avatarFileName"),
-    cancelAvatar: getElement("cancelAvatarSelection"),
-
-    saveButton: getElement("saveProfileButton"),
-
-    formError: getElement("profileFormError"),
-    formErrorMessage: getElement("profileFormErrorMessage"),
-
-    toast: getElement("profileToast"),
-    toastMessage: getElement("profileToastMessage"),
-    toastIcon: getElement("toastIcon")
+  const state = {
+    initialized: false,
+    loading: false,
+    saving: false,
+    user: null,
+    profile: null,
+    avatarUrl: null,
+    avatarPath: null,
+    qrUrl: null,
+    qrExpiresAt: null,
+    qrTimer: null,
+    originalAvatarPath: null
   };
 
-
   /* =======================================================
-     04. NOTIFICATION HELPERS
-  ======================================================= */
+     2. UTILITAS
+     ======================================================= */
 
-  function showAlert(message) {
-    if (!elements.alert || !elements.alertMessage) return;
+  const $ = (selector, root = document) =>
+    root.querySelector(selector);
 
-    elements.alertMessage.textContent = message;
-    elements.alert.hidden = false;
+  const $$ = (selector, root = document) =>
+    Array.from(root.querySelectorAll(selector));
+
+  function log(...args) {
+    console.log("[TARBIYAH PROFILE]", ...args);
   }
 
-  function hideAlert() {
-    if (elements.alert) {
-      elements.alert.hidden = true;
+  function warn(...args) {
+    console.warn("[TARBIYAH PROFILE]", ...args);
+  }
+
+  function showMessage(message, type = "info") {
+    const target =
+      $("#profileMessage") ||
+      $(".profile-message-container") ||
+      $("[data-profile-message]");
+
+    if (target) {
+      target.textContent = message;
+      target.className = `profile-message ${type}`;
+      target.hidden = false;
+      return;
+    }
+
+    if (typeof window.TARBIYAH_NOTIFY === "function") {
+      window.TARBIYAH_NOTIFY(message, type);
+      return;
+    }
+
+    log(message);
+  }
+
+  function setLoading(element, loading, loadingText = "Memproses...") {
+    if (!element) return;
+
+    if (loading) {
+      if (!element.dataset.originalText) {
+        element.dataset.originalText =
+          element.textContent.trim();
+      }
+
+      element.disabled = true;
+      element.textContent = loadingText;
+    } else {
+      element.disabled = false;
+
+      if (element.dataset.originalText) {
+        element.textContent = element.dataset.originalText;
+        delete element.dataset.originalText;
+      }
     }
   }
 
-  function showFormError(message) {
-    if (!elements.formError || !elements.formErrorMessage) return;
-
-    elements.formErrorMessage.textContent = message;
-    elements.formError.hidden = false;
+  function escapeHtml(value) {
+    return String(value ?? "").replace(
+      /[&<>"']/g,
+      character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[character]
+    );
   }
-
-  function hideFormError() {
-    if (elements.formError) {
-      elements.formError.hidden = true;
-    }
-  }
-
-  function showToast(message, type = "success") {
-    if (!elements.toast) return;
-
-    const iconMap = {
-      success: "fa-circle-check",
-      error: "fa-circle-exclamation",
-      warning: "fa-triangle-exclamation",
-      info: "fa-circle-info"
-    };
-
-    const colorMap = {
-      success: "var(--profile-success)",
-      error: "var(--profile-danger)",
-      warning: "var(--profile-warning)",
-      info: "var(--profile-info)"
-    };
-
-    if (toastTimer) {
-      clearTimeout(toastTimer);
-    }
-
-    if (elements.toastMessage) {
-      elements.toastMessage.textContent = message;
-    }
-
-    if (elements.toastIcon) {
-      const iconName = iconMap[type] || iconMap.info;
-
-      elements.toastIcon.innerHTML =
-        `<i class="fa-solid ${iconName}"></i>`;
-
-      elements.toastIcon.style.color =
-        colorMap[type] || colorMap.info;
-    }
-
-    elements.toast.hidden = false;
-
-    toastTimer = setTimeout(() => {
-      elements.toast.hidden = true;
-    }, 4000);
-  }
-
-
-  /* =======================================================
-     05. DATE FORMATTER
-  ======================================================= */
 
   function formatDate(value) {
-    if (!value) return "-";
+    if (!value) return "Belum diisi";
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return "-";
+      return String(value);
     }
 
     return new Intl.DateTimeFormat("id-ID", {
@@ -226,977 +182,455 @@
     }).format(date);
   }
 
-  function formatDateTime(value) {
-    if (!value) return "-";
+  function getInitials(name) {
+    const parts = String(name || "Anggota")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
 
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return "-";
-    }
-
-    return new Intl.DateTimeFormat("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    }).format(date);
+    return parts
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join("");
   }
 
+  function normalizeStatus(status) {
+    const value = String(status || "")
+      .trim()
+      .toLowerCase();
 
-  /* =======================================================
-     06. SUPABASE CLIENT
-  ======================================================= */
+    if (["active", "aktif", "approved"].includes(value)) {
+      return "active";
+    }
+
+    if (["pending", "menunggu", "verification"].includes(value)) {
+      return "pending";
+    }
+
+    return "inactive";
+  }
 
   function getSupabaseClient() {
-    const client = window.tarbiyahSupabase;
-
-    if (!client) {
-      throw new Error(
-        "Supabase client belum tersedia. Periksa js/config.js dan js/supabase-client.js."
-      );
+    if (window.supabaseClient) {
+      return window.supabaseClient;
     }
 
-    if (!client.auth || !client.from || !client.storage) {
-      throw new Error(
-        "Supabase client belum siap digunakan."
-      );
+    if (window.TARBIYAH_SUPABASE) {
+      return window.TARBIYAH_SUPABASE;
     }
-
-    if (window.TARBIYAH_BACKEND_READY === false) {
-      throw new Error(
-        "Backend TARBIYAH belum siap. Periksa konfigurasi Supabase."
-      );
-    }
-
-    return client;
-  }
-
-
-  /* =======================================================
-     07. AUTHENTICATED USER
-  ======================================================= */
-
-  async function getAuthenticatedUser() {
-
-    /*
-      Prioritas pertama:
-      Session yang telah diperiksa auth-guard.js
-    */
-
-    const guardedSession = window.TARBIYAH_SESSION;
 
     if (
-      guardedSession &&
-      guardedSession.ready === true &&
-      guardedSession.user
+      window.TARBIYAH &&
+      window.TARBIYAH.supabase
     ) {
-      return guardedSession.user;
+      return window.TARBIYAH.supabase;
     }
 
-    /*
-      Cadangan:
-      Ambil session langsung dari Supabase Auth.
-    */
+    return null;
+  }
 
-    const { data, error } = await supabase.auth.getSession();
+  function getAuthModule() {
+    return window.TARBIYAH_AUTH || null;
+  }
 
-    if (error) {
+  async function getCurrentUser() {
+    const auth = getAuthModule();
+
+    if (!auth || typeof auth.getSession !== "function") {
       throw new Error(
-        "Tidak dapat memeriksa sesi login: " + error.message
+        "Modul autentikasi TARBIYAH belum tersedia."
       );
     }
 
-    const user = data?.session?.user;
+    const result = await auth.getSession();
+
+    if (result?.error) {
+      throw result.error;
+    }
+
+    const session =
+      result?.data?.session ||
+      result?.session ||
+      result?.data ||
+      result;
+
+    const user =
+      session?.user ||
+      result?.user ||
+      null;
 
     if (!user) {
       throw new Error(
-        "Sesi login tidak ditemukan. Silakan masuk kembali."
+        "Sesi anggota tidak ditemukan. Silakan masuk kembali."
       );
     }
 
     return user;
   }
 
+  function getProfileValue(...keys) {
+    for (const key of keys) {
+      const value = state.profile?.[key];
+
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        return value;
+      }
+    }
+
+    return "";
+  }
+
+  function setText(selectors, value) {
+    const list = Array.isArray(selectors)
+      ? selectors
+      : [selectors];
+
+    list.forEach(selector => {
+      $$(selector).forEach(element => {
+        element.textContent =
+          value === undefined ||
+          value === null ||
+          value === ""
+            ? "Belum diisi"
+            : String(value);
+      });
+    });
+  }
 
   /* =======================================================
-     08. LOAD PROFILE FROM DATABASE
-  ======================================================= */
+     3. MEMUAT DATA PROFIL
+     ======================================================= */
 
-  async function loadProfile() {
+  async function fetchProfile() {
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      throw new Error(
+        "Koneksi Supabase belum tersedia."
+      );
+    }
+
+    if (!state.user) {
+      throw new Error(
+        "Data pengguna belum tersedia."
+      );
+    }
 
     const { data, error } = await supabase
-      .from("profiles")
-      .select(`
-        id,
-        full_name,
-        username,
-        phone,
-        avatar_path,
-        bio,
-        created_at,
-        updated_at
-      `)
-      .eq("id", currentUser.id)
+      .from(CONFIG.table)
+      .select("*")
+      .eq(CONFIG.userIdColumn, state.user.id)
       .maybeSingle();
 
     if (error) {
-      console.error(
-        "[TARBIYAH PROFILE] Gagal mengambil profiles:",
-        error
-      );
-
-      throw new Error(
-        "Gagal mengambil data profil: " + error.message
-      );
+      throw error;
     }
 
     if (!data) {
-      throw new Error(
-        "Data profil Anda belum ditemukan. Silakan hubungi pengurus atau administrator TARBIYAH. Halaman ini tidak membuat profil baru secara otomatis."
+      warn(
+        "Profil anggota belum ditemukan pada tabel:",
+        CONFIG.table
       );
+
+      state.profile = null;
+      return null;
     }
 
-    /*
-      Keamanan tambahan:
-      Profil harus benar-benar milik pengguna login.
-    */
-
-    if (data.id !== currentUser.id) {
-      throw new Error(
-        "Pemeriksaan keamanan profil gagal."
-      );
-    }
-
-    currentProfile = data;
+    state.profile = data;
+    state.originalAvatarPath =
+      data[CONFIG.avatarColumn] || null;
 
     return data;
   }
 
+  async function loadProfile() {
+    if (state.loading) return;
 
-  /* =======================================================
-     09. LOAD MEMBERSHIP
-  ======================================================= */
+    state.loading = true;
+    document.documentElement.classList.add(
+      "profile-loading-active"
+    );
 
-  async function loadMembership() {
+    try {
+      state.user = await getCurrentUser();
 
-    const { data, error } = await supabase
-      .from("members")
-      .select(`
-        id,
-        user_id,
-        member_number,
-        membership_status,
-        submitted_at,
-        reviewed_at,
-        reviewed_by,
-        review_note
-      `)
-      .eq("user_id", currentUser.id)
-      .maybeSingle();
+      const profile = await fetchProfile();
 
-    if (error) {
-      console.error(
-        "[TARBIYAH PROFILE] Gagal mengambil members:",
-        error
-      );
+      if (!profile) {
+        renderFallbackProfile();
+        showMessage(
+          "Akun berhasil dikenali, tetapi data profil anggota belum tersedia.",
+          "warning"
+        );
 
-      currentMembership = null;
+        return null;
+      }
 
-      showAlert(
-        "Informasi profil berhasil dimuat, tetapi data keanggotaan belum dapat diambil. Silakan coba kembali nanti."
+      await renderProfile(profile);
+      log("Profil anggota berhasil dimuat.");
+
+      return profile;
+    } catch (error) {
+      warn("Gagal memuat profil:", error);
+
+      showMessage(
+        error.message ||
+          "Tidak dapat memuat data profil anggota.",
+        "error"
       );
 
       return null;
+    } finally {
+      state.loading = false;
+
+      document.documentElement.classList.remove(
+        "profile-loading-active"
+      );
     }
-
-    currentMembership = data || null;
-
-    return currentMembership;
   }
 
+  function renderFallbackProfile() {
+    const user = state.user;
+
+    if (!user) return;
+
+    const metadata = user.user_metadata || {};
+
+    const name =
+      metadata.full_name ||
+      metadata.name ||
+      user.email ||
+      "Anggota TARBIYAH";
+
+    setText(
+      ["#profileName", "[data-profile-name]", ".profile-name"],
+      name
+    );
+
+    setText(
+      ["#profileEmail", "[data-profile-email]", ".profile-email"],
+      user.email || ""
+    );
+
+    renderAvatar(null, name);
+  }
 
   /* =======================================================
-     10. PRIVATE AVATAR SIGNED URL
-  ======================================================= */
+     4. MENAMPILKAN DATA PROFIL
+     ======================================================= */
 
-  async function getAvatarSignedUrl(path) {
+  async function renderProfile(profile) {
+    if (!profile) return;
 
+    const name = getProfileValue(
+      "full_name",
+      "name",
+      "nama_lengkap"
+    ) || state.user?.email || "Anggota TARBIYAH";
+
+    const email =
+      profile.email ||
+      state.user?.email ||
+      "";
+
+    const memberNumber = getProfileValue(
+      "member_number",
+      "nomor_anggota",
+      "member_code"
+    );
+
+    const status = normalizeStatus(
+      getProfileValue("status", "member_status")
+    );
+
+    setText(
+      ["#profileName", "[data-profile-name]", ".profile-name"],
+      name
+    );
+
+    setText(
+      ["#profileEmail", "[data-profile-email]", ".profile-email"],
+      email
+    );
+
+    setText(
+      [
+        "#profileMemberNumber",
+        "[data-member-number]",
+        ".profile-member-number"
+      ],
+      memberNumber
+    );
+
+    setText(
+      ["#profilePhone", "[data-profile-phone]"],
+      getProfileValue("phone", "nomor_telepon", "no_hp")
+    );
+
+    setText(
+      ["#profileAddress", "[data-profile-address]"],
+      getProfileValue("address", "alamat")
+    );
+
+    setText(
+      ["#profileBirthDate", "[data-profile-birth-date]"],
+      formatDate(
+        getProfileValue("birth_date", "tanggal_lahir")
+      )
+    );
+
+    setText(
+      ["#profileGender", "[data-profile-gender]"],
+      getProfileValue("gender", "jenis_kelamin")
+    );
+
+    setText(
+      ["#profileBio", "[data-profile-bio]"],
+      getProfileValue("bio", "about", "tentang")
+    );
+
+    setText(
+      ["#profileJoinDate", "[data-profile-join-date]"],
+      formatDate(
+        getProfileValue("created_at", "joined_at")
+      )
+    );
+
+    renderStatus(status);
+    renderAvatar(
+      getProfileValue(CONFIG.avatarColumn),
+      name
+    );
+
+    populateForm(profile);
+
+    await renderAttendanceSummary(profile);
+    await loadAttendanceHistory();
+  }
+
+  function renderStatus(status) {
+    const labels = {
+      active: "Anggota Aktif",
+      pending: "Menunggu Verifikasi",
+      inactive: "Tidak Aktif"
+    };
+
+    const elements = [
+      ...$$("[data-profile-status]"),
+      ...$$("#profileStatus"),
+      ...$$(".profile-status")
+    ];
+
+    elements.forEach(element => {
+      element.textContent = labels[status] || labels.inactive;
+
+      element.classList.remove(
+        "is-active",
+        "is-pending",
+        "is-inactive"
+      );
+
+      element.classList.add(`is-${status}`);
+    });
+  }
+
+  /* =======================================================
+     5. FOTO PROFIL
+     ======================================================= */
+
+  async function getAvatarUrl(path) {
     if (!path) return null;
+
+    const supabase = getSupabaseClient();
+
+    if (!supabase) return null;
 
     const { data, error } = await supabase
       .storage
       .from(CONFIG.avatarBucket)
       .createSignedUrl(
         path,
-        CONFIG.signedUrlExpiry
+        CONFIG.signedUrlSeconds
       );
 
     if (error) {
-      console.error(
-        "[TARBIYAH PROFILE] Gagal membuat signed URL avatar:",
-        error
-      );
-
+      warn("Gagal membuat signed URL foto:", error);
       return null;
     }
 
     return data?.signedUrl || null;
   }
 
+  async function renderAvatar(path, name = "") {
+    const fallback = getInitials(name);
 
-  /* =======================================================
-     11. AVATAR RENDERING
-  ======================================================= */
+    const imageElements = [
+      ...$$("[data-profile-avatar]"),
+      ...$$(".profile-avatar img"),
+      ...$$("#profileAvatar")
+    ];
 
-  function createAvatarContent(imageUrl, className = "") {
+    const placeholderElements = [
+      ...$$("[data-profile-avatar-placeholder]"),
+      ...$$(".profile-avatar-placeholder")
+    ];
 
-    if (!imageUrl) {
-      return '<i class="fa-solid fa-user"></i>';
+    let url = null;
+
+    if (path) {
+      url = await getAvatarUrl(path);
     }
 
-    const image = document.createElement("img");
-
-    image.src = imageUrl;
-    image.alt = "Foto profil anggota";
-    image.loading = "lazy";
-    image.referrerPolicy = "no-referrer";
-
-    if (className) {
-      image.className = className;
-    }
-
-    return image;
-  }
-
-
-  function renderAvatar(element, imageUrl) {
-
-    if (!element) return;
-
-    element.replaceChildren();
-
-    if (!imageUrl) {
-      const icon = document.createElement("i");
-
-      icon.className = "fa-solid fa-user";
-
-      element.appendChild(icon);
-
-      return;
-    }
-
-    const image = createAvatarContent(imageUrl);
-
-    image.addEventListener("error", () => {
-      element.innerHTML =
-        '<i class="fa-solid fa-user"></i>';
-    }, { once: true });
-
-    element.appendChild(image);
-  }
-
-
-  async function refreshAvatar() {
-
-    const avatarPath = currentProfile?.avatar_path || "";
-
-    currentAvatarSignedUrl = await getAvatarSignedUrl(
-      avatarPath
-    );
-
-    renderAvatar(
-      getElement("profileAvatar"),
-      currentAvatarSignedUrl
-    );
-
-    renderAvatar(
-      getElement("topbarAvatar"),
-      currentAvatarSignedUrl
-    );
-
-    renderAvatar(
-      getElement("sidebarAvatar"),
-      currentAvatarSignedUrl
-    );
-
-    renderAvatar(
-      elements.avatarPreview,
-      currentAvatarSignedUrl
-    );
-  }
-
-
-  /* =======================================================
-     12. RENDER PROFILE INFORMATION
-  ======================================================= */
-
-  function renderProfile() {
-
-    if (!currentProfile || !currentUser) return;
-
-    const fullName =
-      currentProfile.full_name?.trim() ||
-      currentUser.user_metadata?.full_name ||
-      currentUser.user_metadata?.name ||
-      "Anggota TARBIYAH";
-
-    const username = currentProfile.username
-      ? "@" + currentProfile.username
-      : "Username belum diatur";
-
-    const phone =
-      currentProfile.phone?.trim() || "Belum diisi";
-
-    const bio =
-      currentProfile.bio?.trim() ||
-      "Belum ada deskripsi profil.";
-
-    const email =
-      currentUser.email || "-";
-
-    setText("profileFullName", fullName);
-    setText("profileUsername", username);
-    setText("profileEmail", email);
-
-    setText("detailFullName", fullName);
-    setText(
-      "detailUsername",
-      currentProfile.username
-        ? "@" + currentProfile.username
-        : "Belum diisi"
-    );
-
-    setText("detailPhone", phone);
-    setText("detailEmail", email);
-    setText("detailBio", bio);
-
-    setText("sidebarUserName", fullName);
-    setText("sidebarUserRole", "Anggota TARBIYAH");
-
-    setText("accountUserId", currentUser.id || "-");
-    setText("accountEmail", email);
-
-    setText(
-      "accountCreatedAt",
-      formatDateTime(currentProfile.created_at)
-    );
-
-    setText(
-      "accountUpdatedAt",
-      formatDateTime(currentProfile.updated_at)
-    );
-  }
-
-
-  /* =======================================================
-     13. RENDER MEMBERSHIP INFORMATION
-  ======================================================= */
-
-  function renderMembership() {
-
-    const membership = currentMembership;
-
-    const statusElement = getElement("membershipStatus");
-    const statusText = getElement("membershipStatusText");
-
-    if (!statusElement || !statusText) return;
-
-    statusElement.className = "membership-status";
-
-    if (!membership) {
-
-      statusElement.classList.add("status-pending");
-
-      statusText.textContent = "Belum tersedia";
-
-      setText(
-        "membershipDescription",
-        "Data keanggotaan belum tersedia atau belum dapat ditampilkan."
-      );
-
-      setText("memberNumber", "Belum tersedia");
-      setText("membershipSubmittedAt", "-");
-      setText("membershipReviewedAt", "-");
-
-      return;
-    }
-
-    const rawStatus =
-      String(membership.membership_status || "pending")
-        .trim()
-        .toLowerCase();
-
-    const statusMap = {
-      pending: {
-        label: "Menunggu Verifikasi",
-        className: "status-pending",
-        description:
-          "Pendaftaran keanggotaan Anda sedang menunggu proses pemeriksaan pengurus."
-      },
-
-      approved: {
-        label: "Disetujui",
-        className: "status-active",
-        description:
-          "Pendaftaran keanggotaan Anda telah disetujui."
-      },
-
-      active: {
-        label: "Anggota Aktif",
-        className: "status-active",
-        description:
-          "Keanggotaan Anda tercatat aktif di TARBIYAH."
-      },
-
-      rejected: {
-        label: "Belum Disetujui",
-        className: "status-rejected",
-        description:
-          "Pendaftaran keanggotaan Anda belum disetujui. Silakan hubungi pengurus TARBIYAH."
-      },
-
-      suspended: {
-        label: "Keanggotaan Ditangguhkan",
-        className: "status-rejected",
-        description:
-          "Keanggotaan Anda sedang ditangguhkan. Silakan hubungi pengurus TARBIYAH untuk informasi lebih lanjut."
-      }
-    };
-
-    const status =
-      statusMap[rawStatus] || {
-        label: rawStatus
-          .replace(/[_-]/g, " ")
-          .replace(/\b\w/g, char => char.toUpperCase()),
-
-        className: "",
-        description:
-          "Status keanggotaan sesuai data yang tercatat di sistem TARBIYAH."
-      };
-
-    if (status.className) {
-      statusElement.classList.add(status.className);
-    }
-
-    statusText.textContent = status.label;
-
-    setText(
-      "membershipDescription",
-      status.description
-    );
-
-    setText(
-      "memberNumber",
-      membership.member_number || "Belum tersedia"
-    );
-
-    setText(
-      "membershipSubmittedAt",
-      formatDate(membership.submitted_at)
-    );
-
-    setText(
-      "membershipReviewedAt",
-      formatDate(membership.reviewed_at)
-    );
-  }
-
-
-
-  /* =======================================================
-     13A. QR ANGGOTA — TOKEN DARI EDGE FUNCTION
-     Kontrak backend: member-qr-mint
-     Backend wajib memverifikasi JWT + status active,
-     menyimpan hash token, dan mengembalikan token mentah
-     berumur pendek. Browser tidak mengakses tabel QR langsung.
-  ======================================================= */
-
-  let memberQrExpiryTimer = null;
-  let memberQrRawToken = null;
-
-  function clearMemberQr() {
-    const holder = getElement("memberQrCode");
-    if (holder) {
-      holder.replaceChildren();
-      const icon = document.createElement("i");
-      icon.className = "fa-solid fa-qrcode";
-      const label = document.createElement("span");
-      label.textContent = "QR belum dibuat";
-      holder.append(icon, label);
-    }
-    memberQrRawToken = null;
-    const download = getElement("downloadMemberQr");
-    if (download) download.disabled = true;
-    setText("memberQrExpiry", "");
-  }
-
-  function renderMemberQr(token, expiresAt) {
-    const holder = getElement("memberQrCode");
-    if (!holder || !token) return;
-    if (typeof window.QRCode !== "function") {
-      setText("memberQrMessage", "Pustaka QR belum berhasil dimuat. Muat ulang halaman dan coba kembali.");
-      return;
-    }
-    holder.replaceChildren();
-    new window.QRCode(holder, {
-      text: token,
-      width: 164,
-      height: 164,
-      colorDark: "#102a22",
-      colorLight: "#ffffff",
-      correctLevel: window.QRCode.CorrectLevel.M
-    });
-    memberQrRawToken = token;
-    const download = getElement("downloadMemberQr");
-    if (download) download.disabled = false;
-    setText("memberQrMessage", "Tunjukkan QR ini kepada petugas untuk diverifikasi. Token bersifat sementara.");
-    setText("memberQrExpiry", expiresAt ? "Berlaku sampai " + formatDateTime(expiresAt) : "QR memiliki masa berlaku terbatas.");
-    if (memberQrExpiryTimer) clearTimeout(memberQrExpiryTimer);
-    if (expiresAt) {
-      const remaining = new Date(expiresAt).getTime() - Date.now();
-      if (remaining > 0) {
-        memberQrExpiryTimer = setTimeout(() => {
-          clearMemberQr();
-          setText("memberQrMessage", "QR telah kedaluwarsa. Buat QR baru saat diperlukan.");
-        }, Math.min(remaining, 2147483647));
+    state.avatarPath = path || null;
+    state.avatarUrl = url;
+
+    imageElements.forEach(image => {
+      if (url) {
+        image.src = url;
+        image.alt = `Foto profil ${name}`;
+        image.hidden = false;
       } else {
-        clearMemberQr();
-        setText("memberQrMessage", "QR telah kedaluwarsa. Buat QR baru saat diperlukan.");
+        image.removeAttribute("src");
+        image.hidden = true;
       }
-    }
+    });
+
+    placeholderElements.forEach(element => {
+      element.textContent = fallback;
+      element.hidden = Boolean(url);
+    });
+
+    $$("[data-profile-avatar-fallback]").forEach(element => {
+      element.textContent = fallback;
+      element.hidden = Boolean(url);
+    });
   }
 
-  async function generateMemberQr() {
-    if (!currentMembership || currentMembership.membership_status !== "active") {
-      showToast("QR hanya tersedia untuk anggota dengan status aktif.", "warning");
-      return;
-    }
-    const button = getElement("generateMemberQr");
-    if (button) button.disabled = true;
-    try {
-      const { data, error } = await supabase.functions.invoke("member-qr-mint", {
-        body: { purpose: "member_identity" }
-      });
-      if (error) throw error;
-      const token = data?.token || data?.qr_token;
-      const expiresAt = data?.expires_at || data?.expiresAt;
-      if (!token) {
-        throw new Error(data?.message || "Backend belum mengembalikan token QR.");
-      }
-      renderMemberQr(token, expiresAt);
-      showToast("QR anggota berhasil diterbitkan.", "success");
-    } catch (error) {
-      console.error("[TARBIYAH PROFILE] Gagal menerbitkan QR:", error);
-      showToast(
-        "QR belum dapat dibuat. Pastikan Edge Function member-qr-mint sudah dipasang dan mengembalikan token QR.",
-        "warning"
-      );
-      setText("memberQrMessage", "Layanan penerbit QR belum tersedia atau belum dikonfigurasi di backend.");
-    } finally {
-      if (button) button.disabled = false;
-    }
-  }
-
-  function downloadMemberQr() {
-    const holder = getElement("memberQrCode");
-    const canvas = holder?.querySelector("canvas");
-    const image = holder?.querySelector("img");
-    const source = canvas?.toDataURL("image/png") || image?.src;
-    if (!source) {
-      showToast("Buat QR terlebih dahulu.", "warning");
-      return;
-    }
-    const link = document.createElement("a");
-    link.href = source;
-    link.download = "TARBIYAH-QR-Anggota.png";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  }
-
-  function renderMemberFeatures() {
-    setText("memberQrName",
-      currentProfile?.full_name || currentUser?.user_metadata?.full_name || "Anggota TARBIYAH");
-    setText("memberQrNumber",
-      "Nomor anggota: " + (currentMembership?.member_number || "belum tersedia"));
-    const active = currentMembership?.membership_status === "active";
-    const generate = getElement("generateMemberQr");
-    if (generate) generate.disabled = !active;
-    if (!active) {
-      clearMemberQr();
-      setText("memberQrMessage", "QR hanya dapat diterbitkan setelah status keanggotaan Anda aktif.");
-    }
-  }
-
-  /* =======================================================
-     14. INITIALIZE PAGE DATA
-  ======================================================= */
-
-  async function loadPageData() {
-
-    // Hindari data akun sebelumnya tertinggal ketika halaman dimuat ulang.
-    currentUser = null;
-    currentProfile = null;
-    currentMembership = null;
-    currentAvatarSignedUrl = null;
-
-    if (elements.loading) {
-      elements.loading.hidden = false;
-    }
-
-    if (elements.content) {
-      elements.content.hidden = true;
-    }
-
-    hideAlert();
-
-    try {
-
-      supabase = getSupabaseClient();
-
-      currentUser = await getAuthenticatedUser();
-
-      if (!currentUser?.id) {
-        throw new Error(
-          "Identitas pengguna tidak ditemukan."
-        );
-      }
-
-      console.info(
-        "[TARBIYAH PROFILE] Pengguna terautentikasi:",
-        currentUser.id
-      );
-
-      /*
-        Ambil data profil terlebih dahulu.
-        Profil tidak dibuat manual jika tidak ditemukan.
-      */
-
-      await loadProfile();
-
-      /*
-        Data anggota boleh gagal tanpa menghilangkan
-        informasi profil pribadi.
-      */
-
-      await loadMembership();
-
-      renderProfile();
-      renderMembership();
-      renderMemberFeatures();
-
-      await refreshAvatar();
-
-      if (elements.content) {
-        elements.content.hidden = false;
-      }
-
-      console.info(
-        "[TARBIYAH PROFILE] Data profil berhasil dimuat."
-      );
-
-    } catch (error) {
-
-      console.error(
-        "[TARBIYAH PROFILE] Error:",
-        error
-      );
-
-      showAlert(
-        error.message ||
-        "Terjadi kesalahan saat memuat profil."
-      );
-
-      if (elements.content) {
-        elements.content.hidden = true;
-      }
-
-    } finally {
-
-      if (elements.loading) {
-        elements.loading.hidden = true;
-      }
-
-    }
-  }
-
-
-  /* =======================================================
-     15. OPEN EDIT PROFILE MODAL
-  ======================================================= */
-
-  function populateEditForm() {
-
-    if (!currentProfile) return;
-
-    if (elements.fullName) {
-      elements.fullName.value =
-        currentProfile.full_name || "";
-    }
-
-    if (elements.username) {
-      elements.username.value =
-        currentProfile.username || "";
-    }
-
-    if (elements.phone) {
-      elements.phone.value =
-        currentProfile.phone || "";
-    }
-
-    if (elements.bio) {
-      elements.bio.value =
-        currentProfile.bio || "";
-    }
-
-    resetSelectedAvatar();
-    hideFormError();
-  }
-
-
-  function openEditor() {
-
-    if (!currentProfile) {
-      showToast(
-        "Data profil belum tersedia.",
-        "warning"
-      );
-
-      return;
-    }
-
-    populateEditForm();
-
-    if (!elements.modal) return;
-
-    previousBodyOverflow = document.body.style.overflow;
-
-    elements.modal.hidden = false;
-    elements.modal.setAttribute("aria-hidden", "false");
-
-    document.body.style.overflow = "hidden";
-
-    setTimeout(() => {
-      elements.fullName?.focus();
-    }, 100);
-  }
-
-
-  /* =======================================================
-     16. CLOSE EDIT PROFILE MODAL
-  ======================================================= */
-   
-function closeEditor(force = false) {
-  if (!elements.modal) return;
-
-  // Hanya nilai boolean true yang boleh memaksa penutupan.
-  // Event klik dari tombol tidak dianggap sebagai force.
-  const forceClose = force === true;
-
-  if (isSaving && !forceClose) return;
-
-  elements.modal.hidden = true;
-  elements.modal.setAttribute("aria-hidden", "true");
-
-  document.body.style.overflow = previousBodyOverflow;
-
-  resetSelectedAvatar();
-  hideFormError();
-}
-
-  /* =======================================================
-     17. AVATAR PREVIEW
-  ======================================================= */
-
-  function revokeAvatarPreviewUrl() {
-
-    if (selectedAvatarPreviewUrl) {
-
-      URL.revokeObjectURL(
-        selectedAvatarPreviewUrl
-      );
-
-      selectedAvatarPreviewUrl = null;
-    }
-  }
-
-
-  function resetSelectedAvatar() {
-
-    selectedAvatarFile = null;
-
-    revokeAvatarPreviewUrl();
-
-    if (elements.avatarFile) {
-      elements.avatarFile.value = "";
-    }
-
-    if (elements.avatarFileName) {
-      elements.avatarFileName.textContent =
-        "Belum ada foto baru dipilih";
-    }
-
-    hideElement(elements.cancelAvatar);
-
-    renderAvatar(
-      elements.avatarPreview,
-      currentAvatarSignedUrl
-    );
-  }
-
-
-  function validateAvatarFile(file) {
-
+  function validateAvatar(file) {
     if (!file) {
-      return "File foto tidak ditemukan.";
+      throw new Error("Pilih foto terlebih dahulu.");
     }
 
     if (!CONFIG.allowedAvatarTypes.includes(file.type)) {
-      return "Format foto harus JPG, PNG, atau WEBP.";
+      throw new Error(
+        "Format foto harus JPG, PNG, atau WEBP."
+      );
     }
 
     if (file.size > CONFIG.maxAvatarSize) {
-      return "Ukuran foto maksimal 2 MB.";
+      throw new Error(
+        "Ukuran foto maksimal 2 MB."
+      );
     }
 
-    if (file.size <= 0) {
-      return "File foto kosong atau tidak valid.";
-    }
-
-    return null;
+    return true;
   }
 
-
-  function handleAvatarSelection(event) {
-
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    const validationError = validateAvatarFile(file);
-
-    if (validationError) {
-
-      showFormError(validationError);
-
-      resetSelectedAvatar();
-
-      return;
-    }
-
-    hideFormError();
-
-    revokeAvatarPreviewUrl();
-
-    selectedAvatarFile = file;
-
-    selectedAvatarPreviewUrl =
-      URL.createObjectURL(file);
-
-    renderAvatar(
-      elements.avatarPreview,
-      selectedAvatarPreviewUrl
-    );
-
-    if (elements.avatarFileName) {
-      elements.avatarFileName.textContent =
-        file.name;
-    }
-
-    showElement(elements.cancelAvatar);
-  }
-
-
-  /* =======================================================
-     18. FORM VALIDATION
-  ======================================================= */
-
-  function validateProfileForm() {
-
-    const fullName =
-      elements.fullName?.value.trim() || "";
-
-    const username =
-      elements.username?.value.trim() || "";
-
-    const phone =
-      elements.phone?.value.trim() || "";
-
-    const bio =
-      elements.bio?.value.trim() || "";
-
-    if (!fullName) {
-      return {
-        valid: false,
-        message: "Nama lengkap wajib diisi."
-      };
-    }
-
-    if (fullName.length > 100) {
-      return {
-        valid: false,
-        message: "Nama lengkap maksimal 100 karakter."
-      };
-    }
-
-    if (
-      username &&
-      !/^[a-zA-Z0-9._]{3,30}$/.test(username)
-    ) {
-      return {
-        valid: false,
-        message:
-          "Username harus 3–30 karakter dan hanya boleh menggunakan huruf, angka, titik, atau garis bawah."
-      };
-    }
-
-    if (phone.length > 25) {
-      return {
-        valid: false,
-        message: "Nomor telepon maksimal 25 karakter."
-      };
-    }
-
-    if (bio.length > 500) {
-      return {
-        valid: false,
-        message: "Deskripsi profil maksimal 500 karakter."
-      };
-    }
-
-    if (selectedAvatarFile) {
-
-      const avatarError =
-        validateAvatarFile(selectedAvatarFile);
-
-      if (avatarError) {
-        return {
-          valid: false,
-          message: avatarError
-        };
-      }
-    }
-
-    return {
-      valid: true,
-      values: {
-        full_name: fullName,
-        username: username || null,
-        phone: phone || null,
-        bio: bio || null
-      }
-    };
-  }
-
-
-  /* =======================================================
-     19. GENERATE AVATAR STORAGE PATH
-  ======================================================= */
-
-  function generateAvatarPath(userId, file) {
-
+  function makeAvatarPath(file) {
     const extensionMap = {
       "image/jpeg": "jpg",
       "image/png": "png",
@@ -1204,708 +638,908 @@ function closeEditor(force = false) {
     };
 
     const extension =
-      extensionMap[file.type];
+      extensionMap[file.type] || "jpg";
 
-    if (!extension) {
-      throw new Error(
-        "Format foto tidak didukung."
-      );
-    }
-
-    let uniqueId;
-
-    if (
-      window.crypto &&
-      typeof window.crypto.randomUUID === "function"
-    ) {
-      uniqueId = window.crypto.randomUUID();
-
-    } else {
-
-      uniqueId =
-        Date.now().toString(36) +
-        "-" +
-        Math.random().toString(36).slice(2, 12);
-    }
-
-    return (
-      userId +
-      "/" +
-      uniqueId +
-      "." +
-      extension
-    );
+    return `${state.user.id}/${Date.now()}.${extension}`;
   }
-
-
-  /* =======================================================
-     20. UPLOAD AVATAR
-  ======================================================= */
 
   async function uploadAvatar(file) {
+    const supabase = getSupabaseClient();
 
-    const validationError =
-      validateAvatarFile(file);
-
-    if (validationError) {
-      throw new Error(validationError);
+    if (!supabase) {
+      throw new Error("Supabase belum terhubung.");
     }
 
-    const newPath = generateAvatarPath(
-      currentUser.id,
-      file
-    );
+    validateAvatar(file);
 
-    const { data, error } = await supabase
+    const newPath = makeAvatarPath(file);
+
+    const { error: uploadError } = await supabase
       .storage
       .from(CONFIG.avatarBucket)
-      .upload(
-        newPath,
-        file,
-        {
-          cacheControl: "3600",
-          contentType: file.type,
-          upsert: false
-        }
-      );
+      .upload(newPath, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type
+      });
 
-    if (error) {
-
-      console.error(
-        "[TARBIYAH PROFILE] Upload avatar gagal:",
-        error
-      );
-
-      throw new Error(
-        "Gagal mengunggah foto profil: " + error.message
-      );
+    if (uploadError) {
+      throw uploadError;
     }
 
-    return data.path || newPath;
+    return newPath;
   }
 
-
-  /* =======================================================
-     21. REMOVE NEW UPLOAD IF DATABASE UPDATE FAILS
-  ======================================================= */
-
-  async function cleanupNewAvatar(path) {
-
+  async function deleteAvatar(path) {
     if (!path) return;
 
-    try {
+    const supabase = getSupabaseClient();
 
-      const { error } = await supabase
-        .storage
-        .from(CONFIG.avatarBucket)
-        .remove([path]);
+    if (!supabase) return;
 
-      if (error) {
-        console.warn(
-          "[TARBIYAH PROFILE] Pembersihan foto baru gagal:",
-          error
-        );
-      }
+    const { error } = await supabase
+      .storage
+      .from(CONFIG.avatarBucket)
+      .remove([path]);
 
-    } catch (cleanupError) {
-
-      console.warn(
-        "[TARBIYAH PROFILE] Error saat membersihkan foto baru:",
-        cleanupError
-      );
-    }
-  }
-
-
-  /* =======================================================
-     22. DELETE OLD AVATAR AFTER SUCCESS
-  ======================================================= */
-
-  async function cleanupOldAvatar(oldPath, newPath) {
-
-    if (!oldPath || oldPath === newPath) return;
-
-    /*
-      Pastikan file lama memang berada dalam folder
-      milik pengguna yang sedang login.
-    */
-
-    const expectedPrefix = currentUser.id + "/";
-
-    if (!oldPath.startsWith(expectedPrefix)) {
-
-      console.warn(
-        "[TARBIYAH PROFILE] File avatar lama tidak dihapus karena path tidak sesuai kepemilikan."
-      );
-
-      return;
-    }
-
-    try {
-
-      const { error } = await supabase
-        .storage
-        .from(CONFIG.avatarBucket)
-        .remove([oldPath]);
-
-      if (error) {
-
-        console.warn(
-          "[TARBIYAH PROFILE] Foto lama belum dapat dihapus:",
-          error
-        );
-
-        showToast(
-          "Profil berhasil diperbarui. Foto lama belum berhasil dibersihkan dari penyimpanan.",
-          "warning"
-        );
-      }
-
-    } catch (error) {
-
-      console.warn(
-        "[TARBIYAH PROFILE] Error menghapus foto lama:",
+    if (error) {
+      warn(
+        "Foto lama belum dapat dihapus:",
         error
       );
-
-      showToast(
-        "Profil berhasil diperbarui, tetapi foto lama belum berhasil dibersihkan.",
-        "warning"
-      );
     }
   }
 
+  async function handleAvatarUpload(file) {
+    if (!file || state.saving) return;
 
-  /* =======================================================
-     23. SET SAVE BUTTON STATE
-  ======================================================= */
-
-  function setSavingState(saving) {
-
-    isSaving = saving;
-
-    if (elements.saveButton) {
-
-      elements.saveButton.disabled = saving;
-
-      elements.saveButton.innerHTML = saving
-        ? '<i class="fa-solid fa-spinner fa-spin"></i><span>Menyimpan...</span>'
-        : '<i class="fa-solid fa-floppy-disk"></i><span>Simpan Perubahan</span>';
-    }
-
-    if (elements.cancelEditor) {
-      elements.cancelEditor.disabled = saving;
-    }
-
-    if (elements.closeEditor) {
-      elements.closeEditor.disabled = saving;
-    }
-  }
-
-
-  /* =======================================================
-     24. SAVE PROFILE
-  ======================================================= */
-
-  async function saveProfile(event) {
-
-    event.preventDefault();
-
-    if (isSaving) return;
-
-    hideFormError();
-
-    const validation = validateProfileForm();
-
-    if (!validation.valid) {
-
-      showFormError(validation.message);
-
-      return;
-    }
-
-    setSavingState(true);
-
-    let uploadedAvatarPath = null;
-
-    const oldAvatarPath =
-      currentProfile?.avatar_path || null;
+    let newPath = null;
+    let databaseUpdated = false;
 
     try {
+      state.saving = true;
 
-      /*
-        Pastikan user masih memiliki session.
-      */
+      showMessage(
+        "Mengunggah foto profil...",
+        "info"
+      );
 
-      const authenticatedUser =
-        await getAuthenticatedUser();
+      newPath = await uploadAvatar(file);
 
-      if (authenticatedUser.id !== currentUser.id) {
-        throw new Error(
-          "Sesi pengguna berubah. Silakan muat ulang halaman."
-        );
-      }
-
-      /*
-        Upload foto terlebih dahulu jika ada foto baru.
-      */
-
-      if (selectedAvatarFile) {
-
-        uploadedAvatarPath =
-          await uploadAvatar(selectedAvatarFile);
-      }
-
-      /*
-        Susun data yang boleh diubah pengguna.
-        Status keanggotaan dan role tidak disentuh.
-      */
-
-      const updatePayload = {
-        full_name: validation.values.full_name,
-        username: validation.values.username,
-        phone: validation.values.phone,
-        bio: validation.values.bio,
-        updated_at: new Date().toISOString()
-      };
-
-      if (uploadedAvatarPath) {
-        updatePayload.avatar_path =
-          uploadedAvatarPath;
-      }
-
-      /*
-        Update hanya profil milik pengguna login.
-      */
+      const supabase = getSupabaseClient();
 
       const { data, error } = await supabase
-        .from("profiles")
-        .update(updatePayload)
-        .eq("id", currentUser.id)
-        .select(`
-          id,
-          full_name,
-          username,
-          phone,
-          avatar_path,
-          bio,
-          created_at,
-          updated_at
-        `)
-        .single();
+        .from(CONFIG.table)
+        .update({
+          [CONFIG.avatarColumn]: newPath
+        })
+        .eq(CONFIG.userIdColumn, state.user.id)
+        .select()
+        .maybeSingle();
 
       if (error) {
+        throw error;
+      }
 
-        console.error(
-          "[TARBIYAH PROFILE] Update profil gagal:",
-          error
-        );
-
+      if (!data) {
         throw new Error(
-          "Gagal menyimpan perubahan profil: " +
-          error.message
+          "Data profil tidak ditemukan. Foto belum disimpan."
         );
       }
 
-      if (!data || data.id !== currentUser.id) {
-        throw new Error(
-          "Data profil tidak dapat diverifikasi setelah penyimpanan."
-        );
-      }
+      databaseUpdated = true;
 
-      /*
-        Update lokal hanya setelah database berhasil.
-      */
+      const oldPath = state.originalAvatarPath;
 
-      currentProfile = data;
+      state.profile = data;
+      state.originalAvatarPath = newPath;
 
-      /*
-        Hapus foto baru jika proses penyimpanan database gagal
-        akan ditangani oleh blok catch.
-      */
-
-      await refreshAvatar();
-
-      renderProfile();
-
-      /*
-        Hapus foto lama setelah database berhasil menunjuk
-        ke path foto baru.
-      */
-
-      let oldAvatarCleanupWarning = false;
-      if (uploadedAvatarPath && oldAvatarPath) {
-        await cleanupOldAvatar(oldAvatarPath, uploadedAvatarPath);
-        // cleanupOldAvatar emits a warning toast when deletion fails.
-        oldAvatarCleanupWarning = Boolean(
-          elements.toast && !elements.toast.hidden &&
-          elements.toastMessage?.textContent?.includes("Foto lama")
-        );
-      }
-
-      /*
-        Bersihkan state file pilihan.
-      */
-
-      resetSelectedAvatar();
-     // Tutup modal setelah database berhasil menyimpan profil.
-      closeEditor(true);
-      showToast("Profil berhasil diperbarui.", "success"
+      await renderAvatar(
+        newPath,
+        getProfileValue("full_name", "name")
       );
 
-      console.info(
-        "[TARBIYAH PROFILE] Profil berhasil disimpan."
+      /*
+       * Hapus foto lama hanya setelah database
+       * berhasil menunjuk ke foto yang baru.
+       */
+      if (oldPath && oldPath !== newPath) {
+        await deleteAvatar(oldPath);
+      }
+
+      showMessage(
+        "Foto profil berhasil diperbarui.",
+        "success"
       );
 
     } catch (error) {
-
-      console.error(
-        "[TARBIYAH PROFILE] Gagal menyimpan profil:",
-        error
-      );
+      warn("Upload foto gagal:", error);
 
       /*
-        Jika upload berhasil tetapi update database gagal,
-        hapus file baru agar tidak meninggalkan file yatim.
-      */
-
-      if (uploadedAvatarPath) {
-        await cleanupNewAvatar(uploadedAvatarPath);
+       * Jangan hapus file baru jika database sudah
+       * berhasil diperbarui. Database mungkin sudah
+       * menunjuk ke file tersebut.
+       */
+      if (newPath && !databaseUpdated) {
+        await deleteAvatar(newPath);
       }
 
-      showFormError(
+      showMessage(
         error.message ||
-        "Terjadi kesalahan saat menyimpan profil."
+          "Gagal memperbarui foto profil.",
+        "error"
       );
 
     } finally {
-
-      setSavingState(false);
+      state.saving = false;
     }
   }
 
-
   /* =======================================================
-     25. SIDEBAR / MODULE SHELL COMPATIBILITY
-  ======================================================= */
+     6. FORMULIR PROFIL
+     ======================================================= */
 
-  function setCurrentYear() {
+  function populateForm(profile) {
+    if (!profile) return;
 
-    const yearElement = getElement("currentYear");
+    const fieldMap = {
+      full_name: [
+        "#editFullName",
+        '[name="full_name"]'
+      ],
+      phone: [
+        "#editPhone",
+        '[name="phone"]'
+      ],
+      address: [
+        "#editAddress",
+        '[name="address"]'
+      ],
+      birth_date: [
+        "#editBirthDate",
+        '[name="birth_date"]'
+      ],
+      gender: [
+        "#editGender",
+        '[name="gender"]'
+      ],
+      bio: [
+        "#editBio",
+        '[name="bio"]'
+      ]
+    };
 
-    if (yearElement) {
-      yearElement.textContent =
-        new Date().getFullYear();
-    }
-  }
+    Object.entries(fieldMap).forEach(([key, selectors]) => {
+      const value = profile[key] ?? "";
 
+      selectors.forEach(selector => {
+        const element = $(selector);
 
-  /* =======================================================
-     26. EVENT LISTENERS
-  ======================================================= */
-
-  function bindEvents() {
-
-    /*
-      Open modal
-    */
-
-    elements.openEditor?.addEventListener(
-      "click",
-      openEditor
-    );
-
-    elements.openEditorSecondary?.addEventListener(
-      "click",
-      openEditor
-    );
-
-     
-/* =========================================
-   NOTIFICATION MODAL
-========================================= */
-
-const notificationModal =
-  getElement("notificationModal");
-
-const openNotificationButton =
-  getElement("openNotificationModal");
-
-const closeNotificationButton =
-  getElement("closeNotificationModal");
-
-function openNotificationModal() {
-  if (!notificationModal) return;
-
-  notificationModal.hidden = false;
-  notificationModal.setAttribute("aria-hidden", "false");
-
-  document.body.style.overflow = "hidden";
-}
-
-function closeNotificationModal() {
-  if (!notificationModal) return;
-
-  notificationModal.hidden = true;
-  notificationModal.setAttribute("aria-hidden", "true");
-
-  // Jangan membuka scroll jika modal edit profil
-  // masih sedang terbuka.
-  if (!elements.modal || elements.modal.hidden) {
-    document.body.style.overflow =
-    (elements.modal && !elements.modal.hidden)
-      ? "hidden"
-      : previousBodyOverflow;
-  }
-}
-
-openNotificationButton?.addEventListener(
-  "click",
-  openNotificationModal
-);
-
-closeNotificationButton?.addEventListener(
-  "click",
-  closeNotificationModal
-);
-
-notificationModal
-  ?.querySelectorAll("[data-notification-close]")
-  .forEach(element => {
-    element.addEventListener(
-      "click",
-      closeNotificationModal
-    );
-  });
-
-document.addEventListener("keydown", event => {
-  if (
-    event.key === "Escape" &&
-    notificationModal &&
-    !notificationModal.hidden
-  ) {
-    closeNotificationModal();
-  }
-});
-
-    /*
-      Close modal
-    */
-
-    elements.closeEditor?.addEventListener(
-      "click",
-      closeEditor
-    );
-
-    elements.cancelEditor?.addEventListener(
-      "click",
-      closeEditor
-    );
-
-    /*
-      Click backdrop
-    */
-
-    elements.modal?.querySelectorAll("[data-modal-close]")
-      .forEach(element => {
-        element.addEventListener(
-          "click",
-          closeEditor
-        );
-      });
-
-    /*
-      Escape key
-    */
-
-    document.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Escape" &&
-          elements.modal &&
-          !elements.modal.hidden
-        ) {
-          closeEditor();
+        if (element && !element.matches(":disabled")) {
+          element.value = value;
         }
-      }
-    );
+      });
+    });
+  }
 
-    /*
-      Submit form
-    */
+  function collectFormData(form) {
+    const formData = new FormData(form);
+    const payload = {};
 
-    elements.form?.addEventListener(
-      "submit",
-      saveProfile
-    );
+    CONFIG.editableFields.forEach(field => {
+      if (!formData.has(field)) return;
 
-    /*
-      Avatar file selection
-    */
+      const value = formData.get(field);
 
-    elements.avatarFile?.addEventListener(
-      "change",
-      handleAvatarSelection
-    );
-
-    /*
-      Cancel new avatar selection
-    */
-
-    elements.cancelAvatar?.addEventListener(
-      "click",
-      () => {
-        resetSelectedAvatar();
-        hideFormError();
-
-        showToast(
-          "Pilihan foto baru dibatalkan.",
-          "info"
-        );
-      }
-    );
-
-    /*
-      Clear error while user edits fields
-    */
-
-    [
-      elements.fullName,
-      elements.username,
-      elements.phone,
-      elements.bio
-    ].forEach(element => {
-
-      element?.addEventListener(
-        "input",
-        hideFormError
-      );
+      payload[field] =
+        typeof value === "string"
+          ? value.trim()
+          : value;
     });
 
-    getElement("generateMemberQr")?.addEventListener("click", generateMemberQr);
-    getElement("downloadMemberQr")?.addEventListener("click", downloadMemberQr);
-
-    /*
-      Sidebar year
-    */
-
-    setCurrentYear();
+    return payload;
   }
 
-
-  /* =======================================================
-     27. INITIALIZATION
-  ======================================================= */
-
-  async function initialize() {
-
-    if (isInitialized) return;
-
-    isInitialized = true;
-
-    bindEvents();
-
-    await loadPageData();
-  }
-
-
-  /* =======================================================
-     28. AUTH GUARD EVENT
-  ======================================================= */
-
-  document.addEventListener(
-    "tarbiyah:session-ready",
-    () => {
-
-      console.info(
-        "[TARBIYAH PROFILE] Session siap. Memulai halaman profil."
+  function validateProfileData(payload) {
+    if (
+      payload.full_name !== undefined &&
+      payload.full_name.length < 2
+    ) {
+      throw new Error(
+        "Nama lengkap minimal 2 karakter."
       );
-
-      initialize();
     }
-  );
-
-
-  /* =======================================================
-     29. DOM READY FALLBACK
-  ======================================================= */
-
-  function startWhenReady() {
-
-    /*
-      auth-guard.js mungkin sudah menyelesaikan
-      pemeriksaan session sebelum halaman ini mulai.
-    */
 
     if (
-      window.TARBIYAH_SESSION &&
-      window.TARBIYAH_SESSION.ready === true
+      payload.phone &&
+      !/^[0-9+\-\s()]{7,20}$/.test(payload.phone)
     ) {
-      initialize();
+      throw new Error(
+        "Format nomor telepon belum benar."
+      );
+    }
+
+    return true;
+  }
+
+  async function saveProfile(form) {
+    if (state.saving) return;
+
+    const supabase = getSupabaseClient();
+
+    if (!supabase || !state.user) {
+      showMessage(
+        "Sesi atau koneksi Supabase belum tersedia.",
+        "error"
+      );
       return;
     }
 
-    /*
-      Jika event session belum diterima, beri kesempatan
-      auth-guard.js menyelesaikan pemeriksaan session.
-    */
+    const payload = collectFormData(form);
 
-    if (!window.TARBIYAH_SESSION) {
-      console.info(
-        "[TARBIYAH PROFILE] Menunggu pemeriksaan session auth-guard."
+    try {
+      validateProfileData(payload);
+
+      state.saving = true;
+
+      const submitButton = $(
+        'button[type="submit"]',
+        form
       );
+
+      setLoading(
+        submitButton,
+        true,
+        "Menyimpan..."
+      );
+
+      const { data, error } = await supabase
+        .from(CONFIG.table)
+        .update(payload)
+        .eq(CONFIG.userIdColumn, state.user.id)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error(
+          "Profil tidak ditemukan atau tidak dapat diperbarui."
+        );
+      }
+
+      state.profile = data;
+
+      await renderProfile(data);
+
+      closeProfileModal();
+
+      showMessage(
+        "Perubahan profil berhasil disimpan.",
+        "success"
+      );
+
+      log("Profil berhasil diperbarui.");
+
+    } catch (error) {
+      warn("Gagal menyimpan profil:", error);
+
+      showMessage(
+        error.message ||
+          "Terjadi kesalahan saat menyimpan profil.",
+        "error"
+      );
+
+    } finally {
+      state.saving = false;
+
+      const submitButton = $(
+        'button[type="submit"]',
+        form
+      );
+
+      setLoading(submitButton, false);
     }
   }
 
+  /* =======================================================
+     7. MODAL PROFIL
+     ======================================================= */
 
-  if (document.readyState === "loading") {
+  function openProfileModal() {
+    const modal =
+      $("#editProfileModal") ||
+      $("#profileEditModal") ||
+      $(".profile-modal");
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      startWhenReady,
-      { once: true }
-    );
+    if (!modal) {
+      warn("Modal edit profil tidak ditemukan.");
+      return;
+    }
 
-  } else {
+    if (state.profile) {
+      populateForm(state.profile);
+    }
 
-    startWhenReady();
+    modal.classList.add("is-open", "active");
+    modal.setAttribute("aria-hidden", "false");
+
+    document.body.dataset.profileModalOpen = "true";
   }
 
+  function closeProfileModal() {
+    const modal =
+      $("#editProfileModal") ||
+      $("#profileEditModal") ||
+      $(".profile-modal");
+
+    if (!modal) return;
+
+    modal.classList.remove("is-open", "active", "show");
+    modal.setAttribute("aria-hidden", "true");
+
+    delete document.body.dataset.profileModalOpen;
+  }
 
   /* =======================================================
-     30. PUBLIC DEBUG INTERFACE
-     Hanya untuk pemeriksaan dari console.
-     Tidak menyediakan fungsi perubahan role/status.
-  ======================================================= */
+     8. QR ANGGOTA
+     ======================================================= */
 
-  window.TARBIYAH_PROFILE = {
-    reload: async () => {
-      if (!isInitialized) {
-        return initialize();
+  function clearMemberQr() {
+    if (state.qrTimer) {
+      clearInterval(state.qrTimer);
+      state.qrTimer = null;
+    }
+
+    state.qrUrl = null;
+    state.qrExpiresAt = null;
+
+    const qrImage =
+      $("#memberQrImage") ||
+      $("#profileQrImage") ||
+      $("[data-member-qr]");
+
+    if (qrImage) {
+      qrImage.removeAttribute("src");
+      qrImage.hidden = true;
+    }
+
+    const expiry = $(
+      "#memberQrExpiry, [data-qr-expiry]"
+    );
+
+    if (expiry) {
+      expiry.textContent = "QR belum dibuat.";
+    }
+  }
+
+  function startQrExpiryTimer(expiresAt) {
+    if (state.qrTimer) {
+      clearInterval(state.qrTimer);
+      state.qrTimer = null;
+    }
+
+    const expiryElement = $(
+      "#memberQrExpiry, [data-qr-expiry]"
+    );
+
+    function updateCountdown() {
+      const remaining = expiresAt - Date.now();
+
+      if (remaining <= 0) {
+        clearMemberQr();
+
+        if (expiryElement) {
+          expiryElement.textContent =
+            "QR telah kedaluwarsa. Silakan buat ulang.";
+        }
+
+        return;
       }
 
-      return loadPageData();
+      const totalSeconds = Math.floor(
+        remaining / 1000
+      );
+
+      const minutes = Math.floor(
+        totalSeconds / 60
+      );
+
+      const seconds = totalSeconds % 60;
+
+      if (expiryElement) {
+        expiryElement.textContent =
+          `Berlaku ${minutes} menit ${seconds} detik`;
+      }
+    }
+
+    updateCountdown();
+
+    state.qrTimer = setInterval(
+      updateCountdown,
+      1000
+    );
+  }
+
+  async function generateMemberQr() {
+    const supabase = getSupabaseClient();
+
+    if (!supabase || !state.user) {
+      showMessage(
+        "Sesi anggota belum tersedia.",
+        "error"
+      );
+      return;
+    }
+
+    const button =
+      $("#generateMemberQr") ||
+      $("#btnGenerateQr") ||
+      $("[data-generate-qr]");
+
+    try {
+      setLoading(button, true, "Membuat QR...");
+
+      clearMemberQr();
+
+      const { data, error } = await supabase.functions.invoke(
+        CONFIG.qrFunction,
+        {
+          body: {
+            member_id: state.user.id
+          }
+        }
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error(
+          "Server tidak mengembalikan data QR."
+        );
+      }
+
+      const qrUrl =
+        data.qr_url ||
+        data.qrUrl ||
+        data.signed_url ||
+        data.signedUrl ||
+        data.url;
+
+      if (!qrUrl) {
+        throw new Error(
+          "URL QR tidak ditemukan dalam respons server."
+        );
+      }
+
+      const qrImage =
+        $("#memberQrImage") ||
+        $("#profileQrImage") ||
+        $("[data-member-qr]");
+
+      if (!qrImage) {
+        throw new Error(
+          "Elemen gambar QR tidak ditemukan."
+        );
+      }
+
+      state.qrUrl = qrUrl;
+
+      qrImage.src = qrUrl;
+      qrImage.alt = "QR Anggota TARBIYAH";
+      qrImage.hidden = false;
+
+      const expiryValue =
+        data.expires_at ||
+        data.expiresAt ||
+        data.exp;
+
+      let expiryTimestamp = expiryValue
+        ? new Date(expiryValue).getTime()
+        : NaN;
+
+      if (!Number.isFinite(expiryTimestamp)) {
+        expiryTimestamp =
+          Date.now() + 5 * 60 * 1000;
+      }
+
+      state.qrExpiresAt = expiryTimestamp;
+
+      startQrExpiryTimer(expiryTimestamp);
+
+      showMessage(
+        "QR anggota berhasil dibuat.",
+        "success"
+      );
+
+    } catch (error) {
+      warn("Gagal membuat QR:", error);
+
+      showMessage(
+        error.message ||
+          "Tidak dapat membuat QR anggota.",
+        "error"
+      );
+
+    } finally {
+      setLoading(button, false);
+    }
+  }
+
+  /* =======================================================
+     9. RINGKASAN KEHADIRAN
+     ======================================================= */
+
+  async function renderAttendanceSummary(profile) {
+    /*
+     * Ringkasan menggunakan data yang tersedia pada
+     * record profil. Integrasi dengan tabel presensi
+     * terpisah dilakukan melalui modul kehadiran.
+     */
+
+    const attended = Number(
+      profile.total_attendance ??
+      profile.attendance_count ??
+      0
+    );
+
+    const total = Number(
+      profile.total_sessions ??
+      profile.total_kajian ??
+      0
+    );
+
+    const percent =
+      total > 0
+        ? Math.min(100, Math.round((attended / total) * 100))
+        : 0;
+
+    setText(
+      ["#profileAttendanceCount", "[data-attendance-count]"],
+      attended
+    );
+
+    setText(
+      ["#profileSessionCount", "[data-session-count]"],
+      total
+    );
+
+    setText(
+      ["#profileAttendancePercent", "[data-attendance-percent]"],
+      `${percent}%`
+    );
+
+    const progress = $(
+      "#profileAttendanceProgress, [data-attendance-progress]"
+    );
+
+    if (progress) {
+      progress.style.width = `${percent}%`;
+    }
+  }
+
+  /* =======================================================
+     10. RIWAYAT KEHADIRAN
+     ======================================================= */
+
+  async function loadAttendanceHistory() {
+    /*
+     * Riwayat presensi berasal dari modul kehadiran.
+     * Jika modul tersebut menyediakan API, gunakan API
+     * yang sama agar tidak mengasumsikan nama tabel.
+     */
+
+    const container =
+      $("#profileAttendanceHistory") ||
+      $("[data-profile-attendance-history]");
+
+    if (!container) return;
+
+    const attendanceApi =
+      window.TARBIYAH_ATTENDANCE ||
+      window.TARBIYAH_KEHADIRAN ||
+      null;
+
+    if (
+      !attendanceApi ||
+      typeof attendanceApi.getMemberHistory !== "function"
+    ) {
+      container.innerHTML = `
+        <div class="profile-empty-state">
+          <div class="profile-empty-icon">◷</div>
+          <h3 class="profile-empty-title">
+            Riwayat belum tersedia
+          </h3>
+          <p class="profile-empty-description">
+            Riwayat kehadiran akan ditampilkan setelah
+            modul presensi terhubung.
+          </p>
+        </div>
+      `;
+
+      return;
+    }
+
+    try {
+      const result =
+        await attendanceApi.getMemberHistory(state.user.id);
+
+      if (result?.error) {
+        throw result.error;
+      }
+
+      const rows =
+        result?.data ||
+        result ||
+        [];
+
+      renderAttendanceHistory(rows);
+
+    } catch (error) {
+      warn("Gagal memuat riwayat kehadiran:", error);
+
+      container.innerHTML = `
+        <div class="profile-empty-state">
+          <h3 class="profile-empty-title">
+            Riwayat belum dapat dimuat
+          </h3>
+          <p class="profile-empty-description">
+            Silakan coba kembali beberapa saat lagi.
+          </p>
+        </div>
+      `;
+    }
+  }
+
+  function renderAttendanceHistory(rows) {
+    const container =
+      $("#profileAttendanceHistory") ||
+      $("[data-profile-attendance-history]");
+
+    if (!container) return;
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      container.innerHTML = `
+        <div class="profile-empty-state">
+          <div class="profile-empty-icon">◷</div>
+          <h3 class="profile-empty-title">
+            Belum ada riwayat kehadiran
+          </h3>
+          <p class="profile-empty-description">
+            Riwayat kajian dan presensi akan muncul
+            di bagian ini.
+          </p>
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML = rows.map(item => {
+      const title =
+        item.title ||
+        item.agenda_title ||
+        item.name ||
+        "Kegiatan TARBIYAH";
+
+      const date = formatDate(
+        item.date ||
+        item.attendance_date ||
+        item.created_at
+      );
+
+      const status = String(
+        item.status || item.attendance_status || ""
+      ).toLowerCase();
+
+      let statusLabel = "Hadir";
+      let statusClass = "";
+
+      if (
+        ["absent", "tidak_hadir", "alpa"].includes(status)
+      ) {
+        statusLabel = "Tidak Hadir";
+        statusClass = "is-absent";
+      } else if (
+        ["permission", "izin", "sick", "sakit"].includes(status)
+      ) {
+        statusLabel = "Izin";
+        statusClass = "is-permission";
+      }
+
+      return `
+        <article class="profile-history-item">
+          <div class="profile-history-marker" aria-hidden="true">
+            ◷
+          </div>
+
+          <div class="profile-history-content">
+            <h4 class="profile-history-title">
+              ${escapeHtml(title)}
+            </h4>
+
+            <div class="profile-history-meta">
+              <span>${escapeHtml(date)}</span>
+            </div>
+          </div>
+
+          <span class="profile-history-status ${statusClass}">
+            ${escapeHtml(statusLabel)}
+          </span>
+        </article>
+      `;
+    }).join("");
+  }
+
+  /* =======================================================
+     11. EVENT LISTENERS
+     ======================================================= */
+
+  function bindProfileEvents() {
+    const editButtons = [
+      ...$$("[data-edit-profile]"),
+      ...$$("#btnEditProfile"),
+      ...$$("#editProfileButton")
+    ];
+
+    editButtons.forEach(button => {
+      button.addEventListener("click", openProfileModal);
+    });
+
+    const closeButtons = [
+      ...$$("[data-close-profile-modal]"),
+      ...$$("#closeProfileModal"),
+      ...$$("#cancelEditProfile")
+    ];
+
+    closeButtons.forEach(button => {
+      button.addEventListener("click", closeProfileModal);
+    });
+
+    const modal =
+      $("#editProfileModal") ||
+      $("#profileEditModal") ||
+      $(".profile-modal");
+
+    if (modal) {
+      modal.addEventListener("click", event => {
+        if (event.target === modal) {
+          closeProfileModal();
+        }
+      });
+    }
+
+    const form =
+      $("#profileEditForm") ||
+      $("#editProfileForm") ||
+      $("form[data-profile-form]");
+
+    if (form) {
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        saveProfile(form);
+      });
+    }
+
+    const avatarInputs = [
+      ...$$('input[type="file"][data-profile-avatar-input]'),
+      ...$$("#profileAvatarInput"),
+      ...$$("#avatarInput")
+    ];
+
+    avatarInputs.forEach(input => {
+      input.addEventListener("change", async event => {
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        await handleAvatarUpload(file);
+
+        // Memungkinkan file yang sama dipilih kembali.
+        input.value = "";
+      });
+    });
+
+    const qrButtons = [
+      ...$$("[data-generate-qr]"),
+      ...$$("#generateMemberQr"),
+      ...$$("#btnGenerateQr")
+    ];
+
+    qrButtons.forEach(button => {
+      button.addEventListener("click", generateMemberQr);
+    });
+
+    const refreshButtons = [
+      ...$$("[data-refresh-profile]"),
+      ...$$("#refreshProfile")
+    ];
+
+    refreshButtons.forEach(button => {
+      button.addEventListener("click", loadProfile);
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeProfileModal();
+      }
+    });
+  }
+
+  /* =======================================================
+     12. INISIALISASI
+     ======================================================= */
+
+  async function initialize() {
+    if (state.initialized) return;
+
+    state.initialized = true;
+
+    bindProfileEvents();
+
+    const supabase = getSupabaseClient();
+
+    if (!supabase) {
+      warn("Supabase client belum ditemukan.");
+
+      showMessage(
+        "Koneksi Supabase belum tersedia. Periksa konfigurasi aplikasi.",
+        "error"
+      );
+
+      return;
+    }
+
+    await loadProfile();
+  }
+
+  function start() {
+    if (document.readyState === "loading") {
+      document.addEventListener(
+        "DOMContentLoaded",
+        initialize,
+        { once: true }
+      );
+    } else {
+      initialize();
+    }
+  }
+
+  /* =======================================================
+     13. API PUBLIK
+     ======================================================= */
+
+  window.TARBIYAH_PROFILE = {
+    initialize,
+    load: loadProfile,
+    refresh: loadProfile,
+
+    getState() {
+      return {
+        loading: state.loading,
+        saving: state.saving,
+        user: state.user,
+        profile: state.profile,
+        avatarUrl: state.avatarUrl,
+        qrExpiresAt: state.qrExpiresAt
+      };
     },
 
-    getState: () => ({
-      initialized: isInitialized,
-      userId: currentUser?.id || null,
-      profileLoaded: Boolean(currentProfile),
-      membershipLoaded: Boolean(currentMembership),
-      avatarLoaded: Boolean(currentAvatarSignedUrl),
-      saving: isSaving
-    })
+    openEdit: openProfileModal,
+    closeEdit: closeProfileModal,
+    save: saveProfile,
+    uploadAvatar: handleAvatarUpload,
+    generateQr: generateMemberQr,
+    clearQr: clearMemberQr,
+
+    renderAttendanceHistory,
+    loadAttendanceHistory
   };
 
-
-  window.addEventListener("beforeunload", () => {
-    if (memberQrExpiryTimer) clearTimeout(memberQrExpiryTimer);
-  });
-
-  console.info(
-    "[TARBIYAH PROFILE] Script profil anggota berhasil dimuat."
-  );
+  start();
 
 })();
