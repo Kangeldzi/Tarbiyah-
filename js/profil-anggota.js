@@ -79,12 +79,22 @@
      02. VARIABEL SISTEM
   ===================================================== */
 
-  let supabase = null;
-  let currentUser = null;
-  let profileData = null;
-  let membershipData = null;
+  
+let supabase = null;
+let currentUser = null;
 
-  let originalFormData = null;
+let profileData = null;
+let membershipData = null;
+
+// Variabel yang digunakan BLOK 2 v3.3
+let currentProfile = null;
+let currentMembership = null;
+
+let selectedAvatarFile = null;
+let selectedAvatarPreviewUrl = null;
+
+let originalFormData = null;
+
 
   let isEditing = false;
   let isSaving = false;
