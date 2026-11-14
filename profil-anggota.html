@@ -401,39 +401,73 @@
 
       </section>
 
-      <!-- MEMBER QR -->
-      <section class="profile-section">
+      <!-- MEMBER DIGITAL ID CARD -->
+<section class="profile-section">
+  <div class="profile-section-heading">
+    <div>
+      <span class="profile-section-eyebrow">IDENTITAS DIGITAL</span>
+      <h2>Kartu Anggota Digital</h2>
+    </div>
+  </div>
 
-        <div class="profile-section-heading">
-          <div>
-            <span class="profile-section-eyebrow">IDENTITAS DIGITAL</span>
-            <h2>Kartu Anggota Digital</h2>
-          </div>
-        </div>
+  <div class="profile-qr-card">
 
-        <div class="profile-qr-card">
+    <div class="profile-qr-content">
+      <strong>TARBIYAH</strong>
+      <span>Kartu Identitas Anggota</span>
 
-          <div class="profile-qr-content">
-            <strong>TARBIYAH</strong>
-            <span>Kartu Identitas Anggota</span>
-            <p data-profile-qr-member-name>Nama Anggota</p>
-            <small data-profile-qr-member-id>ID Anggota: —</small>
-          </div>
+      <p data-profile-qr-member-name>Nama Anggota</p>
 
-          <div class="profile-qr-image" data-profile-qr>
-            <span>QR</span>
-          </div>
+      <small data-profile-qr-member-id>
+        Nomor Anggota: Belum tersedia
+      </small>
 
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-profile-qr-refresh>
-            Perbarui Kartu Digital
-          </button>
+      <span class="profile-status" data-profile-card-status>
+        Memuat status...
+      </span>
+    </div>
 
-        </div>
+    <div class="profile-qr-image-wrap">
+      <img
+        id="memberQrImage"
+        class="profile-qr-image"
+        src=""
+        alt="QR verifikasi anggota TARBIYAH"
+        hidden
+      >
 
-      </section>
+      <div class="profile-qr-placeholder" data-profile-qr-placeholder>
+        <span>QR</span>
+        <small>QR belum dibuat</small>
+      </div>
+    </div>
+
+    <p
+      class="profile-qr-expiry"
+      id="memberQrExpiry"
+      data-qr-expiry
+      aria-live="polite"
+    >
+      QR belum dibuat.
+    </p>
+
+    <div class="profile-qr-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-profile-qr-refresh
+      >
+        Buat / Perbarui QR
+      </button>
+    </div>
+
+    <p class="profile-qr-note">
+      QR digunakan untuk proses verifikasi keanggotaan.
+      Jangan membagikan QR kepada pihak yang tidak berkepentingan.
+    </p>
+
+  </div>
+</section>
 
       <!-- EDIT PROFILE FORM -->
       <section class="profile-section" data-profile-form-section hidden>
