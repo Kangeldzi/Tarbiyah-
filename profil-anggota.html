@@ -1,0 +1,865 @@
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+
+  <title>Profil Anggota — TARBIYAH</title>
+
+  <meta name="description"
+    content="Halaman profil dan kartu anggota TARBIYAH — Pembelajaran Muslim">
+
+  <link rel="manifest" href="./manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+
+  <!-- CSS khusus halaman profil -->
+  <link rel="stylesheet" href="./css/profil-anggota.css">
+
+  <link rel="icon" href="./assets/icons/tarbiyah-mark.svg">
+</head>
+
+<body>
+
+  <!-- =====================================
+       LOADING SCREEN
+  ====================================== -->
+
+  <div id="pageLoading" class="page-loading">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Menyiapkan profil anggota...</p>
+    </div>
+  </div>
+
+
+  <!-- =====================================
+       HEADER
+  ====================================== -->
+
+  <header class="profile-header">
+
+    <div class="header-left">
+
+      <button
+        type="button"
+        id="btnBack"
+        class="icon-button"
+        aria-label="Kembali ke dashboard">
+        ←
+      </button>
+
+      <div class="header-brand">
+        <img
+          src="./assets/icons/tarbiyah-mark.svg"
+          alt="Logo TARBIYAH">
+
+        <div>
+          <h1>TARBIYAH</h1>
+          <span>Profil Anggota</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="header-right">
+
+      <button
+        type="button"
+        id="btnTheme"
+        class="icon-button"
+        aria-label="Ubah tema">
+        ◐
+      </button>
+
+      <button
+        type="button"
+        id="btnNotifications"
+        class="icon-button"
+        aria-label="Notifikasi">
+        ♧
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- =====================================
+       MAIN CONTENT
+  ====================================== -->
+
+  <main class="profile-container">
+
+    <!-- PAGE INTRO -->
+
+    <section class="profile-intro">
+
+      <div>
+        <span class="section-eyebrow">
+          AKUN SAYA
+        </span>
+
+        <h2>Profil Anggota</h2>
+
+        <p>
+          Kelola informasi pribadi dan lihat aktivitas
+          keanggotaan TARBIYAH Anda.
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         PROFILE CARD
+    ================================== -->
+
+    <section class="profile-card">
+
+      <div class="profile-cover">
+
+        <div class="cover-decoration"></div>
+
+        <span class="member-label">
+          ANGGOTA TARBIYAH
+        </span>
+
+      </div>
+
+
+      <div class="profile-main">
+
+        <div class="avatar-wrapper">
+
+          <img
+            id="profileAvatar"
+            class="profile-avatar"
+            src="./assets/images/default-avatar.png"
+            alt="Foto profil anggota">
+
+          <button
+            type="button"
+            id="btnChangeAvatar"
+            class="avatar-edit-button"
+            aria-label="Ganti foto profil">
+            ✎
+          </button>
+
+          <input
+            type="file"
+            id="avatarInput"
+            accept="image/jpeg,image/png,image/webp"
+            hidden>
+
+        </div>
+
+
+        <div class="profile-identity">
+
+          <h2 id="profileName">
+            Memuat nama anggota...
+          </h2>
+
+          <p id="profileEmail">
+            Memuat alamat email...
+          </p>
+
+          <div class="member-status-wrapper">
+
+            <span
+              id="memberStatus"
+              class="status-badge">
+              Memuat status...
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="member-number-card">
+
+          <span>Nomor Anggota</span>
+
+          <strong id="memberNumber">
+            —
+          </strong>
+
+          <span id="memberSince">
+            Bergabung: —
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         NAVIGATION TABS
+    ================================== -->
+
+    <nav class="profile-tabs" aria-label="Menu profil">
+
+      <button
+        type="button"
+        class="profile-tab active"
+        data-tab="personal">
+        Data Pribadi
+      </button>
+
+      <button
+        type="button"
+        class="profile-tab"
+        data-tab="membership">
+        Keanggotaan
+      </button>
+
+      <button
+        type="button"
+        class="profile-tab"
+        data-tab="activity">
+        Riwayat
+      </button>
+
+      <button
+        type="button"
+        class="profile-tab"
+        data-tab="qr">
+        Kartu QR
+      </button>
+
+    </nav>
+
+
+    <!-- =================================
+         TAB 1: PERSONAL INFORMATION
+    ================================== -->
+
+    <section
+      id="tab-personal"
+      class="profile-tab-content active">
+
+      <div class="content-card">
+
+        <div class="card-heading">
+
+          <div>
+            <h3>Informasi Pribadi</h3>
+            <p>Informasi identitas akun Anda.</p>
+          </div>
+
+          <button
+            type="button"
+            id="btnEditProfile"
+            class="primary-button">
+            Edit Profil
+          </button>
+
+        </div>
+
+
+        <form id="personalProfileForm">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+
+              <label for="inputFullName">
+                Nama Lengkap
+              </label>
+
+              <input
+                type="text"
+                id="inputFullName"
+                name="full_name"
+                autocomplete="name"
+                maxlength="120"
+                disabled
+                required>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="inputEmail">
+                Alamat Email
+              </label>
+
+              <input
+                type="email"
+                id="inputEmail"
+                name="email"
+                autocomplete="email"
+                disabled>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="inputPhone">
+                Nomor Telepon
+              </label>
+
+              <input
+                type="tel"
+                id="inputPhone"
+                name="phone"
+                autocomplete="tel"
+                maxlength="25"
+                disabled>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="inputGender">
+                Jenis Kelamin
+              </label>
+
+              <select
+                id="inputGender"
+                name="gender"
+                disabled>
+
+                <option value="">Pilih jenis kelamin</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="inputBirthDate">
+                Tanggal Lahir
+              </label>
+
+              <input
+                type="date"
+                id="inputBirthDate"
+                name="birth_date"
+                disabled>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="inputCity">
+                Kota / Kabupaten
+              </label>
+
+              <input
+                type="text"
+                id="inputCity"
+                name="city"
+                maxlength="100"
+                disabled>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+              <label for="inputAddress">
+                Alamat Lengkap
+              </label>
+
+              <textarea
+                id="inputAddress"
+                name="address"
+                rows="3"
+                maxlength="500"
+                disabled></textarea>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="profileEditActions"
+            class="form-actions"
+            hidden>
+
+            <button
+              type="button"
+              id="btnCancelEdit"
+              class="secondary-button">
+              Batal
+            </button>
+
+            <button
+              type="submit"
+              id="btnSaveProfile"
+              class="primary-button">
+              Simpan Perubahan
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         TAB 2: MEMBERSHIP
+    ================================== -->
+
+    <section
+      id="tab-membership"
+      class="profile-tab-content"
+      hidden>
+
+      <div class="content-card">
+
+        <div class="card-heading">
+
+          <div>
+            <h3>Informasi Keanggotaan</h3>
+            <p>Informasi resmi keanggotaan TARBIYAH.</p>
+          </div>
+
+        </div>
+
+
+        <div class="membership-grid">
+
+          <div class="membership-item">
+
+            <span>Nomor Anggota</span>
+
+            <strong id="membershipNumber">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="membership-item">
+
+            <span>Status Keanggotaan</span>
+
+            <strong id="membershipStatus">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="membership-item">
+
+            <span>Tanggal Bergabung</span>
+
+            <strong id="membershipDate">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="membership-item">
+
+            <span>Kelompok / Komunitas</span>
+
+            <strong id="membershipGroup">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="membership-item">
+
+            <span>Peran Anggota</span>
+
+            <strong id="membershipRole">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="membership-item">
+
+            <span>Terakhir Diperbarui</span>
+
+            <strong id="membershipUpdated">
+              —
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="information-notice">
+
+          <strong>Informasi penting</strong>
+
+          <p>
+            Nomor anggota dan status keanggotaan merupakan
+            data resmi yang dikelola oleh administrator.
+            Anggota tidak dapat mengubah informasi tersebut
+            secara mandiri.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         TAB 3: LEARNING HISTORY
+    ================================== -->
+
+    <section
+      id="tab-activity"
+      class="profile-tab-content"
+      hidden>
+
+      <div class="content-card">
+
+        <div class="card-heading">
+
+          <div>
+            <h3>Riwayat Kajian</h3>
+            <p>Rekam jejak kegiatan pembelajaran Anda.</p>
+          </div>
+
+        </div>
+
+
+        <div class="activity-summary">
+
+          <div class="activity-stat">
+
+            <span>Total Kajian</span>
+
+            <strong id="totalKajian">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="activity-stat">
+
+            <span>Total Kehadiran</span>
+
+            <strong id="totalAttendance">
+              —
+            </strong>
+
+          </div>
+
+
+          <div class="activity-stat">
+
+            <span>Tingkat Kehadiran</span>
+
+            <strong id="attendancePercentage">
+              —
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="history-heading">
+
+          <h4>Daftar Riwayat Kehadiran</h4>
+
+        </div>
+
+
+        <div
+          id="attendanceHistory"
+          class="attendance-history"
+          aria-live="polite">
+
+          <div class="empty-state">
+
+            <span class="empty-icon">◷</span>
+
+            <h4>Riwayat belum tersedia</h4>
+
+            <p>
+              Riwayat kajian dan kehadiran akan ditampilkan
+              setelah sumber data kehadiran terhubung.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         TAB 4: MEMBER QR CARD
+    ================================== -->
+
+    <section
+      id="tab-qr"
+      class="profile-tab-content"
+      hidden>
+
+      <div class="content-card">
+
+        <div class="card-heading">
+
+          <div>
+            <h3>Kartu Anggota Digital</h3>
+            <p>Kartu identitas digital anggota TARBIYAH.</p>
+          </div>
+
+        </div>
+
+
+        <div class="digital-member-card">
+
+          <div class="digital-card-header">
+
+            <img
+              src="./assets/icons/tarbiyah-mark.svg"
+              alt="Logo TARBIYAH">
+
+            <div>
+              <strong>TARBIYAH</strong>
+              <span>PEMBELAJARAN MUSLIM</span>
+            </div>
+
+          </div>
+
+
+          <div class="digital-card-body">
+
+            <img
+              id="qrMemberAvatar"
+              class="qr-member-avatar"
+              src="./assets/images/default-avatar.png"
+              alt="Foto anggota">
+
+            <div class="qr-member-information">
+
+              <span>ANGGOTA TARBIYAH</span>
+
+              <h3 id="qrMemberName">
+                —
+              </h3>
+
+              <p id="qrMemberNumber">
+                —
+              </p>
+
+              <span id="qrMemberStatus">
+                —
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="qr-container">
+
+            <div
+              id="memberQRCode"
+              class="member-qr-placeholder">
+
+              <span>QR BELUM DITERBITKAN</span>
+
+            </div>
+
+            <p>
+              QR resmi untuk verifikasi keanggotaan.
+            </p>
+
+          </div>
+
+
+          <div class="digital-card-footer">
+            BELAJAR • BERTUMBUH • BERUKHUWAH
+          </div>
+
+        </div>
+
+
+        <div class="qr-actions">
+
+          <button
+            type="button"
+            id="btnGenerateQR"
+            class="primary-button">
+
+            Terbitkan / Perbarui QR
+
+          </button>
+
+          <button
+            type="button"
+            id="btnDownloadQR"
+            class="secondary-button"
+            disabled>
+
+            Unduh Kartu
+
+          </button>
+
+        </div>
+
+
+        <div class="information-notice">
+
+          <strong>Keamanan QR Anggota</strong>
+
+          <p>
+            QR hanya diterbitkan melalui Edge Function
+            member-qr-mint. Token verifikasi harus berasal
+            dari backend. QR tidak dibuat secara lokal
+            menggunakan nomor anggota saja.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         ACCOUNT SECURITY
+    ================================== -->
+
+    <section class="content-card security-card">
+
+      <div class="card-heading">
+
+        <div>
+          <h3>Keamanan Akun</h3>
+          <p>Informasi sesi dan autentikasi akun Anda.</p>
+        </div>
+
+      </div>
+
+
+      <div class="security-information">
+
+        <div>
+          <span>Status Akun</span>
+          <strong id="accountStatus">Memeriksa...</strong>
+        </div>
+
+        <div>
+          <span>Email Terverifikasi</span>
+          <strong id="emailVerificationStatus">Memeriksa...</strong>
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        id="btnLogout"
+        class="danger-button">
+
+        Keluar dari Akun
+
+      </button>
+
+    </section>
+
+
+    <!-- =================================
+         NOTIFICATION / MESSAGE
+    ================================== -->
+
+    <div
+      id="profileToast"
+      class="profile-toast"
+      role="status"
+      aria-live="polite"
+      hidden>
+
+      <span id="toastMessage"></span>
+
+    </div>
+
+
+    <!-- =================================
+         FOOTER
+    ================================== -->
+
+    <footer class="profile-footer">
+
+      <img
+        src="./assets/icons/tarbiyah-mark.svg"
+        alt="TARBIYAH">
+
+      <p>
+        TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah.
+      </p>
+
+      <span>
+        © 2026 TARBIYAH. Semua Hak Dilindungi.
+      </span>
+
+    </footer>
+
+  </main>
+
+
+  <!-- =====================================
+       SUPABASE & APPLICATION SCRIPTS
+  ====================================== -->
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Konfigurasi aplikasi -->
+  <script src="./js/config.js"></script>
+
+  <!-- Supabase client -->
+  <script src="./js/supabase-client.js"></script>
+
+  <!-- Pengelola tema -->
+  <script src="./js/theme-manager.js"></script>
+
+  <!-- Autentikasi -->
+  <script src="./js/auth.js"></script>
+
+  <!-- PWA -->
+  <script src="./js/pwa.js"></script>
+
+  <!-- JavaScript khusus halaman profil -->
+  <script src="./js/profil-anggota.js"></script>
+
+</body>
+</html>
