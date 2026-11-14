@@ -341,7 +341,11 @@
               </div>
             </div>
           </td>
-          <td>${memberNumber}</td>
+          <td>
+  <span class="member-number-badge">
+    ${memberNumber}
+  </span>
+</td>
           <td><span class="member-status ${status}">${STATUS_LABELS[record.status] || status}</span></td>
           <td>${submitted}</td>
           <td>${actionButtons(record)}</td>
@@ -374,7 +378,12 @@
           </div>
 
           <div class="member-mobile-meta">
-            <div>Nomor Anggota<strong>${escapeHTML(record.member?.member_number || "Belum tersedia")}</strong></div>
+            <div>
+  Nomor Anggota
+  <strong class="member-number-badge">
+    ${escapeHTML(record.member?.member_number || "Belum tersedia")}
+  </strong>
+</div>
             <div>Status<strong><span class="member-status ${status}">${STATUS_LABELS[record.status] || status}</span></strong></div>
             <div>Pengajuan<strong>${formatDate(record.member?.submitted_at)}</strong></div>
             <div>Role<strong>${escapeHTML(record.roles.map(role => ROLE_LABELS[role] || role).join(", ") || "Belum ditetapkan")}</strong></div>
