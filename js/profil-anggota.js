@@ -195,20 +195,28 @@
   }
 
   function normalizeStatus(status) {
-    const value = String(status || "")
-      .trim()
-      .toLowerCase();
+  const value = String(status || "")
+    .trim()
+    .toLowerCase();
 
-    if (["active", "aktif", "approved"].includes(value)) {
-      return "active";
-    }
-
-    if (["pending", "menunggu", "verification"].includes(value)) {
-      return "pending";
-    }
-
-    return "inactive";
+  if (["active", "aktif", "approved"].includes(value)) {
+    return "active";
   }
+
+  if (["pending", "menunggu", "verification"].includes(value)) {
+    return "pending";
+  }
+
+  if (["suspended", "ditangguhkan", "nonaktif sementara"].includes(value)) {
+    return "suspended";
+  }
+
+  if (["rejected", "ditolak"].includes(value)) {
+    return "rejected";
+  }
+
+  return "inactive";
+}
 
   function getSupabaseClient() {
     if (window.supabaseClient) {
@@ -438,14 +446,18 @@
       "";
 
     const memberNumber = getProfileValue(
-      "member_number",
-      "nomor_anggota",
-      "member_code"
-    );
+  "member_number",
+  "nomor_anggota",
+  "member_code"
+);
 
-    const status = normalizeStatus(
-      getProfileValue("status", "member_status")
-    );
+const status = normalizeStatus(
+  getProfileValue(
+    "membership_status",
+    "status",
+    "member_status"
+  )
+);
 
     setText(
       ["#profileName", "[data-profile-name]", ".profile-name"],
@@ -458,13 +470,14 @@
     );
 
     setText(
-      [
-        "#profileMemberNumber",
-        "[data-member-number]",
-        ".profile-member-number"
-      ],
-      memberNumber
-    );
+  [
+    "[data-profile-member-id]",
+    "#profileMemberNumber",
+    "[data-member-number]",
+    ".profile-member-number"
+  ],
+  memberNumber || "Belum tersedia"
+);
 
     setText(
       ["#profilePhone", "[data-profile-phone]"],
@@ -512,32 +525,76 @@
     await loadAttendanceHistory();
   }
 
+// Isi identitas pada kartu digital.
+setText(
+  "[data-profile-qr-member-name]",
+  name
+);
+
+setText(
+  "[data-profile-qr-member-id]",
+  `Nomor Anggota: ${memberNumber || "Belum tersedia"}`
+);
+
+// Tampilkan status keanggotaan pada kartu.
+renderMemberCardStatus(status);
+   
   function renderStatus(status) {
-    const labels = {
-      active: "Anggota Aktif",
-      pending: "Menunggu Verifikasi",
-      inactive: "Tidak Aktif"
-    };
+  const labels = {
+    active: "Anggota Aktif",
+    pending: "Menunggu Verifikasi",
+    suspended: "Keanggotaan Ditangguhkan",
+    rejected: "Pengajuan Ditolak",
+    inactive: "Tidak Aktif"
+  };
 
-    const elements = [
-      ...$$("[data-profile-status]"),
-      ...$$("#profileStatus"),
-      ...$$(".profile-status")
-    ];
+  const elements = [
+    ...$$("[data-profile-status]"),
+    ...$$("#profileStatus"),
+    ...$$(".profile-status")
+  ];
 
-    elements.forEach(element => {
-      element.textContent = labels[status] || labels.inactive;
+  elements.forEach(element => {
+    element.textContent = labels[status] || labels.inactive;
 
-      element.classList.remove(
-        "is-active",
-        "is-pending",
-        "is-inactive"
-      );
+    element.classList.remove(
+      "is-active",
+      "is-pending",
+      "is-suspended",
+      "is-rejected",
+      "is-inactive"
+    );
 
-      element.classList.add(`is-${status}`);
-    });
-  }
+    element.classList.add(`is-${status}`);
+  });
+}
 
+function renderMemberCardStatus(status) {
+  const element = $("[data-profile-card-status]");
+
+  if (!element) return;
+
+  const labels = {
+    active: "KARTU ANGGOTA AKTIF",
+    pending: "MENUNGGU VERIFIKASI",
+    suspended: "KEANGGOTAAN DITANGGUHKAN",
+    rejected: "PENGAJUAN DITOLAK",
+    inactive: "STATUS TIDAK AKTIF"
+  };
+
+  element.textContent = labels[status] || labels.inactive;
+
+  element.classList.remove(
+    "is-active",
+    "is-pending",
+    "is-suspended",
+    "is-rejected",
+    "is-inactive"
+  );
+
+  element.classList.add(`is-${status}`);
+}
+   
   /* =======================================================
      5. FOTO PROFIL
      ======================================================= */
@@ -996,17 +1053,23 @@
     state.qrUrl = null;
     state.qrExpiresAt = null;
 
-    const qrImage =
-      $("#memberQrImage") ||
-      $("#profileQrImage") ||
-      $("[data-member-qr]");
+     const qrImage =
+  $("#memberQrImage") ||
+  $("#profileQrImage") ||
+  $("[data-member-qr]");
 
-    if (qrImage) {
-      qrImage.removeAttribute("src");
-      qrImage.hidden = true;
-    }
+if (qrImage) {
+  qrImage.removeAttribute("src");
+  qrImage.hidden = true;
+}
 
-    const expiry = $(
+const placeholder = $("[data-profile-qr-placeholder]");
+
+if (placeholder) {
+  placeholder.hidden = false;
+}
+
+     const expiry = $(
       "#memberQrExpiry, [data-qr-expiry]"
     );
 
@@ -1075,9 +1138,10 @@
     }
 
     const button =
-      $("#generateMemberQr") ||
-      $("#btnGenerateQr") ||
-      $("[data-generate-qr]");
+  $("[data-profile-qr-refresh]") ||
+  $("#generateMemberQr") ||
+  $("#btnGenerateQr") ||
+  $("[data-generate-qr]");
 
     try {
       setLoading(button, true, "Membuat QR...");
@@ -1133,6 +1197,11 @@
       qrImage.alt = "QR Anggota TARBIYAH";
       qrImage.hidden = false;
 
+      const placeholder = $("[data-profile-qr-placeholder]");
+      if (placeholder) {
+      placeholder.hidden = true;
+    }
+       
       const expiryValue =
         data.expires_at ||
         data.expiresAt ||
@@ -1445,14 +1514,15 @@
     });
 
     const qrButtons = [
-      ...$$("[data-generate-qr]"),
-      ...$$("#generateMemberQr"),
-      ...$$("#btnGenerateQr")
-    ];
+  ...$$("[data-generate-qr]"),
+  ...$$("[data-profile-qr-refresh]"),
+  ...$$("#generateMemberQr"),
+  ...$$("#btnGenerateQr")
+];
 
-    qrButtons.forEach(button => {
-      button.addEventListener("click", generateMemberQr);
-    });
+qrButtons.forEach(button => {
+  button.addEventListener("click", generateMemberQr);
+});
 
     const refreshButtons = [
       ...$$("[data-refresh-profile]"),
