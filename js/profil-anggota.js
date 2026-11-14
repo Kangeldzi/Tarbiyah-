@@ -1255,6 +1255,8 @@ async function v33Initialize() {
     );
 
   } catch (error) {
+     console.error("PESAN ERROR:", error.message);
+console.error("LOKASI ERROR:", error.stack);
     console.error(
       "[TARBIYAH PROFIL v3.3]",
       error
