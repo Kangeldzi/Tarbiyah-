@@ -2,17 +2,46 @@
 /* =========================================================
    TARBIYAH — PROFIL ANGGOTA
    File: css/profil-anggota.css
-   Tema: Emerald / Modern / Mobile First
+   Design: Emerald Premium | Modern | Responsive
    ========================================================= */
 
-/* ---------- PROFILE PAGE ---------- */
+/* =========================================================
+   1. DESIGN TOKENS
+   ========================================================= */
 
 .profile-page {
+  --profile-bg: #0b1914;
+  --profile-surface: #12271f;
+  --profile-surface-2: #18352a;
+  --profile-border: rgba(148, 190, 166, 0.15);
+
+  --profile-text: #edf8f1;
+  --profile-muted: #9bb5a5;
+  --profile-subtle: #718d7d;
+
+  --profile-primary: #10b981;
+  --profile-primary-light: #34d399;
+  --profile-primary-dark: #047857;
+
+  --profile-danger: #f87171;
+  --profile-warning: #fbbf24;
+  --profile-info: #60a5fa;
+
+  --profile-radius-sm: 10px;
+  --profile-radius-md: 15px;
+  --profile-radius-lg: 20px;
+  --profile-radius-xl: 25px;
+
+  --profile-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.16);
+
   width: 100%;
   max-width: 1180px;
-  margin: 0 auto;
-  padding: 20px;
-  color: var(--text-primary, #e8f3ed);
+  min-width: 0;
+  margin-inline: auto;
+  padding: 22px;
+  color: var(--profile-text);
+  font-family: inherit;
 }
 
 .profile-page *,
@@ -32,28 +61,40 @@
   cursor: pointer;
 }
 
-/* ---------- PAGE HEADER ---------- */
+/* Pastikan atribut hidden selalu dipatuhi. */
+.profile-page [hidden] {
+  display: none !important;
+}
+
+.profile-page img {
+  max-width: 100%;
+}
+
+/* =========================================================
+   2. PAGE HEADER
+   ========================================================= */
 
 .profile-page-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 18px;
   margin-bottom: 22px;
 }
 
 .profile-page-title {
   margin: 0;
-  color: var(--text-primary, #e8f3ed);
-  font-size: clamp(1.35rem, 3vw, 1.9rem);
-  font-weight: 800;
+  color: var(--profile-text);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 850;
   line-height: 1.25;
+  letter-spacing: -0.035em;
 }
 
 .profile-page-subtitle {
   margin: 7px 0 0;
-  color: var(--text-secondary, #9eb5a8);
-  font-size: 0.9rem;
+  color: var(--profile-muted);
+  font-size: 0.88rem;
   line-height: 1.6;
 }
 
@@ -64,55 +105,64 @@
   flex-wrap: wrap;
 }
 
-/* ---------- PROFILE HERO CARD ---------- */
+/* =========================================================
+   3. HERO PROFILE
+   ========================================================= */
 
 .profile-hero {
   position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: 24px;
+  min-width: 0;
   overflow: hidden;
   padding: 28px;
   margin-bottom: 22px;
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: var(--radius-xl, 22px);
+  border: 1px solid rgba(52, 211, 153, 0.23);
+  border-radius: var(--profile-radius-xl);
   background:
     radial-gradient(
-      circle at 90% 10%,
-      rgba(16, 185, 129, 0.2),
+      circle at 88% 10%,
+      rgba(16, 185, 129, 0.23),
       transparent 34%
+    ),
+    radial-gradient(
+      circle at 10% 100%,
+      rgba(5, 150, 105, 0.12),
+      transparent 40%
     ),
     linear-gradient(
       135deg,
-      #123e30 0%,
-      #102d24 52%,
-      #0c241d 100%
+      #174b37 0%,
+      #103729 48%,
+      #0b261c 100%
     );
-  box-shadow: var(--shadow-lg, 0 14px 36px rgba(0, 0, 0, 0.2));
+  box-shadow: var(--profile-shadow);
 }
 
-.profile-hero::before {
-  content: "";
-  position: absolute;
-  width: 220px;
-  height: 220px;
-  right: -75px;
-  bottom: -125px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
+.profile-hero::before,
 .profile-hero::after {
   content: "";
   position: absolute;
-  width: 150px;
-  height: 150px;
-  right: 45px;
-  bottom: -105px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  z-index: -1;
+  border: 1px solid rgba(255, 255, 255, 0.075);
   border-radius: 50%;
   pointer-events: none;
+}
+
+.profile-hero::before {
+  width: 260px;
+  height: 260px;
+  right: -100px;
+  bottom: -155px;
+}
+
+.profile-hero::after {
+  width: 175px;
+  height: 175px;
+  right: 30px;
+  bottom: -110px;
 }
 
 .profile-hero-content {
@@ -120,38 +170,41 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 23px;
   width: 100%;
   min-width: 0;
 }
 
-/* ---------- PROFILE AVATAR ---------- */
+/* =========================================================
+   4. AVATAR
+   ========================================================= */
 
 .profile-avatar-wrap {
   position: relative;
   flex: 0 0 auto;
-  width: 116px;
-  height: 116px;
+  width: 112px;
+  height: 112px;
 }
 
-.profile-avatar,
+.profile-avatar {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  place-items: center;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: #d1fae5;
+  box-shadow:
+    0 0 0 5px rgba(16, 185, 129, 0.23),
+    0 10px 26px rgba(0, 0, 0, 0.24);
+}
+
 .profile-avatar img {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-}
-
-.profile-avatar {
-  overflow: hidden;
-  border: 4px solid rgba(255, 255, 255, 0.88);
-  background: #d1fae5;
-  box-shadow:
-    0 0 0 5px rgba(16, 185, 129, 0.25),
-    0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.profile-avatar img {
+  border-radius: inherit;
   object-fit: cover;
 }
 
@@ -161,8 +214,8 @@
   height: 100%;
   place-items: center;
   color: #065f46;
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 2.3rem;
+  font-weight: 850;
 }
 
 .profile-avatar-edit {
@@ -170,28 +223,27 @@
   right: 0;
   bottom: 2px;
   display: grid;
-  width: 35px;
-  height: 35px;
+  width: 36px;
+  height: 36px;
   place-items: center;
-  border: 2px solid #123e30;
+  border: 3px solid #123b2c;
   border-radius: 50%;
-  background: #10b981;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease, background 0.2s ease;
+  background: var(--profile-primary);
+  color: #06291d;
+  box-shadow: 0 5px 13px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
 .profile-avatar-edit:hover {
   transform: scale(1.08);
-  background: #059669;
+  background: var(--profile-primary-light);
 }
 
-.profile-avatar-edit:focus-visible {
-  outline: 3px solid #facc15;
-  outline-offset: 3px;
-}
-
-/* ---------- PROFILE IDENTITY ---------- */
+/* =========================================================
+   5. PROFILE IDENTITY
+   ========================================================= */
 
 .profile-identity {
   flex: 1;
@@ -202,15 +254,16 @@
   margin: 0;
   color: #fff;
   font-size: clamp(1.35rem, 3vw, 1.85rem);
-  font-weight: 800;
+  font-weight: 850;
   line-height: 1.3;
+  letter-spacing: -0.025em;
   overflow-wrap: anywhere;
 }
 
 .profile-email {
   margin: 7px 0 0;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   overflow-wrap: anywhere;
 }
 
@@ -218,32 +271,38 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  max-width: 100%;
   margin-top: 12px;
-  padding: 7px 11px;
+  padding: 8px 12px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.09);
   color: #d1fae5;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.77rem;
+  font-weight: 750;
+  letter-spacing: 0.035em;
+  overflow-wrap: anywhere;
 }
 
-/* ---------- MEMBER STATUS ---------- */
+/* =========================================================
+   6. MEMBERSHIP STATUS
+   ========================================================= */
 
 .profile-status {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   width: fit-content;
+  max-width: 100%;
   margin-top: 12px;
-  padding: 6px 11px;
-  border: 1px solid rgba(167, 243, 208, 0.24);
+  padding: 7px 11px;
+  border: 1px solid rgba(167, 243, 208, 0.23);
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.13);
   color: #a7f3d0;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 750;
+  line-height: 1.35;
 }
 
 .profile-status::before {
@@ -265,13 +324,17 @@
   color: #fcd34d;
 }
 
+.profile-status.is-suspended,
+.profile-status.is-rejected,
 .profile-status.is-inactive {
-  border-color: rgba(248, 113, 113, 0.25);
-  background: rgba(239, 68, 68, 0.13);
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(239, 68, 68, 0.12);
   color: #fca5a5;
 }
 
-/* ---------- HERO ACTIONS ---------- */
+/* =========================================================
+   7. HERO ACTIONS
+   ========================================================= */
 
 .profile-hero-actions {
   position: relative;
@@ -286,19 +349,23 @@
   min-width: 145px;
 }
 
-/* ---------- BUTTONS ---------- */
+/* =========================================================
+   8. BUTTON SYSTEM
+   ========================================================= */
 
 .profile-page .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 42px;
+  min-height: 43px;
   padding: 10px 15px;
   border: 1px solid transparent;
   border-radius: 11px;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 750;
+  line-height: 1.3;
+  text-align: center;
   text-decoration: none;
   transition:
     transform 0.18s ease,
@@ -317,21 +384,27 @@
 
 .profile-page .btn:focus-visible {
   outline: 3px solid rgba(16, 185, 129, 0.35);
-  outline-offset: 2px;
+  outline-offset: 3px;
+}
+
+.profile-page .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
 }
 
 .profile-page .btn-primary {
-  background: #10b981;
-  color: #062d21;
-  box-shadow: 0 5px 14px rgba(16, 185, 129, 0.18);
+  background: var(--profile-primary);
+  color: #052e20;
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.18);
 }
 
 .profile-page .btn-primary:hover {
-  background: #34d399;
+  background: var(--profile-primary-light);
 }
 
 .profile-page .btn-secondary {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.17);
   background: rgba(255, 255, 255, 0.09);
   color: #fff;
 }
@@ -341,20 +414,20 @@
 }
 
 .profile-page .btn-outline {
-  border-color: var(--border-color, rgba(16, 185, 129, 0.25));
+  border-color: var(--profile-border);
   background: transparent;
-  color: var(--text-primary, #e8f3ed);
+  color: var(--profile-text);
 }
 
 .profile-page .btn-outline:hover {
-  border-color: #10b981;
+  border-color: var(--profile-primary);
   background: rgba(16, 185, 129, 0.08);
 }
 
 .profile-page .btn-danger {
   border-color: rgba(239, 68, 68, 0.2);
   background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  color: var(--profile-danger);
 }
 
 .profile-page .btn-danger:hover {
@@ -362,17 +435,21 @@
 }
 
 .profile-page .btn-sm {
-  min-height: 34px;
+  min-height: 35px;
   padding: 7px 11px;
   border-radius: 9px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
 }
 
-/* ---------- CONTENT GRID ---------- */
+/* =========================================================
+   9. MAIN CONTENT GRID
+   ========================================================= */
 
 .profile-content-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(270px, 0.8fr);
+  grid-template-columns:
+    minmax(0, 1.4fr)
+    minmax(270px, 0.8fr);
   gap: 20px;
   align-items: start;
 }
@@ -384,84 +461,113 @@
   min-width: 0;
 }
 
-/* ---------- PROFILE CARD ---------- */
+/* =========================================================
+   10. CONTENT CARDS
+   ========================================================= */
 
 .profile-card {
   min-width: 0;
   padding: 22px;
-  border: 1px solid var(--border-color, rgba(16, 185, 129, 0.14));
-  border-radius: var(--radius-lg, 17px);
-  background: var(--surface-color, #15352b);
-  box-shadow: var(--shadow-sm, 0 5px 18px rgba(0, 0, 0, 0.1));
+  border: 1px solid var(--profile-border);
+  border-radius: var(--profile-radius-lg);
+  background: var(--profile-surface);
+  box-shadow: var(--profile-shadow);
 }
 
-.profile-card-header {
+.profile-section {
+  min-width: 0;
+  margin-bottom: 20px;
+  padding: 22px;
+  border: 1px solid var(--profile-border);
+  border-radius: var(--profile-radius-lg);
+  background: var(--profile-surface);
+  box-shadow: var(--profile-shadow);
+}
+
+.profile-section:last-child {
+  margin-bottom: 0;
+}
+
+.profile-card-header,
+.profile-section-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 19px;
+  gap: 13px;
+  margin-bottom: 18px;
 }
 
-.profile-card-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.profile-card-title,
+.profile-section-heading h2 {
   margin: 0;
-  color: var(--text-primary, #e8f3ed);
+  color: var(--profile-text);
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 850;
+  line-height: 1.4;
+}
+
+.profile-section-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--profile-primary-light);
+  font-size: 0.67rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
 }
 
 .profile-card-title-icon {
   display: grid;
-  width: 35px;
-  height: 35px;
-  flex: 0 0 35px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 11px;
   background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
+  color: var(--profile-primary-light);
 }
 
-/* ---------- PERSONAL INFORMATION ---------- */
+/* =========================================================
+   11. PERSONAL INFORMATION
+   ========================================================= */
 
 .profile-info-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 22px;
+  gap: 17px 22px;
 }
 
 .profile-info-item {
   min-width: 0;
   padding-bottom: 13px;
-  border-bottom: 1px solid var(--border-color, rgba(16, 185, 129, 0.12));
+  border-bottom: 1px solid var(--profile-border);
 }
 
 .profile-info-label {
   display: block;
   margin-bottom: 6px;
-  color: var(--text-muted, #91a99b);
-  font-size: 0.75rem;
+  color: var(--profile-muted);
+  font-size: 0.73rem;
   font-weight: 650;
 }
 
 .profile-info-value {
   display: block;
-  color: var(--text-primary, #e8f3ed);
-  font-size: 0.9rem;
+  color: var(--profile-text);
+  font-size: 0.88rem;
   font-weight: 650;
   line-height: 1.55;
   overflow-wrap: anywhere;
 }
 
 .profile-info-value.is-empty {
-  color: var(--text-muted, #91a99b);
+  color: var(--profile-subtle);
   font-weight: 450;
   font-style: italic;
 }
 
-/* ---------- PROFILE STATISTICS ---------- */
+/* =========================================================
+   12. PROFILE STATISTICS
+   ========================================================= */
 
 .profile-stats-grid {
   display: grid;
@@ -472,22 +578,22 @@
 .profile-stat-card {
   min-width: 0;
   padding: 16px;
-  border: 1px solid var(--border-color, rgba(16, 185, 129, 0.15));
-  border-radius: 14px;
-  background: var(--surface-elevated, rgba(16, 185, 129, 0.045));
+  border: 1px solid var(--profile-border);
+  border-radius: var(--profile-radius-md);
+  background: var(--profile-surface-2);
 }
 
 .profile-stat-label {
   display: block;
-  color: var(--text-secondary, #9eb5a8);
-  font-size: 0.76rem;
+  color: var(--profile-muted);
+  font-size: 0.74rem;
   font-weight: 600;
 }
 
 .profile-stat-value {
   display: block;
   margin-top: 7px;
-  color: var(--text-primary, #e8f3ed);
+  color: var(--profile-text);
   font-size: 1.55rem;
   font-weight: 850;
   line-height: 1.2;
@@ -497,11 +603,13 @@
 .profile-stat-note {
   display: block;
   margin-top: 5px;
-  color: var(--text-muted, #91a99b);
-  font-size: 0.72rem;
+  color: var(--profile-subtle);
+  font-size: 0.7rem;
 }
 
-/* ---------- ATTENDANCE SUMMARY ---------- */
+/* =========================================================
+   13. ATTENDANCE SUMMARY
+   ========================================================= */
 
 .profile-attendance-summary {
   display: grid;
@@ -513,7 +621,7 @@
   height: 9px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.18);
+  background: rgba(148, 163, 184, 0.16);
 }
 
 .profile-attendance-progress-bar {
@@ -521,7 +629,11 @@
   width: 0;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #059669, #34d399);
+  background: linear-gradient(
+    90deg,
+    #059669,
+    #34d399
+  );
   transition: width 0.35s ease;
 }
 
@@ -530,57 +642,100 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: var(--text-secondary, #9eb5a8);
-  font-size: 0.8rem;
+  color: var(--profile-muted);
+  font-size: 0.78rem;
 }
 
 .profile-attendance-percent {
-  color: #10b981;
+  color: var(--profile-primary-light);
   font-size: 1.1rem;
   font-weight: 850;
 }
 
-/* ---------- QR MEMBER CARD ---------- */
+/* =========================================================
+   14. DIGITAL MEMBER CARD
+   Cocok dengan struktur HTML:
+   .profile-qr-card
+   .profile-qr-content
+   .profile-qr-image-wrap
+   .profile-qr-image
+   .profile-qr-placeholder
+   ========================================================= */
 
 .profile-qr-card {
+  position: relative;
   display: grid;
-  justify-items: center;
-  gap: 14px;
-  padding: 22px;
-  border: 1px solid rgba(16, 185, 129, 0.22);
-  border-radius: 17px;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 23px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--profile-radius-lg);
   background:
     radial-gradient(
-      circle at 50% 0,
-      rgba(16, 185, 129, 0.12),
-      transparent 65%
+      circle at 100% 0,
+      rgba(16, 185, 129, 0.15),
+      transparent 45%
     ),
-    var(--surface-color, #15352b);
-  text-align: center;
+    linear-gradient(
+      135deg,
+      #153b2d,
+      #102a20
+    );
 }
 
-.profile-qr-title {
-  margin: 0;
-  color: var(--text-primary, #e8f3ed);
+.profile-qr-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 7px;
+}
+
+.profile-qr-content strong {
+  color: #a7f3d0;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.profile-qr-content > span:not(.profile-status) {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.79rem;
+}
+
+.profile-qr-content p {
+  margin: 13px 0 0;
+  color: #fff;
   font-size: 1rem;
   font-weight: 800;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
-.profile-qr-description {
-  max-width: 260px;
-  margin: 0;
-  color: var(--text-secondary, #9eb5a8);
-  font-size: 0.8rem;
-  line-height: 1.6;
+.profile-qr-content small {
+  color: #c1ded0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.profile-qr-content .profile-status {
+  margin-top: 7px;
 }
 
 .profile-qr-image-wrap {
   display: grid;
-  width: min(100%, 210px);
+  width: 100%;
+  max-width: 190px;
   aspect-ratio: 1;
+  justify-self: end;
   place-items: center;
+  overflow: hidden;
   padding: 10px;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.24);
   border-radius: 15px;
   background: #fff;
 }
@@ -596,26 +751,54 @@
   display: grid;
   width: 100%;
   height: 100%;
-  place-items: center;
+  place-content: center;
+  gap: 7px;
   color: #64748b;
-  font-size: 0.8rem;
   text-align: center;
 }
 
+.profile-qr-placeholder span {
+  color: #059669;
+  font-size: 2.1rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.profile-qr-placeholder small {
+  color: #64748b;
+  font-size: 0.7rem;
+}
+
 .profile-qr-expiry {
-  color: var(--text-muted, #91a99b);
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--profile-muted);
   font-size: 0.72rem;
+  text-align: center;
 }
 
 .profile-qr-actions {
+  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 9px;
   flex-wrap: wrap;
   width: 100%;
 }
 
-/* ---------- ATTENDANCE / STUDY HISTORY ---------- */
+.profile-qr-note {
+  grid-column: 1 / -1;
+  max-width: 540px;
+  margin: 0;
+  color: var(--profile-muted);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* =========================================================
+   15. ATTENDANCE HISTORY
+   ========================================================= */
 
 .profile-history-list {
   display: grid;
@@ -627,7 +810,7 @@
   align-items: flex-start;
   gap: 13px;
   padding: 15px 0;
-  border-bottom: 1px solid var(--border-color, rgba(16, 185, 129, 0.12));
+  border-bottom: 1px solid var(--profile-border);
 }
 
 .profile-history-item:last-child {
@@ -642,7 +825,7 @@
   place-items: center;
   border-radius: 11px;
   background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
+  color: var(--profile-primary-light);
 }
 
 .profile-history-content {
@@ -652,8 +835,8 @@
 
 .profile-history-title {
   margin: 0;
-  color: var(--text-primary, #e8f3ed);
-  font-size: 0.88rem;
+  color: var(--profile-text);
+  font-size: 0.87rem;
   font-weight: 750;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -664,8 +847,8 @@
   flex-wrap: wrap;
   gap: 6px 12px;
   margin-top: 5px;
-  color: var(--text-muted, #91a99b);
-  font-size: 0.73rem;
+  color: var(--profile-muted);
+  font-size: 0.72rem;
 }
 
 .profile-history-status {
@@ -673,32 +856,34 @@
   padding: 5px 9px;
   border-radius: 999px;
   background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  font-size: 0.7rem;
+  color: var(--profile-primary-light);
+  font-size: 0.68rem;
   font-weight: 750;
 }
 
 .profile-history-status.is-absent {
   background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  color: var(--profile-danger);
 }
 
 .profile-history-status.is-permission {
   background: rgba(245, 158, 11, 0.12);
-  color: #f59e0b;
+  color: var(--profile-warning);
 }
 
-/* ---------- EDIT PROFILE FORM ---------- */
+/* =========================================================
+   16. EDIT PROFILE FORM
+   ========================================================= */
 
 .profile-form {
   display: grid;
-  gap: 16px;
+  gap: 17px;
 }
 
 .profile-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 15px;
+  gap: 16px;
 }
 
 .profile-form-group {
@@ -712,50 +897,58 @@
 }
 
 .profile-form-label {
-  color: var(--text-primary, #e8f3ed);
-  font-size: 0.8rem;
-  font-weight: 700;
+  color: var(--profile-text);
+  font-size: 0.79rem;
+  font-weight: 750;
 }
 
 .profile-form-control {
   display: block;
   width: 100%;
-  min-height: 43px;
+  min-width: 0;
+  min-height: 44px;
   padding: 10px 12px;
-  border: 1px solid var(--input-border, rgba(148, 163, 184, 0.25));
-  border-radius: 10px;
+  border: 1px solid var(--profile-border);
+  border-radius: 11px;
   outline: none;
-  background: var(--input-bg, rgba(15, 23, 42, 0.18));
-  color: var(--text-primary, #e8f3ed);
-  font-size: 0.88rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(4, 18, 12, 0.3);
+  color: var(--profile-text);
+  font-size: 0.86rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .profile-form-control::placeholder {
-  color: var(--text-muted, #91a99b);
-  opacity: 0.8;
+  color: var(--profile-subtle);
+  opacity: 0.9;
 }
 
 .profile-form-control:focus {
-  border-color: #10b981;
+  border-color: var(--profile-primary);
+  background: rgba(4, 18, 12, 0.42);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.13);
 }
 
 .profile-form-control:disabled,
 .profile-form-control[readonly] {
   cursor: not-allowed;
-  opacity: 0.65;
+  opacity: 0.6;
 }
 
-.profile-form-control textarea,
-textarea.profile-form-control {
-  min-height: 105px;
+.profile-page textarea.profile-form-control {
+  min-height: 110px;
   resize: vertical;
 }
 
+.profile-page select.profile-form-control {
+  color-scheme: dark;
+}
+
 .profile-form-hint {
-  color: var(--text-muted, #91a99b);
-  font-size: 0.72rem;
+  color: var(--profile-muted);
+  font-size: 0.71rem;
   line-height: 1.5;
 }
 
@@ -766,7 +959,9 @@ textarea.profile-form-control {
   padding-top: 8px;
 }
 
-/* ---------- AVATAR UPLOAD ---------- */
+/* =========================================================
+   17. AVATAR UPLOAD
+   ========================================================= */
 
 .profile-avatar-upload {
   display: flex;
@@ -790,6 +985,7 @@ textarea.profile-form-control {
 }
 
 .profile-avatar-preview img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -802,19 +998,23 @@ textarea.profile-form-control {
 
 .profile-avatar-upload-title {
   margin: 0;
-  color: var(--text-primary, #e8f3ed);
-  font-size: 0.84rem;
+  color: var(--profile-text);
+  font-size: 0.83rem;
   font-weight: 750;
 }
 
 .profile-avatar-upload-hint {
   margin: 5px 0 0;
-  color: var(--text-muted, #91a99b);
-  font-size: 0.72rem;
+  color: var(--profile-muted);
+  font-size: 0.71rem;
   line-height: 1.5;
 }
 
-/* ---------- MODAL ---------- */
+/* =========================================================
+   18. LEGACY MODAL SUPPORT
+   Dipertahankan jika ada bagian HTML lama yang masih
+   menggunakan .profile-modal.
+   ========================================================= */
 
 .profile-modal {
   position: fixed;
@@ -842,15 +1042,10 @@ textarea.profile-form-control {
   max-height: min(88vh, 850px);
   overflow-y: auto;
   padding: 24px;
-  border: 1px solid var(--border-color, rgba(16, 185, 129, 0.2));
+  border: 1px solid var(--profile-border);
   border-radius: 19px;
-  background: var(--surface-color, #15352b);
+  background: var(--profile-surface);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
-  animation: profileModalIn 0.22s ease both;
-}
-
-.profile-modal-dialog.modal-wide {
-  width: min(100%, 820px);
 }
 
 .profile-modal-header {
@@ -863,46 +1058,33 @@ textarea.profile-form-control {
 
 .profile-modal-title {
   margin: 0;
-  color: var(--text-primary, #e8f3ed);
-  font-size: 1.12rem;
+  color: var(--profile-text);
+  font-size: 1.1rem;
   font-weight: 850;
 }
 
 .profile-modal-description {
   margin: 6px 0 0;
-  color: var(--text-secondary, #9eb5a8);
-  font-size: 0.8rem;
+  color: var(--profile-muted);
+  font-size: 0.79rem;
   line-height: 1.55;
 }
 
 .profile-modal-close {
   display: grid;
-  width: 35px;
-  height: 35px;
-  flex: 0 0 35px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
   place-items: center;
-  border: 1px solid var(--border-color, rgba(16, 185, 129, 0.2));
+  border: 1px solid var(--profile-border);
   border-radius: 10px;
   background: transparent;
-  color: var(--text-primary, #e8f3ed);
+  color: var(--profile-text);
 }
 
-.profile-modal-close:hover {
-  background: rgba(16, 185, 129, 0.1);
-}
-
-@keyframes profileModalIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ---------- ALERT / MESSAGE ---------- */
+/* =========================================================
+   19. NOTIFICATION MESSAGE
+   ========================================================= */
 
 .profile-message {
   display: flex;
@@ -911,7 +1093,7 @@ textarea.profile-form-control {
   padding: 12px 14px;
   border: 1px solid transparent;
   border-radius: 11px;
-  font-size: 0.82rem;
+  font-size: 0.81rem;
   line-height: 1.55;
 }
 
@@ -939,14 +1121,16 @@ textarea.profile-form-control {
   color: #60a5fa;
 }
 
-/* ---------- EMPTY / LOADING ---------- */
+/* =========================================================
+   20. EMPTY STATE
+   ========================================================= */
 
 .profile-empty-state {
   display: grid;
   justify-items: center;
   gap: 9px;
   padding: 30px 18px;
-  color: var(--text-muted, #91a99b);
+  color: var(--profile-muted);
   text-align: center;
 }
 
@@ -957,23 +1141,28 @@ textarea.profile-form-control {
   place-items: center;
   border-radius: 16px;
   background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  color: var(--profile-primary-light);
   font-size: 1.35rem;
 }
 
 .profile-empty-title {
   margin: 0;
-  color: var(--text-primary, #e8f3ed);
-  font-size: 0.92rem;
+  color: var(--profile-text);
+  font-size: 0.91rem;
   font-weight: 750;
 }
 
 .profile-empty-description {
   max-width: 340px;
   margin: 0;
-  font-size: 0.78rem;
+  color: var(--profile-muted);
+  font-size: 0.76rem;
   line-height: 1.6;
 }
+
+/* =========================================================
+   21. LOADING
+   ========================================================= */
 
 .profile-loading {
   display: flex;
@@ -981,15 +1170,15 @@ textarea.profile-form-control {
   justify-content: center;
   gap: 10px;
   min-height: 110px;
-  color: var(--text-secondary, #9eb5a8);
-  font-size: 0.84rem;
+  color: var(--profile-muted);
+  font-size: 0.83rem;
 }
 
 .profile-loading-spinner {
   width: 20px;
   height: 20px;
   border: 2px solid rgba(16, 185, 129, 0.2);
-  border-top-color: #10b981;
+  border-top-color: var(--profile-primary);
   border-radius: 50%;
   animation: profileSpin 0.8s linear infinite;
 }
@@ -1000,7 +1189,22 @@ textarea.profile-form-control {
   }
 }
 
-/* ---------- LIGHT THEME ---------- */
+/* =========================================================
+   22. LIGHT THEME
+   ========================================================= */
+
+[data-theme="light"] .profile-page {
+  --profile-surface: #ffffff;
+  --profile-surface-2: #f0faf5;
+  --profile-border: rgba(15, 95, 64, 0.13);
+
+  --profile-text: #17382a;
+  --profile-muted: #647d6e;
+  --profile-subtle: #82988b;
+
+  --profile-shadow:
+    0 10px 28px rgba(15, 60, 40, 0.07);
+}
 
 [data-theme="light"] .profile-hero {
   background:
@@ -1009,33 +1213,67 @@ textarea.profile-form-control {
       rgba(16, 185, 129, 0.2),
       transparent 34%
     ),
-    linear-gradient(135deg, #065f46, #047857 58%, #064e3b);
+    linear-gradient(
+      135deg,
+      #065f46,
+      #047857 58%,
+      #064e3b
+    );
 }
 
-[data-theme="light"] .profile-card,
-[data-theme="light"] .profile-modal-dialog,
 [data-theme="light"] .profile-qr-card {
-  background: var(--surface-color, #fff);
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      rgba(16, 185, 129, 0.13),
+      transparent 45%
+    ),
+    linear-gradient(135deg, #e7f8ef, #d7f1e3);
 }
 
-[data-theme="light"] .profile-info-value,
-[data-theme="light"] .profile-card-title,
-[data-theme="light"] .profile-stat-value,
-[data-theme="light"] .profile-history-title,
-[data-theme="light"] .profile-modal-title {
-  color: var(--text-primary, #17372b);
+[data-theme="light"] .profile-qr-content strong {
+  color: #047857;
+}
+
+[data-theme="light"] .profile-qr-content > span:not(.profile-status) {
+  color: #496b59;
+}
+
+[data-theme="light"] .profile-qr-content p {
+  color: #17382a;
+}
+
+[data-theme="light"] .profile-qr-content small {
+  color: #496b59;
 }
 
 [data-theme="light"] .profile-form-control {
+  border-color: rgba(15, 95, 64, 0.2);
+  background: #f8fcf9;
+  color: #17382a;
+}
+
+[data-theme="light"] .profile-form-control:focus {
   background: #fff;
-  color: #17372b;
 }
 
-[data-theme="light"] .profile-form-label {
-  color: #244638;
+[data-theme="light"] .profile-page select.profile-form-control {
+  color-scheme: light;
 }
 
-/* ---------- TABLET ---------- */
+[data-theme="light"] .profile-card-title,
+[data-theme="light"] .profile-section-heading h2,
+[data-theme="light"] .profile-info-value,
+[data-theme="light"] .profile-stat-value,
+[data-theme="light"] .profile-history-title,
+[data-theme="light"] .profile-form-label,
+[data-theme="light"] .profile-modal-title {
+  color: var(--profile-text);
+}
+
+/* =========================================================
+   23. TABLET
+   ========================================================= */
 
 @media (max-width: 900px) {
   .profile-content-grid {
@@ -1052,7 +1290,9 @@ textarea.profile-form-control {
   }
 }
 
-/* ---------- MOBILE ---------- */
+/* =========================================================
+   24. MOBILE
+   ========================================================= */
 
 @media (max-width: 640px) {
   .profile-page {
@@ -1075,8 +1315,8 @@ textarea.profile-form-control {
   }
 
   .profile-hero {
-    padding: 20px 16px;
-    border-radius: 17px;
+    padding: 21px 16px;
+    border-radius: 18px;
   }
 
   .profile-hero-content {
@@ -1100,7 +1340,12 @@ textarea.profile-form-control {
   }
 
   .profile-email {
-    font-size: 0.82rem;
+    font-size: 0.81rem;
+  }
+
+  .profile-member-number,
+  .profile-status {
+    justify-content: center;
   }
 
   .profile-hero-actions {
@@ -1115,13 +1360,10 @@ textarea.profile-form-control {
     min-width: 0;
   }
 
+  .profile-section,
   .profile-card {
     padding: 17px;
-    border-radius: 15px;
-  }
-
-  .profile-card-header {
-    align-items: flex-start;
+    border-radius: 16px;
   }
 
   .profile-side-column {
@@ -1141,16 +1383,34 @@ textarea.profile-form-control {
     grid-column: auto;
   }
 
-  .profile-modal {
-    align-items: flex-end;
-    padding: 10px;
+  .profile-qr-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    padding: 19px 15px;
   }
 
-  .profile-modal-dialog {
+  .profile-qr-content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-qr-image-wrap {
+    width: min(100%, 190px);
+    justify-self: center;
+  }
+
+  .profile-qr-expiry,
+  .profile-qr-actions,
+  .profile-qr-note {
+    grid-column: auto;
+  }
+
+  .profile-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .profile-form-actions .btn {
     width: 100%;
-    max-height: 90vh;
-    padding: 19px;
-    border-radius: 18px 18px 12px 12px;
   }
 
   .profile-history-item {
@@ -1158,11 +1418,13 @@ textarea.profile-form-control {
   }
 
   .profile-history-status {
-    font-size: 0.65rem;
+    font-size: 0.64rem;
   }
 }
 
-/* ---------- SMALL MOBILE ---------- */
+/* =========================================================
+   25. SMALL MOBILE
+   ========================================================= */
 
 @media (max-width: 380px) {
   .profile-page {
@@ -1170,9 +1432,10 @@ textarea.profile-form-control {
   }
 
   .profile-hero {
-    padding: 17px 12px;
+    padding: 18px 12px;
   }
 
+  .profile-section,
   .profile-card {
     padding: 14px;
   }
@@ -1185,20 +1448,22 @@ textarea.profile-form-control {
     padding: 13px;
   }
 
-  .profile-form-actions {
-    flex-direction: column-reverse;
-  }
-
-  .profile-form-actions .btn {
+  .profile-qr-actions .btn {
     width: 100%;
   }
 
-  .profile-qr-actions .btn {
-    flex: 1 1 100%;
+  .profile-history-item {
+    flex-wrap: wrap;
+  }
+
+  .profile-history-status {
+    margin-left: 47px;
   }
 }
 
-/* ---------- ACCESSIBILITY ---------- */
+/* =========================================================
+   26. ACCESSIBILITY
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .profile-page *,
