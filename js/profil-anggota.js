@@ -3,98 +3,97 @@
    TARBIYAH — PROFIL ANGGOTA
    File: js/profil-anggota.js
 
-   Fitur:
-   1. Memuat sesi dan data profil anggota
-   2. Menampilkan identitas anggota
-   3. Memperbarui informasi profil
-   4. Mengunggah foto profil ke Supabase Storage
-   5. Menghapus foto profil lama setelah update berhasil
-   6. Membuat QR anggota melalui Edge Function
-   7. Menampilkan riwayat dan ringkasan kehadiran
-   8. Menangani modal dan notifikasi halaman profil
+   Versi penulisan ulang:
+   - Memuat sesi dan profil anggota dari Supabase
+   - Menampilkan identitas dan nomor anggota
+   - Membaca membership_status
+   - Mengedit data profil
+   - Mengunggah foto profil
+   - Membuat QR melalui Edge Function
+   - Menampilkan ringkasan dan riwayat kehadiran
 
    Catatan:
-   Sesuaikan PROFILE_CONFIG dengan skema tabel Supabase
-   TARBIYAH yang digunakan pada proyek.
+   Nomor anggota dan status keanggotaan tidak dapat
+   diubah melalui formulir profil.
    ========================================================= */
 
 (function () {
   "use strict";
 
-  if (window.__TARBIYAH_PROFILE_INITIALIZED__) return;
+  /* =======================================================
+     1. PENCEGAHAN INISIALISASI GANDA
+     ======================================================= */
+
+  if (window.__TARBIYAH_PROFILE_INITIALIZED__) {
+    console.warn("[TARBIYAH PROFILE] Sudah diinisialisasi.");
+    return;
+  }
+
   window.__TARBIYAH_PROFILE_INITIALIZED__ = true;
 
   /* =======================================================
-     1. KONFIGURASI
+     2. KONFIGURASI
      ======================================================= */
 
-  const PROFILE_CONFIG = {
-    table: "members",
-    userIdColumn: "user_id",
-
-    // Bucket Supabase Storage untuk foto anggota.
-    avatarBucket: "avatar",
-
-    // Edge Function untuk membuat QR anggota.
-    qrFunction: "member-qr-mint",
-
-    // Batas ukuran foto: 2 MB.
-    maxAvatarSize: 2 * 1024 * 1024,
-
-    allowedAvatarTypes: [
-      "image/jpeg",
-      "image/png",
-      "image/webp"
-    ],
-
-    // Masa berlaku signed URL foto privat.
-    signedUrlSeconds: 3600,
-
-    // Kolom yang diizinkan untuk diperbarui.
-    editableFields: [
-      "full_name",
-      "phone",
-      "address",
-      "birth_date",
-      "gender",
-      "bio"
-    ],
-
-    // Nama kolom foto profil.
-    avatarColumn: "avatar_path"
-  };
-
-  /*
-   * Konfigurasi dapat ditimpa sebelum file ini dimuat:
-   *
-   * window.TARBIYAH_PROFILE_CONFIG = {
-   *   table: "nama_tabel_profil",
-   *   userIdColumn: "user_id"
-   * };
-   */
-
   const CONFIG = Object.assign(
-    {},
-    PROFILE_CONFIG,
+    {
+      table: "members",
+      userIdColumn: "user_id",
+
+      avatarBucket: "avatar",
+      avatarColumn: "avatar_path",
+
+      qrFunction: "member-qr-mint",
+
+      maxAvatarSize: 2 * 1024 * 1024,
+
+      allowedAvatarTypes: [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+
+      signedUrlSeconds: 3600,
+
+      /*
+       * Hanya kolom profil yang boleh diperbarui.
+       * member_number dan membership_status sengaja
+       * tidak dimasukkan ke daftar ini.
+       */
+      editableFields: [
+        "full_name",
+        "phone",
+        "address",
+        "birth_date",
+        "gender",
+        "bio"
+      ]
+    },
     window.TARBIYAH_PROFILE_CONFIG || {}
   );
+
+  /* =======================================================
+     3. STATE
+     ======================================================= */
 
   const state = {
     initialized: false,
     loading: false,
     saving: false,
+
     user: null,
     profile: null,
-    avatarUrl: null,
+
     avatarPath: null,
+    avatarUrl: null,
+
     qrUrl: null,
     qrExpiresAt: null,
-    qrTimer: null,
-    originalAvatarPath: null
+    qrTimer: null
   };
 
   /* =======================================================
-     2. UTILITAS
+     4. UTILITAS
      ======================================================= */
 
   const $ = (selector, root = document) =>
@@ -109,6 +108,19 @@
 
   function warn(...args) {
     console.warn("[TARBIYAH PROFILE]", ...args);
+  }
+
+  function getSupabaseClient() {
+    return (
+      window.supabaseClient ||
+      window.TARBIYAH_SUPABASE ||
+      window.TARBIYAH?.supabase ||
+      null
+    );
+  }
+
+  function getAuthModule() {
+    return window.TARBIYAH_AUTH || null;
   }
 
   function showMessage(message, type = "info") {
@@ -132,23 +144,26 @@
     log(message);
   }
 
-  function setLoading(element, loading, loadingText = "Memproses...") {
-    if (!element) return;
+  function setButtonLoading(button, loading, text) {
+    if (!button) return;
 
     if (loading) {
-      if (!element.dataset.originalText) {
-        element.dataset.originalText =
-          element.textContent.trim();
+      if (!button.dataset.originalText) {
+        button.dataset.originalText =
+          button.textContent.trim();
       }
 
-      element.disabled = true;
-      element.textContent = loadingText;
-    } else {
-      element.disabled = false;
+      button.disabled = true;
 
-      if (element.dataset.originalText) {
-        element.textContent = element.dataset.originalText;
-        delete element.dataset.originalText;
+      if (text) {
+        button.textContent = text;
+      }
+    } else {
+      button.disabled = false;
+
+      if (button.dataset.originalText) {
+        button.textContent = button.dataset.originalText;
+        delete button.dataset.originalText;
       }
     }
   }
@@ -183,63 +198,104 @@
   }
 
   function getInitials(name) {
-    const parts = String(name || "Anggota")
+    const words = String(name || "Anggota")
       .trim()
       .split(/\s+/)
       .filter(Boolean);
 
-    return parts
+    return words
       .slice(0, 2)
-      .map(part => part.charAt(0).toUpperCase())
+      .map(word => word.charAt(0).toUpperCase())
       .join("");
   }
 
-  function normalizeStatus(status) {
-  const value = String(status || "")
-    .trim()
-    .toLowerCase();
+  function getProfileValue(...keys) {
+    for (const key of keys) {
+      const value = state.profile?.[key];
 
-  if (["active", "aktif", "approved"].includes(value)) {
-    return "active";
-  }
-
-  if (["pending", "menunggu", "verification"].includes(value)) {
-    return "pending";
-  }
-
-  if (["suspended", "ditangguhkan", "nonaktif sementara"].includes(value)) {
-    return "suspended";
-  }
-
-  if (["rejected", "ditolak"].includes(value)) {
-    return "rejected";
-  }
-
-  return "inactive";
-}
-
-  function getSupabaseClient() {
-    if (window.supabaseClient) {
-      return window.supabaseClient;
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        return value;
+      }
     }
 
-    if (window.TARBIYAH_SUPABASE) {
-      return window.TARBIYAH_SUPABASE;
+    return "";
+  }
+
+  /*
+   * setText hanya untuk elemen tampilan.
+   * Jangan gunakan fungsi ini untuk mengisi input,
+   * textarea, atau select.
+   */
+  function setText(selectors, value, fallback = "Belum diisi") {
+    const list = Array.isArray(selectors)
+      ? selectors
+      : [selectors];
+
+    const text =
+      value === undefined ||
+      value === null ||
+      value === ""
+        ? fallback
+        : String(value);
+
+    list.forEach(selector => {
+      $$(selector).forEach(element => {
+        element.textContent = text;
+      });
+    });
+  }
+
+  function normalizeStatus(status) {
+    const value = String(status || "")
+      .trim()
+      .toLowerCase();
+
+    if (
+      ["active", "aktif", "approved"].includes(value)
+    ) {
+      return "active";
     }
 
     if (
-      window.TARBIYAH &&
-      window.TARBIYAH.supabase
+      ["pending", "menunggu", "verification"].includes(value)
     ) {
-      return window.TARBIYAH.supabase;
+      return "pending";
     }
 
-    return null;
+    if (
+      ["suspended", "ditangguhkan", "nonaktif_sementara"].includes(value)
+    ) {
+      return "suspended";
+    }
+
+    if (
+      ["rejected", "ditolak"].includes(value)
+    ) {
+      return "rejected";
+    }
+
+    return "inactive";
   }
 
-  function getAuthModule() {
-    return window.TARBIYAH_AUTH || null;
+  function getStatusLabel(status) {
+    const labels = {
+      active: "Anggota Aktif",
+      pending: "Menunggu Verifikasi",
+      suspended: "Anggota Ditangguhkan",
+      rejected: "Pendaftaran Ditolak",
+      inactive: "Tidak Aktif"
+    };
+
+    return labels[status] || labels.inactive;
   }
+
+  /* =======================================================
+     5. AUTENTIKASI
+     ======================================================= */
 
   async function getCurrentUser() {
     const auth = getAuthModule();
@@ -276,41 +332,8 @@
     return user;
   }
 
-  function getProfileValue(...keys) {
-    for (const key of keys) {
-      const value = state.profile?.[key];
-
-      if (
-        value !== undefined &&
-        value !== null &&
-        value !== ""
-      ) {
-        return value;
-      }
-    }
-
-    return "";
-  }
-
-  function setText(selectors, value) {
-    const list = Array.isArray(selectors)
-      ? selectors
-      : [selectors];
-
-    list.forEach(selector => {
-      $$(selector).forEach(element => {
-        element.textContent =
-          value === undefined ||
-          value === null ||
-          value === ""
-            ? "Belum diisi"
-            : String(value);
-      });
-    });
-  }
-
   /* =======================================================
-     3. MEMUAT DATA PROFIL
+     6. MEMUAT PROFIL DARI SUPABASE
      ======================================================= */
 
   async function fetchProfile() {
@@ -339,26 +362,20 @@
     }
 
     if (!data) {
-      warn(
-        "Profil anggota belum ditemukan pada tabel:",
-        CONFIG.table
-      );
-
       state.profile = null;
       return null;
     }
 
     state.profile = data;
-    state.originalAvatarPath =
-      data[CONFIG.avatarColumn] || null;
 
     return data;
   }
 
   async function loadProfile() {
-    if (state.loading) return;
+    if (state.loading) return null;
 
     state.loading = true;
+
     document.documentElement.classList.add(
       "profile-loading-active"
     );
@@ -370,8 +387,9 @@
 
       if (!profile) {
         renderFallbackProfile();
+
         showMessage(
-          "Akun berhasil dikenali, tetapi data profil anggota belum tersedia.",
+          "Akun dikenali, tetapi data profil anggota belum ditemukan.",
           "warning"
         );
 
@@ -379,19 +397,22 @@
       }
 
       await renderProfile(profile);
+
       log("Profil anggota berhasil dimuat.");
 
       return profile;
+
     } catch (error) {
       warn("Gagal memuat profil:", error);
 
       showMessage(
         error.message ||
-          "Tidak dapat memuat data profil anggota.",
+          "Tidak dapat memuat profil anggota.",
         "error"
       );
 
       return null;
+
     } finally {
       state.loading = false;
 
@@ -400,6 +421,10 @@
       );
     }
   }
+
+  /* =======================================================
+     7. TAMPILAN PROFIL CADANGAN
+     ======================================================= */
 
   function renderFallbackProfile() {
     const user = state.user;
@@ -414,148 +439,194 @@
       user.email ||
       "Anggota TARBIYAH";
 
+    setText("[data-profile-name]", name);
+    setText("[data-profile-email]", user.email || "");
+
     setText(
-      ["#profileName", "[data-profile-name]", ".profile-name"],
+      "[data-profile-member-id]",
+      "ID Anggota: Belum tersedia"
+    );
+
+    setText(
+      "[data-profile-qr-member-name]",
       name
     );
 
     setText(
-      ["#profileEmail", "[data-profile-email]", ".profile-email"],
-      user.email || ""
+      "[data-profile-qr-member-id]",
+      "Nomor Anggota: Belum tersedia"
+    );
+
+    setText(
+      "[data-profile-card-status]",
+      "Data anggota belum tersedia"
     );
 
     renderAvatar(null, name);
   }
 
   /* =======================================================
-     4. MENAMPILKAN DATA PROFIL
+     8. RENDER PROFIL UTAMA
      ======================================================= */
 
   async function renderProfile(profile) {
     if (!profile) return;
 
-    const name = getProfileValue(
-      "full_name",
-      "name",
-      "nama_lengkap"
-    ) || state.user?.email || "Anggota TARBIYAH";
+    const name =
+      profile.full_name ||
+      profile.name ||
+      profile.nama_lengkap ||
+      state.user?.email ||
+      "Anggota TARBIYAH";
 
     const email =
       profile.email ||
       state.user?.email ||
       "";
 
-    const memberNumber = getProfileValue(
-  "member_number",
-  "nomor_anggota",
-  "member_code"
-);
+    const memberNumber =
+      profile.member_number ||
+      profile.nomor_anggota ||
+      profile.member_code ||
+      "";
 
-const status = normalizeStatus(
-  getProfileValue(
-    "membership_status",
-    "status",
-    "member_status"
-  )
-);
+    /*
+     * membership_status adalah kolom status
+     * keanggotaan yang digunakan oleh sistem.
+     */
+    const status = normalizeStatus(
+      profile.membership_status ||
+      profile.status ||
+      profile.member_status
+    );
+
+    /* Identitas utama */
+    setText("[data-profile-name]", name);
+    setText("[data-profile-email]", email);
 
     setText(
-      ["#profileName", "[data-profile-name]", ".profile-name"],
+      "[data-profile-member-id]",
+      memberNumber
+        ? `ID Anggota: ${memberNumber}`
+        : "ID Anggota: Belum tersedia"
+    );
+
+    /* Informasi profil */
+    setText("[data-profile-full-name]", name);
+    setText("[data-profile-info-email]", email);
+
+    setText(
+      "[data-profile-phone]",
+      profile.phone ||
+      profile.nomor_telepon ||
+      profile.no_hp
+    );
+
+    setText(
+      "[data-profile-gender]",
+      profile.gender ||
+      profile.jenis_kelamin
+    );
+
+    setText(
+      "[data-profile-birth-date]",
+      formatDate(
+        profile.birth_date ||
+        profile.tanggal_lahir
+      )
+    );
+
+    setText(
+      "[data-profile-address]",
+      profile.address ||
+      profile.alamat
+    );
+
+    setText(
+      "[data-profile-joined-date]",
+      formatDate(
+        profile.created_at ||
+        profile.joined_at ||
+        profile.submitted_at
+      )
+    );
+
+    setText(
+      "[data-profile-group]",
+      profile.group_name ||
+      profile.halaqah ||
+      profile.group
+    );
+
+    setText(
+      "[data-profile-bio]",
+      profile.bio ||
+      profile.about ||
+      profile.tentang
+    );
+
+    /* Kartu anggota digital */
+    setText(
+      "[data-profile-qr-member-name]",
       name
     );
 
     setText(
-      ["#profileEmail", "[data-profile-email]", ".profile-email"],
-      email
+      "[data-profile-qr-member-id]",
+      memberNumber
+        ? `Nomor Anggota: ${memberNumber}`
+        : "Nomor Anggota: Belum tersedia"
     );
 
-    setText(
-  [
-    "[data-profile-member-id]",
-    "#profileMemberNumber",
-    "[data-member-number]",
-    ".profile-member-number"
-  ],
-  memberNumber || "Belum tersedia"
-);
-
-    setText(
-      ["#profilePhone", "[data-profile-phone]"],
-      getProfileValue("phone", "nomor_telepon", "no_hp")
-    );
-
-    setText(
-      ["#profileAddress", "[data-profile-address]"],
-      getProfileValue("address", "alamat")
-    );
-
-    setText(
-      ["#profileBirthDate", "[data-profile-birth-date]"],
-      formatDate(
-        getProfileValue("birth_date", "tanggal_lahir")
-      )
-    );
-
-    setText(
-      ["#profileGender", "[data-profile-gender]"],
-      getProfileValue("gender", "jenis_kelamin")
-    );
-
-    setText(
-      ["#profileBio", "[data-profile-bio]"],
-      getProfileValue("bio", "about", "tentang")
-    );
-
-    setText(
-      ["#profileJoinDate", "[data-profile-join-date]"],
-      formatDate(
-        getProfileValue("created_at", "joined_at")
-      )
-    );
-
+    /* Status keanggotaan */
     renderStatus(status);
-    renderAvatar(
-      getProfileValue(CONFIG.avatarColumn),
+    renderMemberCardStatus(status);
+
+    /* Foto profil */
+    await renderAvatar(
+      profile[CONFIG.avatarColumn],
       name
     );
 
+    /* Isi formulir tanpa mengubah nomor/status anggota */
     populateForm(profile);
 
+    /* Ringkasan dan riwayat kehadiran */
     await renderAttendanceSummary(profile);
     await loadAttendanceHistory();
   }
 
-// Isi identitas pada kartu digital.
-setText(
-  "[data-profile-qr-member-name]",
-  name
-);
+  /* =======================================================
+     9. STATUS KEANGGOTAAN
+     ======================================================= */
 
-setText(
-  "[data-profile-qr-member-id]",
-  `Nomor Anggota: ${memberNumber || "Belum tersedia"}`
-);
-
-// Tampilkan status keanggotaan pada kartu.
-renderMemberCardStatus(status);
-   
   function renderStatus(status) {
-  const labels = {
-    active: "Anggota Aktif",
-    pending: "Menunggu Verifikasi",
-    suspended: "Keanggotaan Ditangguhkan",
-    rejected: "Pengajuan Ditolak",
-    inactive: "Tidak Aktif"
-  };
+    const elements = [
+      ...$$("[data-profile-status]"),
+      ...$$("#profileStatus")
+    ];
 
-  const elements = [
-    ...$$("[data-profile-status]"),
-    ...$$("#profileStatus"),
-    ...$$(".profile-status")
-  ];
+    elements.forEach(element => {
+      element.textContent = getStatusLabel(status);
 
-  elements.forEach(element => {
-    element.textContent = labels[status] || labels.inactive;
+      element.classList.remove(
+        "is-active",
+        "is-pending",
+        "is-suspended",
+        "is-rejected",
+        "is-inactive"
+      );
+
+      element.classList.add(`is-${status}`);
+    });
+  }
+
+  function renderMemberCardStatus(status) {
+    const element = $("[data-profile-card-status]");
+
+    if (!element) return;
+
+    element.textContent = getStatusLabel(status);
 
     element.classList.remove(
       "is-active",
@@ -566,37 +637,10 @@ renderMemberCardStatus(status);
     );
 
     element.classList.add(`is-${status}`);
-  });
-}
+  }
 
-function renderMemberCardStatus(status) {
-  const element = $("[data-profile-card-status]");
-
-  if (!element) return;
-
-  const labels = {
-    active: "KARTU ANGGOTA AKTIF",
-    pending: "MENUNGGU VERIFIKASI",
-    suspended: "KEANGGOTAAN DITANGGUHKAN",
-    rejected: "PENGAJUAN DITOLAK",
-    inactive: "STATUS TIDAK AKTIF"
-  };
-
-  element.textContent = labels[status] || labels.inactive;
-
-  element.classList.remove(
-    "is-active",
-    "is-pending",
-    "is-suspended",
-    "is-rejected",
-    "is-inactive"
-  );
-
-  element.classList.add(`is-${status}`);
-}
-   
   /* =======================================================
-     5. FOTO PROFIL
+     10. FOTO PROFIL
      ======================================================= */
 
   async function getAvatarUrl(path) {
@@ -615,7 +659,7 @@ function renderMemberCardStatus(status) {
       );
 
     if (error) {
-      warn("Gagal membuat signed URL foto:", error);
+      warn("Gagal membuat URL foto:", error);
       return null;
     }
 
@@ -623,7 +667,7 @@ function renderMemberCardStatus(status) {
   }
 
   async function renderAvatar(path, name = "") {
-    const fallback = getInitials(name);
+    const initials = getInitials(name);
 
     const imageElements = [
       ...$$("[data-profile-avatar]"),
@@ -633,7 +677,8 @@ function renderMemberCardStatus(status) {
 
     const placeholderElements = [
       ...$$("[data-profile-avatar-placeholder]"),
-      ...$$(".profile-avatar-placeholder")
+      ...$$(".profile-avatar-placeholder"),
+      ...$$("[data-profile-avatar-fallback]")
     ];
 
     let url = null;
@@ -657,12 +702,7 @@ function renderMemberCardStatus(status) {
     });
 
     placeholderElements.forEach(element => {
-      element.textContent = fallback;
-      element.hidden = Boolean(url);
-    });
-
-    $$("[data-profile-avatar-fallback]").forEach(element => {
-      element.textContent = fallback;
+      element.textContent = initials;
       element.hidden = Boolean(url);
     });
   }
@@ -683,8 +723,6 @@ function renderMemberCardStatus(status) {
         "Ukuran foto maksimal 2 MB."
       );
     }
-
-    return true;
   }
 
   function makeAvatarPath(file) {
@@ -709,22 +747,20 @@ function renderMemberCardStatus(status) {
 
     validateAvatar(file);
 
-    const newPath = makeAvatarPath(file);
+    const path = makeAvatarPath(file);
 
-    const { error: uploadError } = await supabase
+    const { error } = await supabase
       .storage
       .from(CONFIG.avatarBucket)
-      .upload(newPath, file, {
+      .upload(path, file, {
         cacheControl: "3600",
         upsert: false,
         contentType: file.type
       });
 
-    if (uploadError) {
-      throw uploadError;
-    }
+    if (error) throw error;
 
-    return newPath;
+    return path;
   }
 
   async function deleteAvatar(path) {
@@ -740,10 +776,7 @@ function renderMemberCardStatus(status) {
       .remove([path]);
 
     if (error) {
-      warn(
-        "Foto lama belum dapat dihapus:",
-        error
-      );
+      warn("Foto lama belum dapat dihapus:", error);
     }
   }
 
@@ -754,10 +787,14 @@ function renderMemberCardStatus(status) {
     let databaseUpdated = false;
 
     try {
+      if (!state.user) {
+        throw new Error("Sesi anggota tidak tersedia.");
+      }
+
       state.saving = true;
 
       showMessage(
-        "Mengunggah foto profil...",
+        "Sedang mengunggah foto profil...",
         "info"
       );
 
@@ -774,9 +811,7 @@ function renderMemberCardStatus(status) {
         .select()
         .maybeSingle();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data) {
         throw new Error(
@@ -786,20 +821,15 @@ function renderMemberCardStatus(status) {
 
       databaseUpdated = true;
 
-      const oldPath = state.originalAvatarPath;
+      const oldPath = state.profile?.[CONFIG.avatarColumn];
 
       state.profile = data;
-      state.originalAvatarPath = newPath;
 
       await renderAvatar(
         newPath,
-        getProfileValue("full_name", "name")
+        data.full_name || state.user.email
       );
 
-      /*
-       * Hapus foto lama hanya setelah database
-       * berhasil menunjuk ke foto yang baru.
-       */
       if (oldPath && oldPath !== newPath) {
         await deleteAvatar(oldPath);
       }
@@ -812,11 +842,6 @@ function renderMemberCardStatus(status) {
     } catch (error) {
       warn("Upload foto gagal:", error);
 
-      /*
-       * Jangan hapus file baru jika database sudah
-       * berhasil diperbarui. Database mungkin sudah
-       * menunjuk ke file tersebut.
-       */
       if (newPath && !databaseUpdated) {
         await deleteAvatar(newPath);
       }
@@ -833,50 +858,93 @@ function renderMemberCardStatus(status) {
   }
 
   /* =======================================================
-     6. FORMULIR PROFIL
+     11. FORMULIR EDIT PROFIL
      ======================================================= */
+
+  function getProfileForm() {
+    return $("form[data-profile-form]");
+  }
 
   function populateForm(profile) {
     if (!profile) return;
 
-    const fieldMap = {
-      full_name: [
-        "#editFullName",
-        '[name="full_name"]'
-      ],
-      phone: [
-        "#editPhone",
-        '[name="phone"]'
-      ],
-      address: [
-        "#editAddress",
-        '[name="address"]'
-      ],
-      birth_date: [
-        "#editBirthDate",
-        '[name="birth_date"]'
-      ],
-      gender: [
-        "#editGender",
-        '[name="gender"]'
-      ],
-      bio: [
-        "#editBio",
-        '[name="bio"]'
-      ]
-    };
+    const form = getProfileForm();
 
-    Object.entries(fieldMap).forEach(([key, selectors]) => {
-      const value = profile[key] ?? "";
+    if (!form) return;
 
-      selectors.forEach(selector => {
-        const element = $(selector);
+    const fields = [
+      "full_name",
+      "phone",
+      "address",
+      "birth_date",
+      "gender",
+      "bio"
+    ];
 
-        if (element && !element.matches(":disabled")) {
-          element.value = value;
-        }
-      });
+    fields.forEach(field => {
+      const element = form.elements.namedItem(field);
+
+      if (!element) return;
+
+      if (
+        element instanceof HTMLInputElement ||
+        element instanceof HTMLTextAreaElement ||
+        element instanceof HTMLSelectElement
+      ) {
+        element.value = profile[field] ?? "";
+      }
     });
+  }
+
+  function openProfileModal() {
+    /*
+     * HTML menggunakan section dengan atribut hidden,
+     * bukan modal dialog.
+     */
+    const section = $("[data-profile-form-section]");
+
+    if (!section) {
+      warn("Bagian formulir profil tidak ditemukan.");
+      showMessage(
+        "Formulir edit profil tidak ditemukan pada halaman.",
+        "error"
+      );
+      return;
+    }
+
+    if (state.profile) {
+      populateForm(state.profile);
+    }
+
+    section.hidden = false;
+    section.setAttribute("aria-hidden", "false");
+
+    const firstInput = $(
+      'input[name="full_name"]',
+      section
+    );
+
+    if (firstInput) {
+      firstInput.focus();
+    }
+
+    section.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
+  function closeProfileModal() {
+    const section = $("[data-profile-form-section]");
+
+    if (!section) return;
+
+    section.hidden = true;
+    section.setAttribute("aria-hidden", "true");
+
+    if (state.profile) {
+      populateForm(state.profile);
+    }
   }
 
   function collectFormData(form) {
@@ -915,8 +983,6 @@ function renderMemberCardStatus(status) {
         "Format nomor telepon belum benar."
       );
     }
-
-    return true;
   }
 
   async function saveProfile(form) {
@@ -934,17 +1000,23 @@ function renderMemberCardStatus(status) {
 
     const payload = collectFormData(form);
 
+    const submitButton = $(
+      'button[type="submit"]',
+      form
+    );
+
     try {
       validateProfileData(payload);
 
+      if (Object.keys(payload).length === 0) {
+        throw new Error(
+          "Tidak ada data profil yang dapat disimpan."
+        );
+      }
+
       state.saving = true;
 
-      const submitButton = $(
-        'button[type="submit"]',
-        form
-      );
-
-      setLoading(
+      setButtonLoading(
         submitButton,
         true,
         "Menyimpan..."
@@ -957,9 +1029,7 @@ function renderMemberCardStatus(status) {
         .select()
         .maybeSingle();
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data) {
         throw new Error(
@@ -991,58 +1061,21 @@ function renderMemberCardStatus(status) {
 
     } finally {
       state.saving = false;
-
-      const submitButton = $(
-        'button[type="submit"]',
-        form
-      );
-
-      setLoading(submitButton, false);
+      setButtonLoading(submitButton, false);
     }
   }
 
   /* =======================================================
-     7. MODAL PROFIL
+     12. QR ANGGOTA
      ======================================================= */
 
-  function openProfileModal() {
-    const modal =
-      $("#editProfileModal") ||
-      $("#profileEditModal") ||
-      $(".profile-modal");
-
-    if (!modal) {
-      warn("Modal edit profil tidak ditemukan.");
-      return;
-    }
-
-    if (state.profile) {
-      populateForm(state.profile);
-    }
-
-    modal.classList.add("is-open", "active");
-    modal.setAttribute("aria-hidden", "false");
-
-    document.body.dataset.profileModalOpen = "true";
+  function getQrImage() {
+    return $("#memberQrImage");
   }
 
-  function closeProfileModal() {
-    const modal =
-      $("#editProfileModal") ||
-      $("#profileEditModal") ||
-      $(".profile-modal");
-
-    if (!modal) return;
-
-    modal.classList.remove("is-open", "active", "show");
-    modal.setAttribute("aria-hidden", "true");
-
-    delete document.body.dataset.profileModalOpen;
+  function getQrPlaceholder() {
+    return $("[data-profile-qr-placeholder]");
   }
-
-  /* =======================================================
-     8. QR ANGGOTA
-     ======================================================= */
 
   function clearMemberQr() {
     if (state.qrTimer) {
@@ -1053,35 +1086,28 @@ function renderMemberCardStatus(status) {
     state.qrUrl = null;
     state.qrExpiresAt = null;
 
-     const qrImage =
-  $("#memberQrImage") ||
-  $("#profileQrImage") ||
-  $("[data-member-qr]");
+    const image = getQrImage();
 
-if (qrImage) {
-  qrImage.removeAttribute("src");
-  qrImage.hidden = true;
-}
-
-const placeholder = $("[data-profile-qr-placeholder]");
-
-if (placeholder) {
-  placeholder.hidden = false;
-}
-
-     const expiry = $(
-      "#memberQrExpiry, [data-qr-expiry]"
-    );
-
-    if (expiry) {
-      expiry.textContent = "QR belum dibuat.";
+    if (image) {
+      image.removeAttribute("src");
+      image.hidden = true;
     }
+
+    const placeholder = getQrPlaceholder();
+
+    if (placeholder) {
+      placeholder.hidden = false;
+    }
+
+    setText(
+      ["#memberQrExpiry", "[data-qr-expiry]"],
+      "QR belum dibuat."
+    );
   }
 
   function startQrExpiryTimer(expiresAt) {
     if (state.qrTimer) {
       clearInterval(state.qrTimer);
-      state.qrTimer = null;
     }
 
     const expiryElement = $(
@@ -1106,10 +1132,7 @@ if (placeholder) {
         remaining / 1000
       );
 
-      const minutes = Math.floor(
-        totalSeconds / 60
-      );
-
+      const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
 
       if (expiryElement) {
@@ -1137,14 +1160,14 @@ if (placeholder) {
       return;
     }
 
-    const button =
-  $("[data-profile-qr-refresh]") ||
-  $("#generateMemberQr") ||
-  $("#btnGenerateQr") ||
-  $("[data-generate-qr]");
+    const button = $("[data-profile-qr-refresh]");
 
     try {
-      setLoading(button, true, "Membuat QR...");
+      setButtonLoading(
+        button,
+        true,
+        "Membuat QR..."
+      );
 
       clearMemberQr();
 
@@ -1157,9 +1180,7 @@ if (placeholder) {
         }
       );
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data) {
         throw new Error(
@@ -1180,12 +1201,9 @@ if (placeholder) {
         );
       }
 
-      const qrImage =
-        $("#memberQrImage") ||
-        $("#profileQrImage") ||
-        $("[data-member-qr]");
+      const image = getQrImage();
 
-      if (!qrImage) {
+      if (!image) {
         throw new Error(
           "Elemen gambar QR tidak ditemukan."
         );
@@ -1193,15 +1211,33 @@ if (placeholder) {
 
       state.qrUrl = qrUrl;
 
-      qrImage.src = qrUrl;
-      qrImage.alt = "QR Anggota TARBIYAH";
-      qrImage.hidden = false;
+      image.onload = function () {
+        image.hidden = false;
 
-      const placeholder = $("[data-profile-qr-placeholder]");
-      if (placeholder) {
-      placeholder.hidden = true;
-    }
-       
+        const placeholder = getQrPlaceholder();
+
+        if (placeholder) {
+          placeholder.hidden = true;
+        }
+      };
+
+      image.onerror = function () {
+        image.hidden = true;
+
+        const placeholder = getQrPlaceholder();
+
+        if (placeholder) {
+          placeholder.hidden = false;
+        }
+
+        showMessage(
+          "QR diterima, tetapi gambar QR tidak dapat ditampilkan.",
+          "error"
+        );
+      };
+
+      image.src = qrUrl;
+
       const expiryValue =
         data.expires_at ||
         data.expiresAt ||
@@ -1221,7 +1257,7 @@ if (placeholder) {
       startQrExpiryTimer(expiryTimestamp);
 
       showMessage(
-        "QR anggota berhasil dibuat.",
+        "Permintaan pembuatan QR berhasil dikirim.",
         "success"
       );
 
@@ -1235,21 +1271,15 @@ if (placeholder) {
       );
 
     } finally {
-      setLoading(button, false);
+      setButtonLoading(button, false);
     }
   }
 
   /* =======================================================
-     9. RINGKASAN KEHADIRAN
+     13. RINGKASAN KEHADIRAN
      ======================================================= */
 
   async function renderAttendanceSummary(profile) {
-    /*
-     * Ringkasan menggunakan data yang tersedia pada
-     * record profil. Integrasi dengan tabel presensi
-     * terpisah dilakukan melalui modul kehadiran.
-     */
-
     const attended = Number(
       profile.total_attendance ??
       profile.attendance_count ??
@@ -1262,24 +1292,29 @@ if (placeholder) {
       0
     );
 
-    const percent =
-      total > 0
-        ? Math.min(100, Math.round((attended / total) * 100))
-        : 0;
+    const percent = total > 0
+      ? Math.min(
+          100,
+          Math.round((attended / total) * 100)
+        )
+      : 0;
 
     setText(
       ["#profileAttendanceCount", "[data-attendance-count]"],
-      attended
+      attended,
+      "0"
     );
 
     setText(
       ["#profileSessionCount", "[data-session-count]"],
-      total
+      total,
+      "0"
     );
 
     setText(
       ["#profileAttendancePercent", "[data-attendance-percent]"],
-      `${percent}%`
+      `${percent}%`,
+      "0%"
     );
 
     const progress = $(
@@ -1292,16 +1327,10 @@ if (placeholder) {
   }
 
   /* =======================================================
-     10. RIWAYAT KEHADIRAN
+     14. RIWAYAT KEHADIRAN
      ======================================================= */
 
   async function loadAttendanceHistory() {
-    /*
-     * Riwayat presensi berasal dari modul kehadiran.
-     * Jika modul tersebut menyediakan API, gunakan API
-     * yang sama agar tidak mengasumsikan nama tabel.
-     */
-
     const container =
       $("#profileAttendanceHistory") ||
       $("[data-profile-attendance-history]");
@@ -1402,7 +1431,9 @@ if (placeholder) {
       );
 
       const status = String(
-        item.status || item.attendance_status || ""
+        item.status ||
+        item.attendance_status ||
+        ""
       ).toLowerCase();
 
       let statusLabel = "Hadir";
@@ -1445,47 +1476,22 @@ if (placeholder) {
   }
 
   /* =======================================================
-     11. EVENT LISTENERS
+     15. EVENT LISTENERS
      ======================================================= */
 
   function bindProfileEvents() {
-    const editButtons = [
-      ...$$("[data-edit-profile]"),
-      ...$$("#btnEditProfile"),
-      ...$$("#editProfileButton")
-    ];
-
-    editButtons.forEach(button => {
+    /* Tombol Edit Profil */
+    $$("[data-profile-edit]").forEach(button => {
       button.addEventListener("click", openProfileModal);
     });
 
-    const closeButtons = [
-      ...$$("[data-close-profile-modal]"),
-      ...$$("#closeProfileModal"),
-      ...$$("#cancelEditProfile")
-    ];
-
-    closeButtons.forEach(button => {
+    /* Tombol Batal */
+    $$("[data-profile-cancel]").forEach(button => {
       button.addEventListener("click", closeProfileModal);
     });
 
-    const modal =
-      $("#editProfileModal") ||
-      $("#profileEditModal") ||
-      $(".profile-modal");
-
-    if (modal) {
-      modal.addEventListener("click", event => {
-        if (event.target === modal) {
-          closeProfileModal();
-        }
-      });
-    }
-
-    const form =
-      $("#profileEditForm") ||
-      $("#editProfileForm") ||
-      $("form[data-profile-form]");
+    /* Formulir Simpan */
+    const form = getProfileForm();
 
     if (form) {
       form.addEventListener("submit", event => {
@@ -1494,6 +1500,7 @@ if (placeholder) {
       });
     }
 
+    /* Input foto profil */
     const avatarInputs = [
       ...$$('input[type="file"][data-profile-avatar-input]'),
       ...$$("#profileAvatarInput"),
@@ -1508,22 +1515,16 @@ if (placeholder) {
 
         await handleAvatarUpload(file);
 
-        // Memungkinkan file yang sama dipilih kembali.
         input.value = "";
       });
     });
 
-    const qrButtons = [
-  ...$$("[data-generate-qr]"),
-  ...$$("[data-profile-qr-refresh]"),
-  ...$$("#generateMemberQr"),
-  ...$$("#btnGenerateQr")
-];
+    /* Tombol Buat / Perbarui QR */
+    $$("[data-profile-qr-refresh]").forEach(button => {
+      button.addEventListener("click", generateMemberQr);
+    });
 
-qrButtons.forEach(button => {
-  button.addEventListener("click", generateMemberQr);
-});
-
+    /* Tombol refresh profil */
     const refreshButtons = [
       ...$$("[data-refresh-profile]"),
       ...$$("#refreshProfile")
@@ -1532,16 +1533,10 @@ qrButtons.forEach(button => {
     refreshButtons.forEach(button => {
       button.addEventListener("click", loadProfile);
     });
-
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        closeProfileModal();
-      }
-    });
   }
 
   /* =======================================================
-     12. INISIALISASI
+     16. INISIALISASI
      ======================================================= */
 
   async function initialize() {
@@ -1580,11 +1575,12 @@ qrButtons.forEach(button => {
   }
 
   /* =======================================================
-     13. API PUBLIK
+     17. API PUBLIK
      ======================================================= */
 
   window.TARBIYAH_PROFILE = {
     initialize,
+
     load: loadProfile,
     refresh: loadProfile,
 
@@ -1601,8 +1597,11 @@ qrButtons.forEach(button => {
 
     openEdit: openProfileModal,
     closeEdit: closeProfileModal,
+
     save: saveProfile,
+
     uploadAvatar: handleAvatarUpload,
+
     generateQr: generateMemberQr,
     clearQr: clearMemberQr,
 
@@ -1610,6 +1609,7 @@ qrButtons.forEach(button => {
     loadAttendanceHistory
   };
 
+  /* Mulai aplikasi profil */
   start();
 
 })();
