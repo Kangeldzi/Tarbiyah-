@@ -27,6 +27,29 @@
   <link rel="stylesheet" href="./css/profil-anggota.css">
 
   <link rel="icon" href="./assets/icons/tarbiyah-mark.svg">
+
+  
+<!-- ERUDA CONSOLE - DEBUGGING TARBIYAH -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  window.addEventListener("load", function () {
+    if (window.eruda) {
+      eruda.init({
+        tool: ["console", "elements", "network", "resources"],
+        defaults: {
+          displaySize: 50,
+          transparency: 0.95
+        }
+      });
+
+      console.log("TARBIYAH ERUDA CONSOLE AKTIF");
+    } else {
+      console.error("Eruda gagal dimuat. Periksa koneksi internet.");
+    }
+  });
+</script>
+<!-- END ERUDA CONSOLE -->
+
 </head>
 
 <body>
