@@ -1237,7 +1237,7 @@ async function v33Initialize() {
       );
     }
 
-    const user = await getAuthenticatedUser();
+    const user = await getCurrentUser();
 
     if (!user) {
       window.location.href =
