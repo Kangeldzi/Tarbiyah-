@@ -1,20 +1,21 @@
+
 /* ============================================================
    TARBIYAH — PROFIL ANGGOTA
    File       : js/profil-anggota.js
-   Version    : 3.1 FULL REWRITE
+   Version    : 3.2 FULL REWRITE
    Backend    : Supabase
    Language   : Bahasa Indonesia
 
-   PERBAIKAN:
-   - Loading tidak berputar tanpa batas.
-   - Timeout koneksi dan pengambilan data.
-   - Loading selalu dihentikan pada akhir inisialisasi.
-   - Kegagalan data tertentu tidak mengunci seluruh halaman.
-   - Navigasi tab sesuai struktur HTML profil.
-   - Edit dan simpan profil.
-   - Upload foto profil.
-   - Tema terang/gelap.
-   - Logout dan pemeriksaan sesi.
+   PERBAIKAN V3.2:
+   - Memperbaiki mode Edit Profil.
+   - Mengaktifkan Jenis Kelamin.
+   - Mengaktifkan Tanggal Lahir.
+   - Mengaktifkan Kota / Kabupaten.
+   - Mengaktifkan Alamat Lengkap.
+   - Menyimpan semua kolom tersebut ke tabel profiles.
+   - Memuat kembali seluruh nilai profil dari Supabase.
+   - Email tetap terkunci dan tidak dapat diedit.
+   - Mempertahankan fitur v3.1 lainnya.
    ============================================================ */
 
 (() => {
@@ -106,7 +107,11 @@
      4. TIMEOUT PROTECTION
      ========================================================== */
 
-  function withTimeout(promise, label, timeout = CONFIG.REQUEST_TIMEOUT) {
+  function withTimeout(
+    promise,
+    label,
+    timeout = CONFIG.REQUEST_TIMEOUT
+  ) {
     let timeoutId;
 
     const timeoutPromise = new Promise((resolve, reject) => {
@@ -167,13 +172,6 @@
 
   /* ==========================================================
      6. LOADING SCREEN
-
-     Mencari elemen loading berdasarkan:
-     - ID atau class yang umum digunakan.
-     - Atribut data-loading.
-     - Tulisan "Menyiapkan profil anggota..."
-
-     Tidak bergantung pada satu nama ID tertentu.
      ========================================================== */
 
   function findLoadingElements() {
@@ -508,6 +506,10 @@
 
   /* ==========================================================
      11. LOAD PROFILE
+     
+     V3.2:
+     Tambahkan gender, birth_date, city, address
+     agar nilai kolom tersedia saat formulir dimuat.
      ========================================================== */
 
   async function loadProfile() {
@@ -519,6 +521,10 @@
           full_name,
           username,
           phone,
+          gender,
+          birth_date,
+          city,
+          address,
           avatar_path,
           bio,
           created_at,
@@ -693,6 +699,9 @@
 
   /* ==========================================================
      15. RENDER PROFILE
+
+     V3.2:
+     Mengisi seluruh kolom formulir dari data Supabase.
      ========================================================== */
 
   async function renderProfile() {
@@ -706,6 +715,7 @@
 
     setText("qrMemberName", name);
 
+    // Identitas dasar
     setValue(
       "inputFullName",
       profileData?.full_name || name
@@ -721,6 +731,7 @@
       profileData?.phone
     );
 
+    // Username jika tersedia di HTML
     if ($("inputUsername")) {
       setValue(
         "inputUsername",
@@ -728,12 +739,37 @@
       );
     }
 
+    // Bio jika tersedia di HTML
     if ($("inputBio")) {
       setValue(
         "inputBio",
         profileData?.bio
       );
     }
+
+    // V3.2: Jenis Kelamin
+    setValue(
+      "inputGender",
+      profileData?.gender
+    );
+
+    // V3.2: Tanggal Lahir
+    setValue(
+      "inputBirthDate",
+      profileData?.birth_date
+    );
+
+    // V3.2: Kota / Kabupaten
+    setValue(
+      "inputCity",
+      profileData?.city
+    );
+
+    // V3.2: Alamat Lengkap
+    setValue(
+      "inputAddress",
+      profileData?.address
+    );
 
     await renderAvatar();
   }
@@ -821,18 +857,35 @@
 
   /* ==========================================================
      18. EDIT PROFILE
+
+     V3.2:
+     Daftar kolom yang dapat diedit diperluas.
+
+     Email TIDAK dimasukkan ke daftar ini.
      ========================================================== */
 
   function getEditableFields() {
-    return [
+    const editableIds = [
       "inputFullName",
       "inputPhone",
       "inputUsername",
-      "inputBio"
-    ]
+      "inputBio",
+
+      // Kolom tambahan v3.2
+      "inputGender",
+      "inputBirthDate",
+      "inputCity",
+      "inputAddress"
+    ];
+
+    return editableIds
       .map(id => $(id))
       .filter(Boolean);
   }
+
+  /* ==========================================================
+     19. CAPTURE FORM DATA
+     ========================================================== */
 
   function captureFormData() {
     const data = {};
@@ -844,6 +897,10 @@
     return data;
   }
 
+  /* ==========================================================
+     20. RESTORE FORM DATA
+     ========================================================== */
+
   function restoreFormData() {
     Object.entries(originalFormData).forEach(
       ([id, value]) => {
@@ -852,18 +909,52 @@
     );
   }
 
+  /* ==========================================================
+     21. SET EDIT MODE
+
+     Ketika Edit diklik:
+     - Semua kolom yang diizinkan diaktifkan.
+     - Email tetap disabled.
+     - Tombol Simpan dan Batal ditampilkan.
+
+     Ketika Batal diklik:
+     - Data formulir dikembalikan ke nilai awal.
+     - Semua kolom kembali terkunci.
+     ========================================================== */
+
   function setEditMode(enabled) {
     isEditing = Boolean(enabled);
 
     if (isEditing) {
+      // Simpan kondisi awal sebelum diedit.
       originalFormData = captureFormData();
     } else {
+      // Batalkan perubahan yang belum disimpan.
       restoreFormData();
     }
 
+    // Aktifkan atau kunci seluruh kolom yang diizinkan.
     getEditableFields().forEach(field => {
       field.disabled = !isEditing;
+
+      field.removeAttribute("readonly");
+
+      field.setAttribute(
+        "aria-readonly",
+        "false"
+      );
     });
+
+    // Email selalu dikunci.
+    const emailField = $("inputEmail");
+
+    if (emailField) {
+      emailField.disabled = true;
+      emailField.setAttribute(
+        "aria-readonly",
+        "true"
+      );
+    }
 
     if ($("btnEditProfile")) {
       $("btnEditProfile").hidden = isEditing;
@@ -875,11 +966,36 @@
 
     if ($("btnSaveProfile")) {
       $("btnSaveProfile").disabled = false;
+      $("btnSaveProfile").textContent =
+        "Simpan Perubahan";
     }
+
+    console.log(
+      "[TARBIYAH] Mode edit:",
+      isEditing ? "AKTIF" : "NONAKTIF",
+      {
+        editableFields: getEditableFields().map(
+          field => field.id
+        ),
+        emailLocked: Boolean(emailField?.disabled)
+      }
+    );
   }
 
   /* ==========================================================
-     19. SAVE PROFILE
+     22. SAVE PROFILE
+
+     V3.2:
+     Menyimpan:
+     - full_name
+     - phone
+     - gender
+     - birth_date
+     - city
+     - address
+
+     Username dan Bio tetap didukung jika elemen
+     tersebut tersedia pada HTML.
      ========================================================== */
 
   async function saveProfile(event) {
@@ -903,21 +1019,49 @@
         );
       }
 
+      if (fullName.length < 2) {
+        throw new Error(
+          "Nama lengkap minimal 2 karakter."
+        );
+      }
+
+      /*
+       * Payload utama.
+       *
+       * Nilai kosong dikirim sebagai null agar
+       * database menyimpan kolom sebagai NULL,
+       * bukan string kosong.
+       */
+
       const payload = {
         full_name: fullName,
         phone: getValue("inputPhone") || null,
+
+        // Kolom tambahan v3.2
+        gender: getValue("inputGender") || null,
+        birth_date: getValue("inputBirthDate") || null,
+        city: getValue("inputCity") || null,
+        address: getValue("inputAddress") || null,
+
         updated_at: new Date().toISOString()
       };
 
+      // Username tetap didukung jika ada.
       if ($("inputUsername")) {
         payload.username =
           getValue("inputUsername") || null;
       }
 
+      // Bio tetap didukung jika ada.
       if ($("inputBio")) {
         payload.bio =
           getValue("inputBio") || null;
       }
+
+      console.log(
+        "[TARBIYAH] Data profil yang akan disimpan:",
+        payload
+      );
 
       const result = await withTimeout(
         supabase
@@ -929,6 +1073,10 @@
             full_name,
             username,
             phone,
+            gender,
+            birth_date,
+            city,
+            address,
             avatar_path,
             bio,
             created_at,
@@ -948,17 +1096,49 @@
         );
       }
 
+      // Perbarui state dengan data terbaru dari database.
       profileData = result.data;
 
+      // Tampilkan kembali nilai yang telah disimpan.
       await renderProfile();
 
+      // Simpan kondisi terbaru sebagai data awal.
       originalFormData = captureFormData();
 
-      setEditMode(false);
+      // Keluar dari mode edit tanpa mengembalikan data lama.
+      isEditing = false;
+
+      getEditableFields().forEach(field => {
+        field.disabled = true;
+      });
+
+      if ($("inputEmail")) {
+        $("inputEmail").disabled = true;
+      }
+
+      if ($("btnEditProfile")) {
+        $("btnEditProfile").hidden = false;
+      }
+
+      if ($("profileEditActions")) {
+        $("profileEditActions").hidden = true;
+      }
 
       notify(
         "Profil berhasil diperbarui.",
         "success"
+      );
+
+      console.log(
+        "[TARBIYAH] Profil berhasil diperbarui.",
+        {
+          full_name: profileData.full_name,
+          phone: profileData.phone,
+          gender: profileData.gender,
+          birth_date: profileData.birth_date,
+          city: profileData.city,
+          address: profileData.address
+        }
       );
 
     } catch (error) {
@@ -981,7 +1161,7 @@
   }
 
   /* ==========================================================
-     20. UPLOAD AVATAR
+     23. UPLOAD AVATAR
      ========================================================== */
 
   async function uploadAvatar(file) {
@@ -1051,6 +1231,10 @@
             full_name,
             username,
             phone,
+            gender,
+            birth_date,
+            city,
+            address,
             avatar_path,
             bio,
             created_at,
@@ -1115,7 +1299,7 @@
   }
 
   /* ==========================================================
-     21. NAVIGATION TABS
+     24. NAVIGATION TABS
      ========================================================== */
 
   function setupTabs() {
@@ -1183,7 +1367,7 @@
   }
 
   /* ==========================================================
-     22. ACTIVITY PLACEHOLDER
+     25. ACTIVITY PLACEHOLDER
      ========================================================== */
 
   function renderAttendanceNotice() {
@@ -1201,7 +1385,7 @@
   }
 
   /* ==========================================================
-     23. QR MEMBER
+     26. QR MEMBER
      ========================================================== */
 
   function setupQR() {
@@ -1228,7 +1412,15 @@
   }
 
   /* ==========================================================
-     24. EVENT LISTENERS
+     27. EVENT LISTENERS
+
+     V3.2:
+     Menghapus penguncian paksa pada:
+     inputGender, inputBirthDate, inputCity,
+     dan inputAddress.
+
+     Penguncian sekarang dikendalikan oleh
+     setEditMode() agar tombol Edit berfungsi.
      ========================================================== */
 
   function setupEvents() {
@@ -1294,32 +1486,21 @@
       logout
     );
 
-    [
-      "inputGender",
-      "inputBirthDate",
-      "inputCity",
-      "inputAddress"
-    ].forEach(id => {
-      const field = $(id);
-
-      if (field) {
-        field.disabled = true;
-
-        field.title =
-          "Kolom ini belum tersedia pada database TARBIYAH.";
-      }
-    });
+    /*
+     * PENTING:
+     * Jangan mengunci inputGender, inputBirthDate,
+     * inputCity, dan inputAddress secara permanen.
+     *
+     * Status disabled seluruh kolom edit sekarang
+     * dikontrol oleh fungsi setEditMode().
+     */
 
     setupTabs();
     setupQR();
   }
 
   /* ==========================================================
-     25. LOAD DATA SECARA BERTAHAP
-
-     Profil merupakan data utama.
-     Keanggotaan dan role dimuat secara terpisah
-     agar kegagalan salah satunya tidak mengunci halaman.
+     28. LOAD DATA SECARA BERTAHAP
      ========================================================== */
 
   async function loadAllData() {
@@ -1356,7 +1537,7 @@
   }
 
   /* ==========================================================
-     26. AUTH STATE LISTENER
+     29. AUTH STATE LISTENER
      ========================================================== */
 
   function setupAuthListener() {
@@ -1380,12 +1561,7 @@
   }
 
   /* ==========================================================
-     27. MAIN INITIALIZATION
-
-     PENTING:
-     hideLoadingScreen() dijalankan pada finally.
-     Dengan demikian, layar loading tidak dibiarkan
-     berputar tanpa batas akibat kegagalan proses.
+     30. MAIN INITIALIZATION
      ========================================================== */
 
   async function initialize() {
@@ -1394,17 +1570,12 @@
     initializationStarted = true;
 
     console.log(
-      "[TARBIYAH] Memulai Profil Anggota v3.1..."
+      "[TARBIYAH] Memulai Profil Anggota v3.2..."
     );
 
     try {
       applyLogo();
       applyTheme();
-
-      /*
-       * Pasang tombol dan tab sebelum
-       * mengambil data dari backend.
-       */
 
       setupEvents();
 
@@ -1415,18 +1586,9 @@
         );
       }
 
-      /*
-       * Pemeriksaan sesi login.
-       */
-
       currentUser = await getCurrentUser();
 
       if (!currentUser) return;
-
-      /*
-       * Siapkan data awal agar halaman
-       * tetap dapat menampilkan identitas akun.
-       */
 
       setText(
         "profileName",
@@ -1440,27 +1602,33 @@
         currentUser.email
       );
 
-      /*
-       * Muat data utama dan data pendukung.
-       */
-
       await loadAllData();
 
       /*
-       * Siapkan mode edit setelah data dimuat.
+       * Ambil snapshot awal seluruh kolom
+       * setelah data Supabase selesai dimuat.
        */
 
       originalFormData = captureFormData();
+
+      /*
+       * Pastikan halaman dimulai dalam
+       * keadaan tidak sedang mengedit.
+       */
 
       setEditMode(false);
 
       console.log(
         "[TARBIYAH] Profil selesai dimuat.",
         {
+          version: "3.2",
           userId: currentUser.id,
           profileLoaded: Boolean(profileData),
           membershipLoaded: Boolean(memberData),
-          roleLoaded: roleData.length > 0
+          roleLoaded: roleData.length > 0,
+          editableFields: getEditableFields().map(
+            field => field.id
+          )
         }
       );
 
@@ -1475,11 +1643,6 @@
         "Terjadi kesalahan ketika memuat profil.",
         "error"
       );
-
-      /*
-       * Tampilkan identitas dasar dari sesi
-       * meskipun pengambilan profil gagal.
-       */
 
       if (currentUser) {
         setText(
@@ -1497,11 +1660,6 @@
       }
 
     } finally {
-      /*
-       * WAJIB: hentikan layar loading
-       * baik proses berhasil maupun gagal.
-       */
-
       hideLoadingScreen();
 
       console.log(
@@ -1513,7 +1671,7 @@
   }
 
   /* ==========================================================
-     28. START APPLICATION
+     31. START APPLICATION
      ========================================================== */
 
   if (document.readyState === "loading") {
