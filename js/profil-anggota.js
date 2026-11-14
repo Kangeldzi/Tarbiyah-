@@ -1,56 +1,30 @@
-
-/* =========================================================
+/* ============================================================
    TARBIYAH — PROFIL ANGGOTA
-   JavaScript v3.3
-   Berbasis v3.1 — Perbaikan dan penyempurnaan
+   File       : js/profil-anggota.js
+   Version    : 3.1 FULL REWRITE
+   Backend    : Supabase
+   Language   : Bahasa Indonesia
 
-   FITUR:
-   1. Supabase Authentication
-   2. Memuat data profil anggota
-   3. Edit dan simpan data profil
-   4. Gender, birth_date, city, address
-   5. Status keanggotaan
-   6. Foto profil melalui Supabase Storage
-   7. Navigasi tab
-   8. Pengaturan tema
-   9. QR anggota melalui Edge Function
-   10. Logout dan tombol kembali
-
-   DATABASE:
-   profiles:
-   id, full_name, username, phone, gender,
-   birth_date, city, address, avatar_path,
-   bio, created_at, updated_at
-
-   members:
-   id, user_id, member_number, membership_status,
-   submitted_at, reviewed_at, reviewed_by,
-   review_note, created_at, updated_at
-========================================================= */
+   PERBAIKAN:
+   - Loading tidak berputar tanpa batas.
+   - Timeout koneksi dan pengambilan data.
+   - Loading selalu dihentikan pada akhir inisialisasi.
+   - Kegagalan data tertentu tidak mengunci seluruh halaman.
+   - Navigasi tab sesuai struktur HTML profil.
+   - Edit dan simpan profil.
+   - Upload foto profil.
+   - Tema terang/gelap.
+   - Logout dan pemeriksaan sesi.
+   ============================================================ */
 
 (() => {
   "use strict";
 
-  if (window.__TARBIYAH_PROFILE_V33__) return;
-  window.__TARBIYAH_PROFILE_V33__ = true;
-
-  /* =====================================================
-     01. KONFIGURASI
-  ===================================================== */
+  /* ==========================================================
+     1. KONFIGURASI
+     ========================================================== */
 
   const CONFIG = {
-    VERSION: "3.3",
-
-    AVATAR_BUCKET: "avatar",
-    AVATAR_MAX_SIZE: 2 * 1024 * 1024,
-    AVATAR_EXPIRY: 3600,
-
-    QR_FUNCTION: "member-qr-mint",
-
-    DEFAULT_LOGO:
-      window.TARBIYAH_CONFIG?.DEFAULT_LOGO ||
-      "./assets/icons/tarbiyah-mark.svg",
-
     LOGIN_PAGE:
       window.TARBIYAH_CONFIG?.LOGIN_PAGE ||
       "./login-register.html",
@@ -59,163 +33,395 @@
       window.TARBIYAH_CONFIG?.DASHBOARD_PAGE ||
       "./dashboard.html",
 
-    PROFILE_COLUMNS: [
-      "id",
-      "full_name",
-      "username",
-      "phone",
-      "gender",
-      "birth_date",
-      "city",
-      "address",
-      "avatar_path",
-      "bio",
-      "created_at",
-      "updated_at"
-    ]
+    DEFAULT_LOGO:
+      window.TARBIYAH_CONFIG?.DEFAULT_LOGO ||
+      "./assets/icons/tarbiyah-mark.svg",
+
+    AVATAR_BUCKET: "avatar",
+
+    AVATAR_MAX_SIZE: 2 * 1024 * 1024,
+
+    SIGNED_URL_DURATION: 3600,
+
+    REQUEST_TIMEOUT: 12000,
+
+    THEME_KEY: "tarbiyah-theme"
   };
 
-  /* =====================================================
-     02. VARIABEL SISTEM
-  ===================================================== */
+  const supabase = window.tarbiyahSupabase;
 
-  
-let supabase = null;
-let currentUser = null;
+  /* ==========================================================
+     2. STATE
+     ========================================================== */
 
-let profileData = null;
-let membershipData = null;
+  let currentUser = null;
+  let profileData = null;
+  let memberData = null;
+  let roleData = [];
 
-// Variabel yang digunakan BLOK 2 v3.3
-let currentProfile = null;
-let currentMembership = null;
-
-let selectedAvatarFile = null;
-let selectedAvatarPreviewUrl = null;
-
-let originalFormData = null;
-
+  let originalFormData = {};
 
   let isEditing = false;
-  let isSaving = false;
-  let isInitialized = false;
+  let eventsInitialized = false;
+  let initializationStarted = false;
 
-  let toastTimer = null;
-  let avatarSignedUrl = null;
+  let authSubscription = null;
 
-  /* =====================================================
-     03. DOM HELPER
-  ===================================================== */
+  /* ==========================================================
+     3. DOM HELPER
+     ========================================================== */
 
-  const $ = (selector, root = document) =>
-    root.querySelector(selector);
-
-  const $$ = (selector, root = document) =>
-    Array.from(root.querySelectorAll(selector));
-
-  const getById = id =>
-    document.getElementById(id);
+  const $ = id => document.getElementById(id);
 
   function setText(id, value) {
-    const element = getById(id);
+    const element = $(id);
+
+    if (!element) return;
+
+    element.textContent =
+      value === null ||
+      value === undefined ||
+      value === ""
+        ? "—"
+        : String(value);
+  }
+
+  function setValue(id, value) {
+    const element = $(id);
 
     if (element) {
-      element.textContent =
-        value === null || value === undefined || value === ""
-          ? "-"
-          : String(value);
+      element.value = value ?? "";
     }
   }
 
-  function showElement(element) {
-    if (element) element.hidden = false;
+  function getValue(id) {
+    const element = $(id);
+
+    return element
+      ? element.value.trim()
+      : null;
   }
 
-  function hideElement(element) {
-    if (element) element.hidden = true;
+  /* ==========================================================
+     4. TIMEOUT PROTECTION
+     ========================================================== */
+
+  function withTimeout(promise, label, timeout = CONFIG.REQUEST_TIMEOUT) {
+    let timeoutId;
+
+    const timeoutPromise = new Promise((resolve, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(
+          new Error(
+            label + " melebihi batas waktu " +
+            Math.round(timeout / 1000) +
+            " detik."
+          )
+        );
+      }, timeout);
+    });
+
+    return Promise.race([
+      promise,
+      timeoutPromise
+    ]).finally(() => {
+      clearTimeout(timeoutId);
+    });
   }
 
-  function getErrorMessage(error) {
-    return error?.message ||
-      String(error || "Terjadi kesalahan.");
-  }
-
-  /* =====================================================
-     04. ELEMEN HALAMAN
-  ===================================================== */
-
-  const DOM = {
-    loading: getById("pageLoading"),
-
-    toast: getById("profileToast"),
-    toastMessage: getById("toastMessage"),
-
-    form: getById("personalProfileForm"),
-
-    editButton: getById("btnEditProfile"),
-    editActions: getById("profileEditActions"),
-    cancelButton: getById("btnCancelEdit"),
-    saveButton: getById("btnSaveProfile"),
-
-    backButton: getById("btnBack"),
-    themeButton: getById("btnTheme"),
-    notificationButton: getById("btnNotifications"),
-    logoutButton: getById("btnLogout"),
-
-    avatar: getById("profileAvatar"),
-    avatarButton: getById("btnChangeAvatar"),
-    avatarInput: getById("avatarInput")
-  };
-
-  const FIELDS = {
-    full_name: getById("inputFullName"),
-    email: getById("inputEmail"),
-    phone: getById("inputPhone"),
-    gender: getById("inputGender"),
-    birth_date: getById("inputBirthDate"),
-    city: getById("inputCity"),
-    address: getById("inputAddress")
-  };
-
-  /* =====================================================
-     05. NOTIFIKASI
-  ===================================================== */
+  /* ==========================================================
+     5. NOTIFICATION
+     ========================================================== */
 
   function notify(message, type = "info") {
-    if (DOM.toast && DOM.toastMessage) {
-      DOM.toastMessage.textContent = message;
+    const toast = $("profileToast");
+    const messageElement = $("toastMessage");
 
-      DOM.toast.dataset.type = type;
-      DOM.toast.hidden = false;
-      DOM.toast.classList.add("show");
-
-      if (toastTimer) {
-        clearTimeout(toastTimer);
-      }
-
-      toastTimer = setTimeout(() => {
-        DOM.toast.classList.remove("show");
-        DOM.toast.hidden = true;
-      }, 4000);
-
+    if (!toast || !messageElement) {
+      console.log("[TARBIYAH]", message);
       return;
     }
 
-    console.log("[TARBIYAH]", message);
+    messageElement.textContent = message;
+
+    toast.dataset.type = type;
+    toast.hidden = false;
+
+    toast.style.setProperty(
+      "display",
+      "block",
+      "important"
+    );
+
+    toast.classList.add("show");
+
+    clearTimeout(notify.timer);
+
+    notify.timer = setTimeout(() => {
+      toast.classList.remove("show");
+      toast.hidden = true;
+
+      toast.style.removeProperty("display");
+    }, 3500);
   }
 
-  /* =====================================================
-     06. FORMAT TANGGAL
-  ===================================================== */
+  /* ==========================================================
+     6. LOADING SCREEN
+
+     Mencari elemen loading berdasarkan:
+     - ID atau class yang umum digunakan.
+     - Atribut data-loading.
+     - Tulisan "Menyiapkan profil anggota..."
+
+     Tidak bergantung pada satu nama ID tertentu.
+     ========================================================== */
+
+  function findLoadingElements() {
+    const selectors = [
+      "#profileLoading",
+      "#loadingScreen",
+      "#pageLoading",
+      "#loadingOverlay",
+      "#profileLoader",
+      ".profile-loading",
+      ".profile-loader",
+      ".loading-screen",
+      ".loading-overlay",
+      ".page-loading",
+      "[data-loading='profile']",
+      "[data-profile-loading]"
+    ];
+
+    const found = new Set();
+
+    selectors.forEach(selector => {
+      document.querySelectorAll(selector).forEach(element => {
+        found.add(element);
+      });
+    });
+
+    const allElements = document.body
+      ? document.body.querySelectorAll("*")
+      : [];
+
+    allElements.forEach(element => {
+      if (element.children.length > 2) return;
+
+      const text = (element.textContent || "")
+        .trim()
+        .toLowerCase();
+
+      if (
+        text.includes("menyiapkan profil anggota") ||
+        text.includes("memuat profil anggota")
+      ) {
+        let target = element;
+
+        for (let i = 0; i < 4; i++) {
+          if (!target.parentElement) break;
+
+          const parent = target.parentElement;
+
+          if (
+            parent === document.body ||
+            parent === document.documentElement
+          ) {
+            break;
+          }
+
+          const style = window.getComputedStyle(parent);
+
+          const classText =
+            typeof parent.className === "string"
+              ? parent.className.toLowerCase()
+              : "";
+
+          if (
+            style.position === "fixed" ||
+            style.position === "absolute" ||
+            /loading|loader|overlay|splash/.test(classText)
+          ) {
+            target = parent;
+            break;
+          }
+
+          target = parent;
+        }
+
+        found.add(target);
+      }
+    });
+
+    return Array.from(found);
+  }
+
+  function hideLoadingScreen() {
+    const elements = findLoadingElements();
+
+    elements.forEach(element => {
+      element.hidden = true;
+
+      element.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      element.classList.add("loaded");
+
+      element.style.setProperty(
+        "display",
+        "none",
+        "important"
+      );
+
+      element.style.setProperty(
+        "visibility",
+        "hidden",
+        "important"
+      );
+
+      element.style.setProperty(
+        "pointer-events",
+        "none",
+        "important"
+      );
+    });
+
+    document.documentElement.classList.remove(
+      "profile-loading",
+      "loading"
+    );
+
+    document.body?.classList.remove(
+      "profile-loading",
+      "loading"
+    );
+
+    console.log(
+      "[TARBIYAH] Loading screen dihentikan.",
+      "Elemen ditemukan:",
+      elements.length
+    );
+  }
+
+  /* ==========================================================
+     7. LOGO
+     ========================================================== */
+
+  function applyLogo() {
+    const images = document.querySelectorAll(
+      ".header-brand img, " +
+      ".digital-card-header img, " +
+      ".profile-footer img"
+    );
+
+    images.forEach(image => {
+      image.src = CONFIG.DEFAULT_LOGO;
+
+      image.onerror = () => {
+        console.warn(
+          "[TARBIYAH] Logo tidak ditemukan:",
+          CONFIG.DEFAULT_LOGO
+        );
+      };
+    });
+
+    const favicon = document.querySelector(
+      'link[rel="icon"]'
+    );
+
+    if (favicon) {
+      favicon.href = CONFIG.DEFAULT_LOGO;
+    }
+  }
+
+  /* ==========================================================
+     8. THEME
+     ========================================================== */
+
+  function applyTheme() {
+    try {
+      const savedTheme = localStorage.getItem(
+        CONFIG.THEME_KEY
+      );
+
+      if (
+        savedTheme === "dark" ||
+        savedTheme === "light"
+      ) {
+        document.documentElement.setAttribute(
+          "data-theme",
+          savedTheme
+        );
+      }
+    } catch (error) {
+      console.warn(
+        "[TARBIYAH] Preferensi tema tidak dapat dibaca.",
+        error
+      );
+    }
+
+    updateThemeButton();
+  }
+
+  function updateThemeButton() {
+    const button = $("btnTheme");
+
+    if (!button) return;
+
+    const theme =
+      document.documentElement.getAttribute("data-theme") ||
+      "dark";
+
+    button.textContent =
+      theme === "dark" ? "☀" : "☾";
+
+    button.setAttribute(
+      "aria-label",
+      theme === "dark"
+        ? "Aktifkan tema terang"
+        : "Aktifkan tema gelap"
+    );
+  }
+
+  function toggleTheme() {
+    const root = document.documentElement;
+
+    const current =
+      root.getAttribute("data-theme") || "dark";
+
+    const next =
+      current === "dark" ? "light" : "dark";
+
+    root.setAttribute("data-theme", next);
+
+    try {
+      localStorage.setItem(
+        CONFIG.THEME_KEY,
+        next
+      );
+    } catch (error) {
+      console.warn(
+        "[TARBIYAH] Tema tidak dapat disimpan.",
+        error
+      );
+    }
+
+    updateThemeButton();
+  }
+
+  /* ==========================================================
+     9. DATE FORMAT
+     ========================================================== */
 
   function formatDate(value) {
-    if (!value) return "-";
+    if (!value) return "—";
 
-    const date = /^\d{4}-\d{2}-\d{2}$/.test(String(value))
-      ? new Date(value + "T00:00:00")
-      : new Date(value);
+    const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) return "-";
+    if (Number.isNaN(date.getTime())) {
+      return "—";
+    }
 
     return new Intl.DateTimeFormat("id-ID", {
       day: "2-digit",
@@ -224,1083 +430,1100 @@ let originalFormData = null;
     }).format(date);
   }
 
-  function formatDateTime(value) {
-    if (!value) return "-";
+  function getInitials(name) {
+    if (!name) return "TA";
 
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) return "-";
-
-    return new Intl.DateTimeFormat("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    }).format(date);
+    return name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(word => word[0].toUpperCase())
+      .join("");
   }
 
-  /* =====================================================
-     07. SUPABASE CLIENT
-  ===================================================== */
-
-  function getSupabaseClient() {
-    const client = window.tarbiyahSupabase;
-
-    if (!client) {
-      throw new Error(
-        "Supabase belum terhubung. Periksa js/config.js dan js/supabase-client.js."
-      );
-    }
-
-    if (!client.auth || !client.from || !client.storage) {
-      throw new Error(
-        "Supabase Client belum siap digunakan."
-      );
-    }
-
-    return client;
-  }
-
-  /* =====================================================
-     08. AUTHENTICATION
-  ===================================================== */
+  /* ==========================================================
+     10. AUTHENTICATION
+     ========================================================== */
 
   async function getCurrentUser() {
-    const { data, error } =
-      await supabase.auth.getSession();
-
-    if (error) throw error;
-
-    const user = data?.session?.user;
-
-    if (!user?.id) {
-      throw new Error(
-        "Sesi login tidak ditemukan. Silakan masuk kembali."
-      );
-    }
-
-    return user;
-  }
-
-  /* =====================================================
-     09. LOGO
-  ===================================================== */
-
-  function applyLogo() {
-    const logoImages = $$(
-      ".header-brand img, .digital-card-header img, .profile-footer img"
-    );
-
-    logoImages.forEach(img => {
-      img.onerror = () => {
-        img.onerror = null;
-        img.src = "./assets/icons/tarbiyah-mark.svg";
-      };
-
-      img.src = CONFIG.DEFAULT_LOGO;
-    });
-
-    let favicon = $('link[rel="icon"]');
-
-    if (!favicon) {
-      favicon = document.createElement("link");
-      favicon.rel = "icon";
-      document.head.appendChild(favicon);
-    }
-
-    favicon.href = CONFIG.DEFAULT_LOGO;
-  }
-
-  /* =====================================================
-     10. TEMA
-  ===================================================== */
-
-  function applyTheme() {
-    const savedTheme =
-      localStorage.getItem("tarbiyah-theme");
-
-    const theme =
-      savedTheme === "light" || savedTheme === "dark"
-        ? savedTheme
-        : document.documentElement.dataset.theme || "dark";
-
-    document.documentElement.dataset.theme = theme;
-    document.body.dataset.theme = theme;
-
-    if (DOM.themeButton) {
-      DOM.themeButton.setAttribute(
-        "aria-label",
-        theme === "dark"
-          ? "Aktifkan tema terang"
-          : "Aktifkan tema gelap"
-      );
-    }
-  }
-
-  function toggleTheme() {
-    const current =
-      document.documentElement.dataset.theme || "dark";
-
-    const next =
-      current === "dark" ? "light" : "dark";
-
-    document.documentElement.dataset.theme = next;
-    document.body.dataset.theme = next;
-
-    localStorage.setItem("tarbiyah-theme", next);
-
-    applyTheme();
-  }
-
-  console.info(
-    "[TARBIYAH PROFILE] BLOK 1 v3.3 berhasil dimuat."
-  );
-
-
-/* =========================================================
-   TARBIYAH — PROFIL ANGGOTA
-   JAVASCRIPT v3.3
-   BLOK 2: DATABASE, RENDER, EDIT, AVATAR, NAVIGASI
-========================================================= */
-
-/* ---------- 1. UTILITAS DASAR ---------- */
-
-function v33Get(selector, parent = document) {
-  return parent.querySelector(selector);
-}
-
-function v33GetAll(selector, parent = document) {
-  return Array.from(parent.querySelectorAll(selector));
-}
-
-function v33Toast(message, type = "info") {
-  const toast = document.getElementById("profileToast");
-  const toastMessage = document.getElementById("toastMessage");
-
-  if (toastMessage) toastMessage.textContent = message;
-
-  if (toast) {
-    toast.classList.remove(
-      "success",
-      "error",
-      "warning",
-      "info",
-      "show"
-    );
-
-    toast.classList.add(type);
-    toast.classList.add("show");
-
-    if (typeof toastTimer !== "undefined" && toastTimer) {
-      clearTimeout(toastTimer);
-    }
-
-    toastTimer = setTimeout(() => {
-      toast.classList.remove("show");
-    }, 3500);
-  } else {
-    console.log("[TARBIYAH]", message);
-  }
-}
-
-function v33SetLoading(show) {
-  const loading = document.getElementById("pageLoading");
-
-  if (loading) {
-    loading.style.display = show ? "flex" : "none";
-    loading.setAttribute("aria-hidden", show ? "false" : "true");
-  }
-}
-
-function v33FormatDate(value) {
-  if (!value) return "-";
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return "-";
-
-  return date.toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  });
-}
-
-function v33SetValue(selector, value) {
-  const element = document.getElementById(selector);
-
-  if (element) {
-    element.value = value ?? "";
-  }
-}
-
-function v33SetText(selector, value) {
-  const element = document.getElementById(selector);
-
-  if (element) {
-    element.textContent = value ?? "-";
-  }
-}
-
-function v33SafeRevokePreview() {
-  if (selectedAvatarPreviewUrl) {
-    URL.revokeObjectURL(selectedAvatarPreviewUrl);
-    selectedAvatarPreviewUrl = null;
-  }
-}
-
-/* ---------- 2. LOGO APLIKASI ---------- */
-
-function v33ApplyLogo() {
-  const logoElements = document.querySelectorAll(
-    ".header-brand img, .digital-card-header img"
-  );
-
-  const defaultLogo =
-    CONFIG.defaultLogo ||
-    "./assets/icons/tarbiyah-mark.svg";
-
-  logoElements.forEach((img) => {
-    if (!img) return;
-
-    img.onerror = function () {
-      this.onerror = null;
-      this.src = "./assets/icons/tarbiyah-mark.svg";
-    };
-
-    img.src = defaultLogo;
-  });
-}
-
-/* ---------- 3. TEMA APLIKASI ---------- */
-
-function v33ApplyTheme() {
-  const savedTheme = localStorage.getItem("tarbiyah-theme");
-
-  const theme =
-    savedTheme === "light" || savedTheme === "dark"
-      ? savedTheme
-      : document.documentElement.dataset.theme || "dark";
-
-  document.documentElement.dataset.theme = theme;
-
-  const button = document.getElementById("btnTheme");
-
-  if (button) {
-    button.setAttribute(
-      "aria-label",
-      theme === "dark" ? "Aktifkan mode terang" : "Aktifkan mode gelap"
-    );
-  }
-}
-
-function v33ToggleTheme() {
-  const current =
-    document.documentElement.dataset.theme || "dark";
-
-  const next = current === "dark" ? "light" : "dark";
-
-  document.documentElement.dataset.theme = next;
-
-  localStorage.setItem("tarbiyah-theme", next);
-
-  const button = document.getElementById("btnTheme");
-
-  if (button) {
-    button.setAttribute(
-      "aria-label",
-      next === "dark" ? "Aktifkan mode terang" : "Aktifkan mode gelap"
-    );
-  }
-}
-
-/* ---------- 4. DATA PROFIL DARI SUPABASE ---------- */
-
-async function v33LoadProfile() {
-  if (!supabase || !currentUser) {
-    throw new Error("Koneksi atau sesi pengguna belum tersedia.");
-  }
-
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", currentUser.id)
-    .maybeSingle();
-
-  if (error) throw error;
-
-  if (!data) {
-    throw new Error(
-      "Data profil belum ditemukan. Silakan hubungi administrator."
-    );
-  }
-
-  currentProfile = data;
-
-  return data;
-}
-
-/* ---------- 5. DATA KEANGGOTAAN ---------- */
-
-async function v33LoadMembership() {
-  if (!supabase || !currentUser) return null;
-
-  const { data, error } = await supabase
-    .from("members")
-    .select("*")
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
-
-  if (error) {
-    console.warn("[TARBIYAH] Data keanggotaan:", error.message);
-    return null;
-  }
-
-  currentMembership = data || null;
-
-  return currentMembership;
-}
-
-/* ---------- 6. DATA ROLE / HAK AKSES ---------- */
-
-async function v33LoadRole() {
-  if (!supabase || !currentUser) return null;
-
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role_id, roles(name)")
-    .eq("user_id", currentUser.id);
-
-  if (error) {
-    console.warn("[TARBIYAH] Data role:", error.message);
-    return null;
-  }
-
-  return data || [];
-}
-
-/* ---------- 7. RENDER DATA PROFIL ---------- */
-
-function v33RenderProfile() {
-  if (!currentProfile) return;
-
-  const profile = currentProfile;
-
-  v33SetValue("inputFullName", profile.full_name);
-  v33SetValue("inputEmail", currentUser?.email || "");
-  v33SetValue("inputPhone", profile.phone);
-  v33SetValue("inputGender", profile.gender);
-  v33SetValue("inputBirthDate", profile.birth_date);
-  v33SetValue("inputCity", profile.city);
-  v33SetValue("inputAddress", profile.address);
-
-  // Kolom tambahan jika tersedia pada HTML.
-  v33SetValue("inputUsername", profile.username);
-  v33SetValue("inputBio", profile.bio);
-
-  v33SetText("memberName", profile.full_name || "Anggota TARBIYAH");
-  v33SetText("memberEmail", currentUser?.email || "-");
-  v33SetText("memberPhone", profile.phone || "-");
-
-  v33SetText(
-    "memberJoinDate",
-    v33FormatDate(profile.created_at)
-  );
-
-  v33SetText(
-    "memberBirthDate",
-    v33FormatDate(profile.birth_date)
-  );
-
-  v33SetText(
-    "memberCity",
-    profile.city || "-"
-  );
-
-  v33SetText(
-    "memberGender",
-    profile.gender || "-"
-  );
-
-  v33RenderMembership();
-}
-
-/* ---------- 8. RENDER DATA KEANGGOTAAN ---------- */
-
-function v33RenderMembership() {
-  const membership = currentMembership;
-
-  if (!membership) {
-    v33SetText("memberNumber", "Belum tersedia");
-    v33SetText("membershipStatus", "Belum terdaftar");
-    return;
-  }
-
-  v33SetText(
-    "memberNumber",
-    membership.member_number || "Menunggu nomor anggota"
-  );
-
-  v33SetText(
-    "membershipStatus",
-    membership.membership_status || "Belum diketahui"
-  );
-
-  v33SetText(
-    "memberSubmittedAt",
-    v33FormatDate(membership.submitted_at)
-  );
-}
-
-/* ---------- 9. FOTO PROFIL / AVATAR ---------- */
-
-async function v33RenderAvatar() {
-  const avatar = document.getElementById("profileAvatar");
-  const qrAvatar = document.getElementById("qrMemberAvatar");
-
-  if (!avatar) return;
-
-  const fallback =
-    CONFIG.defaultLogo ||
-    "./assets/icons/tarbiyah-mark.svg";
-
-  const avatarPath = currentProfile?.avatar_path;
-
-  if (!avatarPath || !supabase) {
-    avatar.src = fallback;
-
-    if (qrAvatar) qrAvatar.src = fallback;
-
-    return;
-  }
-
-  try {
-    const { data, error } = await supabase.storage
-      .from(CONFIG.avatarBucket)
-      .createSignedUrl(
-        avatarPath,
-        CONFIG.signedUrlExpiry
-      );
-
-    if (error) throw error;
-
-    currentAvatarSignedUrl = data?.signedUrl || null;
-
-    if (currentAvatarSignedUrl) {
-      avatar.src = currentAvatarSignedUrl;
-
-      if (qrAvatar) {
-        qrAvatar.src = currentAvatarSignedUrl;
-      }
-    } else {
-      avatar.src = fallback;
-
-      if (qrAvatar) qrAvatar.src = fallback;
-    }
-  } catch (error) {
-    console.warn("[TARBIYAH] Avatar:", error.message);
-
-    avatar.src = fallback;
-
-    if (qrAvatar) qrAvatar.src = fallback;
-  }
-}
-
-/* ---------- 10. MODE EDIT PROFIL ---------- */
-
-function v33GetEditableInputs() {
-  return [
-    "inputFullName",
-    "inputPhone",
-    "inputGender",
-    "inputBirthDate",
-    "inputCity",
-    "inputAddress",
-    "inputUsername",
-    "inputBio"
-  ]
-    .map((id) => document.getElementById(id))
-    .filter(Boolean);
-}
-
-function v33CaptureFormData() {
-  const result = {};
-
-  v33GetEditableInputs().forEach((input) => {
-    result[input.id] = input.value;
-  });
-
-  return result;
-}
-
-function v33RestoreFormData() {
-  if (!originalFormData) return;
-
-  Object.entries(originalFormData).forEach(([id, value]) => {
-    const input = document.getElementById(id);
-
-    if (input) input.value = value ?? "";
-  });
-}
-
-function v33SetEditMode(enabled) {
-  isEditing = Boolean(enabled);
-
-  v33GetEditableInputs().forEach((input) => {
-    input.disabled = !isEditing;
-  });
-
-  const editButton = document.getElementById("btnEditProfile");
-  const actions = document.getElementById("profileEditActions");
-
-  if (editButton) {
-    editButton.style.display = isEditing ? "none" : "";
-  }
-
-  if (actions) {
-    actions.style.display = isEditing ? "flex" : "none";
-  }
-
-  const saveButton = document.getElementById("btnSaveProfile");
-
-  if (saveButton) {
-    saveButton.disabled = isSaving;
-    saveButton.textContent = isSaving
-      ? "Menyimpan..."
-      : "Simpan Perubahan";
-  }
-}
-
-function v33StartEditing() {
-  if (!currentProfile) {
-    v33Toast("Data profil belum tersedia.", "warning");
-    return;
-  }
-
-  originalFormData = v33CaptureFormData();
-
-  v33SetEditMode(true);
-
-  v33Toast(
-    "Mode edit aktif. Silakan perbarui data profil.",
-    "info"
-  );
-}
-
-function v33CancelEditing() {
-  v33RestoreFormData();
-
-  v33SetEditMode(false);
-
-  v33Toast("Perubahan dibatalkan.", "info");
-}
-
-/* ---------- 11. SIMPAN PERUBAHAN PROFIL ---------- */
-
-async function v33SaveProfile(event) {
-  if (event) event.preventDefault();
-
-  if (isSaving) return;
-
-  if (!supabase || !currentUser) {
-    v33Toast("Sesi pengguna tidak tersedia.", "error");
-    return;
-  }
-
-  const fullName =
-    document.getElementById("inputFullName")?.value.trim() || "";
-
-  if (!fullName) {
-    v33Toast("Nama lengkap wajib diisi.", "warning");
-    return;
-  }
-
-  const payload = {
-    full_name: fullName,
-    phone:
-      document.getElementById("inputPhone")?.value.trim() || null,
-    gender:
-      document.getElementById("inputGender")?.value || null,
-    birth_date:
-      document.getElementById("inputBirthDate")?.value || null,
-    city:
-      document.getElementById("inputCity")?.value.trim() || null,
-    address:
-      document.getElementById("inputAddress")?.value.trim() || null,
-    updated_at: new Date().toISOString()
-  };
-
-  // Simpan kolom tambahan hanya jika inputnya memang tersedia.
-  const usernameInput = document.getElementById("inputUsername");
-  const bioInput = document.getElementById("inputBio");
-
-  if (usernameInput) {
-    payload.username = usernameInput.value.trim() || null;
-  }
-
-  if (bioInput) {
-    payload.bio = bioInput.value.trim() || null;
-  }
-
-  isSaving = true;
-
-  v33SetEditMode(true);
-
-  try {
-    const { data, error } = await supabase
-      .from("profiles")
-      .update(payload)
-      .eq("id", currentUser.id)
-      .select("*")
-      .single();
-
-    if (error) throw error;
-
-    currentProfile = data;
-
-    v33RenderProfile();
-
-    // Perbarui snapshot agar data yang baru disimpan
-    // tidak tertimpa oleh fungsi pembatalan.
-    originalFormData = v33CaptureFormData();
-
-    v33Toast("Alhamdulillah, profil berhasil diperbarui.", "success");
-
-    v33SetEditMode(false);
-
-  } catch (error) {
-    console.error("[TARBIYAH] Simpan profil:", error);
-
-    v33Toast(
-      "Gagal menyimpan profil: " + (error.message || "Terjadi kesalahan."),
-      "error"
-    );
-
-  } finally {
-    isSaving = false;
-
-    if (isEditing) {
-      v33SetEditMode(true);
-    } else {
-      v33SetEditMode(false);
-    }
-  }
-}
-
-/* ---------- 12. PILIH FOTO PROFIL ---------- */
-
-function v33PreviewAvatar(file) {
-  if (!file) return;
-
-  if (!CONFIG.allowedAvatarTypes.includes(file.type)) {
-    v33Toast(
-      "Format foto harus JPG, PNG, atau WEBP.",
-      "warning"
-    );
-    return;
-  }
-
-  if (file.size > CONFIG.maxAvatarSize) {
-    v33Toast(
-      "Ukuran foto maksimal 2 MB.",
-      "warning"
-    );
-    return;
-  }
-
-  v33SafeRevokePreview();
-
-  selectedAvatarFile = file;
-
-  selectedAvatarPreviewUrl = URL.createObjectURL(file);
-
-  const avatar = document.getElementById("profileAvatar");
-
-  if (avatar) {
-    avatar.src = selectedAvatarPreviewUrl;
-  }
-
-  v33Toast(
-    "Pratinjau foto berhasil. Tekan tombol simpan foto untuk mengunggahnya.",
-    "info"
-  );
-}
-
-/* ---------- 13. UPLOAD FOTO KE SUPABASE STORAGE ---------- */
-
-async function v33UploadAvatar() {
-  if (!selectedAvatarFile) {
-    v33Toast("Pilih foto terlebih dahulu.", "warning");
-    return;
-  }
-
-  if (!supabase || !currentUser) {
-    v33Toast("Sesi pengguna tidak tersedia.", "error");
-    return;
-  }
-
-  const file = selectedAvatarFile;
-
-  const extension =
-    file.name.split(".").pop()?.toLowerCase() || "jpg";
-
-  const filePath =
-    currentUser.id +
-    "/" +
-    Date.now() +
-    "." +
-    extension;
-
-  try {
-    v33Toast("Sedang mengunggah foto...", "info");
-
-    const { error: uploadError } = await supabase.storage
-      .from(CONFIG.avatarBucket)
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-        contentType: file.type
-      });
-
-    if (uploadError) throw uploadError;
-
-    const { data, error: updateError } = await supabase
-      .from("profiles")
-      .update({
-        avatar_path: filePath,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", currentUser.id)
-      .select("*")
-      .single();
-
-    if (updateError) {
-      // Jika penyimpanan path gagal, hapus file yang baru diunggah.
-      await supabase.storage
-        .from(CONFIG.avatarBucket)
-        .remove([filePath]);
-
-      throw updateError;
-    }
-
-    currentProfile = data;
-
-    selectedAvatarFile = null;
-
-    v33SafeRevokePreview();
-
-    await v33RenderAvatar();
-
-    v33Toast("Foto profil berhasil diperbarui.", "success");
-
-  } catch (error) {
-    console.error("[TARBIYAH] Upload avatar:", error);
-
-    v33Toast(
-      "Gagal mengunggah foto: " + (error.message || "Terjadi kesalahan."),
-      "error"
-    );
-
-    // Kembalikan tampilan ke foto yang tersimpan.
-    await v33RenderAvatar();
-  }
-}
-
-/* ---------- 14. TAB NAVIGASI PROFIL ---------- */
-
-function v33SetupTabs() {
-  const tabs = v33GetAll(".profile-tab[data-tab]");
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const target = tab.dataset.tab;
-
-      if (!target) return;
-
-      tabs.forEach((item) => {
-        item.classList.remove("active");
-        item.setAttribute("aria-selected", "false");
-      });
-
-      tab.classList.add("active");
-      tab.setAttribute("aria-selected", "true");
-
-      v33GetAll(".profile-tab-content").forEach((panel) => {
-        panel.classList.remove("active");
-      });
-
-      const targetPanel = document.getElementById(
-        "tab-" + target
-      );
-
-      if (targetPanel) {
-        targetPanel.classList.add("active");
-      }
-    });
-  });
-}
-
-/* ---------- 15. RIWAYAT KEHADIRAN ---------- */
-
-function v33RenderAttendanceNotice() {
-  const container = document.getElementById("attendanceHistory");
-
-  if (!container) return;
-
-  container.innerHTML = `
-    <div class="attendance-empty">
-      <div class="attendance-empty-icon">📚</div>
-      <h3>Riwayat Kajian</h3>
-      <p>
-        Riwayat kehadiran akan ditampilkan setelah
-        sistem database absensi kajian tersedia.
-      </p>
-    </div>
-  `;
-}
-
-/* ---------- 16. QR ANGGOTA ---------- */
-
-function v33SetupQR() {
-  const generateButton = document.getElementById("btnGenerateQR");
-  const downloadButton = document.getElementById("btnDownloadQR");
-
-  if (generateButton) {
-    generateButton.addEventListener("click", () => {
-      v33Toast(
-        "Fitur QR anggota memerlukan Edge Function member-qr-mint. Format permintaan dan respons backend perlu diverifikasi terlebih dahulu.",
-        "warning"
-      );
-    });
-  }
-
-  if (downloadButton) {
-    downloadButton.addEventListener("click", () => {
-      v33Toast(
-        "QR belum tersedia untuk diunduh. Silakan aktifkan layanan QR anggota terlebih dahulu.",
-        "warning"
-      );
-    });
-  }
-}
-
-/* ---------- 17. NAVIGASI KEMBALI ---------- */
-
-function v33GoBack() {
-  const destination =
-    CONFIG.dashboardPage || "./dashboard.html";
-
-  if (window.history.length > 1) {
-    window.history.back();
-  } else {
-    window.location.href = destination;
-  }
-}
-
-/* ---------- 18. LOGOUT ---------- */
-
-async function v33Logout() {
-  if (!supabase) {
-    window.location.href =
-      CONFIG.loginPage || "./login-register.html";
-    return;
-  }
-
-  const confirmed = window.confirm(
-    "Apakah Anda yakin ingin keluar dari akun TARBIYAH?"
-  );
-
-  if (!confirmed) return;
-
-  try {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) throw error;
-
-    window.location.href =
-      CONFIG.loginPage || "./login-register.html";
-
-  } catch (error) {
-    console.error("[TARBIYAH] Logout:", error);
-
-    v33Toast(
-      "Gagal keluar: " + (error.message || "Terjadi kesalahan."),
-      "error"
-    );
-  }
-}
-
-/* ---------- 19. EVENT LISTENERS ---------- */
-
-function v33SetupEvents() {
-  const editButton = document.getElementById("btnEditProfile");
-  const cancelButton = document.getElementById("btnCancelEdit");
-  const saveButton = document.getElementById("btnSaveProfile");
-  const form = document.getElementById("personalProfileForm");
-
-  const backButton = document.getElementById("btnBack");
-  const themeButton = document.getElementById("btnTheme");
-  const notificationButton = document.getElementById("btnNotifications");
-  const logoutButton = document.getElementById("btnLogout");
-
-  const avatarButton = document.getElementById("btnChangeAvatar");
-  const avatarInput = document.getElementById("avatarInput");
-
-  if (editButton) {
-    editButton.addEventListener("click", v33StartEditing);
-  }
-
-  if (cancelButton) {
-    cancelButton.addEventListener("click", v33CancelEditing);
-  }
-
-  if (saveButton) {
-    saveButton.addEventListener("click", v33SaveProfile);
-  }
-
-  if (form) {
-    form.addEventListener("submit", v33SaveProfile);
-  }
-
-  if (backButton) {
-    backButton.addEventListener("click", v33GoBack);
-  }
-
-  if (themeButton) {
-    themeButton.addEventListener("click", v33ToggleTheme);
-  }
-
-  if (notificationButton) {
-    notificationButton.addEventListener("click", () => {
-      v33Toast(
-        "Belum ada notifikasi baru.",
-        "info"
-      );
-    });
-  }
-
-  if (logoutButton) {
-    logoutButton.addEventListener("click", v33Logout);
-  }
-
-  if (avatarButton && avatarInput) {
-    avatarButton.addEventListener("click", () => {
-      avatarInput.click();
-    });
-
-    avatarInput.addEventListener("change", () => {
-      const file = avatarInput.files?.[0];
-
-      if (file) {
-        v33PreviewAvatar(file);
-      }
-    });
-  }
-
-  v33SetupTabs();
-  v33SetupQR();
-}
-
-/* ---------- 20. MUAT SELURUH DATA ---------- */
-
-async function v33LoadAllData() {
-  await v33LoadProfile();
-
-  // Keanggotaan dan role tidak boleh menghalangi
-  // halaman profil apabila salah satunya gagal dimuat.
-  await Promise.allSettled([
-    v33LoadMembership(),
-    v33LoadRole()
-  ]);
-
-  v33RenderProfile();
-
-  await v33RenderAvatar();
-
-  v33RenderAttendanceNotice();
-
-  originalFormData = v33CaptureFormData();
-
-  v33SetEditMode(false);
-}
-
-/* ---------- 21. INISIALISASI APLIKASI ---------- */
-
-async function v33Initialize() {
-  if (isInitialized) return;
-
-  isInitialized = true;
-
-  v33SetLoading(true);
-
-  try {
-    v33ApplyLogo();
-    v33ApplyTheme();
-    v33SetupEvents();
-
-    supabase = getSupabaseClient();
-
     if (!supabase) {
       throw new Error(
-        "Supabase belum terhubung. Periksa js/config.js dan js/supabase-client.js."
+        "Supabase client tidak ditemukan. Periksa supabase-client.js."
       );
     }
 
-    const user = await getCurrentUser();
+    const result = await withTimeout(
+      supabase.auth.getSession(),
+      "Pemeriksaan sesi login"
+    );
 
-    if (!user) {
-      window.location.href =
-        CONFIG.loginPage || "./login-register.html";
+    if (result.error) {
+      throw result.error;
+    }
 
+    const session = result.data?.session;
+
+    if (!session?.user) {
+      window.location.replace(CONFIG.LOGIN_PAGE);
+      return null;
+    }
+
+    return session.user;
+  }
+
+  async function logout() {
+    const button = $("btnLogout");
+
+    try {
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Keluar...";
+      }
+
+      const result = await withTimeout(
+        supabase.auth.signOut(),
+        "Proses logout"
+      );
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      window.location.replace(CONFIG.LOGIN_PAGE);
+
+    } catch (error) {
+      console.error("[TARBIYAH] Logout:", error);
+
+      notify(
+        error.message || "Gagal keluar dari akun.",
+        "error"
+      );
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Keluar";
+      }
+    }
+  }
+
+  /* ==========================================================
+     11. LOAD PROFILE
+     ========================================================== */
+
+  async function loadProfile() {
+    const result = await withTimeout(
+      supabase
+        .from("profiles")
+        .select(`
+          id,
+          full_name,
+          username,
+          phone,
+          avatar_path,
+          bio,
+          created_at,
+          updated_at
+        `)
+        .eq("id", currentUser.id)
+        .maybeSingle(),
+      "Pengambilan data profil"
+    );
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    profileData = result.data;
+
+    if (!profileData) {
+      throw new Error(
+        "Data profil belum ditemukan di tabel profiles."
+      );
+    }
+
+    return profileData;
+  }
+
+  /* ==========================================================
+     12. LOAD MEMBERSHIP
+     ========================================================== */
+
+  async function loadMembership() {
+    const result = await withTimeout(
+      supabase
+        .from("members")
+        .select(`
+          id,
+          user_id,
+          member_number,
+          membership_status,
+          submitted_at,
+          reviewed_at,
+          reviewed_by,
+          review_note,
+          created_at,
+          updated_at
+        `)
+        .eq("user_id", currentUser.id)
+        .maybeSingle(),
+      "Pengambilan data keanggotaan"
+    );
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    memberData = result.data;
+
+    return memberData;
+  }
+
+  /* ==========================================================
+     13. LOAD ROLE
+     ========================================================== */
+
+  async function loadRole() {
+    const result = await withTimeout(
+      supabase
+        .from("user_roles")
+        .select("role_id, roles(name)")
+        .eq("user_id", currentUser.id),
+      "Pengambilan data peran"
+    );
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    roleData = result.data || [];
+
+    return roleData;
+  }
+
+  function getRoleName() {
+    if (!roleData.length) {
+      return "Anggota";
+    }
+
+    const labels = {
+      super_admin: "Super Admin",
+      admin: "Administrator",
+      registered_user: "Anggota Terdaftar",
+      mentor: "Mentor",
+      member: "Anggota"
+    };
+
+    const names = roleData
+      .map(item => item.roles?.name)
+      .filter(Boolean)
+      .map(name => labels[name] || name);
+
+    return names.length
+      ? names.join(", ")
+      : "Anggota";
+  }
+
+  /* ==========================================================
+     14. AVATAR
+     ========================================================== */
+
+  async function getAvatarUrl(path) {
+    if (!path) return null;
+
+    const result = await withTimeout(
+      supabase.storage
+        .from(CONFIG.AVATAR_BUCKET)
+        .createSignedUrl(
+          path,
+          CONFIG.SIGNED_URL_DURATION
+        ),
+      "Pengambilan foto profil"
+    );
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    return result.data?.signedUrl || null;
+  }
+
+  async function renderAvatar() {
+    const ids = [
+      "profileAvatar",
+      "qrMemberAvatar"
+    ];
+
+    let avatarUrl = null;
+
+    if (profileData?.avatar_path) {
+      try {
+        avatarUrl = await getAvatarUrl(
+          profileData.avatar_path
+        );
+      } catch (error) {
+        console.warn(
+          "[TARBIYAH] Foto profil tidak dapat dimuat:",
+          error
+        );
+      }
+    }
+
+    ids.forEach(id => {
+      const image = $(id);
+
+      if (!image) return;
+
+      if (avatarUrl) {
+        image.src = avatarUrl;
+        image.hidden = false;
+      } else {
+        image.removeAttribute("src");
+        image.hidden = true;
+      }
+    });
+
+    document.querySelectorAll(
+      "[data-profile-initials]"
+    ).forEach(element => {
+      element.textContent = getInitials(
+        profileData?.full_name
+      );
+    });
+  }
+
+  /* ==========================================================
+     15. RENDER PROFILE
+     ========================================================== */
+
+  async function renderProfile() {
+    const name =
+      profileData?.full_name ||
+      currentUser?.user_metadata?.full_name ||
+      "Pengguna TARBIYAH";
+
+    setText("profileName", name);
+    setText("profileEmail", currentUser?.email);
+
+    setText("qrMemberName", name);
+
+    setValue(
+      "inputFullName",
+      profileData?.full_name || name
+    );
+
+    setValue(
+      "inputEmail",
+      currentUser?.email
+    );
+
+    setValue(
+      "inputPhone",
+      profileData?.phone
+    );
+
+    if ($("inputUsername")) {
+      setValue(
+        "inputUsername",
+        profileData?.username
+      );
+    }
+
+    if ($("inputBio")) {
+      setValue(
+        "inputBio",
+        profileData?.bio
+      );
+    }
+
+    await renderAvatar();
+  }
+
+  /* ==========================================================
+     16. RENDER MEMBERSHIP
+     ========================================================== */
+
+  function membershipStatusLabel(status) {
+    const labels = {
+      pending: "Menunggu Verifikasi",
+      approved: "Anggota Aktif",
+      active: "Anggota Aktif",
+      rejected: "Ditolak",
+      suspended: "Ditangguhkan",
+      inactive: "Tidak Aktif"
+    };
+
+    return labels[status] || status || "Belum Terdaftar";
+  }
+
+  function renderMembership() {
+    const status = memberData
+      ? membershipStatusLabel(
+          memberData.membership_status
+        )
+      : "Belum Terdaftar";
+
+    const number =
+      memberData?.member_number ||
+      "Belum tersedia";
+
+    const date =
+      memberData?.submitted_at ||
+      memberData?.created_at;
+
+    setText("memberStatus", status);
+    setText("memberNumber", number);
+    setText("memberSince", formatDate(date));
+
+    setText("membershipNumber", number);
+    setText("membershipStatus", status);
+    setText("membershipDate", formatDate(date));
+
+    setText(
+      "membershipGroup",
+      "Belum ditentukan"
+    );
+
+    setText(
+      "membershipRole",
+      getRoleName()
+    );
+
+    setText(
+      "membershipUpdated",
+      formatDate(memberData?.updated_at)
+    );
+
+    setText("qrMemberNumber", number);
+    setText("qrMemberStatus", status);
+  }
+
+  /* ==========================================================
+     17. ACCOUNT STATUS
+     ========================================================== */
+
+  function renderAccountStatus() {
+    setText(
+      "accountStatus",
+      currentUser ? "Akun Terhubung" : "Tidak Terhubung"
+    );
+
+    const verified =
+      currentUser?.email_confirmed_at ||
+      currentUser?.confirmed_at;
+
+    setText(
+      "emailVerificationStatus",
+      verified
+        ? "Email Terverifikasi"
+        : "Email Belum Terverifikasi"
+    );
+  }
+
+  /* ==========================================================
+     18. EDIT PROFILE
+     ========================================================== */
+
+  function getEditableFields() {
+    return [
+      "inputFullName",
+      "inputPhone",
+      "inputUsername",
+      "inputBio"
+    ]
+      .map(id => $(id))
+      .filter(Boolean);
+  }
+
+  function captureFormData() {
+    const data = {};
+
+    getEditableFields().forEach(field => {
+      data[field.id] = field.value;
+    });
+
+    return data;
+  }
+
+  function restoreFormData() {
+    Object.entries(originalFormData).forEach(
+      ([id, value]) => {
+        setValue(id, value);
+      }
+    );
+  }
+
+  function setEditMode(enabled) {
+    isEditing = Boolean(enabled);
+
+    if (isEditing) {
+      originalFormData = captureFormData();
+    } else {
+      restoreFormData();
+    }
+
+    getEditableFields().forEach(field => {
+      field.disabled = !isEditing;
+    });
+
+    if ($("btnEditProfile")) {
+      $("btnEditProfile").hidden = isEditing;
+    }
+
+    if ($("profileEditActions")) {
+      $("profileEditActions").hidden = !isEditing;
+    }
+
+    if ($("btnSaveProfile")) {
+      $("btnSaveProfile").disabled = false;
+    }
+  }
+
+  /* ==========================================================
+     19. SAVE PROFILE
+     ========================================================== */
+
+  async function saveProfile(event) {
+    event?.preventDefault();
+
+    if (!currentUser || !isEditing) return;
+
+    const button = $("btnSaveProfile");
+
+    try {
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Menyimpan...";
+      }
+
+      const fullName = getValue("inputFullName");
+
+      if (!fullName) {
+        throw new Error(
+          "Nama lengkap wajib diisi."
+        );
+      }
+
+      const payload = {
+        full_name: fullName,
+        phone: getValue("inputPhone") || null,
+        updated_at: new Date().toISOString()
+      };
+
+      if ($("inputUsername")) {
+        payload.username =
+          getValue("inputUsername") || null;
+      }
+
+      if ($("inputBio")) {
+        payload.bio =
+          getValue("inputBio") || null;
+      }
+
+      const result = await withTimeout(
+        supabase
+          .from("profiles")
+          .update(payload)
+          .eq("id", currentUser.id)
+          .select(`
+            id,
+            full_name,
+            username,
+            phone,
+            avatar_path,
+            bio,
+            created_at,
+            updated_at
+          `)
+          .maybeSingle(),
+        "Penyimpanan profil"
+      );
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      if (!result.data) {
+        throw new Error(
+          "Profil tidak berhasil diperbarui. Periksa kebijakan RLS."
+        );
+      }
+
+      profileData = result.data;
+
+      await renderProfile();
+
+      originalFormData = captureFormData();
+
+      setEditMode(false);
+
+      notify(
+        "Profil berhasil diperbarui.",
+        "success"
+      );
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH] Save profile:",
+        error
+      );
+
+      notify(
+        error.message || "Gagal menyimpan profil.",
+        "error"
+      );
+
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Simpan Perubahan";
+      }
+    }
+  }
+
+  /* ==========================================================
+     20. UPLOAD AVATAR
+     ========================================================== */
+
+  async function uploadAvatar(file) {
+    if (!file || !currentUser) return;
+
+    try {
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error(
+          "Format foto harus JPG, PNG, atau WEBP."
+        );
+      }
+
+      if (file.size > CONFIG.AVATAR_MAX_SIZE) {
+        throw new Error(
+          "Ukuran foto maksimal 2 MB."
+        );
+      }
+
+      notify(
+        "Sedang mengunggah foto profil...",
+        "info"
+      );
+
+      const extension = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+      }[file.type];
+
+      const filePath =
+        `${currentUser.id}/${Date.now()}.${extension}`;
+
+      const oldPath =
+        profileData?.avatar_path || null;
+
+      const uploadResult = await withTimeout(
+        supabase.storage
+          .from(CONFIG.AVATAR_BUCKET)
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type
+          }),
+        "Upload foto profil"
+      );
+
+      if (uploadResult.error) {
+        throw uploadResult.error;
+      }
+
+      const updateResult = await withTimeout(
+        supabase
+          .from("profiles")
+          .update({
+            avatar_path: filePath,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", currentUser.id)
+          .select(`
+            id,
+            full_name,
+            username,
+            phone,
+            avatar_path,
+            bio,
+            created_at,
+            updated_at
+          `)
+          .maybeSingle(),
+        "Pembaruan data foto profil"
+      );
+
+      if (updateResult.error || !updateResult.data) {
+        await supabase.storage
+          .from(CONFIG.AVATAR_BUCKET)
+          .remove([filePath]);
+
+        if (updateResult.error) {
+          throw updateResult.error;
+        }
+
+        throw new Error(
+          "Foto belum berhasil disimpan ke profil."
+        );
+      }
+
+      profileData = updateResult.data;
+
+      await renderAvatar();
+
+      if (oldPath && oldPath !== filePath) {
+        const removeResult = await supabase.storage
+          .from(CONFIG.AVATAR_BUCKET)
+          .remove([oldPath]);
+
+        if (removeResult.error) {
+          console.warn(
+            "[TARBIYAH] Foto lama belum terhapus:",
+            removeResult.error
+          );
+        }
+      }
+
+      notify(
+        "Foto profil berhasil diperbarui.",
+        "success"
+      );
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH] Upload avatar:",
+        error
+      );
+
+      notify(
+        error.message || "Gagal mengunggah foto.",
+        "error"
+      );
+
+    } finally {
+      if ($("avatarInput")) {
+        $("avatarInput").value = "";
+      }
+    }
+  }
+
+  /* ==========================================================
+     21. NAVIGATION TABS
+     ========================================================== */
+
+  function setupTabs() {
+    const buttons = document.querySelectorAll(
+      ".profile-tabs [data-tab]"
+    );
+
+    const panels = document.querySelectorAll(
+      ".profile-tab-content"
+    );
+
+    if (!buttons.length || !panels.length) {
+      console.warn(
+        "[TARBIYAH] Navigasi tab atau panel tidak ditemukan."
+      );
       return;
     }
 
-    currentUser = user;
+    function activateTab(name) {
+      const target = $("tab-" + name);
 
-    await v33LoadAllData();
+      if (!target) return;
+
+      buttons.forEach(button => {
+        const active =
+          button.dataset.tab === name;
+
+        button.classList.toggle("active", active);
+
+        button.setAttribute(
+          "aria-selected",
+          String(active)
+        );
+      });
+
+      panels.forEach(panel => {
+        const active =
+          panel.id === "tab-" + name;
+
+        panel.hidden = !active;
+
+        panel.classList.toggle(
+          "active",
+          active
+        );
+
+        panel.style.display =
+          active ? "" : "none";
+      });
+    }
+
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        activateTab(button.dataset.tab);
+      });
+    });
+
+    const activeButton = document.querySelector(
+      ".profile-tabs [data-tab].active"
+    );
+
+    activateTab(
+      activeButton?.dataset.tab || "personal"
+    );
+  }
+
+  /* ==========================================================
+     22. ACTIVITY PLACEHOLDER
+     ========================================================== */
+
+  function renderAttendanceNotice() {
+    setText("totalKajian", "—");
+    setText("totalAttendance", "—");
+    setText("attendancePercentage", "—");
+
+    const history = $("attendanceHistory");
+
+    if (history) {
+      history.textContent =
+        "Riwayat kajian dan kehadiran belum tersedia. " +
+        "Fitur ini menunggu integrasi tabel kajian dan kehadiran.";
+    }
+  }
+
+  /* ==========================================================
+     23. QR MEMBER
+     ========================================================== */
+
+  function setupQR() {
+    $("btnGenerateQR")?.addEventListener(
+      "click",
+      () => {
+        notify(
+          "Penerbitan QR anggota belum diaktifkan. " +
+          "Integrasi layanan penerbit token perlu diverifikasi.",
+          "info"
+        );
+      }
+    );
+
+    $("btnDownloadQR")?.addEventListener(
+      "click",
+      () => {
+        notify(
+          "QR anggota belum tersedia untuk diunduh.",
+          "info"
+        );
+      }
+    );
+  }
+
+  /* ==========================================================
+     24. EVENT LISTENERS
+     ========================================================== */
+
+  function setupEvents() {
+    if (eventsInitialized) return;
+
+    eventsInitialized = true;
+
+    $("btnBack")?.addEventListener(
+      "click",
+      () => {
+        window.location.href = CONFIG.DASHBOARD_PAGE;
+      }
+    );
+
+    $("btnEditProfile")?.addEventListener(
+      "click",
+      () => setEditMode(true)
+    );
+
+    $("btnCancelEdit")?.addEventListener(
+      "click",
+      () => setEditMode(false)
+    );
+
+    $("personalProfileForm")?.addEventListener(
+      "submit",
+      saveProfile
+    );
+
+    $("btnChangeAvatar")?.addEventListener(
+      "click",
+      () => $("avatarInput")?.click()
+    );
+
+    $("avatarInput")?.addEventListener(
+      "change",
+      event => {
+        const file = event.target.files?.[0];
+
+        if (file) {
+          uploadAvatar(file);
+        }
+      }
+    );
+
+    $("btnTheme")?.addEventListener(
+      "click",
+      toggleTheme
+    );
+
+    $("btnNotifications")?.addEventListener(
+      "click",
+      () => {
+        notify(
+          "Belum ada notifikasi baru untuk akun Anda.",
+          "info"
+        );
+      }
+    );
+
+    $("btnLogout")?.addEventListener(
+      "click",
+      logout
+    );
+
+    [
+      "inputGender",
+      "inputBirthDate",
+      "inputCity",
+      "inputAddress"
+    ].forEach(id => {
+      const field = $(id);
+
+      if (field) {
+        field.disabled = true;
+
+        field.title =
+          "Kolom ini belum tersedia pada database TARBIYAH.";
+      }
+    });
+
+    setupTabs();
+    setupQR();
+  }
+
+  /* ==========================================================
+     25. LOAD DATA SECARA BERTAHAP
+
+     Profil merupakan data utama.
+     Keanggotaan dan role dimuat secara terpisah
+     agar kegagalan salah satunya tidak mengunci halaman.
+     ========================================================== */
+
+  async function loadAllData() {
+    await loadProfile();
+
+    await renderProfile();
+
+    const results = await Promise.allSettled([
+      loadMembership(),
+      loadRole()
+    ]);
+
+    if (results[0].status === "rejected") {
+      console.error(
+        "[TARBIYAH] Data membership gagal:",
+        results[0].reason
+      );
+
+      memberData = null;
+    }
+
+    if (results[1].status === "rejected") {
+      console.error(
+        "[TARBIYAH] Data role gagal:",
+        results[1].reason
+      );
+
+      roleData = [];
+    }
+
+    renderMembership();
+    renderAccountStatus();
+    renderAttendanceNotice();
+  }
+
+  /* ==========================================================
+     26. AUTH STATE LISTENER
+     ========================================================== */
+
+  function setupAuthListener() {
+    if (!supabase || authSubscription) return;
+
+    const result = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (
+          event === "SIGNED_OUT" ||
+          !session?.user
+        ) {
+          window.location.replace(
+            CONFIG.LOGIN_PAGE
+          );
+        }
+      }
+    );
+
+    authSubscription =
+      result.data?.subscription || null;
+  }
+
+  /* ==========================================================
+     27. MAIN INITIALIZATION
+
+     PENTING:
+     hideLoadingScreen() dijalankan pada finally.
+     Dengan demikian, layar loading tidak dibiarkan
+     berputar tanpa batas akibat kegagalan proses.
+     ========================================================== */
+
+  async function initialize() {
+    if (initializationStarted) return;
+
+    initializationStarted = true;
 
     console.log(
-      "TARBIYAH PROFIL v3.3 berhasil diinisialisasi."
+      "[TARBIYAH] Memulai Profil Anggota v3.1..."
     );
 
-  } catch (error) {
-     console.error("PESAN ERROR:", error.message);
-console.error("LOKASI ERROR:", error.stack);
-    console.error(
-      "[TARBIYAH PROFIL v3.3]",
-      error
-    );
+    try {
+      applyLogo();
+      applyTheme();
 
-    v33Toast(
-      error.message || "Gagal memuat halaman profil.",
-      "error"
-    );
+      /*
+       * Pasang tombol dan tab sebelum
+       * mengambil data dari backend.
+       */
 
-    isInitialized = false;
+      setupEvents();
 
-  } finally {
-    v33SetLoading(false);
+      if (!supabase) {
+        throw new Error(
+          "Supabase client tidak ditemukan. " +
+          "Periksa urutan script HTML."
+        );
+      }
+
+      /*
+       * Pemeriksaan sesi login.
+       */
+
+      currentUser = await getCurrentUser();
+
+      if (!currentUser) return;
+
+      /*
+       * Siapkan data awal agar halaman
+       * tetap dapat menampilkan identitas akun.
+       */
+
+      setText(
+        "profileName",
+        currentUser.user_metadata?.full_name ||
+        currentUser.email ||
+        "Pengguna TARBIYAH"
+      );
+
+      setText(
+        "profileEmail",
+        currentUser.email
+      );
+
+      /*
+       * Muat data utama dan data pendukung.
+       */
+
+      await loadAllData();
+
+      /*
+       * Siapkan mode edit setelah data dimuat.
+       */
+
+      originalFormData = captureFormData();
+
+      setEditMode(false);
+
+      console.log(
+        "[TARBIYAH] Profil selesai dimuat.",
+        {
+          userId: currentUser.id,
+          profileLoaded: Boolean(profileData),
+          membershipLoaded: Boolean(memberData),
+          roleLoaded: roleData.length > 0
+        }
+      );
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH] Gagal memuat profil:",
+        error
+      );
+
+      notify(
+        error.message ||
+        "Terjadi kesalahan ketika memuat profil.",
+        "error"
+      );
+
+      /*
+       * Tampilkan identitas dasar dari sesi
+       * meskipun pengambilan profil gagal.
+       */
+
+      if (currentUser) {
+        setText(
+          "profileName",
+          currentUser.user_metadata?.full_name ||
+          currentUser.email
+        );
+
+        setText(
+          "profileEmail",
+          currentUser.email
+        );
+
+        renderAccountStatus();
+      }
+
+    } finally {
+      /*
+       * WAJIB: hentikan layar loading
+       * baik proses berhasil maupun gagal.
+       */
+
+      hideLoadingScreen();
+
+      console.log(
+        "[TARBIYAH] Proses inisialisasi berakhir."
+      );
+    }
+
+    setupAuthListener();
   }
-}
 
-/* ---------- 22. JALANKAN APLIKASI ---------- */
+  /* ==========================================================
+     28. START APPLICATION
+     ========================================================== */
 
-if (document.readyState === "loading") {
-  document.addEventListener(
-    "DOMContentLoaded",
-    v33Initialize,
-    { once: true }
-  );
-} else {
-  v33Initialize();
-}
-
-/* =========================================================
-   AKHIR TARBIYAH — PROFIL ANGGOTA v3.3
-========================================================= */
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize,
+      { once: true }
+    );
+  } else {
+    initialize();
+  }
 
 })();
-
-
- 
