@@ -2,7 +2,7 @@
 /* ============================================================
    TARBIYAH — PROFIL ANGGOTA
    File       : js/profil-anggota.js
-   Version    : 3.4 QR CDN FIX
+   Version    : 3.5 QRCode.js FIX
    Backend    : Supabase
    Language   : Bahasa Indonesia
 
@@ -14,7 +14,7 @@
    - Membership dan role.
    - Navigasi tab.
    - Integrasi Edge Function member-qr-mint.
-   - Menampilkan QR Code asli.
+   - Menampilkan QR Code asli menggunakan QRCode.js.
    - Memperbarui QR.
    - Mengunduh QR dalam format PNG.
    - Masa berlaku QR dari server.
@@ -48,15 +48,13 @@
 
     QR_FUNCTION: "member-qr-mint",
 
-    // CDN utama dan cadangan.
-    QR_LIBRARIES: [
-      "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js",
-      "https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js"
-    ],
+    // QRCode.js yang sudah berhasil dibuka di Chrome.
+    QR_LIBRARY:
+      "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js",
 
     QR_SIZE: 320,
-    QR_MARGIN: 3,
-    QR_ERROR_CORRECTION: "H"
+    QR_COLOR_DARK: "#102a22",
+    QR_COLOR_LIGHT: "#ffffff"
   };
 
   const supabase = window.tarbiyahSupabase;
@@ -79,7 +77,6 @@
   let authSubscription = null;
 
   // Token hanya disimpan sementara di memori halaman.
-  // Tidak disimpan ke localStorage/sessionStorage.
   let activeQrToken = null;
   let activeQrImage = null;
   let activeQrExpiry = null;
@@ -521,6 +518,8 @@
 
       activeQrToken = null;
       activeQrImage = null;
+      activeQrExpiry = null;
+      activeQrTokenId = null;
 
       window.location.replace(CONFIG.LOGIN_PAGE);
 
@@ -1352,93 +1351,76 @@
   }
 
   /* ==========================================================
-     24. QR — LOAD LIBRARY (FIXED)
+     24. QR — LOAD QRCode.js
      ========================================================== */
 
+  function isQRCodeJsReady() {
+    return (
+      typeof window.QRCode === "function" &&
+      window.QRCode.CorrectLevel !== undefined
+    );
+  }
+
   function loadQrLibrary() {
-    // Periksa apakah library sudah tersedia.
-    if (
-      window.QRCode &&
-      typeof window.QRCode.toDataURL === "function"
-    ) {
+    // QRCode.js menggunakan constructor new QRCode().
+    if (isQRCodeJsReady()) {
       return Promise.resolve(window.QRCode);
     }
 
-    // Hindari memuat library berkali-kali.
     if (qrLibraryPromise) {
       return qrLibraryPromise;
     }
 
     qrLibraryPromise = new Promise((resolve, reject) => {
-      let sourceIndex = 0;
+      const existingScript = document.querySelector(
+        'script[data-tarbiyah-qr-library="true"]'
+      );
 
-      function tryNextCDN() {
-        if (sourceIndex >= CONFIG.QR_LIBRARIES.length) {
-          reject(
-            new Error(
-              "Semua CDN QR Code gagal dimuat. " +
-              "Periksa koneksi internet, pemblokiran CDN, " +
-              "atau pengaturan browser."
-            )
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      const script = document.createElement("script");
+
+      script.src = CONFIG.QR_LIBRARY;
+      script.async = true;
+      script.dataset.tarbiyahQrLibrary = "true";
+
+      script.onload = () => {
+        if (isQRCodeJsReady()) {
+          console.info(
+            "[TARBIYAH] QRCode.js berhasil dimuat:",
+            CONFIG.QR_LIBRARY
           );
 
+          resolve(window.QRCode);
           return;
         }
 
-        const url = CONFIG.QR_LIBRARIES[sourceIndex++];
-
-        // Hapus script lama milik loader ini jika ada.
-        document
-          .querySelectorAll(
-            'script[data-tarbiyah-qr-library="true"]'
+        reject(
+          new Error(
+            "Script QRCode.js berhasil diunduh, " +
+            "tetapi constructor QRCode tidak ditemukan."
           )
-          .forEach(script => script.remove());
+        );
+      };
 
-        const script = document.createElement("script");
+      script.onerror = () => {
+        reject(
+          new Error(
+            "Gagal memuat QRCode.js dari cdnjs. " +
+            "Periksa koneksi internet atau pemblokiran CDN."
+          )
+        );
+      };
 
-        script.src = url;
-        script.async = true;
-        script.dataset.tarbiyahQrLibrary = "true";
-
-        script.onload = () => {
-          if (
-            window.QRCode &&
-            typeof window.QRCode.toDataURL === "function"
-          ) {
-            console.info(
-              "[TARBIYAH] Library QR Code berhasil dimuat:",
-              url
-            );
-
-            resolve(window.QRCode);
-          } else {
-            console.warn(
-              "[TARBIYAH] Script termuat tetapi API QRCode tidak ditemukan:",
-              url
-            );
-
-            script.remove();
-            tryNextCDN();
-          }
-        };
-
-        script.onerror = () => {
-          console.warn(
-            "[TARBIYAH] CDN QR Code gagal dimuat:",
-            url
-          );
-
-          script.remove();
-          tryNextCDN();
-        };
-
-        document.head.appendChild(script);
-      }
-
-      tryNextCDN();
+      document.head.appendChild(script);
     }).catch(error => {
-      // Izinkan percobaan baru jika pemuatan gagal.
       qrLibraryPromise = null;
+      console.error(
+        "[TARBIYAH] Pemuatan QRCode.js gagal:",
+        error.message
+      );
       throw error;
     });
 
@@ -1446,7 +1428,7 @@
   }
 
   /* ==========================================================
-     25. QR — CREATE IMAGE (FIXED)
+     25. QR — CREATE PNG DATA URL
      ========================================================== */
 
   async function createQrDataUrl(token) {
@@ -1458,44 +1440,92 @@
 
     const QRCodeLibrary = await loadQrLibrary();
 
-    // Gunakan callback API agar kompatibel
-    // dengan build browser package qrcode.
-    return new Promise((resolve, reject) => {
-      QRCodeLibrary.toDataURL(
-        token,
-        {
-          width: CONFIG.QR_SIZE,
-          margin: CONFIG.QR_MARGIN,
-          errorCorrectionLevel: CONFIG.QR_ERROR_CORRECTION,
-          color: {
-            dark: "#102a22",
-            light: "#ffffff"
-          }
-        },
-        (error, dataUrl) => {
-          if (error) {
-            reject(
-              new Error(
-                "Gagal membuat gambar QR: " +
-                (error.message || String(error))
-              )
-            );
-            return;
-          }
+    const temporaryContainer = document.createElement("div");
 
-          if (!dataUrl) {
-            reject(
-              new Error(
-                "Library QR tidak menghasilkan gambar."
-              )
-            );
-            return;
-          }
+    temporaryContainer.setAttribute(
+      "aria-hidden",
+      "true"
+    );
 
-          resolve(dataUrl);
+    // Tempat sementara di luar area tampilan.
+    temporaryContainer.style.position = "fixed";
+    temporaryContainer.style.left = "-10000px";
+    temporaryContainer.style.top = "-10000px";
+    temporaryContainer.style.width = CONFIG.QR_SIZE + "px";
+    temporaryContainer.style.height = CONFIG.QR_SIZE + "px";
+    temporaryContainer.style.overflow = "hidden";
+    temporaryContainer.style.background = "#ffffff";
+
+    document.body.appendChild(temporaryContainer);
+
+    try {
+      const correctionLevel =
+        QRCodeLibrary.CorrectLevel.H ??
+        QRCodeLibrary.CorrectLevel.M;
+
+      // API resmi QRCode.js: new QRCode(element, options).
+      new QRCodeLibrary(temporaryContainer, {
+        text: token,
+        width: CONFIG.QR_SIZE,
+        height: CONFIG.QR_SIZE,
+        colorDark: CONFIG.QR_COLOR_DARK,
+        colorLight: CONFIG.QR_COLOR_LIGHT,
+        correctLevel: correctionLevel
+      });
+
+      // QRCode.js menggambar canvas secara sinkron.
+      const canvas = temporaryContainer.querySelector("canvas");
+
+      if (canvas) {
+        const dataUrl = canvas.toDataURL("image/png");
+
+        if (
+          typeof dataUrl === "string" &&
+          dataUrl.startsWith("data:image/png")
+        ) {
+          return dataUrl;
         }
+      }
+
+      // Cadangan jika browser menggunakan elemen img.
+      const image = temporaryContainer.querySelector("img");
+
+      if (image?.src) {
+        if (image.src.startsWith("data:image/")) {
+          return image.src;
+        }
+
+        if (!image.complete) {
+          await new Promise((resolve, reject) => {
+            image.onload = resolve;
+            image.onerror = () => {
+              reject(
+                new Error(
+                  "Gambar QR tidak berhasil diselesaikan."
+                )
+              );
+            };
+          });
+        }
+
+        if (image.src.startsWith("data:image/")) {
+          return image.src;
+        }
+      }
+
+      throw new Error(
+        "QRCode.js tidak menghasilkan canvas atau gambar QR."
       );
-    });
+
+    } catch (error) {
+      throw new Error(
+        "Gagal membuat gambar QR: " +
+        (error?.message || String(error))
+      );
+
+    } finally {
+      temporaryContainer.remove();
+    }
   }
 
   /* ==========================================================
@@ -1740,11 +1770,7 @@
         button.textContent = "Menerbitkan QR...";
       }
 
-      /*
-       * Pastikan library QR berhasil dimuat
-       * sebelum meminta token dari server.
-       */
-
+      // Muat QRCode.js sebelum meminta token ke server.
       await loadQrLibrary();
 
       notify(
@@ -1808,16 +1834,11 @@
         );
       }
 
-      /*
-       * Buat gambar QR dari token yang diterima.
-       * Token tidak dicetak ke Console dan tidak disimpan
-       * ke localStorage/sessionStorage.
-       */
-
+      // Membuat PNG dari token menggunakan QRCode.js.
       const imageDataUrl =
         await createQrDataUrl(token);
 
-      // Simpan sementara hanya di memori halaman.
+      // Token hanya disimpan sementara di memori.
       activeQrToken = token;
       activeQrExpiry = qrData.expires_at;
       activeQrTokenId = qrData.token_id || null;
@@ -1830,6 +1851,7 @@
         "success"
       );
 
+      // Jangan pernah mencetak nilai token ke Console.
       console.info(
         "[TARBIYAH] QR berhasil diterbitkan.",
         {
@@ -1843,8 +1865,7 @@
     } catch (error) {
       console.error(
         "[TARBIYAH] Penerbitan QR gagal:",
-        error?.message || error,
-        error
+        error?.message || String(error)
       );
 
       notify(
@@ -1904,7 +1925,7 @@
     } catch (error) {
       console.error(
         "[TARBIYAH] Download QR:",
-        error
+        error?.message || String(error)
       );
 
       notify(
@@ -2122,7 +2143,7 @@
     initializationStarted = true;
 
     console.log(
-      "[TARBIYAH] Memulai Profil Anggota v3.4..."
+      "[TARBIYAH] Memulai Profil Anggota v3.5..."
     );
 
     try {
@@ -2163,20 +2184,21 @@
       console.log(
         "[TARBIYAH] Profil selesai dimuat.",
         {
-          version: "3.4",
+          version: "3.5",
           userId: currentUser.id,
           profileLoaded: Boolean(profileData),
           membershipLoaded: Boolean(memberData),
           membershipStatus: memberData?.membership_status,
           roleLoaded: roleData.length > 0,
-          qrFunction: CONFIG.QR_FUNCTION
+          qrFunction: CONFIG.QR_FUNCTION,
+          qrLibrary: CONFIG.QR_LIBRARY
         }
       );
 
     } catch (error) {
       console.error(
         "[TARBIYAH] Gagal memuat profil:",
-        error
+        error?.message || String(error)
       );
 
       notify(
