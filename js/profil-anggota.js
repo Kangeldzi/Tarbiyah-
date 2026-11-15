@@ -1598,6 +1598,13 @@
     activeQrImage = dataUrl;
   }
 
+  // Aktifkan tombol unduh setelah QR berhasil ditampilkan
+const downloadButton = document.getElementById("btnDownloadQR");
+
+if (downloadButton) {
+  downloadButton.disabled = false;
+  downloadButton.removeAttribute("disabled");
+}
   /* ==========================================================
      28. QR — UPDATE INFORMATION
      ========================================================== */
@@ -1700,7 +1707,12 @@
     ).forEach(element => {
       element.dataset.qrState = "not-issued";
     });
-  }
+
+   const downloadButton = document.getElementById("btnDownloadQR");
+
+if (downloadButton) {
+  downloadButton.disabled = true;
+}
 
   /* ==========================================================
      30. QR — ERROR MESSAGE
