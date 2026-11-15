@@ -1861,6 +1861,59 @@ async function uploadAvatar(file) {
     return html2canvasPromise;
   }
 
+   
+/* ==========================================================
+   TARBIYAH — PREPARE AVATAR FOR PNG EXPORT
+   Membuat foto persegi tanpa merusak proporsi asli.
+   ========================================================== */
+
+async function createSquareAvatarForExport(image, size = 512) {
+  if (!image || !image.src) {
+    throw new Error("Foto anggota belum tersedia.");
+  }
+
+  await waitForImage(image);
+
+  const sourceWidth = image.naturalWidth;
+  const sourceHeight = image.naturalHeight;
+
+  if (!sourceWidth || !sourceHeight) {
+    throw new Error("Ukuran asli foto anggota tidak valid.");
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("Browser tidak dapat memproses foto anggota.");
+  }
+
+  // Crop bagian tengah dengan rasio 1:1.
+  const cropSize = Math.min(sourceWidth, sourceHeight);
+
+  const sourceX = (sourceWidth - cropSize) / 2;
+  const sourceY = (sourceHeight - cropSize) / 2;
+
+  context.clearRect(0, 0, size, size);
+
+  context.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    cropSize,
+    cropSize,
+    0,
+    0,
+    size,
+    size
+  );
+
+  return canvas.toDataURL("image/png");
+}
+
   /* ==========================================================
      34. DOWNLOAD — WAIT FOR CARD IMAGES
      ========================================================== */
@@ -1980,121 +2033,164 @@ async function uploadAvatar(file) {
      36. DOWNLOAD — FULL MEMBER CARD
      ========================================================== */
 
-  async function downloadMemberCard() {
-    if (cardDownloading) return;
+async function downloadMemberCard() {
+  if (cardDownloading) return;
 
-    const button = $("btnDownloadQR");
-    const card = getMemberCardElement();
+  const button = $("btnDownloadQR");
+  const card = getMemberCardElement();
 
-    if (!activeQrImage) {
-      notify(
-        "QR belum tersedia. Terbitkan QR terlebih dahulu.",
-        "info"
-      );
-      setDownloadButtonState(false);
-      return;
+  if (!activeQrImage) {
+    notify(
+      "QR belum tersedia. Terbitkan QR terlebih dahulu.",
+      "info"
+    );
+    setDownloadButtonState(false);
+    return;
+  }
+
+  if (!card) {
+    notify(
+      "Elemen kartu anggota tidak ditemukan.",
+      "error"
+    );
+    return;
+  }
+
+  let avatarImage = null;
+  let originalAvatarSrc = null;
+  let avatarWasPrepared = false;
+
+  try {
+    cardDownloading = true;
+
+    if (button) {
+      button.disabled = true;
+      button.innerHTML =
+        "<span>◌</span> Menyiapkan Kartu...";
     }
 
-    if (!card) {
-      notify(
-        "Elemen kartu anggota tidak ditemukan.",
-        "error"
+    notify(
+      "Sedang menyiapkan gambar kartu anggota...",
+      "info"
+    );
+
+    // Pastikan QR tersedia.
+    const qrImage = getQrImage();
+
+    if (!qrImage || !qrImage.src) {
+      throw new Error(
+        "Gambar QR belum tampil pada kartu anggota."
       );
-      return;
     }
 
-    try {
-      cardDownloading = true;
+    // Tunggu seluruh gambar kartu selesai dimuat.
+    await waitForCardImages(card);
 
-      if (button) {
-        button.disabled = true;
-        button.innerHTML =
-          '<span>◌</span> Menyiapkan Kartu...';
-      }
+    // Siapkan foto anggota secara khusus.
+    avatarImage = $("qrMemberAvatar");
 
-      notify(
-        "Sedang menyiapkan gambar kartu anggota...",
-        "info"
-      );
+    if (avatarImage && !avatarImage.hidden && avatarImage.src) {
+      originalAvatarSrc = avatarImage.src;
 
-      // Pastikan QR benar-benar tampil di kartu.
-      const qrImage = getQrImage();
-
-      if (!qrImage || !qrImage.src) {
-        throw new Error(
-          "Gambar QR belum tampil pada kartu anggota."
+      const squareAvatar =
+        await createSquareAvatarForExport(
+          avatarImage,
+          512
         );
+
+      // Ganti sementara dengan foto persegi hasil crop.
+      avatarImage.src = squareAvatar;
+      avatarImage.style.width = "78px";
+      avatarImage.style.height = "78px";
+      avatarImage.style.aspectRatio = "1 / 1";
+      avatarImage.style.objectFit = "cover";
+      avatarImage.style.objectPosition = "center";
+      avatarImage.style.flex = "0 0 78px";
+      avatarImage.style.maxWidth = "78px";
+      avatarImage.style.maxHeight = "78px";
+
+      await waitForImage(avatarImage);
+
+      avatarWasPrepared = true;
+    }
+
+    const html2canvas = await loadHtml2Canvas();
+
+    const canvas = await html2canvas(card, {
+      scale: CONFIG.CARD_DOWNLOAD_SCALE,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: "#102a22",
+      logging: false,
+      imageTimeout: 15000,
+      removeContainer: true,
+      scrollX: 0,
+      scrollY: 0
+    });
+
+    if (!canvas || !canvas.width || !canvas.height) {
+      throw new Error(
+        "Gagal menghasilkan gambar kartu."
+      );
+    }
+
+    const memberNumber =
+      memberData?.member_number ||
+      currentUser?.id?.slice(0, 8) ||
+      "anggota";
+
+    const filename =
+      `TARBIYAH-KARTU-ANGGOTA-${memberNumber}.png`;
+
+    await saveCanvasAsPng(canvas, filename);
+
+    notify(
+      "Kartu anggota TARBIYAH berhasil diunduh.",
+      "success"
+    );
+
+    console.info(
+      "[TARBIYAH] Unduh kartu selesai.",
+      {
+        filename,
+        width: canvas.width,
+        height: canvas.height,
+        avatarPrepared: avatarWasPrepared,
+        format: "PNG"
       }
+    );
 
-      await waitForCardImages(card);
+  } catch (error) {
+    console.error(
+      "[TARBIYAH] Unduh kartu gagal:",
+      error
+    );
 
-      const html2canvas = await loadHtml2Canvas();
+    notify(
+      error?.message ||
+      "Gagal mengunduh kartu anggota.",
+      "error"
+    );
 
-      const canvas = await html2canvas(card, {
-        scale: CONFIG.CARD_DOWNLOAD_SCALE,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: "#102a22",
-        logging: false,
-        imageTimeout: 15000,
-        removeContainer: true,
-        scrollX: 0,
-        scrollY: 0
-      });
+  } finally {
+    // Kembalikan foto asli pada halaman profil.
+    if (
+      avatarImage &&
+      avatarWasPrepared &&
+      originalAvatarSrc
+    ) {
+      avatarImage.src = originalAvatarSrc;
+    }
 
-      if (!canvas || !canvas.width || !canvas.height) {
-        throw new Error(
-          "Gagal menghasilkan gambar kartu."
-        );
-      }
+    cardDownloading = false;
 
-      const memberNumber =
-        memberData?.member_number ||
-        currentUser?.id?.slice(0, 8) ||
-        "anggota";
-
-      const filename =
-        `TARBIYAH-KARTU-ANGGOTA-${memberNumber}.png`;
-
-      await saveCanvasAsPng(canvas, filename);
-
-      notify(
-        "Kartu anggota TARBIYAH berhasil disiapkan untuk diunduh.",
-        "success"
-      );
-
-      console.info(
-        "[TARBIYAH] Unduh kartu selesai.",
-        {
-          filename,
-          width: canvas.width,
-          height: canvas.height,
-          format: "PNG"
-        }
-      );
-
-    } catch (error) {
-      console.error(
-        "[TARBIYAH] Unduh kartu gagal:",
-        error?.message || String(error)
-      );
-
-      notify(
-        error?.message ||
-        "Gagal mengunduh kartu anggota. Periksa Console.",
-        "error"
-      );
-
-    } finally {
-      cardDownloading = false;
-
-      if (button) {
-        button.disabled = !activeQrImage;
-        button.innerHTML =
-          "<span>↓</span> Unduh Kartu";
-      }
+    if (button) {
+      button.disabled = !activeQrImage;
+      button.innerHTML =
+        "<span>↓</span> Unduh Kartu";
     }
   }
+}
 
   /* ==========================================================
      37. QR — EVENT LISTENERS
