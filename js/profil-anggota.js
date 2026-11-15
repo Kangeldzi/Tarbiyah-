@@ -284,77 +284,64 @@
   /* ==========================================================
      8. THEME
      ========================================================== */
+   
+function applyTheme() {
+  const themeController = window.TARBIYAH_THEME_CONTROLLER;
 
-  function applyTheme() {
-    try {
-      const savedTheme = localStorage.getItem(
-        CONFIG.THEME_KEY
-      );
-
-      if (
-        savedTheme === "dark" ||
-        savedTheme === "light"
-      ) {
-        document.documentElement.setAttribute(
-          "data-theme",
-          savedTheme
-        );
-      }
-    } catch (error) {
-      console.warn(
-        "[TARBIYAH] Preferensi tema tidak dapat dibaca.",
-        error
-      );
-    }
-
-    updateThemeButton();
-  }
-
-  function updateThemeButton() {
-    const button = $("btnTheme");
-
-    if (!button) return;
-
-    const theme =
-      document.documentElement.getAttribute("data-theme") ||
-      "dark";
-
-    button.textContent =
-      theme === "dark" ? "☀" : "☾";
-
-    button.setAttribute(
-      "aria-label",
-      theme === "dark"
-        ? "Aktifkan tema terang"
-        : "Aktifkan tema gelap"
+  if (!themeController) {
+    console.error(
+      "[TARBIYAH] tarbiyah-theme.js belum dimuat."
     );
+    return;
   }
 
-  function toggleTheme() {
-    const root = document.documentElement;
+  themeController.init();
+}
 
-    const current =
-      root.getAttribute("data-theme") || "dark";
 
-    const next =
-      current === "dark" ? "light" : "dark";
+  
+function updateThemeButton() {
+  const themeController = window.TARBIYAH_THEME_CONTROLLER;
 
-    root.setAttribute("data-theme", next);
+  if (!themeController) return;
 
-    try {
-      localStorage.setItem(
-        CONFIG.THEME_KEY,
-        next
-      );
-    } catch (error) {
-      console.warn(
-        "[TARBIYAH] Tema tidak dapat disimpan.",
-        error
-      );
-    }
+  const button = document.getElementById("btnTheme");
+  if (!button) return;
 
-    updateThemeButton();
+  const theme = themeController.getTheme();
+
+  button.textContent = theme === "dark" ? "☀" : "☾";
+
+  button.setAttribute(
+    "aria-label",
+    theme === "dark"
+      ? "Aktifkan Light Mode"
+      : "Aktifkan Dark Mode"
+  );
+
+  button.setAttribute(
+    "title",
+    theme === "dark"
+      ? "Ganti ke Light Mode"
+      : "Ganti ke Dark Mode"
+  );
+}
+
+
+
+function toggleTheme() {
+  const themeController = window.TARBIYAH_THEME_CONTROLLER;
+
+  if (!themeController) {
+    console.error(
+      "[TARBIYAH] Pengendali tema pusat tidak ditemukan."
+    );
+    return;
   }
+
+  return themeController.toggleTheme();
+}
+
 
   /* ==========================================================
      9. DATE FORMAT
@@ -2254,72 +2241,71 @@ async function downloadMemberCard() {
      38. GENERAL EVENTS
      ========================================================== */
 
-  function setupEvents() {
-    if (eventsInitialized) return;
+function setupEvents() {
+  if (eventsInitialized) return;
 
-    eventsInitialized = true;
+  eventsInitialized = true;
 
-    $("btnBack")?.addEventListener(
-      "click",
-      () => {
-        window.location.href = CONFIG.DASHBOARD_PAGE;
+  $("btnBack")?.addEventListener(
+    "click",
+    () => {
+      window.location.href = CONFIG.DASHBOARD_PAGE;
+    }
+  );
+
+  $("btnEditProfile")?.addEventListener(
+    "click",
+    () => setEditMode(true)
+  );
+
+  $("btnCancelEdit")?.addEventListener(
+    "click",
+    () => setEditMode(false)
+  );
+
+  $("personalProfileForm")?.addEventListener(
+    "submit",
+    saveProfile
+  );
+
+  $("btnChangeAvatar")?.addEventListener(
+    "click",
+    () => $("avatarInput")?.click()
+  );
+
+  $("avatarInput")?.addEventListener(
+    "change",
+    event => {
+      const file = event.target.files?.[0];
+
+      if (file) {
+        uploadAvatar(file);
       }
-    );
+    }
+  );
 
-    $("btnEditProfile")?.addEventListener(
-      "click",
-      () => setEditMode(true)
-    );
+  // Event btnTheme dihapus.
+  // Sekarang ditangani oleh tarbiyah-theme.js.
 
-    $("btnCancelEdit")?.addEventListener(
-      "click",
-      () => setEditMode(false)
-    );
+  $("btnNotifications")?.addEventListener(
+    "click",
+    () => {
+      notify(
+        "Belum ada notifikasi baru untuk akun Anda.",
+        "info"
+      );
+    }
+  );
 
-    $("personalProfileForm")?.addEventListener(
-      "submit",
-      saveProfile
-    );
+  $("btnLogout")?.addEventListener(
+    "click",
+    logout
+  );
 
-    $("btnChangeAvatar")?.addEventListener(
-      "click",
-      () => $("avatarInput")?.click()
-    );
+  setupTabs();
+  setupQR();
+}
 
-    $("avatarInput")?.addEventListener(
-      "change",
-      event => {
-        const file = event.target.files?.[0];
-
-        if (file) {
-          uploadAvatar(file);
-        }
-      }
-    );
-
-    $("btnTheme")?.addEventListener(
-      "click",
-      toggleTheme
-    );
-
-    $("btnNotifications")?.addEventListener(
-      "click",
-      () => {
-        notify(
-          "Belum ada notifikasi baru untuk akun Anda.",
-          "info"
-        );
-      }
-    );
-
-    $("btnLogout")?.addEventListener(
-      "click",
-      logout
-    );
-
-    setupTabs();
-    setupQR();
-  }
 
   /* ==========================================================
      39. LOAD ALL DATA
