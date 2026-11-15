@@ -497,7 +497,226 @@
 #scanner-member-notice[hidden] {
   display: none !important;
 }
- 
+
+
+/* =========================================================
+   TARBIYAH — PRESENSI HEADER
+   Design mengikuti profil-anggota.html
+   Scope: khusus halaman presensi
+========================================================= */
+
+.presensi-header {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+
+  width: 100%;
+  min-height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+  padding: 10px 5%;
+
+  background: var(--profile-surface, var(--surface-primary));
+  border-bottom: 1px solid var(--profile-border, var(--border-default));
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.presensi-header-left,
+.presensi-header-actions {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 12px;
+}
+
+.presensi-header-left {
+  flex: 1 1 auto;
+}
+
+.presensi-header-actions {
+  flex: 0 0 auto;
+}
+
+/* Logo dan identitas */
+
+.presensi-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+  color: var(--profile-text, var(--text-primary));
+  text-decoration: none;
+}
+
+.presensi-brand img {
+  display: block;
+
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+  max-width: 42px;
+
+  object-fit: contain;
+  flex: 0 0 42px;
+}
+
+.presensi-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+
+.presensi-brand-text strong {
+  color: var(--profile-primary-light, var(--green-500));
+
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1.2;
+}
+
+.presensi-brand-text span {
+  color: var(--profile-muted, var(--text-muted));
+
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* Tombol ikon */
+
+.presensi-icon-button,
+.presensi-back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  flex: 0 0 42px;
+
+  padding: 0;
+
+  border: 1px solid var(--profile-border, var(--border-default));
+  border-radius: 12px;
+
+  background: var(--profile-surface-2, var(--surface-secondary));
+  color: var(--profile-text, var(--text-primary));
+
+  font-size: 19px;
+  line-height: 1;
+
+  text-decoration: none;
+  transition: all .25s ease;
+}
+
+.presensi-icon-button:hover,
+.presensi-back-button:hover {
+  color: #ffffff;
+  background: var(--profile-primary-dark, var(--green-700));
+  border-color: var(--profile-primary-dark, var(--green-700));
+  transform: translateY(-2px);
+}
+
+.presensi-icon-button:active,
+.presensi-back-button:active {
+  transform: translateY(0);
+}
+
+/* Responsif tablet */
+
+@media (max-width: 768px) {
+  .presensi-header {
+    min-height: 65px;
+    padding: 9px 3%;
+    gap: 8px;
+  }
+
+  .presensi-header-left,
+  .presensi-header-actions {
+    gap: 8px;
+  }
+
+  .presensi-brand img {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px;
+    max-width: 36px;
+    flex-basis: 36px;
+  }
+
+  .presensi-brand-text strong {
+    font-size: 14px;
+  }
+
+  .presensi-brand-text span {
+    font-size: 10px;
+  }
+
+  .presensi-icon-button,
+  .presensi-back-button {
+    width: 37px;
+    height: 37px;
+    min-width: 37px;
+    flex-basis: 37px;
+    border-radius: 10px;
+  }
+}
+
+/* Responsif HP kecil */
+
+@media (max-width: 380px) {
+  .presensi-header {
+    padding-inline: 8px;
+    gap: 5px;
+  }
+
+  .presensi-header-left,
+  .presensi-header-actions {
+    gap: 5px;
+  }
+
+  .presensi-brand {
+    gap: 6px;
+  }
+
+  .presensi-brand img {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px;
+    max-width: 32px;
+    flex-basis: 32px;
+  }
+
+  .presensi-brand-text strong {
+    font-size: 12px;
+    letter-spacing: .5px;
+  }
+
+  .presensi-brand-text span {
+    font-size: 9px;
+  }
+
+  .presensi-icon-button,
+  .presensi-back-button {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    flex-basis: 34px;
+    font-size: 17px;
+  }
+}
+
   </style>
 
   
@@ -540,19 +759,67 @@
     <div class="sidebar-overlay" data-sidebar-overlay></div>
 
     <main class="main-content">
-      <header class="topbar">
-        <button type="button" data-sidebar-toggle aria-label="Buka menu">☰</button>
+    
+<header class="topbar presensi-header">
 
-        <div class="topbar-title">
-          <strong>Presensi Tarbiyah</strong>
-          <small>Catatan kehadiran kegiatan dan kajian</small>
-        </div>
+  <div class="presensi-header-left">
 
-        <div class="topbar-actions">
-          <button type="button" data-theme-toggle aria-label="Ganti tema">◐</button>
-          <a href="./notifikasi.html" aria-label="Notifikasi">♧</a>
-        </div>
-      </header>
+    <!-- Tombol Sidebar -->
+    <button
+      type="button"
+      class="presensi-icon-button"
+      data-sidebar-toggle
+      aria-label="Buka menu">
+      ☰
+    </button>
+
+    <!-- Identitas TARBIYAH -->
+    <a href="./tarbiyah.html" class="presensi-brand">
+      <img
+        src="./assets/icons/tarbiyah-mark.svg"
+        alt="Logo TARBIYAH">
+
+      <div class="presensi-brand-text">
+        <strong>TARBIYAH</strong>
+        <span>Presensi Anggota</span>
+      </div>
+    </a>
+
+    <!-- Kembali ke Dashboard -->
+    <a
+      href="./tarbiyah.html"
+      class="presensi-back-button"
+      aria-label="Kembali ke Dashboard"
+      title="Kembali ke Dashboard">
+      ←
+    </a>
+
+  </div>
+
+  <div class="presensi-header-actions">
+
+    <!-- Toggle Tema -->
+    <button
+      type="button"
+      class="presensi-icon-button"
+      data-theme-toggle
+      aria-label="Ganti tema"
+      title="Ganti tema">
+      ◐
+    </button>
+
+    <!-- Notifikasi -->
+    <a
+      href="./notifikasi.html"
+      class="presensi-icon-button"
+      aria-label="Notifikasi"
+      title="Notifikasi">
+      ♧
+    </a>
+
+  </div>
+
+</header>
 
       <section class="page-content">
         <section class="attendance-hero">
