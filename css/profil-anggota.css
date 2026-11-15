@@ -1679,6 +1679,93 @@ textarea:focus-visible {
   }
 }
 
+
+/* =========================================================
+   TARBIYAH — FIX PRESISI FOTO & QR SAAT DOWNLOAD PNG
+   Version: 1.1
+========================================================= */
+
+/* Foto anggota pada kartu digital */
+.digital-member-card .qr-member-avatar {
+  display: block;
+
+  aspect-ratio: 1 / 1;
+
+  width: 78px;
+  height: 78px;
+
+  min-width: 78px;
+  min-height: 78px;
+
+  flex: 0 0 78px;
+
+  object-fit: cover;
+  object-position: center center;
+
+  box-sizing: border-box;
+}
+
+/* QR Code hasil penerbitan */
+.digital-member-card .qr-container img#memberQrImage,
+.digital-member-card .qr-container img#qrMemberImage,
+.digital-member-card .qr-container img#qrCodeImage {
+  display: block;
+
+  width: min(100%, 320px);
+  height: auto !important;
+
+  aspect-ratio: 1 / 1;
+
+  max-width: 320px;
+  max-height: none;
+
+  object-fit: contain;
+  object-position: center center;
+
+  flex: 0 0 auto;
+
+  margin: 0 auto;
+}
+
+/* Pastikan wadah QR tidak meregangkan gambar */
+.digital-member-card .qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: auto;
+
+  box-sizing: border-box;
+}
+
+/* Responsif: tablet dan handphone */
+@media (max-width: 600px) {
+  .digital-member-card .qr-member-avatar {
+    width: 65px;
+    height: 65px;
+
+    min-width: 65px;
+    min-height: 65px;
+
+    flex-basis: 65px;
+  }
+}
+
+@media (max-width: 360px) {
+  .digital-member-card .qr-member-avatar {
+    width: 55px;
+    height: 55px;
+
+    min-width: 55px;
+    min-height: 55px;
+
+    flex-basis: 55px;
+  }
+}
+
+
 /* =========================================================
    END OF TARBIYAH PROFILE CSS
 ========================================================= */
