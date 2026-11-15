@@ -774,6 +774,42 @@
   box-sizing: border-box;
 }
 
+
+
+/* =========================================================
+   TARBIYAH — MASTER TOGGLE SWITCH MODE
+   Mengikuti profil-anggota.css
+   ========================================================= */
+
+/* Variabel yang dibutuhkan Toggle Switch */
+:root {
+  --profile-primary: #10b981;
+  --profile-primary-dark: #047857;
+  --profile-primary-light: #34d399;
+
+  --profile-bg: #0b1713;
+  --profile-surface: #12231c;
+  --profile-surface-2: #192e25;
+  --profile-border: rgba(255,255,255,.09);
+
+  --profile-text: #f1f5f3;
+  --profile-muted: #9aada3;
+
+  --profile-transition: .25s ease;
+}
+
+/* Light Theme */
+html[data-theme="light"] {
+  --profile-bg: #f2f7f4;
+  --profile-surface: #ffffff;
+  --profile-surface-2: #eaf3ed;
+  --profile-border: rgba(15,75,48,.12);
+
+  --profile-text: #183329;
+  --profile-muted: #71877b;
+}
+
+/* MASTER BUTTON — SAMA DENGAN profil-anggota.css */
 .icon-button {
   width: 42px;
   height: 42px;
@@ -799,6 +835,7 @@
   transform: translateY(-2px);
 }
 
+/* MOBILE RESPONSIVE */
 @media (max-width: 600px) {
   .icon-button {
     width: 37px;
@@ -807,12 +844,14 @@
   }
 }
 
+/* SMALL MOBILE */
 @media (max-width: 360px) {
   .icon-button {
     width: 33px;
     height: 33px;
   }
 }
+
     
   </style>
 
@@ -940,14 +979,14 @@
 
   <div class="presensi-header-actions">
 
-    <!-- Toggle Tema -->
-    <button
-  type="button"
-  id="btnTheme"
-  class="icon-button"
-  aria-label="Ubah tema">
-  ◐
-  </button>
+  <!-- Toggle Switch Mode: MASTER TARBIYAH -->
+<button
+       type="button"
+       id="btnTheme"
+       class="icon-button"
+       aria-label="Ubah tema">
+       ◐
+</button>
     
     <!-- Notifikasi -->
     <a
