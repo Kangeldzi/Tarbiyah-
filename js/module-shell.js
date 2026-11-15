@@ -830,28 +830,30 @@
     }
   }
 
-  function bindThemeEvents() {
-    allElements(CONFIG.selectors.themeToggle)
-      .forEach(button => {
-        button.addEventListener("click", event => {
-          event.preventDefault();
-          toggleTheme();
-        });
-      });
+  
+function bindThemeEvents() {
 
-    /*
-     * Sinkronisasi tampilan jika theme-manager.js
-     * mengubah atribut tema dari tempat lain.
-     */
-    const observer = new MutationObserver(() => {
-      updateThemeButtons();
-    });
+  /*
+   * Theme Manager menjadi satu-satunya pengendali
+   * pergantian Dark Mode dan Light Mode.
+   *
+   * module-shell.js hanya bertugas menyinkronkan
+   * tampilan tombol dengan tema yang sedang aktif.
+   */
 
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: [CONFIG.themeAttribute]
-    });
-  }
+  const observer = new MutationObserver(() => {
+    updateThemeButtons();
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: [CONFIG.themeAttribute]
+  });
+
+  // Sinkronisasi tampilan tombol saat pertama kali dimuat.
+  updateThemeButtons();
+}
+
 
   function bindKeyboardEvents() {
     document.addEventListener("keydown", event => {
