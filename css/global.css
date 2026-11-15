@@ -952,3 +952,74 @@ html.auth-check-pending {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ==========================================
+   TARBIYAH — STANDARD THEME TOGGLE
+   Berlaku untuk seluruh halaman aplikasi
+========================================== */
+
+.theme-toggle-button {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+  min-height: 42px;
+
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 !important;
+  border-radius: 50% !important;
+
+  font-family: inherit;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  color: var(--text-primary, #e8f5ee);
+  background: var(--surface, rgba(255,255,255,.08));
+  border: 1px solid var(--border, rgba(255,255,255,.15));
+
+  box-shadow: 0 3px 12px rgba(0,0,0,.08);
+
+  transition:
+    background .25s ease,
+    color .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease,
+    transform .2s ease;
+}
+
+.theme-toggle-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 16px rgba(0,0,0,.14);
+}
+
+.theme-toggle-button:active {
+  transform: scale(.92);
+}
+
+.theme-toggle-button:focus-visible {
+  outline: 2px solid var(--primary, #10b981);
+  outline-offset: 3px;
+}
+
+/* Tema terang */
+html[data-theme="light"] .theme-toggle-button {
+  color: #176b4a;
+  background: #e7f5ed;
+  border-color: #c9e6d5;
+}
+
+/* Tema gelap */
+html[data-theme="dark"] .theme-toggle-button {
+  color: #d7f5e5;
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.16);
+}
+
