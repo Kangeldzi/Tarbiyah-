@@ -1,4 +1,3 @@
-
 /* TARBIYAH Dashboard controller
    Carousel SVG arrow consistency fix
    Supabase configuration is not modified.
