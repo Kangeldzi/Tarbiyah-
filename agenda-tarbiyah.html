@@ -286,69 +286,137 @@
         font-size: .72rem;
       }
     }
+
+  
+/* =========================================
+   PERBAIKAN SIDEBAR DAN LOGO PRESENSI
+========================================= */
+
+/* Pastikan sidebar mengikuti sistem module-shell */
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.app-sidebar .brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.app-sidebar .brand-logo img {
+  display: block;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px;
+  max-width: 40px;
+  flex: 0 0 40px;
+  object-fit: contain;
+}
+
+/* Logo Header */
+.presensi-brand img {
+  display: block;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+  max-width: 42px;
+  flex: 0 0 42px;
+  object-fit: contain;
+}
+
+/* Konten utama tidak melebar */
+.app-main {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Cegah elemen Sidebar tampil sebagai konten biasa
+   ketika belum dibuka */
+.app-sidebar:not(.is-open):not(.open):not(.active) {
+  box-sizing: border-box;
+}
+
   </style>
 </head>
 
 <body class="auth-pending">
 
-  <div class="app-shell">
 
-    <!-- HEADER -->
-    <header class="app-header">
+<div class="app-shell" data-module-shell>
 
-      <button
-        class="app-header-menu"
-        type="button"
-        data-sidebar-toggle
-        aria-label="Buka navigasi"
-        aria-expanded="false">
-        ☰
-      </button>
+  <!-- SIDEBAR NAVIGASI -->
+  <aside class="app-sidebar" data-sidebar>
 
-      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
-        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-        <span class="brand-logo-text">
-          <strong>TARBIYAH</strong>
-          <small>Pembelajaran Muslim</small>
-        </span>
+    <div class="sidebar-header">
+
+      <a href="./tarbiyah.html" class="brand-logo">
+        <img
+          src="./assets/icons/icon-192.png"
+          alt="Logo TARBIYAH">
+        <span>TARBIYAH</span>
       </a>
 
-      <div class="app-header-actions">
+      <button
+        type="button"
+        data-sidebar-close
+        aria-label="Tutup menu">
+        ×
+      </button>
 
-        <button
-          type="button"
-          class="app-header-action"
-          data-theme-toggle
-          aria-label="Ganti tema">
-          ◐
-        </button>
+    </div>
 
-        <a
-          href="./notifikasi.html"
-          class="app-header-action notification-action"
-          aria-label="Notifikasi">
-          ♧
-          <span class="notification-count" data-notification-count>0</span>
-        </a>
+    <nav class="sidebar-navigation" aria-label="Navigasi utama">
 
-        <button
-          type="button"
-          class="app-header-user"
-          data-user-menu-toggle
-          aria-label="Menu akun">
-          <img
-            src="./assets/icons/icon-192.png"
-            alt="Foto profil"
-            data-user-avatar>
-        </button>
+      <a href="./tarbiyah.html" class="sidebar-link">
+        Dashboard
+      </a>
 
-      </div>
-    </header>
+      <a href="./profil-anggota.html" class="sidebar-link">
+        Profil Anggota
+      </a>
 
-    <!-- SIDEBAR OVERLAY -->
-    <div
-      class="sidebar-overlay"
-      data-sidebar-overlay
+      <a href="./agenda-tarbiyah.html" class="sidebar-link">
+        Agenda Tarbiyah
+      </a>
+
+      <a href="./pembelajaran.html" class="sidebar-link">
+        Pembelajaran
+      </a>
+
+      <a href="./berita-pengumuman.html" class="sidebar-link">
+        Berita &amp; Pengumuman
+      </a>
+
+      <a href="./presensi-tarbiyah.html" class="sidebar-link active">
+        Presensi
+      </a>
+
+      <a href="./galeri-foto-video.html" class="sidebar-link">
+        Galeri
+      </a>
+
+      <a href="./diskusi-tarbiyah.html" class="sidebar-link">
+        Diskusi
+      </a>
+
+      <a href="./notifikasi.html" class="sidebar-link">
+        Notifikasi
+      </a>
+
+    </nav>
+
+  </aside>
+
+  <!-- OVERLAY SIDEBAR -->
+  <div class="sidebar-overlay" data-sidebar-overlay
       aria-hidden="true">
     </div>
 
