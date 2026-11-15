@@ -51,14 +51,16 @@
   /* ==========================================================
      2. STATE
   ========================================================== */
+ const state = {
+  preference: CONFIG.defaultTheme,
+  activeTheme: "dark",
+  initialized: false,
+  systemMedia: null,
+  storageAvailable: true,
 
-  const state = {
-    preference: CONFIG.defaultTheme,
-    activeTheme: "dark",
-    initialized: false,
-    systemMedia: null,
-    storageAvailable: true
-  };
+  // Mencegah listener dipasang berulang kali
+  themeControlsBound: false
+};
 
   /* ==========================================================
      3. UTILITAS
@@ -377,33 +379,55 @@
      11. EVENT KONTROL TEMA
   ========================================================== */
 
-  function bindThemeControls() {
-    document.addEventListener("click", event => {
-      const toggle = event.target.closest(
-        CONFIG.selectors.toggle
-      );
+ function bindThemeControls() {
 
-      if (toggle) {
-        event.preventDefault();
-        changeTheme();
-        return;
-      }
-
-      const option = event.target.closest(
-        CONFIG.selectors.option
-      );
-
-      if (option) {
-        event.preventDefault();
-
-        const theme = option.dataset.themeOption;
-
-        if (normalizeTheme(theme)) {
-          setTheme(theme);
-        }
-      }
-    });
+  // Jangan memasang listener lebih dari satu kali
+  if (state.themeControlsBound) {
+    return;
   }
+
+  document.addEventListener("click", function (event) {
+
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    const toggle = target.closest(
+      CONFIG.selectors.toggle
+    );
+
+    if (toggle) {
+      event.preventDefault();
+
+      changeTheme();
+
+      return;
+    }
+
+    const option = target.closest(
+      CONFIG.selectors.option
+    );
+
+    if (option) {
+      event.preventDefault();
+
+      const theme = option.dataset.themeOption;
+
+      if (normalizeTheme(theme)) {
+        setTheme(theme);
+      }
+    }
+
+  });
+
+  state.themeControlsBound = true;
+
+  console.info(
+    "[TARBIYAH THEME] Event tombol tema berhasil dipasang."
+  );
+} 
 
   /* ==========================================================
      12. SINKRONISASI ANTAR-TAB
