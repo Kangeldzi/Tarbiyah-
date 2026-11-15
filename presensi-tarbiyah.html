@@ -269,6 +269,227 @@
         font-size: 18px;
       }
     }
+
+  
+/* =========================================
+   TARBIYAH QR ATTENDANCE SCANNER
+========================================= */
+
+.attendance-scanner {
+  display: grid;
+  gap: 18px;
+}
+
+.scanner-admin-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.scanner-agenda-select {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-color, rgba(255,255,255,.14));
+  border-radius: 12px;
+  background: var(--surface, #142b24);
+  color: var(--text-primary, #fff);
+  font: inherit;
+}
+
+.scanner-agenda-info {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid rgba(16,185,129,.24);
+  border-radius: 14px;
+  background: rgba(16,185,129,.07);
+}
+
+.scanner-agenda-info strong {
+  color: var(--text-primary, #fff);
+  font-size: 15px;
+}
+
+.scanner-agenda-info span {
+  color: var(--text-secondary, #a9b8b0);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.scanner-camera-box {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(16,185,129,.3);
+  border-radius: 18px;
+  background: #07130f;
+}
+
+#qr-reader {
+  width: 100%;
+  min-height: 260px;
+  color: #fff;
+}
+
+#qr-reader video {
+  width: 100% !important;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+#qr-reader__dashboard {
+  display: none !important;
+}
+
+#qr-reader__scan_region {
+  min-height: 240px;
+}
+
+#qr-reader__scan_region img {
+  display: none !important;
+}
+
+.scanner-camera-placeholder {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  padding: 24px;
+  color: #a9b8b0;
+  text-align: center;
+}
+
+.scanner-camera-placeholder .camera-icon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px;
+  place-items: center;
+  border: 1px solid rgba(16,185,129,.35);
+  border-radius: 20px;
+  background: rgba(16,185,129,.12);
+  color: #34d399;
+  font-size: 28px;
+}
+
+.scanner-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.scanner-button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.scanner-button:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.scanner-button-primary {
+  background: #059669;
+  color: #fff;
+}
+
+.scanner-button-primary:not(:disabled):hover {
+  background: #047857;
+  box-shadow: 0 0 18px rgba(16,185,129,.25);
+}
+
+.scanner-button-secondary {
+  border-color: rgba(16,185,129,.3);
+  background: rgba(16,185,129,.08);
+  color: var(--text-primary, #fff);
+}
+
+.scanner-status {
+  padding: 13px 15px;
+  border: 1px solid var(--border-color, rgba(255,255,255,.12));
+  border-radius: 12px;
+  background: var(--surface, #142b24);
+  color: var(--text-secondary, #a9b8b0);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.scanner-status.success {
+  border-color: rgba(16,185,129,.4);
+  background: rgba(16,185,129,.1);
+  color: #34d399;
+}
+
+.scanner-status.error {
+  border-color: rgba(239,68,68,.35);
+  background: rgba(239,68,68,.08);
+  color: #fca5a5;
+}
+
+.scanner-status.warning {
+  border-color: rgba(245,158,11,.35);
+  background: rgba(245,158,11,.08);
+  color: #fcd34d;
+}
+
+.scanner-result {
+  display: none;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(16,185,129,.3);
+  border-radius: 14px;
+  background: rgba(16,185,129,.08);
+}
+
+.scanner-result.visible {
+  display: grid;
+}
+
+.scanner-result strong {
+  color: var(--text-primary, #fff);
+}
+
+.scanner-result p {
+  margin: 0;
+  color: var(--text-secondary, #a9b8b0);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.scanner-member-notice {
+  padding: 18px;
+  border: 1px solid var(--border-color, rgba(255,255,255,.12));
+  border-radius: 14px;
+  color: var(--text-secondary, #a9b8b0);
+  line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+  .scanner-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .scanner-button {
+    width: 100%;
+    padding: 11px 10px;
+    font-size: 13px;
+  }
+
+  #qr-reader {
+    min-height: 230px;
+  }
+}
   </style>
 
   
@@ -356,51 +577,138 @@
           <section class="attendance-panel">
             <h2>Formulir Presensi</h2>
 
-            <form class="attendance-form" data-attendance-form>
-              <div class="attendance-field">
-                <label for="attendance-event">Kegiatan / Kajian</label>
-                <select id="attendance-event" name="event_id" required>
-                  <option value="">Pilih kegiatan</option>
-                </select>
-              </div>
+            
+<div class="attendance-scanner" id="attendance-scanner">
 
-              <div class="attendance-field">
-                <label for="attendance-date">Tanggal Kehadiran</label>
-                <input
-                  id="attendance-date"
-                  type="date"
-                  name="attendance_date"
-                  required
-                >
-              </div>
+  <!-- PANEL KHUSUS ADMIN -->
+  <section class="scanner-admin-panel" id="scanner-admin-panel">
 
-              <div class="attendance-field">
-                <label for="attendance-status">Status Kehadiran</label>
-                <select id="attendance-status" name="status" required>
-                  <option value="">Pilih status</option>
-                  <option value="hadir">Hadir</option>
-                  <option value="izin">Izin</option>
-                  <option value="sakit">Sakit</option>
-                </select>
-              </div>
+    <div>
+      <label for="presensi-agenda-select">
+        <strong>Pilih Agenda Kajian</strong>
+      </label>
 
-              <div class="attendance-field">
-                <label for="attendance-note">Catatan (opsional)</label>
-                <textarea
-                  id="attendance-note"
-                  name="note"
-                  placeholder="Tuliskan catatan jika diperlukan..."
-                ></textarea>
-              </div>
+      <select
+        id="presensi-agenda-select"
+        class="scanner-agenda-select"
+        required
+      >
+        <option value="">Memuat agenda kajian...</option>
+      </select>
+    </div>
 
-              <button class="attendance-submit" type="submit">
-                Kirim Presensi
-              </button>
+    <div
+      class="scanner-agenda-info"
+      id="scanner-agenda-info"
+    >
+      <strong id="scanner-agenda-title">
+        Belum ada agenda dipilih
+      </strong>
 
-              <div class="attendance-notice" data-attendance-message aria-live="polite">
-                Data presensi akan diproses setelah sistem backend dihubungkan.
-              </div>
-            </form>
+      <span id="scanner-agenda-time">
+        Silakan pilih agenda kajian terlebih dahulu.
+      </span>
+
+      <span id="scanner-agenda-location">
+        Lokasi: -
+      </span>
+    </div>
+
+    <div>
+      <strong>QR Code Anggota</strong>
+      <p class="scanner-member-notice">
+        Arahkan kamera belakang HP ke QR Code anggota.
+        Pastikan QR terlihat jelas dan pencahayaan cukup.
+      </p>
+    </div>
+
+    <!-- AREA KAMERA -->
+    <div class="scanner-camera-box">
+
+      <div id="qr-reader">
+
+        <div class="scanner-camera-placeholder">
+          <div>
+            <div class="camera-icon">▣</div>
+            <strong>Kamera belum diaktifkan</strong>
+            <p>Tekan tombol Mulai Scanner untuk membuka kamera.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TOMBOL KAMERA -->
+    <div class="scanner-controls">
+
+      <button
+        type="button"
+        class="scanner-button scanner-button-primary"
+        id="btn-start-scanner"
+      >
+        <span>▣</span>
+        Mulai Scanner
+      </button>
+
+      <button
+        type="button"
+        class="scanner-button scanner-button-secondary"
+        id="btn-stop-scanner"
+        disabled
+      >
+        Hentikan Kamera
+      </button>
+
+      <button
+        type="button"
+        class="scanner-button scanner-button-secondary"
+        id="btn-resume-scanner"
+        disabled
+      >
+        Scan Berikutnya
+      </button>
+
+    </div>
+
+    <!-- STATUS -->
+    <div
+      class="scanner-status"
+      id="scanner-status"
+      role="status"
+      aria-live="polite"
+    >
+      Sistem siap. Pilih agenda sebelum memulai pemindaian.
+    </div>
+
+    <!-- HASIL PEMINDAIAN -->
+    <div
+      class="scanner-result"
+      id="scanner-result"
+      aria-live="polite"
+    >
+      <strong id="scanner-result-title">
+        Hasil Presensi
+      </strong>
+
+      <p id="scanner-result-message"></p>
+    </div>
+
+  </section>
+
+  <!-- TAMPILAN JIKA PENGGUNA BUKAN ADMIN -->
+  <div
+    class="scanner-member-notice"
+    id="scanner-member-notice"
+    hidden
+  >
+    Fitur pemindaian QR hanya dapat digunakan oleh Admin
+    dan Super Admin. Riwayat kehadiran pribadi tetap dapat
+    dilihat melalui bagian riwayat presensi.
+  </div>
+
+</div>
+
           </section>
 
           <section class="attendance-panel">
