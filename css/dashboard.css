@@ -7,6 +7,29 @@ html[data-theme="dark"]{--dash-bg:#0c1915;--dash-surface:#14251e;--dash-text:#ed
 @media(max-width:390px){.brand-copy small{display:none}.welcome-row h1{font-size:18px}.role-pill{display:none}.quick-grid{gap:7px}.quick-card{padding:10px}.quick-card strong{font-size:9px}.quick-card small{font-size:7px}.holo-visual{display:none}.gallery-strip{grid-template-columns:1fr 1fr}.gallery-three{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
+
+:root {
+  --profile-primary: #10b981;
+  --profile-primary-dark: #047857;
+  --profile-primary-light: #34d399;
+  --profile-bg: #0b1713;
+  --profile-surface: #12231c;
+  --profile-surface-2: #192e25;
+  --profile-border: rgba(255,255,255,.09);
+  --profile-text: #f1f5f3;
+  --profile-muted: #9aada3;
+  --profile-transition: .25s ease;
+}
+
+html[data-theme="light"] {
+  --profile-bg: #f2f7f4;
+  --profile-surface: #ffffff;
+  --profile-surface-2: #eaf3ed;
+  --profile-border: rgba(15,75,48,.12);
+  --profile-text: #183329;
+  --profile-muted: #71877b;
+}
+
 /* ==========================================
    TARBIYAH — MODERN SVG ARROW ICON
    Dashboard utama
@@ -178,6 +201,43 @@ html[data-theme="dark"]{--dash-bg:#0c1915;--dash-surface:#14251e;--dash-text:#ed
 @media (prefers-reduced-motion: reduce) {
   .hero-carousel .hero-link .hero-arrow {
     transition: none;
+  }
+}
+
+
+.icon-button {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--profile-border);
+  border-radius: 12px;
+  background: var(--profile-surface-2);
+  color: var(--profile-text);
+  font-size: 20px;
+  cursor: pointer;
+  transition: var(--profile-transition);
+}
+
+.icon-button:hover {
+  color: white;
+  background: var(--profile-primary-dark);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .icon-button {
+    width: 37px;
+    height: 37px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .icon-button {
+    width: 33px;
+    height: 33px;
   }
 }
 
