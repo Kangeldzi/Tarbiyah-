@@ -490,6 +490,14 @@
     min-height: 230px;
   }
 }
+
+ 
+/* Pastikan panel yang beratribut hidden tidak tampil */
+#scanner-admin-panel[hidden],
+#scanner-member-notice[hidden] {
+  display: none !important;
+}
+ 
   </style>
 
   
@@ -814,5 +822,12 @@
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
+  
+<!-- QR SCANNER LIBRARY -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<!-- TARBIYAH QR SCANNER -->
+<script src="./js/presensi-scanner.js"></script>
+
 </body>
 </html>
