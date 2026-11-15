@@ -1766,6 +1766,34 @@ textarea:focus-visible {
 }
 
 
+/* ==========================================================
+   TARBIYAH — AVATAR MEMBER CARD EXPORT FIX
+   ========================================================== */
+
+.digital-member-card .qr-member-avatar {
+  display: block !important;
+
+  width: 78px !important;
+  height: 78px !important;
+
+  min-width: 78px !important;
+  min-height: 78px !important;
+
+  max-width: 78px !important;
+  max-height: 78px !important;
+
+  aspect-ratio: 1 / 1 !important;
+
+  flex: 0 0 78px !important;
+
+  object-fit: cover !important;
+  object-position: center center !important;
+
+  box-sizing: border-box !important;
+  overflow: hidden;
+}
+
+
 /* =========================================================
    END OF TARBIYAH PROFILE CSS
 ========================================================= */
