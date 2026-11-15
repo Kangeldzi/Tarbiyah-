@@ -774,6 +774,46 @@
   box-sizing: border-box;
 }
 
+.icon-button {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--profile-border);
+  border-radius: 12px;
+
+  background: var(--profile-surface-2);
+  color: var(--profile-text);
+
+  font-size: 20px;
+
+  transition: var(--profile-transition);
+}
+
+.icon-button:hover {
+  color: white;
+  background: var(--profile-primary-dark);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .icon-button {
+    width: 37px;
+    height: 37px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .icon-button {
+    width: 33px;
+    height: 33px;
+  }
+}
+    
   </style>
 
   
@@ -901,18 +941,13 @@
   <div class="presensi-header-actions">
 
     <!-- Toggle Tema -->
-    
-<button
+    <button
   type="button"
   id="btnTheme"
-  class="icon-button theme-toggle-button"
-  data-theme-toggle
-  aria-label="Ubah tema"
-  aria-pressed="false">
-
-  <span data-theme-icon aria-hidden="true"></span>
-
-</button>
+  class="icon-button"
+  aria-label="Ubah tema">
+  ◐
+  </button>
     
     <!-- Notifikasi -->
     <a
