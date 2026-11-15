@@ -952,3 +952,68 @@ html.auth-check-pending {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ==========================================
+   TARBIYAH UNIVERSAL THEME TOGGLE
+   MASTER DESIGN
+========================================== */
+
+.theme-toggle-button {
+  box-sizing: border-box;
+
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid var(--profile-border);
+  border-radius: 12px;
+
+  background: var(--profile-surface-2);
+  color: var(--profile-text);
+
+  font-family: inherit;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.theme-toggle-button:hover {
+  color: #ffffff;
+  background: var(--profile-primary-dark);
+  border-color: var(--profile-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+}
+
+.theme-toggle-button:active {
+  transform: scale(0.94);
+}
+
+.theme-toggle-button:focus-visible {
+  outline: 3px solid var(--profile-primary);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-button {
+    transition: none;
+  }
+}
