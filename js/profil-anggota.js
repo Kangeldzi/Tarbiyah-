@@ -2,7 +2,7 @@
 /* ============================================================
    TARBIYAH — PROFIL ANGGOTA
    File       : js/profil-anggota.js
-   Version    : 3.5 QRCode.js FIX
+   Version    : 4.0 COMPLETE QR MEMBER CARD
    Backend    : Supabase
    Language   : Bahasa Indonesia
 
@@ -14,10 +14,12 @@
    - Membership dan role.
    - Navigasi tab.
    - Integrasi Edge Function member-qr-mint.
-   - Menampilkan QR Code asli menggunakan QRCode.js.
+   - QR Code resmi dari backend.
    - Memperbarui QR.
-   - Mengunduh QR dalam format PNG.
+   - Mengunduh KARTU ANGGOTA LENGKAP dalam PNG.
    - Masa berlaku QR dari server.
+   - Tombol download otomatis aktif setelah QR berhasil.
+   - Token QR tidak disimpan di localStorage.
    ============================================================ */
 
 (() => {
@@ -48,13 +50,17 @@
 
     QR_FUNCTION: "member-qr-mint",
 
-    // QRCode.js yang sudah berhasil dibuka di Chrome.
     QR_LIBRARY:
       "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js",
 
+    HTML2CANVAS_LIBRARY:
+      "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+
     QR_SIZE: 320,
     QR_COLOR_DARK: "#102a22",
-    QR_COLOR_LIGHT: "#ffffff"
+    QR_COLOR_LIGHT: "#ffffff",
+
+    CARD_DOWNLOAD_SCALE: 3
   };
 
   const supabase = window.tarbiyahSupabase;
@@ -76,14 +82,16 @@
 
   let authSubscription = null;
 
-  // Token hanya disimpan sementara di memori halaman.
   let activeQrToken = null;
   let activeQrImage = null;
   let activeQrExpiry = null;
   let activeQrTokenId = null;
 
   let qrLibraryPromise = null;
+  let html2canvasPromise = null;
+
   let qrIssuing = false;
+  let cardDownloading = false;
 
   /* ==========================================================
      3. DOM HELPER
@@ -165,7 +173,6 @@
     }
 
     messageElement.textContent = message;
-
     toast.dataset.type = type;
     toast.hidden = false;
 
@@ -190,7 +197,7 @@
      6. LOADING SCREEN
      ========================================================== */
 
-  function findLoadingElements() {
+  function hideLoadingScreen() {
     const selectors = [
       "#profileLoading",
       "#loadingScreen",
@@ -201,81 +208,20 @@
       ".profile-loader",
       ".loading-screen",
       ".loading-overlay",
-      ".page-loading",
-      "[data-loading='profile']",
-      "[data-profile-loading]"
+      ".page-loading"
     ];
 
-    const found = new Set();
+    const elements = new Set();
 
     selectors.forEach(selector => {
       document.querySelectorAll(selector).forEach(element => {
-        found.add(element);
+        elements.add(element);
       });
     });
-
-    const allElements = document.body
-      ? document.body.querySelectorAll("*")
-      : [];
-
-    allElements.forEach(element => {
-      if (element.children.length > 2) return;
-
-      const text = (element.textContent || "")
-        .trim()
-        .toLowerCase();
-
-      if (
-        text.includes("menyiapkan profil anggota") ||
-        text.includes("memuat profil anggota")
-      ) {
-        let target = element;
-
-        for (let i = 0; i < 4; i++) {
-          if (!target.parentElement) break;
-
-          const parent = target.parentElement;
-
-          if (
-            parent === document.body ||
-            parent === document.documentElement
-          ) {
-            break;
-          }
-
-          const style = window.getComputedStyle(parent);
-
-          const classText =
-            typeof parent.className === "string"
-              ? parent.className.toLowerCase()
-              : "";
-
-          if (
-            style.position === "fixed" ||
-            style.position === "absolute" ||
-            /loading|loader|overlay|splash/.test(classText)
-          ) {
-            target = parent;
-            break;
-          }
-
-          target = parent;
-        }
-
-        found.add(target);
-      }
-    });
-
-    return Array.from(found);
-  }
-
-  function hideLoadingScreen() {
-    const elements = findLoadingElements();
 
     elements.forEach(element => {
       element.hidden = true;
       element.setAttribute("aria-hidden", "true");
-      element.classList.add("loaded");
 
       element.style.setProperty(
         "display",
@@ -307,9 +253,7 @@
     );
 
     console.log(
-      "[TARBIYAH] Loading screen dihentikan.",
-      "Elemen ditemukan:",
-      elements.length
+      "[TARBIYAH] Loading screen dihentikan."
     );
   }
 
@@ -318,21 +262,12 @@
      ========================================================== */
 
   function applyLogo() {
-    const images = document.querySelectorAll(
+    document.querySelectorAll(
       ".header-brand img, " +
       ".digital-card-header img, " +
       ".profile-footer img"
-    );
-
-    images.forEach(image => {
+    ).forEach(image => {
       image.src = CONFIG.DEFAULT_LOGO;
-
-      image.onerror = () => {
-        console.warn(
-          "[TARBIYAH] Logo tidak ditemukan:",
-          CONFIG.DEFAULT_LOGO
-        );
-      };
     });
 
     const favicon = document.querySelector(
@@ -516,10 +451,7 @@
         throw result.error;
       }
 
-      activeQrToken = null;
-      activeQrImage = null;
-      activeQrExpiry = null;
-      activeQrTokenId = null;
+      clearQrMemory();
 
       window.location.replace(CONFIG.LOGIN_PAGE);
 
@@ -533,7 +465,7 @@
 
       if (button) {
         button.disabled = false;
-        button.textContent = "Keluar";
+        button.textContent = "Keluar dari Akun";
       }
     }
   }
@@ -710,6 +642,7 @@
       if (!image) return;
 
       if (avatarUrl) {
+        image.crossOrigin = "anonymous";
         image.src = avatarUrl;
         image.hidden = false;
       } else {
@@ -757,38 +690,17 @@
     );
 
     if ($("inputUsername")) {
-      setValue(
-        "inputUsername",
-        profileData?.username
-      );
+      setValue("inputUsername", profileData?.username);
     }
 
     if ($("inputBio")) {
-      setValue(
-        "inputBio",
-        profileData?.bio
-      );
+      setValue("inputBio", profileData?.bio);
     }
 
-    setValue(
-      "inputGender",
-      profileData?.gender
-    );
-
-    setValue(
-      "inputBirthDate",
-      profileData?.birth_date
-    );
-
-    setValue(
-      "inputCity",
-      profileData?.city
-    );
-
-    setValue(
-      "inputAddress",
-      profileData?.address
-    );
+    setValue("inputGender", profileData?.gender);
+    setValue("inputBirthDate", profileData?.birth_date);
+    setValue("inputCity", profileData?.city);
+    setValue("inputAddress", profileData?.address);
 
     document.querySelectorAll(
       "[data-profile-qr-member-name]"
@@ -839,15 +751,8 @@
     setText("membershipStatus", status);
     setText("membershipDate", formatDate(date));
 
-    setText(
-      "membershipGroup",
-      "Belum ditentukan"
-    );
-
-    setText(
-      "membershipRole",
-      getRoleName()
-    );
+    setText("membershipGroup", "Belum ditentukan");
+    setText("membershipRole", getRoleName());
 
     setText(
       "membershipUpdated",
@@ -947,10 +852,7 @@
 
     if (emailField) {
       emailField.disabled = true;
-      emailField.setAttribute(
-        "aria-readonly",
-        "true"
-      );
+      emailField.setAttribute("aria-readonly", "true");
     }
 
     if ($("btnEditProfile")) {
@@ -963,14 +865,8 @@
 
     if ($("btnSaveProfile")) {
       $("btnSaveProfile").disabled = false;
-      $("btnSaveProfile").textContent =
-        "Simpan Perubahan";
+      $("btnSaveProfile").textContent = "Simpan Perubahan";
     }
-
-    console.log(
-      "[TARBIYAH] Mode edit:",
-      isEditing ? "AKTIF" : "NONAKTIF"
-    );
   }
 
   /* ==========================================================
@@ -1080,10 +976,7 @@
       );
 
     } catch (error) {
-      console.error(
-        "[TARBIYAH] Save profile:",
-        error
-      );
+      console.error("[TARBIYAH] Save profile:", error);
 
       notify(
         error.message || "Gagal menyimpan profil.",
@@ -1219,10 +1112,7 @@
       );
 
     } catch (error) {
-      console.error(
-        "[TARBIYAH] Upload avatar:",
-        error
-      );
+      console.error("[TARBIYAH] Upload avatar:", error);
 
       notify(
         error.message || "Gagal mengunggah foto.",
@@ -1249,12 +1139,7 @@
       ".profile-tab-content"
     );
 
-    if (!buttons.length || !panels.length) {
-      console.warn(
-        "[TARBIYAH] Navigasi tab atau panel tidak ditemukan."
-      );
-      return;
-    }
+    if (!buttons.length || !panels.length) return;
 
     function activateTab(name) {
       const target = $("tab-" + name);
@@ -1317,7 +1202,7 @@
   }
 
   /* ==========================================================
-     23. QR — FIND ELEMENTS
+     23. QR — ELEMENT HELPERS
      ========================================================== */
 
   function getQrImage() {
@@ -1350,8 +1235,40 @@
     );
   }
 
+  function getMemberCardElement() {
+    return document.querySelector(".digital-member-card");
+  }
+
   /* ==========================================================
-     24. QR — LOAD QRCode.js
+     24. QR — DOWNLOAD BUTTON STATE
+     ========================================================== */
+
+  function setDownloadButtonState(enabled, label) {
+    const button = $("btnDownloadQR");
+
+    if (!button) return;
+
+    button.disabled = !enabled;
+    button.setAttribute(
+      "aria-disabled",
+      String(!enabled)
+    );
+
+    if (label) {
+      button.innerHTML = label;
+    } else if (enabled) {
+      button.innerHTML = "<span>↓</span> Unduh Kartu";
+    } else {
+      button.innerHTML = "<span>↓</span> Unduh Kartu";
+    }
+
+    button.title = enabled
+      ? "Unduh kartu anggota TARBIYAH dalam format PNG"
+      : "Terbitkan QR anggota terlebih dahulu";
+  }
+
+  /* ==========================================================
+     25. QR — LOAD QRCode.js
      ========================================================== */
 
   function isQRCodeJsReady() {
@@ -1362,7 +1279,6 @@
   }
 
   function loadQrLibrary() {
-    // QRCode.js menggunakan constructor new QRCode().
     if (isQRCodeJsReady()) {
       return Promise.resolve(window.QRCode);
     }
@@ -1372,14 +1288,6 @@
     }
 
     qrLibraryPromise = new Promise((resolve, reject) => {
-      const existingScript = document.querySelector(
-        'script[data-tarbiyah-qr-library="true"]'
-      );
-
-      if (existingScript) {
-        existingScript.remove();
-      }
-
       const script = document.createElement("script");
 
       script.src = CONFIG.QR_LIBRARY;
@@ -1388,28 +1296,20 @@
 
       script.onload = () => {
         if (isQRCodeJsReady()) {
-          console.info(
-            "[TARBIYAH] QRCode.js berhasil dimuat:",
-            CONFIG.QR_LIBRARY
-          );
-
           resolve(window.QRCode);
-          return;
+        } else {
+          reject(
+            new Error(
+              "QRCode.js dimuat tetapi constructor tidak ditemukan."
+            )
+          );
         }
-
-        reject(
-          new Error(
-            "Script QRCode.js berhasil diunduh, " +
-            "tetapi constructor QRCode tidak ditemukan."
-          )
-        );
       };
 
       script.onerror = () => {
         reject(
           new Error(
-            "Gagal memuat QRCode.js dari cdnjs. " +
-            "Periksa koneksi internet atau pemblokiran CDN."
+            "Gagal memuat QRCode.js. Periksa koneksi internet."
           )
         );
       };
@@ -1418,7 +1318,7 @@
     }).catch(error => {
       qrLibraryPromise = null;
       console.error(
-        "[TARBIYAH] Pemuatan QRCode.js gagal:",
+        "[TARBIYAH] QRCode.js:",
         error.message
       );
       throw error;
@@ -1428,7 +1328,7 @@
   }
 
   /* ==========================================================
-     25. QR — CREATE PNG DATA URL
+     26. QR — CREATE PNG DATA URL
      ========================================================== */
 
   async function createQrDataUrl(token) {
@@ -1447,7 +1347,6 @@
       "true"
     );
 
-    // Tempat sementara di luar area tampilan.
     temporaryContainer.style.position = "fixed";
     temporaryContainer.style.left = "-10000px";
     temporaryContainer.style.top = "-10000px";
@@ -1463,7 +1362,6 @@
         QRCodeLibrary.CorrectLevel.H ??
         QRCodeLibrary.CorrectLevel.M;
 
-      // API resmi QRCode.js: new QRCode(element, options).
       new QRCodeLibrary(temporaryContainer, {
         text: token,
         width: CONFIG.QR_SIZE,
@@ -1473,38 +1371,25 @@
         correctLevel: correctionLevel
       });
 
-      // QRCode.js menggambar canvas secara sinkron.
-      const canvas = temporaryContainer.querySelector("canvas");
+      const canvas =
+        temporaryContainer.querySelector("canvas");
 
       if (canvas) {
         const dataUrl = canvas.toDataURL("image/png");
 
-        if (
-          typeof dataUrl === "string" &&
-          dataUrl.startsWith("data:image/png")
-        ) {
+        if (dataUrl.startsWith("data:image/png")) {
           return dataUrl;
         }
       }
 
-      // Cadangan jika browser menggunakan elemen img.
-      const image = temporaryContainer.querySelector("img");
+      const image =
+        temporaryContainer.querySelector("img");
 
       if (image?.src) {
-        if (image.src.startsWith("data:image/")) {
-          return image.src;
-        }
-
         if (!image.complete) {
           await new Promise((resolve, reject) => {
             image.onload = resolve;
-            image.onerror = () => {
-              reject(
-                new Error(
-                  "Gambar QR tidak berhasil diselesaikan."
-                )
-              );
-            };
+            image.onerror = reject;
           });
         }
 
@@ -1514,7 +1399,7 @@
       }
 
       throw new Error(
-        "QRCode.js tidak menghasilkan canvas atau gambar QR."
+        "QRCode.js tidak menghasilkan gambar QR."
       );
 
     } catch (error) {
@@ -1529,7 +1414,7 @@
   }
 
   /* ==========================================================
-     26. QR — ENSURE IMAGE ELEMENT
+     27. QR — ENSURE IMAGE ELEMENT
      ========================================================== */
 
   function ensureQrImage() {
@@ -1543,8 +1428,7 @@
 
     if (!container) {
       throw new Error(
-        "Tempat menampilkan QR tidak ditemukan di HTML. " +
-        "Periksa elemen memberQRCode."
+        "Tempat menampilkan QR tidak ditemukan."
       );
     }
 
@@ -1570,7 +1454,7 @@
   }
 
   /* ==========================================================
-     27. QR — DISPLAY IMAGE
+     28. QR — DISPLAY IMAGE
      ========================================================== */
 
   function displayQrImage(dataUrl) {
@@ -1579,7 +1463,6 @@
     image.src = dataUrl;
     image.alt = "QR Code Anggota TARBIYAH";
     image.hidden = false;
-
     image.style.display = "block";
 
     const placeholder = getQrPlaceholder();
@@ -1596,10 +1479,14 @@
     }
 
     activeQrImage = dataUrl;
+
+    // PENTING:
+    // Tombol Unduh Kartu baru aktif setelah QR tersedia.
+    setDownloadButtonState(true);
   }
 
   /* ==========================================================
-     28. QR — UPDATE INFORMATION
+     29. QR — UPDATE INFORMATION
      ========================================================== */
 
   function renderQrInformation(qrData) {
@@ -1616,43 +1503,29 @@
       memberData?.membership_status
     );
 
-    const nameSelectors = [
-      "#qrMemberName",
-      "[data-profile-qr-member-name]"
-    ];
-
-    const numberSelectors = [
-      "#qrMemberNumber",
-      "[data-profile-qr-member-id]"
-    ];
-
-    const statusSelectors = [
-      "#qrMemberStatus",
-      "[data-profile-card-status]"
-    ];
-
-    nameSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(element => {
-        element.textContent = name;
-      });
+    document.querySelectorAll(
+      "#qrMemberName, [data-profile-qr-member-name]"
+    ).forEach(element => {
+      element.textContent = name;
     });
 
-    numberSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(element => {
-        element.textContent = number;
-      });
+    document.querySelectorAll(
+      "#qrMemberNumber, [data-profile-qr-member-id]"
+    ).forEach(element => {
+      element.textContent = number;
     });
 
-    statusSelectors.forEach(selector => {
-      document.querySelectorAll(selector).forEach(element => {
-        element.textContent = status;
-      });
+    document.querySelectorAll(
+      "#qrMemberStatus, [data-profile-card-status]"
+    ).forEach(element => {
+      element.textContent = status;
     });
 
     const expiryElement = getQrExpiryElement();
 
     if (expiryElement) {
       expiryElement.textContent =
+        "Berlaku sampai: " +
         formatDateTime(qrData.expires_at);
     }
 
@@ -1664,14 +1537,18 @@
   }
 
   /* ==========================================================
-     29. QR — RESET DISPLAY
+     30. QR — RESET DISPLAY
      ========================================================== */
 
-  function resetQrDisplay() {
+  function clearQrMemory() {
     activeQrToken = null;
     activeQrImage = null;
     activeQrExpiry = null;
     activeQrTokenId = null;
+  }
+
+  function resetQrDisplay() {
+    clearQrMemory();
 
     const image = getQrImage();
 
@@ -1691,8 +1568,7 @@
     const expiryElement = getQrExpiryElement();
 
     if (expiryElement) {
-      expiryElement.textContent =
-        "Belum diterbitkan";
+      expiryElement.textContent = "Belum diterbitkan";
     }
 
     document.querySelectorAll(
@@ -1700,10 +1576,13 @@
     ).forEach(element => {
       element.dataset.qrState = "not-issued";
     });
+
+    // Tombol selalu terkunci ketika QR belum tersedia.
+    setDownloadButtonState(false);
   }
 
   /* ==========================================================
-     30. QR — ERROR MESSAGE
+     31. QR — ERROR MESSAGE
      ========================================================== */
 
   async function getFunctionErrorMessage(error) {
@@ -1725,23 +1604,15 @@
       // Respons mungkin bukan JSON.
     }
 
-    if (detail?.message) {
-      return detail.message;
-    }
+    if (detail?.message) return detail.message;
+    if (detail?.error) return detail.error;
 
-    if (detail?.error) {
-      return detail.error;
-    }
-
-    if (error.message) {
-      return error.message;
-    }
-
-    return "Gagal menghubungi layanan penerbit QR.";
+    return error.message ||
+      "Gagal menghubungi layanan penerbit QR.";
   }
 
   /* ==========================================================
-     31. QR — MINT TOKEN
+     32. QR — MINT TOKEN
      ========================================================== */
 
   async function mintMemberQR() {
@@ -1755,8 +1626,7 @@
       return;
     }
 
-    const button =
-      $("btnGenerateQR") ||
+    const button = $("btnGenerateQR") ||
       document.querySelector("[data-profile-qr-refresh]");
 
     try {
@@ -1764,13 +1634,11 @@
 
       if (button) {
         button.disabled = true;
-        button.dataset.originalText =
-          button.textContent;
-
+        button.dataset.originalText = button.textContent;
         button.textContent = "Menerbitkan QR...";
       }
 
-      // Muat QRCode.js sebelum meminta token ke server.
+      // Pastikan library tersedia sebelum meminta token.
       await loadQrLibrary();
 
       notify(
@@ -1781,19 +1649,16 @@
       const result = await withTimeout(
         supabase.functions.invoke(
           CONFIG.QR_FUNCTION,
-          {
-            body: {}
-          }
+          { body: {} }
         ),
         "Penerbitan QR anggota",
         30000
       );
 
       if (result.error) {
-        const message =
-          await getFunctionErrorMessage(result.error);
-
-        throw new Error(message);
+        throw new Error(
+          await getFunctionErrorMessage(result.error)
+        );
       }
 
       const data = result.data;
@@ -1834,11 +1699,11 @@
         );
       }
 
-      // Membuat PNG dari token menggunakan QRCode.js.
+      // Token diproses menjadi gambar QR.
       const imageDataUrl =
         await createQrDataUrl(token);
 
-      // Token hanya disimpan sementara di memori.
+      // Token hanya disimpan sementara di memori halaman.
       activeQrToken = token;
       activeQrExpiry = qrData.expires_at;
       activeQrTokenId = qrData.token_id || null;
@@ -1847,18 +1712,20 @@
       renderQrInformation(qrData);
 
       notify(
-        "Alhamdulillah! QR anggota berhasil diterbitkan.",
+        "Alhamdulillah! QR anggota berhasil diterbitkan. Kartu siap diunduh.",
         "success"
       );
 
-      // Jangan pernah mencetak nilai token ke Console.
+      // Tidak mencetak token ke Console.
       console.info(
         "[TARBIYAH] QR berhasil diterbitkan.",
         {
           token_id: activeQrTokenId,
           expires_at: activeQrExpiry,
           token_received: Boolean(activeQrToken),
-          image_created: Boolean(activeQrImage)
+          image_created: Boolean(activeQrImage),
+          download_button_enabled:
+            $("btnDownloadQR")?.disabled === false
         }
       );
 
@@ -1888,64 +1755,298 @@
   }
 
   /* ==========================================================
-     32. QR — DOWNLOAD PNG
+     33. DOWNLOAD — LOAD HTML2CANVAS
      ========================================================== */
 
-  function downloadMemberQR() {
+  function loadHtml2Canvas() {
+    if (typeof window.html2canvas === "function") {
+      return Promise.resolve(window.html2canvas);
+    }
+
+    if (html2canvasPromise) {
+      return html2canvasPromise;
+    }
+
+    html2canvasPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+
+      script.src = CONFIG.HTML2CANVAS_LIBRARY;
+      script.async = true;
+      script.dataset.tarbiyahHtml2canvas = "true";
+
+      script.onload = () => {
+        if (typeof window.html2canvas === "function") {
+          resolve(window.html2canvas);
+        } else {
+          reject(
+            new Error(
+              "Library html2canvas dimuat tetapi tidak tersedia."
+            )
+          );
+        }
+      };
+
+      script.onerror = () => {
+        reject(
+          new Error(
+            "Gagal memuat library pengunduh kartu. Periksa koneksi internet."
+          )
+        );
+      };
+
+      document.head.appendChild(script);
+    }).catch(error => {
+      html2canvasPromise = null;
+      throw error;
+    });
+
+    return html2canvasPromise;
+  }
+
+  /* ==========================================================
+     34. DOWNLOAD — WAIT FOR CARD IMAGES
+     ========================================================== */
+
+  async function waitForImage(image) {
+    if (!image) return;
+
+    if (image.complete && image.naturalWidth > 0) {
+      return;
+    }
+
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(
+          new Error(
+            "Waktu pemuatan gambar kartu habis."
+          )
+        );
+      }, 10000);
+
+      image.addEventListener(
+        "load",
+        () => {
+          clearTimeout(timeout);
+          resolve();
+        },
+        { once: true }
+      );
+
+      image.addEventListener(
+        "error",
+        () => {
+          clearTimeout(timeout);
+          reject(
+            new Error(
+              "Salah satu gambar kartu gagal dimuat."
+            )
+          );
+        },
+        { once: true }
+      );
+    });
+  }
+
+  async function waitForCardImages(card) {
+    const images = Array.from(
+      card.querySelectorAll("img")
+    );
+
+    for (const image of images) {
+      if (image.hidden) continue;
+
+      await waitForImage(image);
+    }
+
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
+  }
+
+  /* ==========================================================
+     35. DOWNLOAD — SAVE PNG
+     ========================================================== */
+
+  function saveCanvasAsPng(canvas, filename) {
+    return new Promise((resolve, reject) => {
+      if (!canvas || !canvas.toBlob) {
+        try {
+          const dataUrl = canvas.toDataURL("image/png");
+
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = filename;
+
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+
+        return;
+      }
+
+      canvas.toBlob(blob => {
+        if (!blob) {
+          reject(
+            new Error(
+              "Browser gagal membuat file PNG kartu."
+            )
+          );
+          return;
+        }
+
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = objectUrl;
+        link.download = filename;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        setTimeout(() => {
+          URL.revokeObjectURL(objectUrl);
+        }, 2000);
+
+        resolve();
+      }, "image/png");
+    });
+  }
+
+  /* ==========================================================
+     36. DOWNLOAD — FULL MEMBER CARD
+     ========================================================== */
+
+  async function downloadMemberCard() {
+    if (cardDownloading) return;
+
+    const button = $("btnDownloadQR");
+    const card = getMemberCardElement();
+
     if (!activeQrImage) {
       notify(
         "QR belum tersedia. Terbitkan QR terlebih dahulu.",
         "info"
       );
+      setDownloadButtonState(false);
+      return;
+    }
+
+    if (!card) {
+      notify(
+        "Elemen kartu anggota tidak ditemukan.",
+        "error"
+      );
       return;
     }
 
     try {
-      const link = document.createElement("a");
+      cardDownloading = true;
+
+      if (button) {
+        button.disabled = true;
+        button.innerHTML =
+          '<span>◌</span> Menyiapkan Kartu...';
+      }
+
+      notify(
+        "Sedang menyiapkan gambar kartu anggota...",
+        "info"
+      );
+
+      // Pastikan QR benar-benar tampil di kartu.
+      const qrImage = getQrImage();
+
+      if (!qrImage || !qrImage.src) {
+        throw new Error(
+          "Gambar QR belum tampil pada kartu anggota."
+        );
+      }
+
+      await waitForCardImages(card);
+
+      const html2canvas = await loadHtml2Canvas();
+
+      const canvas = await html2canvas(card, {
+        scale: CONFIG.CARD_DOWNLOAD_SCALE,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#102a22",
+        logging: false,
+        imageTimeout: 15000,
+        removeContainer: true,
+        scrollX: 0,
+        scrollY: 0
+      });
+
+      if (!canvas || !canvas.width || !canvas.height) {
+        throw new Error(
+          "Gagal menghasilkan gambar kartu."
+        );
+      }
 
       const memberNumber =
         memberData?.member_number ||
         currentUser?.id?.slice(0, 8) ||
         "anggota";
 
-      link.href = activeQrImage;
+      const filename =
+        `TARBIYAH-KARTU-ANGGOTA-${memberNumber}.png`;
 
-      link.download =
-        `TARBIYAH-QR-${memberNumber}.png`;
-
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      await saveCanvasAsPng(canvas, filename);
 
       notify(
-        "Gambar QR berhasil disiapkan untuk diunduh.",
+        "Kartu anggota TARBIYAH berhasil disiapkan untuk diunduh.",
         "success"
+      );
+
+      console.info(
+        "[TARBIYAH] Unduh kartu selesai.",
+        {
+          filename,
+          width: canvas.width,
+          height: canvas.height,
+          format: "PNG"
+        }
       );
 
     } catch (error) {
       console.error(
-        "[TARBIYAH] Download QR:",
+        "[TARBIYAH] Unduh kartu gagal:",
         error?.message || String(error)
       );
 
       notify(
-        "Gagal mengunduh gambar QR.",
+        error?.message ||
+        "Gagal mengunduh kartu anggota. Periksa Console.",
         "error"
       );
+
+    } finally {
+      cardDownloading = false;
+
+      if (button) {
+        button.disabled = !activeQrImage;
+        button.innerHTML =
+          "<span>↓</span> Unduh Kartu";
+      }
     }
   }
 
   /* ==========================================================
-     33. QR — EVENT LISTENERS
+     37. QR — EVENT LISTENERS
      ========================================================== */
 
   function setupQR() {
     const generateButtons = new Set();
 
-    const primaryButton = $("btnGenerateQR");
-
-    if (primaryButton) {
-      generateButtons.add(primaryButton);
+    if ($("btnGenerateQR")) {
+      generateButtons.add($("btnGenerateQR"));
     }
 
     document.querySelectorAll(
@@ -1963,10 +2064,8 @@
 
     const downloadButtons = new Set();
 
-    const downloadButton = $("btnDownloadQR");
-
-    if (downloadButton) {
-      downloadButtons.add(downloadButton);
+    if ($("btnDownloadQR")) {
+      downloadButtons.add($("btnDownloadQR"));
     }
 
     document.querySelectorAll(
@@ -1978,7 +2077,7 @@
     downloadButtons.forEach(button => {
       button.addEventListener("click", event => {
         event.preventDefault();
-        downloadMemberQR();
+        downloadMemberCard();
       });
     });
 
@@ -1989,14 +2088,16 @@
       {
         generateButtons: generateButtons.size,
         downloadButtons: downloadButtons.size,
-        qrImageElement: Boolean(getQrImage()),
-        qrContainer: Boolean(getQrContainer())
+        cardElement: Boolean(getMemberCardElement()),
+        qrContainer: Boolean(getQrContainer()),
+        downloadInitiallyDisabled:
+          $("btnDownloadQR")?.disabled
       }
     );
   }
 
   /* ==========================================================
-     34. GENERAL EVENTS
+     38. GENERAL EVENTS
      ========================================================== */
 
   function setupEvents() {
@@ -2067,7 +2168,7 @@
   }
 
   /* ==========================================================
-     35. LOAD ALL DATA
+     39. LOAD ALL DATA
      ========================================================== */
 
   async function loadAllData() {
@@ -2104,7 +2205,7 @@
   }
 
   /* ==========================================================
-     36. AUTH STATE LISTENER
+     40. AUTH STATE LISTENER
      ========================================================== */
 
   function setupAuthListener() {
@@ -2116,11 +2217,7 @@
           event === "SIGNED_OUT" ||
           !session?.user
         ) {
-          // Hapus token dari memori ketika logout.
-          activeQrToken = null;
-          activeQrImage = null;
-          activeQrExpiry = null;
-          activeQrTokenId = null;
+          clearQrMemory();
 
           window.location.replace(
             CONFIG.LOGIN_PAGE
@@ -2134,7 +2231,7 @@
   }
 
   /* ==========================================================
-     37. MAIN INITIALIZATION
+     41. MAIN INITIALIZATION
      ========================================================== */
 
   async function initialize() {
@@ -2143,12 +2240,15 @@
     initializationStarted = true;
 
     console.log(
-      "[TARBIYAH] Memulai Profil Anggota v3.5..."
+      "[TARBIYAH] Memulai Profil Anggota v4.0..."
     );
 
     try {
       applyLogo();
       applyTheme();
+
+      // Tombol unduh langsung dibuat terkunci.
+      setDownloadButtonState(false);
 
       setupEvents();
 
@@ -2184,14 +2284,14 @@
       console.log(
         "[TARBIYAH] Profil selesai dimuat.",
         {
-          version: "3.5",
-          userId: currentUser.id,
+          version: "4.0",
           profileLoaded: Boolean(profileData),
           membershipLoaded: Boolean(memberData),
           membershipStatus: memberData?.membership_status,
           roleLoaded: roleData.length > 0,
           qrFunction: CONFIG.QR_FUNCTION,
-          qrLibrary: CONFIG.QR_LIBRARY
+          qrLibrary: CONFIG.QR_LIBRARY,
+          cardDownload: "PNG"
         }
       );
 
@@ -2234,7 +2334,7 @@
   }
 
   /* ==========================================================
-     38. START APPLICATION
+     42. START APPLICATION
      ========================================================== */
 
   if (document.readyState === "loading") {
