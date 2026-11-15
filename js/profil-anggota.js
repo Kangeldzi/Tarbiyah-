@@ -46,6 +46,8 @@
     AVATAR_MAX_SIZE: 2 * 1024 * 1024,
     SIGNED_URL_DURATION: 3600,
     REQUEST_TIMEOUT: 12000,
+    AVATAR_UPLOAD_TIMEOUT: 45000,
+    AVATAR_UPDATE_TIMEOUT: 20000,
     THEME_KEY: "tarbiyah-theme",
 
     QR_FUNCTION: "member-qr-mint",
@@ -994,137 +996,193 @@
   /* ==========================================================
      20. UPLOAD AVATAR
      ========================================================== */
+  
+async function uploadAvatar(file) {
+  if (!file || !currentUser) return;
 
-  async function uploadAvatar(file) {
-    if (!file || !currentUser) return;
+  let uploadedPath = null;
 
-    try {
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-      ];
+  try {
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ];
 
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error(
-          "Format foto harus JPG, PNG, atau WEBP."
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error(
+        "Format foto harus JPG, PNG, atau WEBP."
+      );
+    }
+
+    if (file.size > CONFIG.AVATAR_MAX_SIZE) {
+      throw new Error(
+        "Ukuran foto maksimal 2 MB."
+      );
+    }
+
+    const extension = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp"
+    }[file.type];
+
+    const filePath =
+      `${currentUser.id}/${Date.now()}.${extension}`;
+
+    const oldPath = profileData?.avatar_path || null;
+
+    notify(
+      "Sedang mengunggah foto profil...",
+      "info"
+    );
+
+    console.info("[TARBIYAH] Upload avatar dimulai", {
+      size: file.size,
+      type: file.type
+    });
+
+    // TAHAP 1 — UPLOAD KE STORAGE
+    const uploadResult = await withTimeout(
+      supabase.storage
+        .from(CONFIG.AVATAR_BUCKET)
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type
+        }),
+      "Upload foto profil",
+      CONFIG.AVATAR_UPLOAD_TIMEOUT
+    );
+
+    if (uploadResult.error) {
+      throw uploadResult.error;
+    }
+
+    uploadedPath = filePath;
+
+    console.info(
+      "[TARBIYAH] Upload Storage berhasil."
+    );
+
+    // TAHAP 2 — SIMPAN PATH KE DATABASE
+    const updateResult = await withTimeout(
+      supabase
+        .from("profiles")
+        .update({
+          avatar_path: filePath,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", currentUser.id)
+        .select(`
+          id,
+          full_name,
+          username,
+          phone,
+          gender,
+          birth_date,
+          city,
+          address,
+          avatar_path,
+          bio,
+          created_at,
+          updated_at
+        `)
+        .maybeSingle(),
+      "Pembaruan data foto profil",
+      CONFIG.AVATAR_UPDATE_TIMEOUT
+    );
+
+    if (updateResult.error) {
+      throw updateResult.error;
+    }
+
+    if (!updateResult.data) {
+      throw new Error(
+        "Foto berhasil diunggah, tetapi data profil tidak berhasil diperbarui."
+      );
+    }
+
+    // TAHAP 3 — PERBARUI DATA PROFIL
+    profileData = updateResult.data;
+
+    await renderAvatar();
+
+    // TAHAP 4 — HAPUS FOTO LAMA SETELAH FOTO BARU TERSIMPAN
+    if (oldPath && oldPath !== filePath) {
+      const removeResult = await supabase.storage
+        .from(CONFIG.AVATAR_BUCKET)
+        .remove([oldPath]);
+
+      if (removeResult.error) {
+        console.warn(
+          "[TARBIYAH] Foto lama belum berhasil dihapus:",
+          removeResult.error
         );
-      }
-
-      if (file.size > CONFIG.AVATAR_MAX_SIZE) {
-        throw new Error(
-          "Ukuran foto maksimal 2 MB."
-        );
-      }
-
-      notify(
-        "Sedang mengunggah foto profil...",
-        "info"
-      );
-
-      const extension = {
-        "image/jpeg": "jpg",
-        "image/png": "png",
-        "image/webp": "webp"
-      }[file.type];
-
-      const filePath =
-        `${currentUser.id}/${Date.now()}.${extension}`;
-
-      const oldPath =
-        profileData?.avatar_path || null;
-
-      const uploadResult = await withTimeout(
-        supabase.storage
-          .from(CONFIG.AVATAR_BUCKET)
-          .upload(filePath, file, {
-            cacheControl: "3600",
-            upsert: false,
-            contentType: file.type
-          }),
-        "Upload foto profil"
-      );
-
-      if (uploadResult.error) {
-        throw uploadResult.error;
-      }
-
-      const updateResult = await withTimeout(
-        supabase
-          .from("profiles")
-          .update({
-            avatar_path: filePath,
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", currentUser.id)
-          .select(`
-            id,
-            full_name,
-            username,
-            phone,
-            gender,
-            birth_date,
-            city,
-            address,
-            avatar_path,
-            bio,
-            created_at,
-            updated_at
-          `)
-          .maybeSingle(),
-        "Pembaruan data foto profil"
-      );
-
-      if (updateResult.error || !updateResult.data) {
-        await supabase.storage
-          .from(CONFIG.AVATAR_BUCKET)
-          .remove([filePath]);
-
-        if (updateResult.error) {
-          throw updateResult.error;
-        }
-
-        throw new Error(
-          "Foto belum berhasil disimpan ke profil."
-        );
-      }
-
-      profileData = updateResult.data;
-
-      await renderAvatar();
-
-      if (oldPath && oldPath !== filePath) {
-        const removeResult = await supabase.storage
-          .from(CONFIG.AVATAR_BUCKET)
-          .remove([oldPath]);
-
-        if (removeResult.error) {
-          console.warn(
-            "[TARBIYAH] Foto lama belum terhapus:",
-            removeResult.error
-          );
-        }
-      }
-
-      notify(
-        "Foto profil berhasil diperbarui.",
-        "success"
-      );
-
-    } catch (error) {
-      console.error("[TARBIYAH] Upload avatar:", error);
-
-      notify(
-        error.message || "Gagal mengunggah foto.",
-        "error"
-      );
-
-    } finally {
-      if ($("avatarInput")) {
-        $("avatarInput").value = "";
       }
     }
+
+    uploadedPath = null;
+
+    notify(
+      "Foto profil berhasil diperbarui.",
+      "success"
+    );
+
+    console.info(
+      "[TARBIYAH] Foto profil berhasil diperbarui."
+    );
+
+  } catch (error) {
+    console.error(
+      "[TARBIYAH] Upload avatar gagal:",
+      {
+        name: error?.name || "Unknown",
+        message: error?.message || String(error),
+        status: error?.status,
+        statusCode: error?.statusCode,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+        error
+      }
+    );
+
+    // Bersihkan file baru jika proses penyimpanan database gagal.
+    if (uploadedPath) {
+      try {
+        const cleanup = await supabase.storage
+          .from(CONFIG.AVATAR_BUCKET)
+          .remove([uploadedPath]);
+
+        if (cleanup.error) {
+          console.warn(
+            "[TARBIYAH] Pembersihan file gagal:",
+            cleanup.error
+          );
+        }
+      } catch (cleanupError) {
+        console.warn(
+          "[TARBIYAH] Pembersihan file mengalami kendala:",
+          cleanupError
+        );
+      }
+    }
+
+    notify(
+      error?.message ||
+      "Gagal mengunggah foto profil. Silakan coba kembali.",
+      "error"
+    );
+
+  } finally {
+    if ($("avatarInput")) {
+      $("avatarInput").value = "";
+    }
   }
+}
+
+  
 
   /* ==========================================================
      21. NAVIGATION TABS
