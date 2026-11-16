@@ -304,8 +304,9 @@
       );
     },
 
+    
     // -----------------------------------------------------
-    // 9. JADWAL KEGIATAN MENDATANG
+    // 9. AGENDA BERLANGSUNG DAN KEGIATAN MENDATANG
     // -----------------------------------------------------
 
     async getUpcomingAgendas() {
@@ -326,7 +327,7 @@
           status
         `)
         .eq("status", "published")
-        .gte("starts_at", now)
+        .gte("ends_at", now)
         .order("starts_at", {
           ascending: true
         })
@@ -336,6 +337,7 @@
 
       return data || [];
     },
+
 
     // -----------------------------------------------------
     // 10. RENDER JADWAL KEGIATAN
@@ -355,7 +357,7 @@
 
         empty.className = "attendance-empty";
         empty.textContent =
-          "Belum ada jadwal kegiatan mendatang.";
+        "Belum ada agenda yang sedang berlangsung atau akan datang.";
 
         container.appendChild(empty);
         return;
