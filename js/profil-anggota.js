@@ -1234,7 +1234,7 @@ async function uploadAvatar(file) {
      ========================================================== */
 
   async function loadAttendanceHistory() {
-    const container = $("memberAttendanceList");
+    const container = $("attendanceHistory");
 
     if (!container) {
       console.warn(
@@ -1247,7 +1247,7 @@ async function uploadAvatar(file) {
 
     function showAttendanceMessage(title, description) {
       const wrapper = document.createElement("div");
-      wrapper.className = "profile-feature-empty";
+      wrapper.className = "empty-state";
 
       const heading = document.createElement("strong");
       heading.textContent = title;
