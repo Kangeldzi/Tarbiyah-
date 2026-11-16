@@ -89,10 +89,14 @@
       margin-bottom: 22px;
     }
 
-    .summary-card {
+    .summary-card,
+    .attendance-panel {
       background: var(--attendance-card);
       border: 1px solid var(--attendance-border);
       border-radius: 16px;
+    }
+
+    .summary-card {
       padding: 17px;
     }
 
@@ -113,9 +117,6 @@
     }
 
     .attendance-panel {
-      background: var(--attendance-card);
-      border: 1px solid var(--attendance-border);
-      border-radius: 18px;
       padding: 19px;
       margin-bottom: 18px;
     }
@@ -138,119 +139,6 @@
       color: var(--attendance-muted);
       font-size: .77rem;
       margin: 5px 0 0;
-    }
-
-    .attendance-filters {
-      display: flex;
-      gap: 9px;
-      flex-wrap: wrap;
-      margin-bottom: 17px;
-    }
-
-    .attendance-filters input,
-    .attendance-filters select {
-      min-width: 0;
-      border: 1px solid var(--attendance-border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: inherit;
-      background: transparent;
-      font: inherit;
-      font-size: .8rem;
-    }
-
-    .attendance-filters input {
-      flex: 1;
-      min-width: 160px;
-    }
-
-    .attendance-list {
-      display: grid;
-      gap: 11px;
-    }
-
-    .attendance-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 13px;
-      padding: 14px;
-      border: 1px solid var(--attendance-border);
-      border-radius: 13px;
-    }
-
-    .attendance-date {
-      width: 49px;
-      min-width: 49px;
-      padding: 8px 4px;
-      text-align: center;
-      border-radius: 11px;
-      background: rgba(16,185,129,.1);
-      color: var(--attendance-green);
-    }
-
-    .attendance-date strong {
-      display: block;
-      font: 800 1.1rem Poppins, sans-serif;
-    }
-
-    .attendance-date small {
-      font-size: .65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .attendance-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .attendance-info h3 {
-      font-size: .88rem;
-      margin: 1px 0 6px;
-      line-height: 1.4;
-    }
-
-    .attendance-info p {
-      color: var(--attendance-muted);
-      font-size: .75rem;
-      line-height: 1.6;
-      margin: 0;
-    }
-
-    .attendance-status {
-      display: inline-block;
-      border-radius: 30px;
-      padding: 5px 9px;
-      font-size: .68rem;
-      font-weight: 700;
-      white-space: nowrap;
-      background: rgba(16,185,129,.1);
-      color: var(--attendance-green);
-      margin-top: 8px;
-    }
-
-    .attendance-status.absent {
-      background: rgba(248,113,113,.1);
-      color: #f87171;
-    }
-
-    .attendance-status.permission {
-      background: rgba(251,191,36,.1);
-      color: #fbbf24;
-    }
-
-    .attendance-empty {
-      text-align: center;
-      padding: 35px 15px;
-      color: var(--attendance-muted);
-      font-size: .83rem;
-      line-height: 1.7;
-    }
-
-    .attendance-empty span {
-      display: block;
-      font-size: 2rem;
-      margin-bottom: 10px;
     }
 
     .attendance-progress {
@@ -313,6 +201,235 @@
       background: #059669;
     }
 
+    .attendance-button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .attendance-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .attendance-tab {
+      border: 1px solid var(--attendance-border);
+      color: var(--attendance-muted);
+      background: transparent;
+      border-radius: 30px;
+      padding: 9px 13px;
+      font: 700 .73rem Inter, sans-serif;
+      cursor: pointer;
+    }
+
+    .attendance-tab.active {
+      color: #fff;
+      background: #047857;
+      border-color: #047857;
+    }
+
+    .attendance-filters {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-bottom: 17px;
+    }
+
+    .attendance-filters input,
+    .attendance-filters select {
+      min-width: 0;
+      border: 1px solid var(--attendance-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: inherit;
+      background: var(--attendance-card);
+      font: inherit;
+      font-size: .8rem;
+    }
+
+    .attendance-filters input {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .attendance-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .attendance-item {
+      border: 1px solid var(--attendance-border);
+      border-radius: 14px;
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .attendance-item-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+    }
+
+    .attendance-date {
+      width: 53px;
+      min-width: 53px;
+      padding: 9px 4px;
+      text-align: center;
+      border-radius: 11px;
+      background: rgba(16,185,129,.1);
+      color: var(--attendance-green);
+    }
+
+    .attendance-date strong {
+      display: block;
+      font: 800 1.1rem Poppins, sans-serif;
+    }
+
+    .attendance-date small {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .attendance-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .attendance-info h3 {
+      font-size: .88rem;
+      margin: 1px 0 6px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .attendance-info p {
+      color: var(--attendance-muted);
+      font-size: .75rem;
+      line-height: 1.6;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .attendance-status {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 5px 9px;
+      font-size: .68rem;
+      font-weight: 700;
+      white-space: nowrap;
+      background: rgba(16,185,129,.1);
+      color: var(--attendance-green);
+      margin-top: 8px;
+    }
+
+    .attendance-status.absent {
+      background: rgba(248,113,113,.1);
+      color: #f87171;
+    }
+
+    .attendance-status.permission {
+      background: rgba(251,191,36,.1);
+      color: #fbbf24;
+    }
+
+    .attendance-status.unknown {
+      background: rgba(148,163,184,.12);
+      color: var(--attendance-muted);
+    }
+
+    .attendance-source {
+      display: inline-block;
+      margin-top: 8px;
+      margin-right: 5px;
+      font-size: .64rem;
+      color: var(--attendance-muted);
+      border: 1px solid var(--attendance-border);
+      padding: 4px 7px;
+      border-radius: 20px;
+    }
+
+    .attendance-topics {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--attendance-border);
+    }
+
+    .attendance-topics summary {
+      cursor: pointer;
+      font-size: .76rem;
+      font-weight: 700;
+      color: var(--attendance-green);
+    }
+
+    .topic-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .topic-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: .74rem;
+      line-height: 1.5;
+    }
+
+    .topic-name {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .topic-state {
+      flex-shrink: 0;
+      font-size: .66rem;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 4px 7px;
+      background: rgba(148,163,184,.12);
+      color: var(--attendance-muted);
+    }
+
+    .topic-state.hadir {
+      background: rgba(16,185,129,.1);
+      color: var(--attendance-green);
+    }
+
+    .topic-state.izin,
+    .topic-state.sakit {
+      background: rgba(251,191,36,.1);
+      color: #fbbf24;
+    }
+
+    .topic-state.alpa {
+      background: rgba(248,113,113,.1);
+      color: #f87171;
+    }
+
+    .attendance-empty {
+      text-align: center;
+      padding: 35px 15px;
+      color: var(--attendance-muted);
+      font-size: .83rem;
+      line-height: 1.7;
+      border: 1px dashed var(--attendance-border);
+      border-radius: 13px;
+    }
+
+    .attendance-empty span {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .attendance-loading {
+      opacity: .65;
+      pointer-events: none;
+    }
+
     @media(max-width: 650px) {
       .attendance-page {
         padding: 19px 13px 90px;
@@ -335,7 +452,6 @@
       }
 
       .attendance-item {
-        gap: 10px;
         padding: 11px;
       }
 
@@ -347,6 +463,10 @@
     @media(max-width: 370px) {
       .attendance-summary {
         grid-template-columns: 1fr;
+      }
+
+      .attendance-tab {
+        padding: 8px 10px;
       }
     }
   </style>
@@ -364,6 +484,7 @@
           pembelajaran, dan kegiatan TARBIYAH.
         </p>
       </div>
+
       <button class="attendance-button" id="refreshAttendance" type="button">
         ↻ Perbarui
       </button>
@@ -372,7 +493,7 @@
     <section class="attendance-summary">
       <article class="summary-card">
         <div class="summary-icon">📚</div>
-        <small>Total Kegiatan</small>
+        <small>Total Kegiatan Tercatat</small>
         <strong id="totalActivities">—</strong>
       </article>
 
@@ -393,7 +514,7 @@
       <div class="panel-heading">
         <div>
           <h2>📊 Tingkat Kehadiran</h2>
-          <p>Persentase kehadiran dari catatan yang tersedia.</p>
+          <p>Persentase berdasarkan catatan kehadiran yang tersedia.</p>
         </div>
       </div>
 
@@ -410,18 +531,30 @@
       <div class="panel-heading">
         <div>
           <h2>🗓️ Riwayat Kegiatan</h2>
-          <p>Daftar kehadiran kajian dan kegiatan Anda.</p>
+          <p>Arsip historis dan kajian terbaru Anda.</p>
         </div>
       </div>
 
       <div class="attendance-message" id="attendanceMessage" role="status"></div>
 
+      <div class="attendance-tabs" role="group" aria-label="Kategori riwayat">
+        <button class="attendance-tab active" type="button" data-source="all">
+          Semua Kajian
+        </button>
+        <button class="attendance-tab" type="button" data-source="historical">
+          Arsip Historis
+        </button>
+        <button class="attendance-tab" type="button" data-source="latest">
+          Kajian Terbaru
+        </button>
+      </div>
+
       <div class="attendance-filters">
         <input
           type="search"
           id="attendanceSearch"
-          placeholder="Cari nama kegiatan..."
-          aria-label="Cari kegiatan"
+          placeholder="Cari judul kajian atau topik..."
+          aria-label="Cari kajian atau topik"
         >
 
         <select id="attendanceFilter" aria-label="Filter status">
@@ -429,7 +562,8 @@
           <option value="hadir">Hadir</option>
           <option value="izin">Izin</option>
           <option value="sakit">Sakit</option>
-          <option value="alpa">Tidak Hadir</option>
+          <option value="alpa">Alpa</option>
+          <option value="unknown">Belum ada catatan</option>
         </select>
       </div>
 
@@ -440,7 +574,6 @@
         </div>
       </div>
     </section>
-
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -454,307 +587,554 @@
   <script src="./js/pwa.js"></script>
 
   <script>
-    (() => {
-      "use strict";
+  (() => {
+    "use strict";
 
-      const CONFIG = {
-        table: "attendance",
-        userColumn: "user_id",
-        agendaColumn: "agenda_id",
-        dateColumn: "attendance_date",
-        statusColumn: "status",
-        titleColumn: "activity_name"
+    const $ = id => document.getElementById(id);
+
+    const state = {
+      client: null,
+      user: null,
+      member: null,
+      records: [],
+      source: "all",
+      loading: false
+    };
+
+    const STATUS_LABELS = {
+      hadir: "Hadir",
+      izin: "Izin",
+      sakit: "Sakit",
+      alpa: "Alpa",
+      unknown: "Belum ada catatan"
+    };
+
+    function getSupabase() {
+      return window.tarbiyahSupabase || null;
+    }
+
+    function normalizeStatus(value) {
+      const status = String(value || "").toLowerCase().trim();
+
+      if (["hadir", "present", "attended"].includes(status)) return "hadir";
+      if (["izin", "permission"].includes(status)) return "izin";
+      if (["sakit", "sick"].includes(status)) return "sakit";
+      if (["alpa", "absent"].includes(status)) return "alpa";
+
+      return "unknown";
+    }
+
+    function showMessage(message, isError = false) {
+      const element = $("attendanceMessage");
+      element.textContent = message;
+      element.classList.add("show");
+      element.classList.toggle("error", isError);
+    }
+
+    function clearMessage() {
+      const element = $("attendanceMessage");
+      element.textContent = "";
+      element.classList.remove("show", "error");
+    }
+
+    function safeDate(value) {
+      if (!value) return null;
+
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatDate(value) {
+      const date = safeDate(value);
+
+      if (!date) return "Tanggal belum diketahui";
+
+      return date.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+    }
+
+    function dateBox(value) {
+      const date = safeDate(value);
+
+      if (!date) {
+        return { day: "—", month: "TANPA TANGGAL" };
+      }
+
+      return {
+        day: date.toLocaleDateString("id-ID", { day: "2-digit" }),
+        month: date.toLocaleDateString("id-ID", { month: "short" })
       };
+    }
 
-      const $ = id => document.getElementById(id);
+    function statusClass(status) {
+      if (status === "alpa") return "absent";
+      if (status === "izin" || status === "sakit") return "permission";
+      if (status === "unknown") return "unknown";
+      return "";
+    }
 
-      let attendanceRecords = [];
+    function createStatusBadge(status) {
+      const badge = document.createElement("span");
+      badge.className = `attendance-status ${statusClass(status)}`;
+      badge.textContent = STATUS_LABELS[status] || "Belum ada catatan";
+      return badge;
+    }
 
-      const getSupabase = () =>
-        window.supabaseClient ||
-        window.TARBIYAH_SUPABASE ||
-        window.TARBIYAH?.supabase ||
-        null;
+    function createEmpty(message, icon = "📭") {
+      const empty = document.createElement("div");
+      empty.className = "attendance-empty";
 
-      function showMessage(message, isError = false) {
-        const element = $("attendanceMessage");
-        element.textContent = message;
-        element.classList.add("show");
-        element.classList.toggle("error", isError);
+      const symbol = document.createElement("span");
+      symbol.textContent = icon;
+
+      const text = document.createElement("div");
+      text.textContent = message;
+
+      empty.append(symbol, text);
+      return empty;
+    }
+
+    function uniqueIds(values) {
+      return [...new Set((values || []).filter(Boolean))];
+    }
+
+    async function getOwnMember(client, userId) {
+      const { data, error } = await client
+        .from("members")
+        .select("id, user_id, member_number, membership_status")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        throw new Error(
+          "Data keanggotaan tidak ditemukan untuk akun ini. Hubungi Admin TARBIYAH."
+        );
       }
 
-      function normalizeStatus(status) {
-        const value = String(status || "").toLowerCase().trim();
+      return data;
+    }
 
-        if (["hadir", "present", "attended"].includes(value)) {
-          return "hadir";
-        }
+    async function loadHistorical(client, memberId) {
+      const { data: attendance, error: attendanceError } = await client
+        .from("historical_meeting_attendance")
+        .select("*")
+        .eq("member_id", memberId)
+        .order("created_at", { ascending: false });
 
-        if (["izin", "permission"].includes(value)) {
-          return "izin";
-        }
+      if (attendanceError) throw attendanceError;
 
-        if (["sakit", "sick"].includes(value)) {
-          return "sakit";
-        }
+      const rows = attendance || [];
+      if (!rows.length) return [];
 
-        if (["alpa", "absent", "tidak hadir"].includes(value)) {
-          return "alpa";
-        }
+      const meetingIds = uniqueIds(rows.map(row => row.meeting_id));
 
-        return value || "lainnya";
+      const { data: meetings, error: meetingsError } = await client
+        .from("historical_meetings")
+        .select("*")
+        .in("id", meetingIds);
+
+      if (meetingsError) throw meetingsError;
+
+      const meetingMap = new Map(
+        (meetings || []).map(item => [item.id, item])
+      );
+
+      const { data: topics, error: topicsError } = await client
+        .from("historical_topics")
+        .select("*")
+        .in("meeting_id", meetingIds)
+        .order("sort_order", { ascending: true });
+
+      if (topicsError) throw topicsError;
+
+      const topicRows = topics || [];
+      const topicIds = uniqueIds(topicRows.map(item => item.id));
+
+      let topicAttendance = [];
+
+      if (topicIds.length) {
+        const { data, error } = await client
+          .from("historical_topic_attendance")
+          .select("*")
+          .eq("member_id", memberId)
+          .in("topic_id", topicIds);
+
+        if (error) throw error;
+        topicAttendance = data || [];
       }
 
-      function statusLabel(status) {
-        const labels = {
-          hadir: "Hadir",
-          izin: "Izin",
-          sakit: "Sakit",
-          alpa: "Tidak Hadir"
-        };
+      const topicAttendanceMap = new Map(
+        topicAttendance.map(item => [item.topic_id, item])
+      );
 
-        return labels[status] || status;
-      }
+      const topicsByMeeting = new Map();
 
-      function statusClass(status) {
-        if (status === "alpa") return "absent";
-        if (status === "izin" || status === "sakit") return "permission";
-        return "";
-      }
-
-      function safeDate(value) {
-        if (!value) return null;
-
-        const date = new Date(value);
-        return Number.isNaN(date.getTime()) ? null : date;
-      }
-
-      function dateParts(value) {
-        const date = safeDate(value);
-
-        if (!date) {
-          return {
-            day: "--",
-            month: "—",
-            full: "Tanggal tidak tersedia"
-          };
+      topicRows.forEach(topic => {
+        if (!topicsByMeeting.has(topic.meeting_id)) {
+          topicsByMeeting.set(topic.meeting_id, []);
         }
+
+        const attendanceRow = topicAttendanceMap.get(topic.id);
+
+        topicsByMeeting.get(topic.meeting_id).push({
+          id: topic.id,
+          title: topic.title || "Topik tanpa judul",
+          status: attendanceRow
+            ? normalizeStatus(attendanceRow.attendance_status)
+            : "unknown",
+          note: attendanceRow?.attendance_note || ""
+        });
+      });
+
+      return rows.map(row => {
+        const meeting = meetingMap.get(row.meeting_id) || {};
 
         return {
-          day: date.toLocaleDateString("id-ID", { day: "2-digit" }),
-          month: date.toLocaleDateString("id-ID", { month: "short" }),
-          full: date.toLocaleDateString("id-ID", {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-          })
+          id: `historical-${row.id}`,
+          source: "historical",
+          sourceLabel: "Arsip Historis",
+          title: meeting.title || `Pertemuan Historis`,
+          meetingNumber: meeting.meeting_number,
+          date: meeting.meeting_date || null,
+          location: meeting.location_name || "",
+          description: meeting.description || "",
+          status: normalizeStatus(row.attendance_status),
+          note: row.attendance_note || "",
+          topics: topicsByMeeting.get(row.meeting_id) || [],
+          createdAt: row.created_at || null
         };
+      });
+    }
+
+    async function loadLatest(client, memberId) {
+      const { data: attendance, error: attendanceError } = await client
+        .from("kajian_attendance")
+        .select("*")
+        .eq("member_id", memberId)
+        .order("attended_at", { ascending: false })
+        .limit(500);
+
+      if (attendanceError) throw attendanceError;
+
+      const rows = attendance || [];
+      if (!rows.length) return [];
+
+      const agendaIds = uniqueIds(rows.map(row => row.agenda_id));
+
+      const { data: agendas, error: agendaError } = await client
+        .from("kajian_agenda")
+        .select("*")
+        .in("id", agendaIds);
+
+      if (agendaError) throw agendaError;
+
+      const agendaMap = new Map(
+        (agendas || []).map(item => [item.id, item])
+      );
+
+      return rows.map(row => {
+        const agenda = agendaMap.get(row.agenda_id) || {};
+
+        return {
+          id: `latest-${row.id}`,
+          source: "latest",
+          sourceLabel: "Kajian Terbaru",
+          title: agenda.title || "Kajian TARBIYAH",
+          date: row.attended_at || agenda.starts_at || null,
+          location: agenda.location_name || agenda.location_address || "",
+          description: agenda.description || "",
+          speaker: agenda.speaker_name || "",
+          status: normalizeStatus(row.attendance_status),
+          note: row.manual_reason || "",
+          topics: [],
+          attendanceMethod: row.attendance_method || "",
+          createdAt: row.created_at || null
+        };
+      });
+    }
+
+    function renderSummary(records) {
+      const total = records.length;
+      const present = records.filter(item => item.status === "hadir").length;
+
+      const known = records.filter(item =>
+        ["hadir", "izin", "sakit", "alpa"].includes(item.status)
+      ).length;
+
+      const percentage = known
+        ? Math.round((present / known) * 100)
+        : 0;
+
+      $("totalActivities").textContent = total.toLocaleString("id-ID");
+      $("totalPresent").textContent = present.toLocaleString("id-ID");
+      $("attendancePercentage").textContent = `${percentage}%`;
+
+      $("attendanceProgressBar").style.width = `${percentage}%`;
+
+      $("attendanceProgressText").textContent = known
+        ? `${present} dari ${known} kegiatan dengan status terkonfirmasi tercatat hadir. ${total - known} catatan belum memiliki status yang dapat dihitung.`
+        : "Belum ada status kehadiran yang dapat dihitung.";
+    }
+
+    function matchesRecord(record, keyword, filter) {
+      const searchable = [
+        record.title,
+        record.location,
+        record.description,
+        record.speaker,
+        ...(record.topics || []).map(topic => topic.title)
+      ].join(" ").toLowerCase();
+
+      const matchesKeyword = searchable.includes(keyword);
+      const matchesStatus = filter === "all" || record.status === filter;
+
+      return matchesKeyword && matchesStatus;
+    }
+
+    function createTopicDetails(record) {
+      if (!record.topics || !record.topics.length) return null;
+
+      const details = document.createElement("details");
+      details.className = "attendance-topics";
+
+      const summary = document.createElement("summary");
+      summary.textContent = `Lihat ${record.topics.length} topik pembelajaran`;
+
+      const list = document.createElement("div");
+      list.className = "topic-list";
+
+      record.topics.forEach((topic, index) => {
+        const row = document.createElement("div");
+        row.className = "topic-row";
+
+        const name = document.createElement("div");
+        name.className = "topic-name";
+        name.textContent = `${index + 1}. ${topic.title}`;
+
+        const badge = document.createElement("span");
+        badge.className = `topic-state ${topic.status}`;
+        badge.textContent = STATUS_LABELS[topic.status] || "Belum ada catatan";
+
+        row.append(name, badge);
+        list.appendChild(row);
+      });
+
+      details.append(summary, list);
+      return details;
+    }
+
+    function createRecordCard(record) {
+      const item = document.createElement("article");
+      item.className = "attendance-item";
+
+      const top = document.createElement("div");
+      top.className = "attendance-item-top";
+
+      const date = dateBox(record.date);
+
+      const dateElement = document.createElement("div");
+      dateElement.className = "attendance-date";
+
+      const day = document.createElement("strong");
+      day.textContent = date.day;
+
+      const month = document.createElement("small");
+      month.textContent = date.month;
+
+      dateElement.append(day, month);
+
+      const info = document.createElement("div");
+      info.className = "attendance-info";
+
+      const title = document.createElement("h3");
+      title.textContent = record.meetingNumber
+        ? `Pertemuan ${record.meetingNumber} — ${record.title}`
+        : record.title;
+
+      const details = document.createElement("p");
+      const detailParts = [formatDate(record.date)];
+
+      if (record.location) detailParts.push(record.location);
+      if (record.speaker) detailParts.push(`Pemateri: ${record.speaker}`);
+
+      details.textContent = detailParts.join(" · ");
+
+      info.append(title, details, createStatusBadge(record.status));
+
+      const source = document.createElement("span");
+      source.className = "attendance-source";
+      source.textContent = record.sourceLabel;
+      info.appendChild(source);
+
+      if (record.attendanceMethod) {
+        const method = document.createElement("span");
+        method.className = "attendance-source";
+        method.textContent = record.attendanceMethod === "qr"
+          ? "Presensi QR"
+          : "Presensi Manual";
+        info.appendChild(method);
       }
 
-      function getActivityName(record) {
-        return (
-          record[CONFIG.titleColumn] ||
-          record.activity_title ||
-          record.title ||
-          record.agenda?.title ||
-          record.agenda?.name ||
-          "Kegiatan TARBIYAH"
+      if (record.note) {
+        const note = document.createElement("p");
+        note.style.marginTop = "9px";
+        note.textContent = `Catatan: ${record.note}`;
+        info.appendChild(note);
+      }
+
+      top.append(dateElement, info);
+      item.appendChild(top);
+
+      const topicDetails = createTopicDetails(record);
+      if (topicDetails) item.appendChild(topicDetails);
+
+      return item;
+    }
+
+    function renderRecords() {
+      const list = $("attendanceList");
+      const keyword = $("attendanceSearch").value.trim().toLowerCase();
+      const filter = $("attendanceFilter").value;
+
+      const filtered = state.records.filter(record => {
+        const sourceMatches =
+          state.source === "all" || record.source === state.source;
+
+        return sourceMatches && matchesRecord(record, keyword, filter);
+      });
+
+      list.replaceChildren();
+
+      if (!filtered.length) {
+        list.appendChild(
+          createEmpty(
+            state.records.length
+              ? "Tidak ada riwayat yang sesuai dengan pencarian atau filter."
+              : "Belum ada catatan kehadiran untuk akun ini."
+          )
         );
+        return;
       }
 
-      function renderSummary(records) {
-        const total = records.length;
-        const present = records.filter(
-          item => normalizeStatus(item[CONFIG.statusColumn]) === "hadir"
-        ).length;
+      filtered.forEach(record => {
+        list.appendChild(createRecordCard(record));
+      });
+    }
 
-        const percentage = total
-          ? Math.round((present / total) * 100)
-          : 0;
+    async function loadAttendance() {
+      if (state.loading) return;
 
-        $("totalActivities").textContent = total.toLocaleString("id-ID");
-        $("totalPresent").textContent = present.toLocaleString("id-ID");
-        $("attendancePercentage").textContent = `${percentage}%`;
+      const client = getSupabase();
 
-        $("attendanceProgressBar").style.width = `${percentage}%`;
-
-        $("attendanceProgressText").textContent = total
-          ? `${present} dari ${total} kegiatan tercatat sebagai hadir.`
-          : "Belum ada catatan kehadiran.";
+      if (!client) {
+        showMessage(
+          "Koneksi Supabase tidak ditemukan. Periksa js/supabase-client.js.",
+          true
+        );
+        return;
       }
 
-      function renderRecords() {
-        const list = $("attendanceList");
-        const keyword = $("attendanceSearch").value.trim().toLowerCase();
-        const filter = $("attendanceFilter").value;
+      state.loading = true;
+      $("refreshAttendance").disabled = true;
+      $("attendanceList").classList.add("attendance-loading");
+      clearMessage();
 
-        const filtered = attendanceRecords.filter(record => {
-          const name = getActivityName(record).toLowerCase();
-          const status = normalizeStatus(record[CONFIG.statusColumn]);
+      try {
+        const { data: authData, error: authError } =
+          await client.auth.getUser();
 
-          const matchesKeyword = name.includes(keyword);
-          const matchesStatus = filter === "all" || status === filter;
+        if (authError) throw authError;
 
-          return matchesKeyword && matchesStatus;
+        const user = authData?.user;
+
+        if (!user) {
+          throw new Error("Sesi login tidak ditemukan. Silakan login kembali.");
+        }
+
+        state.user = user;
+
+        const member = await getOwnMember(client, user.id);
+        state.member = member;
+
+        const [historical, latest] = await Promise.all([
+          loadHistorical(client, member.id),
+          loadLatest(client, member.id)
+        ]);
+
+        state.records = [...historical, ...latest].sort((a, b) => {
+          const dateA = safeDate(a.date);
+          const dateB = safeDate(b.date);
+
+          if (dateA && dateB) return dateB - dateA;
+          if (dateA) return -1;
+          if (dateB) return 1;
+
+          return (b.meetingNumber || 0) - (a.meetingNumber || 0);
         });
 
-        list.replaceChildren();
+        renderSummary(state.records);
+        renderRecords();
 
-        if (!filtered.length) {
-          const empty = document.createElement("div");
-          empty.className = "attendance-empty";
+        showMessage(
+          `Riwayat berhasil dimuat: ${historical.length} arsip historis dan ${latest.length} kajian terbaru.`
+        );
 
-          const icon = document.createElement("span");
-          icon.textContent = "📭";
+      } catch (error) {
+        console.error("[TARBIYAH KEHADIRAN]", error);
 
-          const text = document.createElement("div");
-          text.textContent = attendanceRecords.length
-            ? "Tidak ada kegiatan yang sesuai dengan pencarian atau filter."
-            : "Belum ada riwayat kehadiran yang dapat ditampilkan.";
+        state.records = [];
+        renderSummary([]);
+        renderRecords();
 
-          empty.append(icon, text);
-          list.appendChild(empty);
-          return;
-        }
+        showMessage(
+          error?.message || "Terjadi kesalahan saat memuat riwayat.",
+          true
+        );
+      } finally {
+        state.loading = false;
+        $("refreshAttendance").disabled = false;
+        $("attendanceList").classList.remove("attendance-loading");
+      }
+    }
 
-        filtered.forEach(record => {
-          const date = dateParts(
-            record[CONFIG.dateColumn] ||
-            record.created_at ||
-            record.date
-          );
+    function init() {
+      $("refreshAttendance").addEventListener("click", loadAttendance);
 
-          const status = normalizeStatus(record[CONFIG.statusColumn]);
+      $("attendanceSearch").addEventListener("input", renderRecords);
+      $("attendanceFilter").addEventListener("change", renderRecords);
 
-          const item = document.createElement("article");
-          item.className = "attendance-item";
+      document.querySelectorAll(".attendance-tab").forEach(button => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".attendance-tab").forEach(tab => {
+            tab.classList.remove("active");
+          });
 
-          const dateBox = document.createElement("div");
-          dateBox.className = "attendance-date";
-
-          const day = document.createElement("strong");
-          day.textContent = date.day;
-
-          const month = document.createElement("small");
-          month.textContent = date.month;
-
-          dateBox.append(day, month);
-
-          const info = document.createElement("div");
-          info.className = "attendance-info";
-
-          const title = document.createElement("h3");
-          title.textContent = getActivityName(record);
-
-          const detail = document.createElement("p");
-          const location =
-            record.location ||
-            record.agenda?.location ||
-            "";
-
-          detail.textContent = location
-            ? `${date.full} · ${location}`
-            : date.full;
-
-          const badge = document.createElement("span");
-          badge.className = `attendance-status ${statusClass(status)}`;
-          badge.textContent = statusLabel(status);
-
-          info.append(title, detail, badge);
-          item.append(dateBox, info);
-          list.appendChild(item);
+          button.classList.add("active");
+          state.source = button.dataset.source || "all";
+          renderRecords();
         });
-      }
+      });
 
-      async function loadAttendance() {
-        const client = getSupabase();
+      loadAttendance();
+    }
 
-        if (!client) {
-          attendanceRecords = [];
-          renderSummary([]);
-          renderRecords();
-          showMessage(
-            "Supabase belum terhubung. Periksa konfigurasi koneksi aplikasi.",
-            true
-          );
-          return;
-        }
+    window.TARBIYAH_ATTENDANCE = {
+      refresh: loadAttendance,
+      getRecords: () => [...state.records],
+      getMember: () => state.member
+    };
 
-        try {
-          const { data: authData, error: authError } =
-            await client.auth.getUser();
-
-          if (authError) throw authError;
-
-          const user = authData?.user;
-
-          if (!user) {
-            throw new Error("Sesi login tidak ditemukan. Silakan login kembali.");
-          }
-
-          const { data, error } = await client
-            .from(CONFIG.table)
-            .select("*")
-            .eq(CONFIG.userColumn, user.id)
-            .order(CONFIG.dateColumn, { ascending: false })
-            .limit(500);
-
-          if (error) throw error;
-
-          attendanceRecords = Array.isArray(data) ? data : [];
-
-          renderSummary(attendanceRecords);
-          renderRecords();
-
-          showMessage(
-            attendanceRecords.length
-              ? "Riwayat kehadiran berhasil dimuat."
-              : "Belum ada riwayat kehadiran untuk akun ini."
-          );
-        } catch (error) {
-          console.error("Gagal memuat riwayat kehadiran:", error);
-
-          attendanceRecords = [];
-          renderSummary([]);
-          renderRecords();
-
-          showMessage(
-            error.message || "Terjadi kesalahan saat memuat kehadiran.",
-            true
-          );
-        }
-      }
-
-      function init() {
-        $("refreshAttendance").addEventListener(
-          "click",
-          loadAttendance
-        );
-
-        $("attendanceSearch").addEventListener(
-          "input",
-          renderRecords
-        );
-
-        $("attendanceFilter").addEventListener(
-          "change",
-          renderRecords
-        );
-
-        loadAttendance();
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-      } else {
-        init();
-      }
-
-      window.TARBIYAH_ATTENDANCE = {
-        refresh: loadAttendance,
-        getRecords: () => [...attendanceRecords]
-      };
-    })();
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
   </script>
 </body>
 </html>
