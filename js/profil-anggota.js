@@ -1232,169 +1232,179 @@ async function uploadAvatar(file) {
   /* ==========================================================
      22. RIWAYAT PRESENSI ANGGOTA — SUPABASE
      ========================================================== */
+    
+async function loadAttendanceHistory() {
+  // ID ini harus sama dengan ID pada HTML.
+  const container = $("memberAttendanceList");
 
-  async function loadAttendanceHistory() {
-    const container = $("attendanceHistory");
-
-    if (!container) {
-      console.warn(
-        "[TARBIYAH] Elemen memberAttendanceList tidak ditemukan."
-      );
-      return;
-    }
-
-    container.replaceChildren();
-
-    function showAttendanceMessage(title, description) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "empty-state";
-
-      const heading = document.createElement("strong");
-      heading.textContent = title;
-
-      const paragraph = document.createElement("p");
-      paragraph.textContent = description;
-
-      wrapper.append(heading, paragraph);
-      container.replaceChildren(wrapper);
-    }
-
-    if (!memberData?.id) {
-      showAttendanceMessage(
-        "Data keanggotaan belum tersedia",
-        "Riwayat presensi akan tampil setelah akun terhubung dengan data anggota TARBIYAH."
-      );
-      return;
-    }
-
-    try {
-      const result = await withTimeout(
-        supabase
-          .from("kajian_attendance")
-          .select(`
-            id,
-            agenda_id,
-            attended_at,
-            attendance_method,
-            manual_reason,
-            kajian_agenda (
-              title,
-              location_name
-            )
-          `)
-          .eq("member_id", memberData.id)
-          .order("attended_at", { ascending: false })
-          .limit(100),
-        "Pengambilan riwayat presensi"
-      );
-
-      if (result.error) {
-        throw result.error;
-      }
-
-      const rows = Array.isArray(result.data)
-        ? result.data
-        : [];
-
-      if (rows.length === 0) {
-        showAttendanceMessage(
-          "Belum ada riwayat kehadiran",
-          "Riwayat akan muncul setelah Anda mengikuti kegiatan dan presensi berhasil dicatat."
-        );
-
-        console.info(
-          "[TARBIYAH] Riwayat presensi kosong."
-        );
-        return;
-      }
-
-      rows.forEach(item => {
-        const agenda = Array.isArray(item.kajian_agenda)
-          ? item.kajian_agenda[0]
-          : item.kajian_agenda;
-
-        const article = document.createElement("article");
-        article.className = "profile-history-item";
-
-        const marker = document.createElement("span");
-        marker.className = "profile-history-marker";
-        marker.setAttribute("aria-hidden", "true");
-        marker.textContent = "✓";
-
-        const content = document.createElement("div");
-        content.className = "profile-history-content";
-
-        const heading = document.createElement("h3");
-        heading.className = "profile-history-title";
-        heading.textContent =
-          agenda?.title || "Kegiatan TARBIYAH";
-
-        const meta = document.createElement("div");
-        meta.className = "profile-history-meta";
-
-        const date = document.createElement("span");
-
-        const dateValue = item.attended_at
-          ? new Date(item.attended_at)
-          : null;
-
-        date.textContent =
-          dateValue && !Number.isNaN(dateValue.getTime())
-            ? new Intl.DateTimeFormat("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                timeZone: "Asia/Jakarta",
-                timeZoneName: "short"
-              }).format(dateValue)
-            : "Waktu belum tersedia";
-
-        meta.appendChild(date);
-        content.append(heading, meta);
-
-        if (agenda?.location_name) {
-          const location = document.createElement("small");
-          location.textContent = agenda.location_name;
-          content.appendChild(location);
-        }
-
-        const status = document.createElement("span");
-        status.className = "profile-history-status";
-
-        if (item.attendance_method === "qr") {
-          status.textContent = "Hadir · QR Code";
-        } else if (item.attendance_method === "manual") {
-          status.textContent = "Hadir · Manual Admin";
-        } else {
-          status.textContent = "Hadir · Tercatat";
-        }
-
-        article.append(marker, content, status);
-        container.appendChild(article);
-      });
-
-      console.info(
-        "[TARBIYAH] Riwayat presensi berhasil dimuat:",
-        rows.length,
-        "catatan."
-      );
-
-    } catch (error) {
-      console.error(
-        "[TARBIYAH] Gagal memuat riwayat presensi:",
-        error
-      );
-
-      showAttendanceMessage(
-        "Riwayat belum dapat dimuat",
-        error.message ||
-          "Periksa koneksi dan kebijakan akses Supabase."
-      );
-    }
+  if (!container) {
+    console.warn(
+      "[TARBIYAH] Elemen #memberAttendanceList tidak ditemukan."
+    );
+    return;
   }
 
+  container.replaceChildren();
+
+  function showAttendanceMessage(title, description) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "empty-state";
+
+    const heading = document.createElement("strong");
+    heading.textContent = title;
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = description;
+
+    wrapper.append(heading, paragraph);
+    container.appendChild(wrapper);
+  }
+
+  if (!memberData?.id) {
+    showAttendanceMessage(
+      "Data keanggotaan belum tersedia",
+      "Riwayat kehadiran akan tampil setelah akun terhubung dengan data anggota TARBIYAH."
+    );
+    return;
+  }
+
+  try {
+    const result = await withTimeout(
+      supabase
+        .from("kajian_attendance")
+        .select(`
+          id,
+          agenda_id,
+          attended_at,
+          attendance_method,
+          attendance_status,
+          manual_reason,
+          kajian_agenda (
+            title,
+            location_name
+          )
+        `)
+        .eq("member_id", memberData.id)
+        .order("attended_at", { ascending: false })
+        .limit(100),
+      "Pengambilan riwayat presensi"
+    );
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    const rows = Array.isArray(result.data)
+      ? result.data
+      : [];
+
+    if (!rows.length) {
+      showAttendanceMessage(
+        "Belum ada riwayat kehadiran",
+        "Catatan akan muncul setelah kegiatan dan presensi anggota tercatat."
+      );
+      return;
+    }
+
+    rows.forEach(item => {
+      const agenda = Array.isArray(item.kajian_agenda)
+        ? item.kajian_agenda[0]
+        : item.kajian_agenda;
+
+      const article = document.createElement("article");
+      article.className = "profile-history-item";
+
+      const marker = document.createElement("span");
+      marker.className = "profile-history-marker";
+      marker.setAttribute("aria-hidden", "true");
+
+      const content = document.createElement("div");
+      content.className = "profile-history-content";
+
+      const heading = document.createElement("h3");
+      heading.className = "profile-history-title";
+      heading.textContent =
+        agenda?.title || "Kegiatan TARBIYAH";
+
+      const meta = document.createElement("div");
+      meta.className = "profile-history-meta";
+
+      const date = document.createElement("span");
+
+      const dateValue = item.attended_at
+        ? new Date(item.attended_at)
+        : null;
+
+      date.textContent =
+        dateValue && !Number.isNaN(dateValue.getTime())
+          ? new Intl.DateTimeFormat("id-ID", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              timeZone: "Asia/Jakarta"
+            }).format(dateValue)
+          : "Waktu belum tersedia";
+
+      meta.appendChild(date);
+      content.append(heading, meta);
+
+      if (agenda?.location_name) {
+        const location = document.createElement("small");
+        location.textContent = agenda.location_name;
+        content.appendChild(location);
+      }
+
+      const status = document.createElement("span");
+      status.className = "profile-history-status";
+
+      const statusLabels = {
+        hadir: "Hadir",
+        izin: "Izin",
+        sakit: "Sakit",
+        alpa: "Alpa"
+      };
+
+      const attendanceStatus =
+        item.attendance_status || "hadir";
+
+      status.textContent =
+        statusLabels[attendanceStatus] ||
+        "Status belum tersedia";
+
+      marker.textContent =
+        attendanceStatus === "hadir" ? "✓" : "•";
+
+      if (item.attendance_method === "qr") {
+        status.textContent += " · QR Code";
+      } else if (item.attendance_method === "manual") {
+        status.textContent += " · Manual Admin";
+      }
+
+      article.append(marker, content, status);
+      container.appendChild(article);
+    });
+
+    console.info(
+      "[TARBIYAH] Riwayat berhasil dimuat:",
+      rows.length,
+      "catatan."
+    );
+
+  } catch (error) {
+    console.error(
+      "[TARBIYAH] Gagal memuat riwayat:",
+      error
+    );
+
+    showAttendanceMessage(
+      "Riwayat belum dapat dimuat",
+      error.message ||
+        "Periksa koneksi dan akses data Supabase."
+    );
+  }
+}
 
   /* ==========================================================
      23. QR — ELEMENT HELPERS
