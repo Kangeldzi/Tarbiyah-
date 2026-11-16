@@ -1794,6 +1794,61 @@ textarea:focus-visible {
 }
 
 
+/* ==================================================
+   TARBIYAH — TOMBOL LIHAT SEMUA RIWAYAT
+================================================== */
+
+.attendance-history-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color, rgba(128,128,128,.2));
+}
+
+.btn-view-all-history {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  width: 100%;
+  max-width: 320px;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #087f5b;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  transition:
+    background .25s ease,
+    transform .25s ease,
+    box-shadow .25s ease;
+}
+
+.btn-view-all-history:hover {
+  background: #066b4d;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(8,127,91,.22);
+}
+
+.btn-view-all-history:active {
+  transform: scale(.98);
+}
+
+.btn-view-all-history:focus-visible {
+  outline: 3px solid rgba(16,185,129,.45);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .btn-view-all-history {
+    max-width: 100%;
+    font-size: 13px;
+  }
+}
+
 /* =========================================================
    END OF TARBIYAH PROFILE CSS
 ========================================================= */
