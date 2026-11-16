@@ -2462,6 +2462,39 @@ function setupEvents() {
     logout
   );
 
+ 
+  // Navigasi menu Riwayat Aktivitas.
+  document.querySelectorAll(
+    '[data-action="attendance-history"]'
+  ).forEach(link => {
+    link.addEventListener("click", event => {
+      event.preventDefault();
+
+      const panel = $("memberAttendancePanel");
+
+      if (!panel) {
+        notify(
+          "Panel Riwayat Aktivitas tidak ditemukan.",
+          "error"
+        );
+        return;
+      }
+
+      panel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+      panel.classList.add("attendance-panel-highlight");
+
+      setTimeout(() => {
+        panel.classList.remove(
+          "attendance-panel-highlight"
+        );
+      }, 1400);
+    });
+  });
+
   setupTabs();
   setupQR();
 }
