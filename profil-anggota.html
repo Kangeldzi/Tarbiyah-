@@ -555,94 +555,92 @@
     </section>
 
 
-    <!-- =================================
-         TAB 3: LEARNING HISTORY
-    ================================== -->
+    
+<!-- =================================
+     TAB 3: LEARNING HISTORY
+================================== -->
 
-    <section
-      id="tab-activity"
-      class="profile-tab-content"
-      hidden>
+<section
+  id="tab-activity"
+  class="profile-tab-content"
+  hidden>
 
-      <div class="content-card">
+  <div class="content-card">
 
-        <div class="card-heading">
+    <div class="card-heading">
+      <div>
+        <h3>Riwayat Kajian & Kehadiran</h3>
+        <p>
+          Rekam jejak partisipasi Anda dalam kegiatan
+          pembelajaran TARBIYAH.
+        </p>
+      </div>
+    </div>
 
-          <div>
-            <h3>Riwayat Kajian</h3>
-            <p>Rekam jejak kegiatan pembelajaran Anda.</p>
-          </div>
+    <!-- RINGKASAN AKTIVITAS -->
+    <div class="activity-summary">
 
-        </div>
-
-
-        <div class="activity-summary">
-
-          <div class="activity-stat">
-
-            <span>Total Kajian</span>
-
-            <strong id="totalKajian">
-              —
-            </strong>
-
-          </div>
-
-
-          <div class="activity-stat">
-
-            <span>Total Kehadiran</span>
-
-            <strong id="totalAttendance">
-              —
-            </strong>
-
-          </div>
-
-
-          <div class="activity-stat">
-
-            <span>Tingkat Kehadiran</span>
-
-            <strong id="attendancePercentage">
-              —
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div class="history-heading">
-
-          <h4>Daftar Riwayat Kehadiran</h4>
-
-        </div>
-
-
-        <div
-          id="attendanceHistory"
-          class="attendance-history"
-          aria-live="polite">
-
-          <div class="empty-state">
-
-            <span class="empty-icon">◷</span>
-
-            <h4>Riwayat belum tersedia</h4>
-
-            <p>
-              Riwayat kajian dan kehadiran akan ditampilkan
-              setelah sumber data kehadiran terhubung.
-            </p>
-
-          </div>
-
-        </div>
-
+      <div class="activity-stat">
+        <span>Total Kajian</span>
+        <strong id="totalKajian">—</strong>
       </div>
 
-    </section>
+      <div class="activity-stat">
+        <span>Total Kehadiran</span>
+        <strong id="totalAttendance">—</strong>
+      </div>
+
+      <div class="activity-stat">
+        <span>Tingkat Kehadiran</span>
+        <strong id="attendancePercentage">—</strong>
+      </div>
+
+    </div>
+
+    <!-- DAFTAR RIWAYAT -->
+    <div class="history-heading">
+      <h4>Riwayat Kehadiran Terbaru</h4>
+    </div>
+
+    <div
+      id="attendanceHistory"
+      class="attendance-history"
+      aria-live="polite">
+
+      <div class="empty-state">
+        <span class="empty-icon">◷</span>
+
+        <h4>Memuat riwayat kehadiran...</h4>
+
+        <p>
+          Mohon tunggu, sistem sedang mengambil data
+          kehadiran Anda.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- TOMBOL KE HALAMAN RIWAYAT LENGKAP -->
+    <div class="attendance-history-action">
+
+      <a
+        href="./kehadiran.html"
+        class="btn-view-all-history">
+
+        <i class="fa-solid fa-clock-rotate-left"></i>
+
+        <span>Lihat Semua Riwayat</span>
+
+        <i class="fa-solid fa-arrow-right"></i>
+
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
 
 
     <!-- =================================
