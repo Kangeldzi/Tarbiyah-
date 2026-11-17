@@ -610,3 +610,79 @@ html[data-theme="light"] {
   border-color: rgba(239, 68, 68, .55) !important;
   color: #f87171 !important;
 }
+
+
+/* ==========================================
+   TARBIYAH — HEADER AVATAR EMERALD FRAME
+   PRIORITY OVERRIDE
+   ========================================== */
+
+#appHeader .header-user-avatar,
+.header-user-avatar[data-user-avatar],
+[data-user-avatar] {
+  position: relative !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex: 0 0 40px !important;
+
+  box-sizing: border-box !important;
+  padding: 1px !important;
+
+  border: 1.5px solid #10b981 !important;
+  border-radius: 50% !important;
+
+  background: rgba(16, 185, 129, 0.12) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, 0.25),
+    0 0 5px rgba(16, 185, 129, 0.30),
+    0 0 12px rgba(16, 185, 129, 0.22) !important;
+
+  overflow: hidden !important;
+  isolation: isolate !important;
+}
+
+/* FOTO PROFIL HEADER */
+.header-user-avatar > img[data-profile-photo],
+[data-user-avatar] > img[data-profile-photo] {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  flex: 0 0 100% !important;
+
+  object-fit: cover !important;
+  object-position: center !important;
+
+  border: none !important;
+  border-radius: 50% !important;
+}
+
+/* INDIKATOR STATUS AKTIF */
+.header-user-avatar .profile-active-indicator,
+[data-user-avatar] .profile-active-indicator {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 5 !important;
+
+  width: 9px !important;
+  height: 9px !important;
+
+  border: 2px solid var(--bg-primary, #102a22) !important;
+  border-radius: 50% !important;
+  background: #22c55e !important;
+}
