@@ -464,3 +464,149 @@ html[data-theme="light"] {
   );
 })();
   
+
+/* ==========================================
+   TARBIYAH — AVATAR FRAME HEADER & SIDEBAR
+   ========================================== */
+
+/* HEADER */
+.header-user-avatar {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  flex: 0 0 40px !important;
+
+  box-sizing: border-box !important;
+  padding: 1px !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+
+  border: 1.5px solid #10b981 !important;
+  background: rgba(16, 185, 129, .12) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, .18),
+    0 0 8px rgba(16, 185, 129, .20) !important;
+}
+
+/* SIDEBAR */
+.sidebar-profile-avatar {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  min-height: 46px !important;
+  flex: 0 0 46px !important;
+
+  box-sizing: border-box !important;
+  padding: 1px !important;
+  overflow: hidden !important;
+  border-radius: 50% !important;
+
+  border: 1.5px solid #10b981 !important;
+  background: rgba(16, 185, 129, .12) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, .18),
+    0 0 8px rgba(16, 185, 129, .20) !important;
+}
+
+/* FOTO DI DALAM BINGKAI */
+.header-user-avatar > img[data-profile-photo],
+.sidebar-profile-avatar > img[data-profile-photo] {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center !important;
+  border: none !important;
+  border-radius: 50% !important;
+}
+
+/* INDIKATOR STATUS AKTIF */
+.header-user-avatar .profile-active-indicator,
+.sidebar-profile-avatar .profile-active-indicator {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 5 !important;
+
+  width: 9px !important;
+  height: 9px !important;
+
+  border: 2px solid var(--bg-primary, #102a22) !important;
+  border-radius: 50% !important;
+  background: #22c55e !important;
+  pointer-events: none !important;
+}
+
+
+/* ==========================================
+   SIDEBAR — FOTO PROFIL & LOGOUT SEJAJAR
+   ========================================== */
+
+/* Posisi foto profil */
+#appSidebar > .sidebar-profile-avatar {
+  align-self: flex-start !important;
+  margin-bottom: 0 !important;
+}
+
+/* Tombol Logout */
+#appSidebar > #logoutMini {
+  position: relative !important;
+
+  align-self: flex-end !important;
+
+  /* Naik sejajar dengan foto profil */
+  margin-top: -46px !important;
+
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  flex: 0 0 40px !important;
+  box-sizing: border-box !important;
+
+  border-radius: 12px !important;
+  border: 1px solid rgba(239, 68, 68, .30) !important;
+
+  background: rgba(239, 68, 68, .10) !important;
+  color: #fca5a5 !important;
+
+  cursor: pointer !important;
+}
+
+/* Ukuran ikon Logout */
+#appSidebar > #logoutMini svg {
+  width: 20px !important;
+  height: 20px !important;
+  display: block !important;
+}
+
+/* Efek interaksi */
+#appSidebar > #logoutMini:hover {
+  background: rgba(239, 68, 68, .20) !important;
+  border-color: rgba(239, 68, 68, .55) !important;
+  color: #f87171 !important;
+}
