@@ -12,7 +12,7 @@
   window.__TARBIYAH_PROFILE_AVATAR_V2__ = true;
 
   const BUCKET = "avatar";
-  const TABLE = "members";
+  const TABLE = "profiles";
   const DEFAULT_AVATAR = "./assets/icons/icon-192.png";
   const SIGNED_URL_SECONDS = 3600;
 
@@ -124,12 +124,14 @@
     }
 
     // Ambil profil milik akun yang sedang login.
-    const { data: profile, error: profileError } =
-      await client
-        .from(TABLE)
-        .select("full_name, avatar_path")
-        .eq("user_id", user.id)
-        .maybeSingle();
+    
+const { data: profile, error: profileError } =
+  await client
+    .from("profiles")
+    .select("full_name, avatar_path")
+    .eq("id", user.id)
+    .maybeSingle();
+
 
     if (profileError) throw profileError;
 
