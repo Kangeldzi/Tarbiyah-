@@ -377,3 +377,71 @@ html[data-theme="light"] {
   right: 0 !important;
   bottom: 0 !important;
 }
+
+
+/* =========================================
+   TARBIYAH — SIDEBAR PROFILE AVATAR FRAME
+   ========================================= */
+
+.sidebar-profile-avatar {
+  position: relative !important;
+
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  flex: 0 0 48px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  border-radius: 50% !important;
+
+  /* Bingkai lingkaran */
+  border: 2px solid #10b981 !important;
+  padding: 2px !important;
+
+  /* Efek bingkai */
+  background: rgba(16, 185, 129, 0.12) !important;
+  box-shadow:
+    0 0 0 2px rgba(16, 185, 129, 0.16),
+    0 0 10px rgba(16, 185, 129, 0.20) !important;
+}
+
+/* Foto profil */
+.sidebar-profile-avatar > img[data-profile-photo] {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  object-fit: cover !important;
+  object-position: center !important;
+
+  border-radius: 50% !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Indikator status aktif */
+.sidebar-profile-avatar .profile-active-indicator {
+  position: absolute !important;
+  right: -1px !important;
+  bottom: -1px !important;
+  z-index: 5 !important;
+
+  width: 10px !important;
+  height: 10px !important;
+
+  border: 2px solid var(--bg-primary, #102a22) !important;
+  border-radius: 50% !important;
+  background: #22c55e !important;
+
+  pointer-events: none !important;
+}
