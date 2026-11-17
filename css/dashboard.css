@@ -241,3 +241,100 @@ html[data-theme="light"] {
   }
 }
 
+
+/* =====================================================
+   TARBIYAH — FIX FOTO PROFIL HEADER & SIDEBAR
+   Ukuran terkunci, proporsional, dan tidak meluber
+===================================================== */
+
+/* HEADER: wadah foto profil */
+.profile-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  text-decoration: none;
+}
+
+.header-user-avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+
+  flex: 0 0 40px;
+  overflow: hidden;
+  border-radius: 50%;
+  isolation: isolate;
+}
+
+/* SIDEBAR: wadah foto profil */
+.sidebar-profile-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  min-height: 64px;
+
+  flex: 0 0 64px;
+  overflow: hidden;
+  border-radius: 50%;
+  isolation: isolate;
+}
+
+/* Gambar profil Header dan Sidebar */
+.header-user-avatar > img[data-profile-photo],
+.sidebar-profile-avatar > img[data-profile-photo] {
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+
+  flex: 0 0 100%;
+  object-fit: cover;
+  object-position: center;
+
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+/* Indikator akun aktif */
+.header-user-avatar .profile-active-indicator,
+.sidebar-profile-avatar .profile-active-indicator {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  z-index: 2;
+
+  width: 10px;
+  height: 10px;
+
+  border: 2px solid var(--bg-primary, #102a22);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Pastikan elemen gambar tidak memperbesar layout */
+[data-user-avatar],
+[data-sidebar-avatar] {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
