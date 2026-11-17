@@ -454,7 +454,23 @@
     );
   }
 
-  function handleNavigationClick(event) {
+  
+function handleNavigationClick(event) {
+    /*
+     * Jangan mengambil alih klik pada komponen
+     * interaktif yang bukan navigasi halaman.
+     * Khususnya <details> dan <summary> untuk
+     * membuka/menutup daftar topik pembelajaran.
+     */
+    if (
+      event.target instanceof Element &&
+      event.target.closest(
+        "summary, details, .attendance-topics, .topic-list"
+      )
+    ) {
+      return;
+    }
+
     const link = event.target.closest(
       "[data-module], [data-page], [data-route], [data-nav-link]"
     );
@@ -489,7 +505,8 @@
     closeUserMenu();
 
     navigateTo(pageKey);
-  }
+}
+
 
   /* =======================================================
      7. PENANDA MENU AKTIF
