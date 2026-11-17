@@ -1,18 +1,22 @@
 
 /* =========================================================
-   TARBIYAH — PROFILE AVATAR CONTROLLER
-   Foto profil akun aktif + sinkronisasi Header dan Sidebar
+   TARBIYAH — PROFILE AVATAR CONTROLLER v2
+   Sumber foto: members.avatar_path
+   Storage: avatar
    ========================================================= */
 
 (() => {
   "use strict";
 
-  if (window.__TARBIYAH_PROFILE_AVATAR__) return;
-  window.__TARBIYAH_PROFILE_AVATAR__ = true;
+  if (window.__TARBIYAH_PROFILE_AVATAR_V2__) return;
+  window.__TARBIYAH_PROFILE_AVATAR_V2__ = true;
 
-  const DEFAULT_AVATAR = "./assets/images/default-avatar.png";
+  const BUCKET = "avatar";
+  const TABLE = "members";
+  const DEFAULT_AVATAR = "./assets/icons/icon-192.png";
+  const SIGNED_URL_SECONDS = 3600;
 
-  const $all = (selector) =>
+  const $all = selector =>
     Array.from(document.querySelectorAll(selector));
 
   function getClient() {
@@ -26,25 +30,7 @@
     return null;
   }
 
-  function getPhotoUrl(user) {
-    const metadata = user?.user_metadata || {};
-
-    const candidates = [
-      metadata.avatar_url,
-      metadata.picture,
-      metadata.photo_url,
-      metadata.profile_photo_url,
-      metadata.profile_image,
-      metadata.avatar
-    ];
-
-    return candidates.find(value =>
-      typeof value === "string" &&
-      /^https?:\/\//i.test(value.trim())
-    )?.trim() || DEFAULT_AVATAR;
-  }
-
-  function setPhoto(url) {
+  function setPhoto(url, name) {
     $all("[data-profile-photo]").forEach(img => {
       img.onerror = () => {
         img.onerror = null;
@@ -52,27 +38,31 @@
       };
 
       img.src = url || DEFAULT_AVATAR;
-      img.alt = "Foto profil pengguna TARBIYAH";
+      img.alt = name
+        ? `Foto profil ${name}`
+        : "Foto profil pengguna TARBIYAH";
     });
   }
 
-  function setName(user) {
+  function setName(user, profile) {
     const metadata = user?.user_metadata || {};
 
     const name =
+      profile?.full_name ||
+      profile?.name ||
+      profile?.nama_lengkap ||
       metadata.full_name ||
       metadata.display_name ||
       metadata.name ||
       user?.email?.split("@")[0] ||
       "Pengguna";
 
-    $all("[data-user-name]").forEach(el => {
-      el.textContent = name;
-    });
+    $all("[data-user-name], [data-sidebar-user-name]")
+      .forEach(el => {
+        el.textContent = name;
+      });
 
-    $all("[data-sidebar-user-name]").forEach(el => {
-      el.textContent = name;
-    });
+    return name;
   }
 
   function normalizeRole(value) {
@@ -82,89 +72,127 @@
       .replace(/[\s-]+/g, "_");
   }
 
-  function getRoleLabel(role) {
-    const normalized = normalizeRole(role);
+  function setRole() {
+    const roleState = window.TARBIYAH_USER_ROLE;
+    const role = roleState?.name;
 
-    if (normalized === "super_admin" ||
-        normalized === "superadmin") {
-      return "Super Admin";
+    let label = "Role belum ditetapkan";
+
+    if (roleState?.ready && role) {
+      const normalized = normalizeRole(role);
+
+      if (
+        normalized === "super_admin" ||
+        normalized === "superadmin"
+      ) {
+        label = "Super Admin";
+      } else if (normalized === "admin") {
+        label = "Admin";
+      } else if (
+        normalized === "anggota" ||
+        normalized === "member"
+      ) {
+        label = "Anggota";
+      } else {
+        label = role;
+      }
     }
 
-    if (normalized === "admin") {
-      return "Admin";
-    }
-
-    if (normalized === "anggota" ||
-        normalized === "member") {
-      return "Anggota";
-    }
-
-    return role || "Role belum ditetapkan";
+    $all("[data-sidebar-user-role], [data-user-role]")
+      .forEach(el => {
+        el.textContent = label;
+      });
   }
 
-  function setRole(role) {
-    const label = getRoleLabel(role);
-
-    $all("[data-sidebar-user-role]").forEach(el => {
-      el.textContent = label;
-    });
-
-    $all("[data-user-role]").forEach(el => {
-      el.textContent = label;
-    });
-  }
-
-  async function initialize() {
+  async function loadAvatar() {
     const client = getClient();
 
     if (!client) {
-      console.warn(
-        "[TARBIYAH PROFILE] Backend belum tersedia."
-      );
-      return;
+      throw new Error("Koneksi Supabase belum tersedia.");
     }
 
-    const { data, error } = await client.auth.getSession();
+    const { data: sessionData, error: sessionError } =
+      await client.auth.getSession();
 
-    if (error) throw error;
+    if (sessionError) throw sessionError;
 
-    const user = data?.session?.user;
+    const user = sessionData?.session?.user;
 
     if (!user) {
       setPhoto(DEFAULT_AVATAR);
       return;
     }
 
-    setPhoto(getPhotoUrl(user));
-    setName(user);
+    // Ambil profil milik akun yang sedang login.
+    const { data: profile, error: profileError } =
+      await client
+        .from(TABLE)
+        .select("full_name, avatar_path")
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-    // Role hanya diambil dari hasil pemeriksaan database
-    // oleh dashboard.js, bukan dari metadata akun.
-    const roleState = window.TARBIYAH_USER_ROLE;
+    if (profileError) throw profileError;
 
-    if (roleState?.ready && roleState?.name) {
-      setRole(roleState.name);
-    } else {
-      setRole("Role belum ditetapkan");
+    const name = setName(user, profile);
+
+    let photoUrl = null;
+
+    if (profile?.avatar_path) {
+      const { data, error } = await client
+        .storage
+        .from(BUCKET)
+        .createSignedUrl(
+          profile.avatar_path,
+          SIGNED_URL_SECONDS
+        );
+
+      if (error) {
+        console.error(
+          "[TARBIYAH AVATAR] Signed URL gagal:",
+          error
+        );
+      } else {
+        photoUrl = data?.signedUrl || null;
+      }
     }
 
-    console.info(
-      "[TARBIYAH PROFILE] Foto profil berhasil diproses.",
-      {
-        userId: user.id,
-        role: roleState?.name || "Belum ditetapkan"
-      }
-    );
+    setPhoto(photoUrl || DEFAULT_AVATAR, name);
+    setRole();
+
+    console.info("[TARBIYAH AVATAR] Selesai", {
+      userId: user.id,
+      hasProfile: Boolean(profile),
+      hasAvatar: Boolean(photoUrl)
+    });
+  }
+
+  async function initialize() {
+    try {
+      await loadAvatar();
+    } catch (error) {
+      console.error(
+        "[TARBIYAH AVATAR] Gagal memuat foto:",
+        error
+      );
+
+      setPhoto(DEFAULT_AVATAR);
+    }
   }
 
   if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
-      () => initialize().catch(console.error),
+      initialize,
       { once: true }
     );
   } else {
-    initialize().catch(console.error);
+    initialize();
   }
+
+  // API untuk memperbarui foto setelah pengguna
+  // mengganti foto profil tanpa memuat ulang halaman.
+  window.TARBIYAH_PROFILE_AVATAR = {
+    refresh: initialize
+  };
 
 })();
