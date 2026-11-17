@@ -528,6 +528,92 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
+
+    
+/* =====================================================
+   TARBIYAH SIDEBAR BRAND HEADER
+   ===================================================== */
+
+.sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 76px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  flex: 0 0 auto;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.sidebar-brand-logo {
+  display: block;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: contain;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.sidebar-brand-text strong {
+  color: var(--text-primary);
+  font-size: .94rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.sidebar-brand-text small {
+  margin-top: 3px;
+  color: var(--text-secondary);
+  font-size: .64rem;
+  white-space: nowrap;
+}
+
+.sidebar-close-button {
+  display: none;
+  flex: 0 0 36px;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  font: inherit;
+  font-size: 1.55rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.sidebar-close-button:hover {
+  color: #fff;
+  border-color: #059669;
+  background: #059669;
+}
+
+@media (max-width: 900px) {
+  .sidebar-close-button {
+    display: flex;
+  }
+}
+
   </style>
 </head>
 
@@ -641,9 +727,36 @@
 
 
     <!-- SIDEBAR -->
-    <aside class="app-sidebar" data-sidebar>
+    
+<aside class="app-sidebar" data-sidebar>
 
-      <div class="sidebar-profile">
+  <!-- HEADER SIDEBAR TARBIYAH -->
+  <div class="sidebar-brand-row">
+    <a href="./tarbiyah.html" class="sidebar-brand">
+      <img
+        src="./assets/icons/tarbiyah-mark.svg"
+        alt="Logo TARBIYAH"
+        class="sidebar-brand-logo"
+      >
+      <span class="sidebar-brand-text">
+        <strong>TARBIYAH</strong>
+        <small>Pembelajaran Muslim</small>
+      </span>
+    </a>
+
+    <button
+      type="button"
+      class="sidebar-close-button"
+      data-sidebar-close
+      aria-label="Tutup menu"
+      title="Tutup menu"
+    >
+      &times;
+    </button>
+  </div>
+
+  <div class="sidebar-profile">
+
 
         <div class="sidebar-profile-avatar" data-sidebar-avatar>
           T
