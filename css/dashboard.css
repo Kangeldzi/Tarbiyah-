@@ -445,3 +445,22 @@ html[data-theme="light"] {
 
   pointer-events: none !important;
 }
+
+(() => {
+  const sidebar = document.querySelector(".app-sidebar");
+
+  console.log("=== STRUKTUR SIDEBAR ===");
+  console.log(sidebar?.outerHTML);
+
+  console.log("=== SEMUA TOMBOL DAN LINK ===");
+  console.table(
+    [...(sidebar?.querySelectorAll("button, a") || [])].map(el => ({
+      tag: el.tagName,
+      text: el.innerText,
+      class: el.className,
+      id: el.id,
+      onclick: el.getAttribute("onclick")
+    }))
+  );
+})();
+  
