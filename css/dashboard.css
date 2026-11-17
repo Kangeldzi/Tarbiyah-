@@ -338,3 +338,42 @@ html[data-theme="light"] {
   overflow: hidden;
 }
 
+
+/* =====================================================
+   TARBIYAH — PENYESUAIAN FOTO PROFIL SIDEBAR
+   ===================================================== */
+
+/* Wadah foto profil Sidebar */
+.sidebar-profile-avatar {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  flex: 0 0 48px !important;
+
+  overflow: hidden !important;
+  border-radius: 50% !important;
+  position: relative;
+}
+
+/* Foto di dalam Sidebar */
+.sidebar-profile-avatar > img[data-profile-photo] {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 50% !important;
+}
+
+/* Indikator akun aktif */
+.sidebar-profile-avatar .profile-active-indicator {
+  width: 9px !important;
+  height: 9px !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
