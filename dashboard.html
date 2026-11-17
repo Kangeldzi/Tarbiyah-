@@ -120,8 +120,16 @@ window.addEventListener("unhandledrejection", function (event) {
       </a>
 
       <a class="profile-chip" href="./profil-anggota.html" aria-label="Buka profil">
-        <span class="avatar" id="userAvatar">TA</span>
-        <span class="profile-name" id="userName">Pengguna</span>
+      <span class="header-user-avatar" data-user-avatar>
+  <img
+    src="./assets/images/default-avatar.png"
+    alt="Foto profil pengguna"
+    data-profile-photo
+  >
+  <span class="profile-active-indicator"
+        title="Akun aktif"
+        aria-label="Akun aktif"></span>
+</span> 
       </a>
 
     </div>
@@ -212,14 +220,16 @@ window.addEventListener("unhandledrejection", function (event) {
 
       <div class="sidebar-spacer"></div>
 
-      <div class="sidebar-user">
-
-        <span class="avatar avatar-small" id="sidebarAvatar">TA</span>
-
-        <span>
-          <strong id="sidebarName">Pengguna</strong>
-          <small id="sidebarRole">Anggota TARBIYAH</small>
-        </span>
+      <div class="sidebar-profile-avatar" data-sidebar-avatar>
+  <img
+    src="./assets/images/default-avatar.png"
+    alt="Foto profil pengguna"
+    data-profile-photo
+  >
+  <span class="profile-active-indicator"
+        title="Akun aktif"
+        aria-label="Akun aktif"></span>
+</div>
 
         <button
           class="icon-button logout-mini"
