@@ -1,4 +1,73 @@
 
+<style>
+/* =========================================
+   TARBIYAH — ATTENDANCE LOADING
+========================================= */
+
+.attendance-loading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 18px;
+  margin: 10px 0;
+
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 16px;
+
+  background: rgba(16, 185, 129, 0.07);
+
+  color: var(--text-primary, #e8f5ef);
+}
+
+.attendance-loading-spinner {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+
+  border: 3px solid rgba(16, 185, 129, 0.18);
+  border-top-color: #10b981;
+  border-right-color: #10b981;
+
+  border-radius: 50%;
+
+  animation: tarbiyahAttendanceSpin 0.8s linear infinite;
+}
+
+.attendance-loading-copy {
+  min-width: 0;
+}
+
+.attendance-loading-copy strong {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.attendance-loading-copy span {
+  display: block;
+  margin-top: 4px;
+
+  color: var(--text-secondary, #9ca3af);
+
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+@keyframes tarbiyahAttendanceSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Aksesibilitas: kurangi animasi jika diminta perangkat */
+@media (prefers-reduced-motion: reduce) {
+  .attendance-loading-spinner {
+    animation: none;
+  }
+}
+</style>
+
 /* =========================================================
    TARBIYAH — PROFIL ANGGOTA
    File: css/profil-anggota.css
