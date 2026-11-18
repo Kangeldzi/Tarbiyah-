@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="Riwayat aktivitas anggota TARBIYAH.">
+  <meta name="description" content="Riwayat kajian dan kehadiran anggota TARBIYAH.">
   <title>Riwayat Aktivitas — TARBIYAH</title>
 
   <link rel="manifest" href="./manifest.json">
@@ -80,7 +79,7 @@
 
     .activity-summary {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 20px;
     }
@@ -218,16 +217,31 @@
       font-size: 10px;
     }
 
-    .activity-delete {
+    .activity-status {
       align-self: center;
-      padding: 7px 9px;
-      border: 1px solid var(--border-color, #777);
-      border-radius: 8px;
-      background: transparent;
-      color: #ef7777;
+      flex: 0 0 auto;
+      padding: 6px 9px;
+      border-radius: 20px;
+      background: rgba(128,128,128,.12);
+      color: var(--text-secondary, #999);
       font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .activity-status.hadir {
+      background: rgba(16,185,129,.13);
+      color: #10b981;
+    }
+
+    .activity-status.izin,
+    .activity-status.sakit {
+      background: rgba(245,158,11,.13);
+      color: #d69a32;
+    }
+
+    .activity-status.alpa {
+      background: rgba(239,68,68,.13);
+      color: #ef7777;
     }
 
     .activity-empty {
@@ -254,6 +268,28 @@
       color: var(--text-secondary, #999);
       font-size: 11px;
       line-height: 1.7;
+    }
+
+    .activity-loading {
+      padding: 30px 15px;
+      text-align: center;
+      color: var(--text-secondary, #999);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .activity-spinner {
+      width: 30px;
+      height: 30px;
+      margin: 0 auto 12px;
+      border: 3px solid rgba(16,185,129,.15);
+      border-top-color: #10b981;
+      border-radius: 50%;
+      animation: activitySpin .8s linear infinite;
+    }
+
+    @keyframes activitySpin {
+      to { transform: rotate(360deg); }
     }
 
     .activity-toast {
@@ -293,6 +329,10 @@
         padding: 14px;
       }
 
+      .activity-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .activity-item {
         gap: 9px;
       }
@@ -307,6 +347,11 @@
       .activity-item:not(:last-child)::before {
         left: 17px;
       }
+
+      .activity-status {
+        font-size: 9px;
+        padding: 5px 7px;
+      }
     }
   </style>
 </head>
@@ -319,47 +364,52 @@
         <div class="activity-eyebrow">✦ MEMBER ACTIVITY CENTER</div>
         <h1>Riwayat Aktivitas</h1>
         <p>
-          Lihat catatan aktivitas Anda selama menggunakan
-          platform pembelajaran dan komunitas TARBIYAH.
+          Lihat catatan kajian dan kehadiran Anda selama
+          mengikuti kegiatan pembelajaran TARBIYAH.
         </p>
       </section>
 
       <section class="activity-summary">
         <article class="activity-summary-card">
-          <strong id="activityTotal">0</strong>
-          <span>Total aktivitas tercatat</span>
+          <strong id="activityTotal">—</strong>
+          <span>Total kegiatan</span>
         </article>
 
         <article class="activity-summary-card">
-          <strong id="activityToday">0</strong>
-          <span>Aktivitas hari ini</span>
+          <strong id="activityPresent">—</strong>
+          <span>Total kehadiran</span>
+        </article>
+
+        <article class="activity-summary-card">
+          <strong id="activityPercentage">—</strong>
+          <span>Persentase kehadiran arsip historis</span>
         </article>
       </section>
 
       <section class="activity-panel">
         <div class="activity-toolbar">
-          <h2>🕒 Jejak Aktivitas</h2>
+          <h2>🕒 Riwayat Kajian & Kehadiran</h2>
         </div>
 
         <div class="activity-filter" id="activityFilters">
           <button type="button" class="active" data-filter="all">Semua</button>
-          <button type="button" data-filter="account">Akun</button>
-          <button type="button" data-filter="learning">Pembelajaran</button>
-          <button type="button" data-filter="community">Komunitas</button>
-          <button type="button" data-filter="other">Lainnya</button>
+          <button type="button" data-filter="historical">Arsip Historis</button>
+          <button type="button" data-filter="latest">Kajian Terbaru</button>
         </div>
 
-        <div class="activity-timeline" id="activityTimeline">
-          <div class="activity-empty">
-            <span>🕒</span>
-            Belum ada aktivitas yang tercatat.
+        <div class="activity-timeline" id="activityTimeline" aria-live="polite">
+          <div class="activity-loading">
+            <div class="activity-spinner"></div>
+            Mengambil riwayat kehadiran dari server TARBIYAH...
           </div>
         </div>
 
         <div class="activity-notice">
-          <strong>Privasi dan keamanan:</strong> Data pada versi ini
-          disimpan secara lokal di browser. Riwayat ini belum menjadi
-          catatan audit resmi dari server TARBIYAH.
+          <strong>Informasi:</strong>
+          Riwayat ini diambil dari database Supabase berdasarkan
+          akun anggota yang sedang login. Persentase kehadiran
+          dihitung dari arsip pertemuan historis, mengikuti
+          perhitungan pada halaman Kehadiran.
         </div>
       </section>
 
@@ -371,233 +421,537 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
-  <script src="./js/auth.js"></script>
-  <script src="./js/auth-guard.js"></script>
   <script src="./js/theme-manager.js"></script>
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
 
   <script>
-    (() => {
-      "use strict";
+  (() => {
+    "use strict";
 
-      const STORAGE_KEY = "tarbiyah_activity_history_v1";
-      const $ = (id) => document.getElementById(id);
+    const supabase = window.tarbiyahSupabase;
 
-      const ACTIVITY_TYPES = {
-        account: { icon: "👤", label: "Akun" },
-        learning: { icon: "📚", label: "Pembelajaran" },
-        community: { icon: "🤝", label: "Komunitas" },
-        other: { icon: "📌", label: "Lainnya" }
-      };
+    const $ = id => document.getElementById(id);
 
-      let activities = [];
-      let activeFilter = "all";
+    const CONFIG = {
+      LOGIN_PAGE: window.TARBIYAH_CONFIG?.LOGIN_PAGE ||
+        "./login-register.html",
+      TIMEOUT: 15000
+    };
 
-      function escapeHTML(value) {
-        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;"
-        })[char]);
+    let records = [];
+    let activeFilter = "all";
+    let initialized = false;
+
+    function withTimeout(promise, label) {
+      let timer;
+
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          timer = setTimeout(() => {
+            reject(new Error(
+              label + " melebihi batas waktu 15 detik."
+            ));
+          }, CONFIG.TIMEOUT);
+        })
+      ]).finally(() => clearTimeout(timer));
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function showToast(message) {
+      const toast = $("activityToast");
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    function showMessage(title, description, icon = "🕒") {
+      $("activityTimeline").innerHTML = `
+        <div class="activity-empty">
+          <span>${icon}</span>
+          <strong>${escapeHTML(title)}</strong>
+          <div>${escapeHTML(description)}</div>
+        </div>
+      `;
+    }
+
+    function normalizeStatus(value) {
+      const status = String(value || "")
+        .toLowerCase()
+        .trim();
+
+      if (["hadir", "present", "attended"].includes(status)) {
+        return "hadir";
       }
 
-      function showToast(message) {
-        const toast = $("activityToast");
-        toast.textContent = message;
-        toast.classList.add("show");
-
-        window.setTimeout(() => {
-          toast.classList.remove("show");
-        }, 2300);
+      if (["izin", "permission"].includes(status)) {
+        return "izin";
       }
 
-      function loadActivities() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          const parsed = raw ? JSON.parse(raw) : [];
-
-          activities = Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-          console.error("Gagal membaca riwayat aktivitas:", error);
-          activities = [];
-        }
-
-        render();
+      if (["sakit", "sick"].includes(status)) {
+        return "sakit";
       }
 
-      function saveActivities() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
-          return true;
-        } catch (error) {
-          console.error("Gagal menyimpan riwayat aktivitas:", error);
-          showToast("Tidak dapat menyimpan riwayat aktivitas.");
-          return false;
-        }
+      if (["alpa", "absent"].includes(status)) {
+        return "alpa";
       }
 
-      function formatDate(value) {
-        const date = new Date(value);
+      return "unknown";
+    }
 
-        if (Number.isNaN(date.getTime())) return "-";
+    function statusLabel(status) {
+      return {
+        hadir: "Hadir",
+        izin: "Izin",
+        sakit: "Sakit",
+        alpa: "Alpa",
+        unknown: "Belum ada catatan"
+      }[status] || "Belum ada catatan";
+    }
 
-        return new Intl.DateTimeFormat("id-ID", {
-          dateStyle: "medium",
-          timeStyle: "short"
-        }).format(date);
+    function formatDate(value) {
+      if (!value) return "Tanggal belum tersedia";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "Tanggal belum tersedia";
       }
 
-      function isToday(value) {
-        const date = new Date(value);
-        const now = new Date();
+      return new Intl.DateTimeFormat("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Asia/Jakarta"
+      }).format(date);
+    }
 
-        return !Number.isNaN(date.getTime()) &&
-          date.getFullYear() === now.getFullYear() &&
-          date.getMonth() === now.getMonth() &&
-          date.getDate() === now.getDate();
+    function uniqueIds(values) {
+      return [...new Set((values || []).filter(Boolean))];
+    }
+
+    async function getCurrentUser() {
+      if (!supabase) {
+        throw new Error(
+          "Supabase client tidak ditemukan. Periksa js/supabase-client.js."
+        );
       }
 
-      function render() {
-        const todayCount = activities.filter((item) =>
-          isToday(item.createdAt)
-        ).length;
+      const result = await withTimeout(
+        supabase.auth.getSession(),
+        "Pemeriksaan sesi login"
+      );
 
-        $("activityTotal").textContent = activities.length;
-        $("activityToday").textContent = todayCount;
+      if (result.error) throw result.error;
 
-        let filtered = activities;
+      const user = result.data?.session?.user;
 
-        if (activeFilter !== "all") {
-          filtered = activities.filter((item) =>
-            item.category === activeFilter
-          );
-        }
+      if (!user) {
+        window.location.replace(CONFIG.LOGIN_PAGE);
+        return null;
+      }
 
-        filtered = [...filtered].sort((a, b) =>
-          new Date(b.createdAt) - new Date(a.createdAt)
+      return user;
+    }
+
+    async function getOwnMember(userId) {
+      const result = await withTimeout(
+        supabase
+          .from("members")
+          .select("id,user_id,member_number,membership_status")
+          .eq("user_id", userId)
+          .maybeSingle(),
+        "Pengambilan data anggota"
+      );
+
+      if (result.error) throw result.error;
+
+      return result.data;
+    }
+
+    async function loadHistorical(memberId) {
+      const meetingsResult = await withTimeout(
+        supabase
+          .from("historical_meetings")
+          .select(`
+            id,
+            meeting_number,
+            meeting_date,
+            title,
+            location_name,
+            description
+          `)
+          .order("meeting_number", {
+            ascending: true
+          }),
+        "Pengambilan arsip pertemuan"
+      );
+
+      if (meetingsResult.error) {
+        throw meetingsResult.error;
+      }
+
+      const meetings = meetingsResult.data || [];
+
+      const meetingIds = uniqueIds(
+        meetings.map(row => row.id)
+      );
+
+      let attendanceRows = [];
+
+      if (meetingIds.length) {
+        const attendanceResult = await withTimeout(
+          supabase
+            .from("historical_meeting_attendance")
+            .select(`
+              id,
+              meeting_id,
+              attendance_status,
+              attendance_note,
+              created_at
+            `)
+            .eq("member_id", memberId)
+            .in("meeting_id", meetingIds),
+          "Pengambilan presensi historis"
         );
 
-        if (!filtered.length) {
-          $("activityTimeline").innerHTML = `
-            <div class="activity-empty">
-              <span>🕒</span>
-              Tidak ada aktivitas pada kategori ini.
-            </div>
-          `;
-          return;
+        if (attendanceResult.error) {
+          throw attendanceResult.error;
         }
 
-        $("activityTimeline").innerHTML = filtered.map((item) => {
-          const type = ACTIVITY_TYPES[item.category] ||
-            ACTIVITY_TYPES.other;
-
-          return `
-            <article class="activity-item">
-              <div class="activity-icon" aria-hidden="true">
-                ${type.icon}
-              </div>
-
-              <div class="activity-content">
-                <h3>${escapeHTML(item.title)}</h3>
-                <p>${escapeHTML(item.description)}</p>
-                <span class="activity-time">
-                  ${escapeHTML(formatDate(item.createdAt))}
-                  · ${escapeHTML(type.label)}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                class="activity-delete"
-                data-delete="${escapeHTML(item.id)}"
-                aria-label="Hapus aktivitas"
-              >Hapus</button>
-            </article>
-          `;
-        }).join("");
+        attendanceRows = attendanceResult.data || [];
       }
 
-      function addActivity(data) {
-        if (!data || !data.title || !data.description) {
-          throw new Error("Judul dan deskripsi aktivitas wajib diisi.");
+      const attendanceMap = new Map();
+
+      attendanceRows.forEach(row => {
+        attendanceMap.set(row.meeting_id, row);
+      });
+
+      return meetings.map(meeting => {
+        const attendance = attendanceMap.get(meeting.id);
+
+        return {
+          id: "historical-" + meeting.id,
+          source: "historical",
+          title: meeting.title || (
+            "Pertemuan ke-" + (meeting.meeting_number || "-")
+          ),
+          date: meeting.meeting_date || null,
+          location: meeting.location_name || "",
+          description: meeting.description || "",
+          status: attendance
+            ? normalizeStatus(attendance.attendance_status)
+            : "unknown",
+          note: attendance?.attendance_note || "",
+          method: "historical"
+        };
+      });
+    }
+
+    async function loadLatest(memberId) {
+      const agendasResult = await withTimeout(
+        supabase
+          .from("kajian_agenda")
+          .select(`
+            id,
+            title,
+            starts_at,
+            location_name,
+            location_address,
+            status
+          `)
+          .order("starts_at", {
+            ascending: false
+          })
+          .limit(500),
+        "Pengambilan agenda kajian"
+      );
+
+      if (agendasResult.error) {
+        throw agendasResult.error;
+      }
+
+      const agendas = agendasResult.data || [];
+
+      const agendaIds = uniqueIds(
+        agendas.map(row => row.id)
+      );
+
+      let attendanceRows = [];
+
+      if (agendaIds.length) {
+        const attendanceResult = await withTimeout(
+          supabase
+            .from("kajian_attendance")
+            .select(`
+              id,
+              agenda_id,
+              attended_at,
+              attendance_method,
+              attendance_status,
+              manual_reason,
+              created_at
+            `)
+            .eq("member_id", memberId)
+            .in("agenda_id", agendaIds)
+            .order("attended_at", {
+              ascending: false
+            }),
+          "Pengambilan presensi kajian terbaru"
+        );
+
+        if (attendanceResult.error) {
+          throw attendanceResult.error;
         }
 
-        const allowed = Object.keys(ACTIVITY_TYPES);
+        attendanceRows = attendanceResult.data || [];
+      }
 
-        const category = allowed.includes(data.category)
-          ? data.category
-          : "other";
+      const attendanceMap = new Map();
 
-        activities.push({
-          id: window.crypto?.randomUUID?.() ||
-            "activity-" + Date.now() + "-" +
-            Math.random().toString(36).slice(2, 8),
-          title: String(data.title),
-          description: String(data.description),
-          category,
-          createdAt: new Date().toISOString()
+      attendanceRows.forEach(row => {
+        if (!attendanceMap.has(row.agenda_id)) {
+          attendanceMap.set(row.agenda_id, row);
+        }
+      });
+
+      return agendas.map(agenda => {
+        const attendance = attendanceMap.get(agenda.id);
+
+        return {
+          id: "latest-" + agenda.id,
+          source: "latest",
+          title: agenda.title || "Kajian TARBIYAH",
+          date: agenda.starts_at ||
+            attendance?.attended_at ||
+            null,
+          location: agenda.location_name ||
+            agenda.location_address ||
+            "",
+          description: attendance?.manual_reason || "",
+          status: attendance
+            ? normalizeStatus(attendance.attendance_status)
+            : "unknown",
+          note: attendance?.manual_reason || "",
+          method: attendance?.attendance_method || ""
+        };
+      });
+    }
+
+    function updateSummary() {
+      const historical = records.filter(
+        item => item.source === "historical"
+      );
+
+      const total = historical.length;
+
+      const present = historical.filter(
+        item => item.status === "hadir"
+      ).length;
+
+      const percentage = total
+        ? Math.round((present / total) * 100)
+        : 0;
+
+      $("activityTotal").textContent =
+        records.length.toLocaleString("id-ID");
+
+      $("activityPresent").textContent =
+        present.toLocaleString("id-ID");
+
+      $("activityPercentage").textContent =
+        percentage + "%";
+    }
+
+    function render() {
+      const filtered = records
+        .filter(item =>
+          activeFilter === "all" ||
+          item.source === activeFilter
+        )
+        .sort((a, b) => {
+          const aTime = a.date
+            ? new Date(a.date).getTime()
+            : 0;
+
+          const bTime = b.date
+            ? new Date(b.date).getTime()
+            : 0;
+
+          return bTime - aTime;
         });
 
-        if (!saveActivities()) return false;
-
-        render();
-        return true;
+      if (!filtered.length) {
+        showMessage(
+          "Belum ada riwayat aktivitas",
+          "Belum ditemukan catatan pada kategori yang dipilih."
+        );
+        return;
       }
 
-      function handleFilter(event) {
+      $("activityTimeline").innerHTML = filtered.map(item => {
+        const isHistorical = item.source === "historical";
+        const icon = item.status === "hadir"
+          ? "✓"
+          : isHistorical ? "📚" : "🕌";
+
+        const sourceLabel = isHistorical
+          ? "Arsip Historis"
+          : "Kajian Terbaru";
+
+        const description = [
+          item.location,
+          item.note
+        ].filter(Boolean).join(" · ");
+
+        const methodLabel = item.method === "qr"
+          ? " · QR Code"
+          : item.method === "manual"
+            ? " · Manual Admin"
+            : "";
+
+        return `
+          <article class="activity-item">
+            <div class="activity-icon" aria-hidden="true">
+              ${icon}
+            </div>
+
+            <div class="activity-content">
+              <h3>${escapeHTML(item.title)}</h3>
+
+              <p>
+                ${escapeHTML(description || sourceLabel)}
+              </p>
+
+              <span class="activity-time">
+                ${escapeHTML(formatDate(item.date))}
+                · ${escapeHTML(sourceLabel)}
+                ${escapeHTML(methodLabel)}
+              </span>
+            </div>
+
+            <span class="activity-status ${escapeHTML(item.status)}">
+              ${escapeHTML(statusLabel(item.status))}
+            </span>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function setupFilters() {
+      $("activityFilters").addEventListener("click", event => {
         const button = event.target.closest("[data-filter]");
         if (!button) return;
 
         activeFilter = button.dataset.filter;
 
-        document.querySelectorAll("#activityFilters button")
-          .forEach((item) => {
-            item.classList.toggle("active", item === button);
-          });
+        document.querySelectorAll(
+          "#activityFilters button"
+        ).forEach(item => {
+          item.classList.toggle("active", item === button);
+        });
 
         render();
-      }
+      });
+    }
 
-      function handleDelete(event) {
-        const button = event.target.closest("[data-delete]");
-        if (!button) return;
+    async function initialize() {
+      if (initialized) return;
+      initialized = true;
 
-        const id = button.dataset.delete;
+      setupFilters();
 
-        if (!window.confirm("Hapus catatan aktivitas ini dari perangkat?")) {
+      try {
+        const user = await getCurrentUser();
+
+        if (!user) return;
+
+        const member = await getOwnMember(user.id);
+
+        if (!member?.id) {
+          updateSummary();
+          showMessage(
+            "Data keanggotaan belum ditemukan",
+            "Akun ini belum terhubung dengan data anggota TARBIYAH. Silakan hubungi administrator.",
+            "👤"
+          );
           return;
         }
 
-        activities = activities.filter((item) => item.id !== id);
+        const [historicalRecords, latestRecords] =
+          await Promise.all([
+            loadHistorical(member.id),
+            loadLatest(member.id)
+          ]);
 
-        if (!saveActivities()) return;
+        records = [
+          ...historicalRecords,
+          ...latestRecords
+        ];
 
+        updateSummary();
         render();
-        showToast("Aktivitas dihapus dari penyimpanan lokal.");
+
+        console.info(
+          "[TARBIYAH] Riwayat aktivitas berhasil dimuat.",
+          {
+            memberId: member.id,
+            historical: historicalRecords.length,
+            latest: latestRecords.length,
+            total: records.length
+          }
+        );
+
+      } catch (error) {
+        console.error(
+          "[TARBIYAH] Gagal memuat riwayat aktivitas:",
+          error
+        );
+
+        showMessage(
+          "Riwayat belum dapat dimuat",
+          error?.message ||
+            "Terjadi kesalahan ketika mengambil data dari server.",
+          "⚠️"
+        );
+
+        showToast(
+          error?.message || "Gagal mengambil data riwayat."
+        );
       }
+    }
 
-      function initialize() {
-        $("activityFilters").addEventListener("click", handleFilter);
-        $("activityTimeline").addEventListener("click", handleDelete);
+    if (document.readyState === "loading") {
+      document.addEventListener(
+        "DOMContentLoaded",
+        initialize,
+        { once: true }
+      );
+    } else {
+      initialize();
+    }
 
-        loadActivities();
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initialize);
-      } else {
-        initialize();
-      }
-
-      window.TARBIYAH_ACTIVITY = {
-        add: addActivity,
-        refresh: render
-      };
-    })();
+  })();
   </script>
 </body>
 </html>
