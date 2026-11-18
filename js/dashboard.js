@@ -1,9 +1,22 @@
-/* TARBIYAH Dashboard controller
-   Carousel SVG arrow consistency fix
-   Supabase configuration is not modified.
-*/
+
+/* =========================================================
+   TARBIYAH — DASHBOARD CONTROLLER
+   Versi integrasi:
+   - Sidebar dikendalikan module-shell.js
+   - Tema dikendalikan theme-manager.js
+   - Identitas dan role pengguna dari Supabase
+   - Carousel SVG konsisten
+   - Pencarian menu
+   - Logout
+   - Tanggal dan tahun otomatis
+   ========================================================= */
+
 (() => {
   "use strict";
+
+  // =====================================================
+  // HELPER
+  // =====================================================
 
   const $ = (id) => document.getElementById(id);
 
@@ -18,57 +31,15 @@
     item.textContent = message;
 
     region.appendChild(item);
-    window.setTimeout(() => item.remove(), 3200);
+
+    window.setTimeout(() => {
+      item.remove();
+    }, 3200);
   };
 
-  // =====================================================
-  // SIDEBAR MOBILE
-  // =====================================================
-
-  const sidebar = $("appSidebar");
-  const scrim = $("sidebarScrim");
-
-  const openMenu = () => {
-    sidebar?.classList.add("open");
-    scrim?.classList.add("show");
-    $("menuOpen")?.setAttribute("aria-expanded", "true");
-    document.body.classList.add("menu-open");
-  };
-
-  const closeMenu = () => {
-    sidebar?.classList.remove("open");
-    scrim?.classList.remove("show");
-    $("menuOpen")?.setAttribute("aria-expanded", "false");
-    document.body.classList.remove("menu-open");
-  };
-
-  $("menuOpen")?.addEventListener("click", openMenu);
-  $("menuClose")?.addEventListener("click", closeMenu);
-  scrim?.addEventListener("click", closeMenu);
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeMenu();
-  });
 
   // =====================================================
-  // THEME
-  // =====================================================
-
-  $("themeToggle")?.addEventListener("click", () => {
-    const manager = window.TARBIYAH_THEME;
-
-    if (manager?.get && manager?.set) {
-      const current = manager.get();
-      manager.set(current === "dark" ? "light" : "dark");
-    } else {
-      const root = document.documentElement;
-      root.dataset.theme =
-        root.dataset.theme === "dark" ? "light" : "dark";
-    }
-  });
-
-  // =====================================================
-  // CAROUSEL — CONSISTENT SVG ARROW
+  // CAROUSEL — SVG ARROW CONSISTENT
   // =====================================================
 
   const slides = [
@@ -96,12 +67,13 @@
   ];
 
   let slideIndex = 0;
+  let carouselTimer = null;
 
   const slideHost = document.querySelector(".hero-slide");
-  const dots = [...document.querySelectorAll(".carousel-dot")];
+  const dots = [
+    ...document.querySelectorAll(".carousel-dot")
+  ];
 
-  // SVG panah yang sama untuk SEMUA slide.
-  // Tidak lagi menggunakan karakter teks "→".
   const carouselArrow = `
     <svg
       class="arrow-icon hero-arrow"
@@ -114,29 +86,49 @@
   `;
 
   function showSlide(index) {
-    slideIndex = (index + slides.length) % slides.length;
+    if (!slides.length) return;
 
-    const s = slides[slideIndex];
+    slideIndex =
+      (index + slides.length) % slides.length;
 
-    const heroCopy = slideHost?.querySelector(".hero-copy");
+    const slide = slides[slideIndex];
+
+    const heroCopy =
+      slideHost?.querySelector(".hero-copy");
 
     if (heroCopy) {
       heroCopy.innerHTML = `
-        <span class="hero-kicker">${s.kicker}</span>
+        <span class="hero-kicker">
+          ${slide.kicker}
+        </span>
 
-        <h2>${s.title}</h2>
+        <h2>${slide.title}</h2>
 
-        <p>${s.desc}</p>
+        <p>${slide.desc}</p>
 
-        <a class="primary-button hero-link" href="${s.link}">
-          <span class="hero-link-label">${s.action}</span>
+        <a
+          class="primary-button hero-link"
+          href="${slide.link}"
+        >
+          <span class="hero-link-label">
+            ${slide.action}
+          </span>
+
           ${carouselArrow}
         </a>
       `;
     }
 
-    dots.forEach((dot, i) => {
-      dot.classList.toggle("active", i === slideIndex);
+    dots.forEach((dot, index) => {
+      dot.classList.toggle(
+        "active",
+        index === slideIndex
+      );
+
+      dot.setAttribute(
+        "aria-current",
+        index === slideIndex ? "true" : "false"
+      );
     });
 
     if ($("slideCounter")) {
@@ -145,33 +137,45 @@
     }
   }
 
-  // Tombol indikator slide
-  dots.forEach((dot, i) => {
-    dot.addEventListener("click", () => showSlide(i));
-  });
-
-  // Jalankan slide pertama melalui template yang sama.
-  // Dengan demikian, SVG sudah konsisten sejak awal.
-  showSlide(0);
-
-  let carouselTimer = window.setInterval(
-    () => showSlide(slideIndex + 1),
-    6500
-  );
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
+  function stopCarousel() {
+    if (carouselTimer !== null) {
       window.clearInterval(carouselTimer);
-    } else {
-      window.clearInterval(carouselTimer);
-
-      carouselTimer = window.setInterval(
-        () => showSlide(slideIndex + 1),
-        6500
-      );
+      carouselTimer = null;
     }
+  }
+
+  function startCarousel() {
+    stopCarousel();
+
+    if (document.hidden || slides.length <= 1) {
+      return;
+    }
+
+    carouselTimer = window.setInterval(() => {
+      showSlide(slideIndex + 1);
+    }, 6500);
+  }
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener("click", () => {
+      showSlide(index);
+      startCarousel();
+    });
   });
 
+  showSlide(0);
+  startCarousel();
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        stopCarousel();
+      } else {
+        startCarousel();
+      }
+    }
+  );
 
 
   // =====================================================
@@ -201,50 +205,64 @@
     ["notifikasi", "./notifikasi.html"]
   ];
 
-  $("searchForm")?.addEventListener("submit", (e) => {
-    e.preventDefault();
+  $("searchForm")?.addEventListener(
+    "submit",
+    (event) => {
+      event.preventDefault();
 
-    const query = ($("globalSearch")?.value || "")
-      .trim()
-      .toLowerCase();
+      const query = (
+        $("globalSearch")?.value || ""
+      )
+        .trim()
+        .toLowerCase();
 
-    if (!query) return;
+      if (!query) return;
 
-    const found = searchRoutes.find(([word]) =>
-      query.includes(word)
-    );
+      const found = searchRoutes.find(([word]) =>
+        query.includes(word)
+      );
 
-    if (found) {
-      const adminRoles = ["admin", "super_admin"];
+      if (!found) {
+        toast(
+          "Belum ditemukan menu yang cocok. Coba kata kunci lain."
+        );
+        return;
+      }
+
+      const adminRoles = [
+        "admin",
+        "super_admin"
+      ];
 
       if (
         found[1] === "./dashboard-admin.html" &&
         !adminRoles.includes(currentUserRole)
       ) {
-        toast("Anda tidak memiliki akses administrasi.");
+        toast(
+          "Anda tidak memiliki akses administrasi."
+        );
         return;
       }
 
-      location.href = found[1];
-    } else {
-      toast("Belum ditemukan menu yang cocok. Coba kata kunci lain.");
+      window.location.href = found[1];
     }
-  });
+  );
 
-  // Shortcut keyboard untuk membuka pencarian.
-  document.addEventListener("keydown", (e) => {
+  // Shortcut keyboard untuk pencarian.
+  document.addEventListener("keydown", (event) => {
+    const activeTag =
+      document.activeElement?.tagName;
+
     if (
-      e.key === "/" &&
-      !["INPUT", "TEXTAREA"].includes(
-        document.activeElement?.tagName
-      )
+      event.key === "/" &&
+      !["INPUT", "TEXTAREA"].includes(activeTag)
     ) {
-      e.preventDefault();
+      event.preventDefault();
       $("globalSearch")?.focus();
     }
   });
 
-  
+
   // =====================================================
   // USER IDENTITY & ROLE — SUPABASE DATABASE
   // =====================================================
@@ -262,22 +280,30 @@
       description: "Super Administrator",
       admin: true
     },
+
     admin: {
       label: "ADMIN",
       description: "Administrator TARBIYAH",
       admin: true
     },
+
     member: {
       label: "ANGGOTA",
       description: "Anggota TARBIYAH",
       admin: false
     },
+
     registered_user: {
       label: "PENGGUNA TERDAFTAR",
       description: "Pengguna Terdaftar",
       admin: false
     }
   };
+
+
+  // =====================================================
+  // SUPABASE CLIENT
+  // =====================================================
 
   function getSupabaseClient() {
     if (
@@ -292,9 +318,14 @@
     );
   }
 
+
+  // =====================================================
+  // AUTH SESSION
+  // =====================================================
+
   async function resolveSession() {
-    // Gunakan status Auth Guard apabila sudah tersedia.
-    const guardedSession = window.TARBIYAH_SESSION;
+    const guardedSession =
+      window.TARBIYAH_SESSION;
 
     if (guardedSession?.ready) {
       return guardedSession.session || null;
@@ -302,7 +333,9 @@
 
     const auth = window.TARBIYAH_AUTH;
 
-    if (typeof auth?.getSession !== "function") {
+    if (
+      typeof auth?.getSession !== "function"
+    ) {
       throw new Error(
         "Modul TARBIYAH_AUTH belum tersedia."
       );
@@ -320,10 +353,17 @@
       throw result.error;
     }
 
-    return result?.session ||
+    return (
+      result?.session ||
       result?.data?.session ||
-      null;
+      null
+    );
   }
+
+
+  // =====================================================
+  // ROLE PROCESSING
+  // =====================================================
 
   function normalizeRoleName(value) {
     return String(value || "")
@@ -348,11 +388,9 @@
     }
 
     return data
-      .map(row => {
+      .map((row) => {
         const relation = row.roles;
 
-        // Relasi Supabase dapat berbentuk objek
-        // atau array, bergantung pada relasinya.
         const roleRecord = Array.isArray(relation)
           ? relation[0]
           : relation;
@@ -372,19 +410,23 @@
       "registered_user"
     ];
 
-    return priority.find(role =>
-      roles.includes(role)
-    ) || null;
+    return (
+      priority.find((role) =>
+        roles.includes(role)
+      ) || null
+    );
   }
+
+
+  // =====================================================
+  // RENDER USER ROLE
+  // =====================================================
 
   function renderUserRole(role) {
     const info = ROLE_INFO[role];
-
     const admin = Boolean(info?.admin);
 
-    // Selalu sembunyikan terlebih dahulu.
-    // Hak administrasi hanya diberikan jika role
-    // berhasil dibaca dan dikenali.
+    // Default: akses administrasi disembunyikan.
     if ($("adminLink")) {
       $("adminLink").hidden = !admin;
     }
@@ -413,6 +455,11 @@
     };
   }
 
+
+  // =====================================================
+  // HYDRATE USER PROFILE
+  // =====================================================
+
   async function hydrateUser() {
     const session = await resolveSession();
 
@@ -436,17 +483,23 @@
       .split(/\s+/)
       .filter(Boolean)
       .slice(0, 2)
-      .map(part => part.charAt(0))
+      .map((part) => part.charAt(0))
       .join("")
       .toUpperCase();
 
-    ["userName", "sidebarName"].forEach(id => {
+    [
+      "userName",
+      "sidebarName"
+    ].forEach((id) => {
       if ($(id)) {
         $(id).textContent = name;
       }
     });
 
-    ["userAvatar", "sidebarAvatar"].forEach(id => {
+    [
+      "userAvatar",
+      "sidebarAvatar"
+    ].forEach((id) => {
       if ($(id)) {
         $(id).textContent = initials;
       }
@@ -457,13 +510,15 @@
         `Assalamu’alaikum, ${name}`;
     }
 
-    // Role hanya dibaca dari database.
-    // Metadata akun tidak digunakan sebagai otorisasi.
+    // Jangan memberikan akses admin sebelum
+    // role berhasil dibaca dari database.
     renderUserRole(null);
 
     try {
       const roles = await fetchUserRoles(user.id);
-      const primaryRole = selectPrimaryRole(roles);
+
+      const primaryRole =
+        selectPrimaryRole(roles);
 
       renderUserRole(primaryRole);
 
@@ -502,7 +557,9 @@
   // =====================================================
 
   async function logout() {
-    const buttons = [$("logoutMini")].filter(Boolean);
+    const buttons = [
+      $("logoutMini")
+    ].filter(Boolean);
 
     buttons.forEach((button) => {
       button.disabled = true;
@@ -512,14 +569,24 @@
     try {
       const authApi = window.TARBIYAH_AUTH;
 
-      if (typeof authApi?.signOut === "function") {
-        await authApi.signOut();
+      if (
+        typeof authApi?.signOut === "function"
+      ) {
+        const result = await authApi.signOut();
+
+        if (result?.error) {
+          throw result.error;
+        }
+
       } else {
         const client = [
+          window.tarbiyahSupabase,
           window.supabaseClient,
           window.TARBIYAH_SUPABASE,
           window.supabase
-        ].find((c) => c?.auth?.signOut);
+        ].find((item) =>
+          typeof item?.auth?.signOut === "function"
+        );
 
         if (!client) {
           throw new Error(
@@ -527,18 +594,26 @@
           );
         }
 
-        const { error } = await client.auth.signOut();
+        const { error } =
+          await client.auth.signOut();
 
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
       }
 
-      location.replace("./login-register.html");
+      window.location.replace(
+        "./login-register.html"
+      );
 
-    } catch (err) {
-      console.error("[TARBIYAH] Logout gagal:", err);
+    } catch (error) {
+      console.error(
+        "[TARBIYAH] Logout gagal:",
+        error
+      );
 
       toast(
-        err?.message ||
+        error?.message ||
         "Logout gagal. Silakan coba kembali."
       );
 
@@ -549,10 +624,14 @@
     }
   }
 
-  $("logoutMini")?.addEventListener("click", logout);
+  $("logoutMini")?.addEventListener(
+    "click",
+    logout
+  );
+
 
   // =====================================================
-  // DATE & INITIALIZATION
+  // DATE & YEAR
   // =====================================================
 
   if ($("currentYear")) {
@@ -560,22 +639,36 @@
       new Date().getFullYear();
   }
 
-  const today = new Intl.DateTimeFormat("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  }).format(new Date());
+  const today = new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "Asia/Jakarta"
+    }
+  ).format(new Date());
 
   if ($("todayLabel")) {
-    $("todayLabel").textContent = today.toUpperCase();
+    $("todayLabel").textContent =
+      today.toUpperCase();
   }
 
-  hydrateUser().catch((err) => {
+
+  // =====================================================
+  // INITIALIZATION
+  // =====================================================
+
+  hydrateUser().catch((error) => {
     console.warn(
       "[TARBIYAH] Gagal memuat profil:",
-      err
+      error
     );
   });
+
+  console.info(
+    "[TARBIYAH] Dashboard controller berhasil diinisialisasi."
+  );
 
 })();
