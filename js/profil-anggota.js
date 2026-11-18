@@ -1234,19 +1234,46 @@ async function uploadAvatar(file) {
      ========================================================== */
     
 async function loadAttendanceHistory() {
-  // ID ini harus sama dengan ID pada HTML.
-  const container = $("memberAttendanceList");
+  const container = $("attendanceHistory");
 
-  if (!container) {
-    console.warn(
-      "[TARBIYAH] Elemen #memberAttendanceList tidak ditemukan."
-    );
-    return;
-  }
+  const totalKajianEl = $("totalKajian");
+  const totalAttendanceEl = $("totalAttendance");
+  const percentageEl = $("attendancePercentage");
 
-  container.replaceChildren();
+  // ==========================================
+  // 1. FUNGSI STATISTIK PROFIL
+  // ==========================================
 
-  function showAttendanceMessage(title, description) {
+  const setStats = (total, present) => {
+    const percentage = total
+      ? Math.round((present / total) * 100)
+      : 0;
+
+    if (totalKajianEl) {
+      totalKajianEl.textContent =
+        total.toLocaleString("id-ID");
+    }
+
+    if (totalAttendanceEl) {
+      totalAttendanceEl.textContent =
+        present.toLocaleString("id-ID");
+    }
+
+    if (percentageEl) {
+      percentageEl.textContent =
+        percentage + "%";
+    }
+  };
+
+  // ==========================================
+  // 2. PESAN KOSONG / ERROR
+  // ==========================================
+
+  const showMessage = (title, description) => {
+    if (!container) return;
+
+    container.replaceChildren();
+
     const wrapper = document.createElement("div");
     wrapper.className = "empty-state";
 
@@ -1258,153 +1285,468 @@ async function loadAttendanceHistory() {
 
     wrapper.append(heading, paragraph);
     container.appendChild(wrapper);
-  }
+  };
 
-  if (!memberData?.id) {
-    showAttendanceMessage(
-      "Data keanggotaan belum tersedia",
-      "Riwayat kehadiran akan tampil setelah akun terhubung dengan data anggota TARBIYAH."
+  if (!container) {
+    console.warn(
+      "[TARBIYAH] Elemen #attendanceHistory tidak ditemukan."
     );
     return;
   }
 
-  try {
-    const result = await withTimeout(
-      supabase
-        .from("kajian_attendance")
-        .select(`
-          id,
-          agenda_id,
-          attended_at,
-          attendance_method,
-          attendance_status,
-          manual_reason,
-          kajian_agenda (
-            title,
-            location_name
-          )
-        `)
-        .eq("member_id", memberData.id)
-        .order("attended_at", { ascending: false })
-        .limit(100),
-      "Pengambilan riwayat presensi"
+  container.replaceChildren();
+
+  // ==========================================
+  // 3. VALIDASI DATA ANGGOTA
+  // ==========================================
+
+  if (!memberData?.id) {
+    setStats(0, 0);
+
+    showMessage(
+      "Data keanggotaan belum tersedia",
+      "Riwayat kehadiran akan tampil setelah akun terhubung dengan data anggota TARBIYAH."
     );
 
-    if (result.error) {
-      throw result.error;
+    return;
+  }
+
+  // ==========================================
+  // 4. NORMALISASI STATUS
+  // ==========================================
+
+  const normalizeStatus = value => {
+    const status = String(value || "")
+      .toLowerCase()
+      .trim();
+
+    if (
+      ["hadir", "present", "attended"].includes(status)
+    ) return "hadir";
+
+    if (
+      ["izin", "permission"].includes(status)
+    ) return "izin";
+
+    if (
+      ["sakit", "sick"].includes(status)
+    ) return "sakit";
+
+    if (
+      ["alpa", "absent"].includes(status)
+    ) return "alpa";
+
+    return "unknown";
+  };
+
+  const uniqueIds = values =>
+    [...new Set((values || []).filter(Boolean))];
+
+  try {
+
+    // ==========================================
+    // 5. AMBIL ARSIP PERTEMUAN HISTORIS
+    // ==========================================
+
+    const meetingsResult = await withTimeout(
+      supabase
+        .from("historical_meetings")
+        .select(`
+          id,
+          meeting_number,
+          meeting_date,
+          title,
+          location_name,
+          description
+        `)
+        .order("meeting_number", {
+          ascending: true
+        }),
+      "Pengambilan arsip pertemuan"
+    );
+
+    if (meetingsResult.error) {
+      throw meetingsResult.error;
     }
 
-    const rows = Array.isArray(result.data)
-      ? result.data
-      : [];
+    const meetings = meetingsResult.data || [];
 
-    if (!rows.length) {
-      showAttendanceMessage(
-        "Belum ada riwayat kehadiran",
-        "Catatan akan muncul setelah kegiatan dan presensi anggota tercatat."
+    const meetingIds = uniqueIds(
+      meetings.map(row => row.id)
+    );
+
+    // ==========================================
+    // 6. AMBIL PRESENSI HISTORIS ANGGOTA
+    // ==========================================
+
+    let historicalAttendance = [];
+
+    if (meetingIds.length) {
+      const attendanceResult = await withTimeout(
+        supabase
+          .from("historical_meeting_attendance")
+          .select(`
+            id,
+            meeting_id,
+            attendance_status,
+            attendance_note,
+            created_at
+          `)
+          .eq("member_id", memberData.id)
+          .in("meeting_id", meetingIds),
+        "Pengambilan presensi historis"
       );
+
+      if (attendanceResult.error) {
+        throw attendanceResult.error;
+      }
+
+      historicalAttendance =
+        attendanceResult.data || [];
+    }
+
+    const historicalMap = new Map();
+
+    historicalAttendance.forEach(row => {
+      historicalMap.set(row.meeting_id, row);
+    });
+
+    const historicalRecords = meetings.map(meeting => {
+      const attendance =
+        historicalMap.get(meeting.id);
+
+      return {
+        source: "historical",
+
+        title:
+          meeting.title || "Pertemuan Historis",
+
+        date:
+          meeting.meeting_date || null,
+
+        location:
+          meeting.location_name || "",
+
+        status: attendance
+          ? normalizeStatus(
+              attendance.attendance_status
+            )
+          : "unknown",
+
+        note:
+          attendance?.attendance_note || "",
+
+        meetingNumber:
+          meeting.meeting_number
+      };
+    });
+
+    // ==========================================
+    // 7. AMBIL AGENDA KAJIAN TERBARU
+    // ==========================================
+
+    const agendasResult = await withTimeout(
+      supabase
+        .from("kajian_agenda")
+        .select(`
+          id,
+          title,
+          starts_at,
+          location_name,
+          location_address
+        `)
+        .order("starts_at", {
+          ascending: false
+        })
+        .limit(500),
+      "Pengambilan agenda kajian"
+    );
+
+    if (agendasResult.error) {
+      throw agendasResult.error;
+    }
+
+    const agendas = agendasResult.data || [];
+
+    const agendaIds = uniqueIds(
+      agendas.map(row => row.id)
+    );
+
+    // ==========================================
+    // 8. AMBIL PRESENSI KAJIAN TERBARU
+    // ==========================================
+
+    let latestAttendance = [];
+
+    if (agendaIds.length) {
+      const attendanceResult = await withTimeout(
+        supabase
+          .from("kajian_attendance")
+          .select(`
+            id,
+            agenda_id,
+            attended_at,
+            attendance_method,
+            attendance_status,
+            manual_reason,
+            created_at
+          `)
+          .eq("member_id", memberData.id)
+          .in("agenda_id", agendaIds)
+          .order("attended_at", {
+            ascending: false
+          }),
+        "Pengambilan presensi kajian terbaru"
+      );
+
+      if (attendanceResult.error) {
+        throw attendanceResult.error;
+      }
+
+      latestAttendance =
+        attendanceResult.data || [];
+    }
+
+    const latestMap = new Map();
+
+    latestAttendance.forEach(row => {
+      if (!latestMap.has(row.agenda_id)) {
+        latestMap.set(row.agenda_id, row);
+      }
+    });
+
+    const latestRecords = agendas.map(agenda => {
+      const attendance =
+        latestMap.get(agenda.id);
+
+      return {
+        source: "latest",
+
+        title:
+          agenda.title || "Kajian TARBIYAH",
+
+        date:
+          agenda.starts_at ||
+          attendance?.attended_at ||
+          null,
+
+        location:
+          agenda.location_name ||
+          agenda.location_address ||
+          "",
+
+        status: attendance
+          ? normalizeStatus(
+              attendance.attendance_status
+            )
+          : "unknown",
+
+        method:
+          attendance?.attendance_method || ""
+      };
+    });
+
+    // ==========================================
+    // 9. HITUNG STATISTIK KEHADIRAN
+    // ==========================================
+
+    // Statistik mengikuti halaman kehadiran.html.
+    // Hanya arsip historis yang menjadi dasar
+    // perhitungan persentase.
+
+    const historicalTotal =
+      historicalRecords.length;
+
+    const historicalPresent =
+      historicalRecords.filter(
+        row => row.status === "hadir"
+      ).length;
+
+    setStats(
+      historicalTotal,
+      historicalPresent
+    );
+
+    // ==========================================
+    // 10. GABUNGKAN DAN URUTKAN RIWAYAT
+    // ==========================================
+
+    const records = [
+      ...historicalRecords,
+      ...latestRecords
+    ].sort((a, b) => {
+      const aTime = a.date
+        ? new Date(a.date).getTime()
+        : 0;
+
+      const bTime = b.date
+        ? new Date(b.date).getTime()
+        : 0;
+
+      return bTime - aTime;
+    });
+
+    if (!records.length) {
+      showMessage(
+        "Belum ada riwayat kajian",
+        "Catatan akan muncul setelah agenda kajian atau arsip pertemuan tersedia."
+      );
+
       return;
     }
 
-    rows.forEach(item => {
-      const agenda = Array.isArray(item.kajian_agenda)
-        ? item.kajian_agenda[0]
-        : item.kajian_agenda;
+    // ==========================================
+    // 11. LABEL STATUS KEHADIRAN
+    // ==========================================
 
-      const article = document.createElement("article");
-      article.className = "profile-history-item";
+    const labels = {
+      hadir: "Hadir",
+      izin: "Izin",
+      sakit: "Sakit",
+      alpa: "Alpa",
+      unknown: "Belum ada catatan"
+    };
 
-      const marker = document.createElement("span");
-      marker.className = "profile-history-marker";
-      marker.setAttribute("aria-hidden", "true");
+    // ==========================================
+    // 12. TAMPILKAN RIWAYAT TERBARU
+    // ==========================================
 
-      const content = document.createElement("div");
-      content.className = "profile-history-content";
+    records.slice(0, 10).forEach(item => {
 
-      const heading = document.createElement("h3");
-      heading.className = "profile-history-title";
+      const article =
+        document.createElement("article");
+
+      article.className =
+        "profile-history-item";
+
+      const marker =
+        document.createElement("span");
+
+      marker.className =
+        "profile-history-marker";
+
+      marker.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      marker.textContent =
+        item.status === "hadir" ? "✓" : "•";
+
+      const content =
+        document.createElement("div");
+
+      content.className =
+        "profile-history-content";
+
+      const heading =
+        document.createElement("h3");
+
+      heading.className =
+        "profile-history-title";
+
       heading.textContent =
-        agenda?.title || "Kegiatan TARBIYAH";
+        item.title;
 
-      const meta = document.createElement("div");
-      meta.className = "profile-history-meta";
+      const meta =
+        document.createElement("div");
 
-      const date = document.createElement("span");
+      meta.className =
+        "profile-history-meta";
 
-      const dateValue = item.attended_at
-        ? new Date(item.attended_at)
+      const date =
+        document.createElement("span");
+
+      const dateValue = item.date
+        ? new Date(item.date)
         : null;
 
       date.textContent =
-        dateValue && !Number.isNaN(dateValue.getTime())
+        dateValue &&
+        !Number.isNaN(dateValue.getTime())
           ? new Intl.DateTimeFormat("id-ID", {
               day: "2-digit",
               month: "long",
               year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
               timeZone: "Asia/Jakarta"
             }).format(dateValue)
-          : "Waktu belum tersedia";
+          : "Tanggal belum tersedia";
 
       meta.appendChild(date);
-      content.append(heading, meta);
 
-      if (agenda?.location_name) {
-        const location = document.createElement("small");
-        location.textContent = agenda.location_name;
+      content.append(
+        heading,
+        meta
+      );
+
+      if (item.location) {
+        const location =
+          document.createElement("small");
+
+        location.textContent =
+          item.location;
+
         content.appendChild(location);
       }
 
-      const status = document.createElement("span");
-      status.className = "profile-history-status";
+      const status =
+        document.createElement("span");
 
-      const statusLabels = {
-        hadir: "Hadir",
-        izin: "Izin",
-        sakit: "Sakit",
-        alpa: "Alpa"
-      };
-
-      const attendanceStatus =
-        item.attendance_status || "hadir";
+      status.className =
+        "profile-history-status";
 
       status.textContent =
-        statusLabels[attendanceStatus] ||
-        "Status belum tersedia";
+        labels[item.status] || labels.unknown;
 
-      marker.textContent =
-        attendanceStatus === "hadir" ? "✓" : "•";
+      if (item.source === "historical") {
+        status.textContent +=
+          " · Arsip Historis";
 
-      if (item.attendance_method === "qr") {
-        status.textContent += " · QR Code";
-      } else if (item.attendance_method === "manual") {
-        status.textContent += " · Manual Admin";
+      } else if (item.method === "qr") {
+        status.textContent +=
+          " · QR Code";
+
+      } else if (item.method === "manual") {
+        status.textContent +=
+          " · Manual Admin";
       }
 
-      article.append(marker, content, status);
+      article.append(
+        marker,
+        content,
+        status
+      );
+
       container.appendChild(article);
     });
 
     console.info(
-      "[TARBIYAH] Riwayat berhasil dimuat:",
-      rows.length,
-      "catatan."
+      "[TARBIYAH] Riwayat profil berhasil dimuat.",
+      {
+        historicalTotal,
+        historicalPresent,
+        latestAgendaTotal: latestRecords.length,
+        displayed: Math.min(records.length, 10)
+      }
     );
 
   } catch (error) {
+
     console.error(
-      "[TARBIYAH] Gagal memuat riwayat:",
+      "[TARBIYAH] Gagal memuat riwayat profil:",
       error
     );
 
-    showAttendanceMessage(
+    setStats(0, 0);
+
+    showMessage(
       "Riwayat belum dapat dimuat",
-      error.message ||
+      error?.message ||
         "Periksa koneksi dan akses data Supabase."
     );
   }
 }
+
 
   /* ==========================================================
      23. QR — ELEMENT HELPERS
