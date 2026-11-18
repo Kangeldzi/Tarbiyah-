@@ -1812,7 +1812,7 @@ async function loadAttendanceHistory() {
 
       container.appendChild(article);
     });
-    finishLoading();
+    
     console.info(
       "[TARBIYAH] Riwayat profil berhasil dimuat.",
       {
