@@ -37,7 +37,7 @@
     themeAttribute: "data-theme",
 
     routes: {
-      dashboard: "./tarbiyah.html",
+      dashboard: "./dashboard.html",
       profil: "./profil-anggota.html",
       agenda: "./agenda-tarbiyah.html",
       pembelajaran: "./pembelajaran.html",
