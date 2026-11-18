@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="id" data-theme="dark">
 <head>
@@ -101,7 +100,7 @@ window.addEventListener("unhandledrejection", function (event) {
 
     <button
   type="button"
-  id="btnTheme"
+  id="btnTheme" data-theme-toggle
   class="icon-button"
   aria-label="Ubah tema">
   ◐
@@ -155,47 +154,47 @@ window.addEventListener("unhandledrejection", function (event) {
         >×</button>
       </div>
 
-      <a class="side-link active" href="./dashboard.html">
+      <a class="side-link active" href="./dashboard.html" data-nav-link>
         <span class="side-icon">⌂</span>
         <span>Beranda</span>
       </a>
 
-      <a class="side-link" href="./agenda-tarbiyah.html">
+      <a class="side-link" href="./agenda-tarbiyah.html" data-nav-link>
         <span class="side-icon">▦</span>
         <span>Agenda Tarbiyah</span>
       </a>
 
-      <a class="side-link" href="./pembelajaran.html">
+      <a class="side-link" href="./pembelajaran.html" data-nav-link>
         <span class="side-icon">▤</span>
         <span>Pembelajaran</span>
       </a>
 
-      <a class="side-link" href="./materi-pembelajaran.html">
+      <a class="side-link" href="./materi-pembelajaran.html" data-nav-link>
         <span class="side-icon">◫</span>
         <span>Materi Pembelajaran</span>
       </a>
 
-      <a class="side-link" href="./berita-pengumuman.html">
+      <a class="side-link" href="./berita-pengumuman.html" data-nav-link>
         <span class="side-icon">▧</span>
         <span>Berita & Pengumuman</span>
       </a>
 
-      <a class="side-link" href="./presensi-tarbiyah.html">
+      <a class="side-link" href="./presensi-tarbiyah.html" data-nav-link>
         <span class="side-icon">✓</span>
         <span>Presensi</span>
       </a>
 
-      <a class="side-link" href="./galeri-foto-video.html">
+      <a class="side-link" href="./galeri-foto-video.html" data-nav-link>
         <span class="side-icon">▣</span>
         <span>Galeri Foto & Video</span>
       </a>
 
-      <a class="side-link" href="./diskusi-tarbiyah.html">
+      <a class="side-link" href="./diskusi-tarbiyah.html" data-nav-link>
         <span class="side-icon">☷</span>
         <span>Diskusi</span>
       </a>
 
-      <a class="side-link" href="./profil-anggota.html">
+      <a class="side-link" href="./profil-anggota.html" data-nav-link>
         <span class="side-icon">♙</span>
         <span>Anggota & Profil</span>
       </a>
@@ -213,7 +212,7 @@ window.addEventListener("unhandledrejection", function (event) {
         <em>ADMIN</em>
       </a>
 
-      <a class="side-link" href="./administrasi-pengaturan.html">
+      <a class="side-link" href="./administrasi-pengaturan.html" data-nav-link>
         <span class="side-icon">⚙</span>
         <span>Pengaturan</span>
       </a>
@@ -260,7 +259,7 @@ window.addEventListener("unhandledrejection", function (event) {
           <p class="eyebrow" id="todayLabel">RUANG BELAJAR & UKHUWAH</p>
           <h1 id="welcomeTitle">Assalamu’alaikum, Sahabat Tarbiyah</h1>
           <p class="welcome-subtitle">
-            Mari belajar, bertumbuh, dan berukhuwah dalam kebaikan.
+            Mari Tarbiyah, berdakwah, dan berukhuwah dalam kebaikan.
           </p>
         </div>
 
@@ -508,12 +507,12 @@ window.addEventListener("unhandledrejection", function (event) {
 
           <a class="gallery-placeholder gallery-two" href="./galeri-foto-video.html">
             <span>GALERI TARBIYAH</span>
-            <strong>Ukhuwah & kebersamaan</strong>
+            <strong>Ukhuwah & Berdakwah</strong>
           </a>
 
           <a class="gallery-placeholder gallery-three" href="./galeri-foto-video.html">
             <span>GALERI TARBIYAH</span>
-            <strong>Berbagi kebaikan</strong>
+            <strong>Beramal & Berbagi kebaikan</strong>
           </a>
 
         </div>
@@ -548,8 +547,8 @@ window.addEventListener("unhandledrejection", function (event) {
            FOOTER
       ====================================== -->
       <footer class="app-footer">
-        <span>© <span id="currentYear"></span> TARBIYAH</span>
-        <span>Belajar, Bertumbuh, dan Berukhuwah.</span>
+        <span>© <span id="currentYear"></span> TARBIYAH TAUHID</span>
+        <span>Tarbiyah, Dakwah, dan Beramal.</span>
       </footer>
 
     </main>
@@ -561,33 +560,32 @@ window.addEventListener("unhandledrejection", function (event) {
   ====================================== -->
   <nav class="bottom-nav" aria-label="Navigasi bawah">
 
-    <a class="bottom-link active" href="./dashboard.html">
+    <a class="bottom-link active" href="./dashboard.html" data-nav-link>
       <span>⌂</span>
       <small>Beranda</small>
     </a>
 
-    <a class="bottom-link" href="./agenda-tarbiyah.html">
+    <a class="bottom-link" href="./agenda-tarbiyah.html" data-nav-link>
       <span>▦</span>
       <small>Agenda</small>
     </a>
 
-    <a class="bottom-link" href="./pembelajaran.html">
+    <a class="bottom-link" href="./pembelajaran.html" data-nav-link>
       <span>▤</span>
       <small>Belajar</small>
     </a>
 
-    <a class="bottom-link" href="./profil-anggota.html">
+    <a class="bottom-link" href="./profil-anggota.html" data-nav-link>
       <span>♙</span>
       <small>Anggota</small>
     </a>
 
-    <a class="bottom-link" href="./profil-anggota.html">
+    <a class="bottom-link" href="./profil-anggota.html" data-nav-link>
       <span>◉</span>
       <small>Profil</small>
     </a>
 
   </nav>
-
 
   <!-- TOAST NOTIFICATION -->
   <div class="toast-region" id="toastRegion" aria-live="polite"></div>
@@ -606,10 +604,7 @@ window.addEventListener("unhandledrejection", function (event) {
   <!-- =====================================
        DASHBOARD SCRIPTS
   ====================================== -->
-<script src="./js/config.js"></script>
-<script src="./js/supabase-client.js"></script>
-<script src="./js/auth.js"></script>
-<script src="./js/tarbiyah-theme.js"></script>
+
 <script src="./js/module.js"></script>
 <script src="./js/module-shell.js"></script> 
 <script src="./js/dashboard.js" defer></script>
