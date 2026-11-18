@@ -62,21 +62,24 @@
       ],
 
       overlay: [
+        "#sidebarScrim",
         "#sidebarOverlay",
         ".sidebar-overlay"
       ],
 
       menuToggle: [
+        "#menuOpen",
         "#menuToggle",
         "#sidebarToggle",
         "[data-sidebar-toggle]"
       ],
 
       sidebarClose: [
+        "#menuClose",
         "#sidebarClose",
         "[data-sidebar-close]"
       ],
-
+          
       userMenu: [
         "#userDropdown",
         "#userMenu",
@@ -94,6 +97,7 @@
       ],
 
       themeToggle: [
+        "#btnTheme",
         "#themeToggle",
         "[data-theme-toggle]"
       ]
@@ -454,59 +458,38 @@
     );
   }
 
-  
-function handleNavigationClick(event) {
-    /*
-     * Jangan mengambil alih klik pada komponen
-     * interaktif yang bukan navigasi halaman.
-     * Khususnya <details> dan <summary> untuk
-     * membuka/menutup daftar topik pembelajaran.
-     */
-    if (
-      event.target instanceof Element &&
-      event.target.closest(
-        "summary, details, .attendance-topics, .topic-list"
-      )
-    ) {
-      return;
-    }
+  function handleNavigationClick(event) {
+  const navLink = event.target.closest(
+    'a[data-module], a[data-page], a[data-route], a[data-nav-link], ' +
+    'button[data-module], button[data-page], button[data-route], button[data-nav-link]'
+  );
 
-    const link = event.target.closest(
-      "[data-module], [data-page], [data-route], [data-nav-link]"
-    );
+  if (!navLink) return;
 
-    if (!link) return;
+  if (
+    navLink.tagName === "A" &&
+    navLink.getAttribute("href") &&
+    navLink.getAttribute("href") !== "#"
+  ) {
+    return;
+  }
 
-    const pageKey = getPageKeyFromElement(link);
+  const moduleName =
+    navLink.dataset.module ||
+    navLink.dataset.page ||
+    navLink.dataset.route;
 
-    if (!pageKey) return;
+  if (!moduleName) return;
 
-    /*
-     * Jika elemen memiliki href eksternal atau target
-     * khusus, jangan mengambil alih navigasinya.
-     */
-    const href = link.getAttribute("href");
+  event.preventDefault();
 
-    if (
-      href &&
-      (
-        href.startsWith("http://") ||
-        href.startsWith("https://") ||
-        href.startsWith("mailto:") ||
-        href.startsWith("tel:")
-      )
-    ) {
-      return;
-    }
-
-    event.preventDefault();
-
-    closeSidebar();
-    closeUserMenu();
-
-    navigateTo(pageKey);
+  if (
+    window.TARBIYAH_MODULES &&
+    typeof window.TARBIYAH_MODULES.navigate === "function"
+  ) {
+    window.TARBIYAH_MODULES.navigate(moduleName);
+  }
 }
-
 
   /* =======================================================
      7. PENANDA MENU AKTIF
