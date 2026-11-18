@@ -1,268 +1,253 @@
-
-/* ==========================================================
-   TARBIYAH — DASHBOARD CONTROLLER
-   Versi integrasi:
-   - Supabase Authentication
-   - User Roles dari database
-   - User Identity
-   - Dashboard Search
-   - Responsive Carousel
-   - Logout
-   - Tanggal dan tahun WIB
-
-   Sidebar dikelola oleh module-shell.js.
-   Tema dikelola oleh theme-manager.js.
-   ========================================================== */
-
+/* TARBIYAH Dashboard controller
+   Carousel SVG arrow consistency fix
+   Supabase configuration is not modified.
+*/
 (() => {
   "use strict";
 
-  // ========================================================
-  // 01. HELPER
-  // ========================================================
+  const $ = (id) => document.getElementById(id);
 
-  const $ = (selector, parent = document) =>
-    parent.querySelector(selector);
+  const toast = (message) => {
+    const region = $("toastRegion");
+    if (!region) return;
 
-  const $$ = (selector, parent = document) =>
-    [...parent.querySelectorAll(selector)];
-
-  const normalize = (value) =>
-    String(value || "").trim().toLowerCase();
-
-  // ========================================================
-  // 02. TOAST NOTIFICATION
-  // ========================================================
-
-  function toast(message, type = "info") {
-    let region = $("#toastRegion");
-
-    if (!region) {
-      region = document.createElement("div");
-      region.id = "toastRegion";
-      region.setAttribute("role", "status");
-      region.setAttribute("aria-live", "polite");
-
-      Object.assign(region.style, {
-        position: "fixed",
-        top: "18px",
-        right: "18px",
-        zIndex: "99999",
-        maxWidth: "min(360px, calc(100vw - 36px))"
-      });
-
-      document.body.appendChild(region);
-    }
+    region.innerHTML = "";
 
     const item = document.createElement("div");
-
-    item.className = `toast toast-${type}`;
+    item.className = "toast";
     item.textContent = message;
 
-    Object.assign(item.style, {
-      padding: "13px 17px",
-      marginBottom: "8px",
-      borderRadius: "12px",
-      background: "#102a22",
-      color: "#ecfdf5",
-      border: "1px solid rgba(110,231,183,.35)",
-      boxShadow: "0 8px 25px rgba(0,0,0,.2)",
-      fontSize: "13px",
-      lineHeight: "1.5"
-    });
-
     region.appendChild(item);
+    window.setTimeout(() => item.remove(), 3200);
+  };
 
-    window.setTimeout(() => {
-      item.remove();
-    }, 3500);
+  // =====================================================
+  // SIDEBAR MOBILE
+  // =====================================================
+
+  const sidebar = $("appSidebar");
+  const scrim = $("sidebarScrim");
+
+  const openMenu = () => {
+    sidebar?.classList.add("open");
+    scrim?.classList.add("show");
+    $("menuOpen")?.setAttribute("aria-expanded", "true");
+    document.body.classList.add("menu-open");
+  };
+
+  const closeMenu = () => {
+    sidebar?.classList.remove("open");
+    scrim?.classList.remove("show");
+    $("menuOpen")?.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("menu-open");
+  };
+
+  $("menuOpen")?.addEventListener("click", openMenu);
+  $("menuClose")?.addEventListener("click", closeMenu);
+  scrim?.addEventListener("click", closeMenu);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  // =====================================================
+  // THEME
+  // =====================================================
+
+  $("themeToggle")?.addEventListener("click", () => {
+    const manager = window.TARBIYAH_THEME;
+
+    if (manager?.get && manager?.set) {
+      const current = manager.get();
+      manager.set(current === "dark" ? "light" : "dark");
+    } else {
+      const root = document.documentElement;
+      root.dataset.theme =
+        root.dataset.theme === "dark" ? "light" : "dark";
+    }
+  });
+
+  // =====================================================
+  // CAROUSEL — CONSISTENT SVG ARROW
+  // =====================================================
+
+  const slides = [
+    {
+      kicker: "TARBIYAH • PEMBELAJARAN MUSLIM",
+      title: "Menuntut ilmu,<br><i>menumbuhkan ukhuwah.</i>",
+      desc: "Ruang bersama untuk belajar, berbagi, dan menguatkan langkah dalam kebaikan.",
+      link: "./pembelajaran.html",
+      action: "Jelajahi pembelajaran"
+    },
+    {
+      kicker: "AGENDA & KEGIATAN",
+      title: "Bersama dalam<br><i>majelis kebaikan.</i>",
+      desc: "Temukan jadwal kajian, pertemuan, dan aktivitas komunitas berikutnya.",
+      link: "./agenda-tarbiyah.html",
+      action: "Jelajahi agenda"
+    },
+    {
+      kicker: "KOMUNITAS TARBIYAH",
+      title: "Tumbuh bersama,<br><i>berbagi manfaat.</i>",
+      desc: "Kenali anggota, dokumentasikan perjalanan, dan kuatkan ukhuwah.",
+      link: "./profil-anggota.html",
+      action: "Kenali komunitas"
+    }
+  ];
+
+  let slideIndex = 0;
+
+  const slideHost = document.querySelector(".hero-slide");
+  const dots = [...document.querySelectorAll(".carousel-dot")];
+
+  // SVG panah yang sama untuk SEMUA slide.
+  // Tidak lagi menggunakan karakter teks "→".
+  const carouselArrow = `
+    <svg
+      class="arrow-icon hero-arrow"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M5 12h14M13 5l7 7-7 7"></path>
+    </svg>
+  `;
+
+  function showSlide(index) {
+    slideIndex = (index + slides.length) % slides.length;
+
+    const s = slides[slideIndex];
+
+    const heroCopy = slideHost?.querySelector(".hero-copy");
+
+    if (heroCopy) {
+      heroCopy.innerHTML = `
+        <span class="hero-kicker">${s.kicker}</span>
+
+        <h2>${s.title}</h2>
+
+        <p>${s.desc}</p>
+
+        <a class="primary-button hero-link" href="${s.link}">
+          <span class="hero-link-label">${s.action}</span>
+          ${carouselArrow}
+        </a>
+      `;
+    }
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === slideIndex);
+    });
+
+    if ($("slideCounter")) {
+      $("slideCounter").textContent =
+        `0${slideIndex + 1} / 0${slides.length}`;
+    }
   }
 
-  // ========================================================
-  // 03. TANGGAL DAN TAHUN
-  // ========================================================
+  // Tombol indikator slide
+  dots.forEach((dot, i) => {
+    dot.addEventListener("click", () => showSlide(i));
+  });
 
-  function initializeDate() {
-    const now = new Date();
+  // Jalankan slide pertama melalui template yang sama.
+  // Dengan demikian, SVG sudah konsisten sejak awal.
+  showSlide(0);
 
-    const dateElement = $("[data-dashboard-date]");
+  let carouselTimer = window.setInterval(
+    () => showSlide(slideIndex + 1),
+    6500
+  );
 
-    if (dateElement) {
-      dateElement.textContent =
-        new Intl.DateTimeFormat("id-ID", {
-          timeZone: "Asia/Jakarta",
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        }).format(now);
-    }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      window.clearInterval(carouselTimer);
+    } else {
+      window.clearInterval(carouselTimer);
 
-    const yearElement = $("[data-dashboard-year]");
-
-    if (yearElement) {
-      yearElement.textContent =
-        new Intl.DateTimeFormat("id-ID", {
-          timeZone: "Asia/Jakarta",
-          year: "numeric"
-        }).format(now);
-    }
-  }
-
-  // ========================================================
-  // 04. SUPABASE CLIENT
-  // ========================================================
-
-  function getSupabaseClient() {
-    const client = window.tarbiyahSupabase;
-
-    if (!client) {
-      throw new Error(
-        "Supabase client TARBIYAH belum tersedia."
+      carouselTimer = window.setInterval(
+        () => showSlide(slideIndex + 1),
+        6500
       );
     }
+  });
 
-    if (
-      !client.auth ||
-      typeof client.from !== "function"
-    ) {
-      throw new Error(
-        "Supabase client belum siap digunakan."
-      );
-    }
 
-    if (window.TARBIYAH_BACKEND_READY === false) {
-      throw new Error(
-        "Backend TARBIYAH belum siap. Periksa konfigurasi Supabase."
-      );
-    }
 
-    return client;
-  }
+  // =====================================================
+  // SEARCH
+  // =====================================================
 
-  // ========================================================
-  // 05. RESOLVE AUTHENTICATION SESSION
-  // ========================================================
+  let currentUserRole = null;
 
-  async function resolveSession() {
-    const guardedSession = window.TARBIYAH_SESSION;
+  const searchRoutes = [
+    ["agenda", "./agenda-tarbiyah.html"],
+    ["jadwal", "./agenda-tarbiyah.html"],
+    ["materi", "./materi-pembelajaran.html"],
+    ["belajar", "./pembelajaran.html"],
+    ["pembelajaran", "./pembelajaran.html"],
+    ["berita", "./berita-pengumuman.html"],
+    ["pengumuman", "./berita-pengumuman.html"],
+    ["presensi", "./presensi-tarbiyah.html"],
+    ["absen", "./presensi-tarbiyah.html"],
+    ["galeri", "./galeri-foto-video.html"],
+    ["foto", "./galeri-foto-video.html"],
+    ["video", "./galeri-foto-video.html"],
+    ["diskusi", "./diskusi-tarbiyah.html"],
+    ["anggota", "./profil-anggota.html"],
+    ["profil", "./profil-anggota.html"],
+    ["administrasi", "./dashboard-admin.html"],
+    ["pengaturan", "./administrasi-pengaturan.html"],
+    ["notifikasi", "./notifikasi.html"]
+  ];
 
-    // Prioritaskan session dari Auth Guard.
-    if (guardedSession?.ready === true) {
-      return (
-        guardedSession.session ||
-        guardedSession.data?.session ||
-        (guardedSession.user ? guardedSession : null) ||
-        null
-      );
-    }
+  $("searchForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-    const auth = window.TARBIYAH_AUTH;
-
-    if (typeof auth?.getSession !== "function") {
-      throw new Error(
-        "Modul TARBIYAH_AUTH belum tersedia."
-      );
-    }
-
-    const result = await auth.getSession();
-
-    if (result?.configured === false) {
-      throw new Error(
-        "Supabase belum dikonfigurasi."
-      );
-    }
-
-    if (result?.error) {
-      throw result.error;
-    }
-
-    return (
-      result?.session ||
-      result?.data?.session ||
-      result?.data?.data?.session ||
-      null
-    );
-  }
-
-  // ========================================================
-  // 06. USER IDENTITY
-  // ========================================================
-
-  function getInitials(name) {
-    return String(name || "Pengguna")
+    const query = ($("globalSearch")?.value || "")
       .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(part => part.charAt(0))
-      .join("")
-      .toUpperCase();
-  }
+      .toLowerCase();
 
-  function setAvatar(element, name, avatarUrl) {
-    if (!element) return;
+    if (!query) return;
 
+    const found = searchRoutes.find(([word]) =>
+      query.includes(word)
+    );
+
+    if (found) {
+      const adminRoles = ["admin", "super_admin"];
+
+      if (
+        found[1] === "./dashboard-admin.html" &&
+        !adminRoles.includes(currentUserRole)
+      ) {
+        toast("Anda tidak memiliki akses administrasi.");
+        return;
+      }
+
+      location.href = found[1];
+    } else {
+      toast("Belum ditemukan menu yang cocok. Coba kata kunci lain.");
+    }
+  });
+
+  // Shortcut keyboard untuk membuka pencarian.
+  document.addEventListener("keydown", (e) => {
     if (
-      element.tagName === "IMG" &&
-      avatarUrl
+      e.key === "/" &&
+      !["INPUT", "TEXTAREA"].includes(
+        document.activeElement?.tagName
+      )
     ) {
-      element.src = avatarUrl;
-      element.alt = `Foto profil ${name}`;
-      return;
+      e.preventDefault();
+      $("globalSearch")?.focus();
     }
+  });
 
-    element.textContent = getInitials(name);
-  }
-
-  function renderUserIdentity(user) {
-    const metadata = user.user_metadata || {};
-
-    const name =
-      metadata.full_name ||
-      metadata.display_name ||
-      metadata.name ||
-      user.email?.split("@")[0] ||
-      "Pengguna";
-
-    const avatarUrl =
-      metadata.avatar_url ||
-      metadata.picture ||
-      null;
-
-    $$("[data-user-name]").forEach(element => {
-      element.textContent = name;
-    });
-
-    $$("[data-sidebar-user-name]").forEach(element => {
-      element.textContent = name;
-    });
-
-    $$("[data-greeting-name]").forEach(element => {
-      element.textContent = name;
-    });
-
-    $$("[data-user-avatar]").forEach(element => {
-      setAvatar(element, name, avatarUrl);
-    });
-
-    $$("[data-sidebar-avatar]").forEach(element => {
-      setAvatar(element, name, avatarUrl);
-    });
-
-    const welcomeTitle = $("#welcomeTitle");
-
-    if (welcomeTitle) {
-      welcomeTitle.textContent =
-        `Assalamu'alaikum, ${name}`;
-    }
-
-    return name;
-  }
-
-  // ========================================================
-  // 07. USER ROLE — SUPABASE DATABASE
-  // ========================================================
+  
+  // =====================================================
+  // USER IDENTITY & ROLE — SUPABASE DATABASE
+  // =====================================================
 
   const ROLE_CONFIG = {
     table: "user_roles",
@@ -277,19 +262,16 @@
       description: "Super Administrator",
       admin: true
     },
-
     admin: {
       label: "ADMIN",
       description: "Administrator TARBIYAH",
       admin: true
     },
-
     member: {
       label: "ANGGOTA",
       description: "Anggota TARBIYAH",
       admin: false
     },
-
     registered_user: {
       label: "PENGGUNA TERDAFTAR",
       description: "Pengguna Terdaftar",
@@ -297,7 +279,57 @@
     }
   };
 
-  let currentUserRole = null;
+  function getSupabaseClient() {
+    if (
+      window.TARBIYAH_BACKEND_READY &&
+      window.tarbiyahSupabase
+    ) {
+      return window.tarbiyahSupabase;
+    }
+
+    throw new Error(
+      "Client Supabase TARBIYAH belum tersedia."
+    );
+  }
+
+  async function resolveSession() {
+    // Gunakan status Auth Guard apabila sudah tersedia.
+    const guardedSession = window.TARBIYAH_SESSION;
+
+    if (guardedSession?.ready) {
+      return guardedSession.session || null;
+    }
+
+    const auth = window.TARBIYAH_AUTH;
+
+    if (typeof auth?.getSession !== "function") {
+      throw new Error(
+        "Modul TARBIYAH_AUTH belum tersedia."
+      );
+    }
+
+    const result = await auth.getSession();
+
+    if (result?.configured === false) {
+      throw new Error(
+        "Backend Supabase belum dikonfigurasi."
+      );
+    }
+
+    if (result?.error) {
+      throw result.error;
+    }
+
+    return result?.session ||
+      result?.data?.session ||
+      null;
+  }
+
+  function normalizeRoleName(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase();
+  }
 
   async function fetchUserRoles(userId) {
     const supabase = getSupabaseClient();
@@ -319,11 +351,13 @@
       .map(row => {
         const relation = row.roles;
 
+        // Relasi Supabase dapat berbentuk objek
+        // atau array, bergantung pada relasinya.
         const roleRecord = Array.isArray(relation)
           ? relation[0]
           : relation;
 
-        return normalize(
+        return normalizeRoleName(
           roleRecord?.[ROLE_CONFIG.roleNameColumn]
         );
       })
@@ -338,45 +372,35 @@
       "registered_user"
     ];
 
-    return (
-      priority.find(role => roles.includes(role)) ||
-      null
-    );
+    return priority.find(role =>
+      roles.includes(role)
+    ) || null;
   }
 
   function renderUserRole(role) {
-    const info = ROLE_INFO[role] || null;
+    const info = ROLE_INFO[role];
 
-    const isAdmin = Boolean(info?.admin);
+    const admin = Boolean(info?.admin);
 
-    // Sembunyikan menu administrasi terlebih dahulu.
-    const adminElements = [
-      "#adminLink",
-      "#adminBanner",
-      "[data-admin-only]"
-    ];
+    // Selalu sembunyikan terlebih dahulu.
+    // Hak administrasi hanya diberikan jika role
+    // berhasil dibaca dan dikenali.
+    if ($("adminLink")) {
+      $("adminLink").hidden = !admin;
+    }
 
-    adminElements.forEach(selector => {
-      $$(selector).forEach(element => {
-        element.hidden = !isAdmin;
-      });
-    });
+    if ($("adminBanner")) {
+      $("adminBanner").hidden = !admin;
+    }
 
-    $$("[data-user-role]").forEach(element => {
-      element.textContent =
+    if ($("rolePill")) {
+      $("rolePill").textContent =
         info?.label || "ROLE BELUM DITETAPKAN";
-    });
+    }
 
-    $$("[data-sidebar-user-role]").forEach(element => {
-      element.textContent =
+    if ($("sidebarRole")) {
+      $("sidebarRole").textContent =
         info?.description || "Role belum ditetapkan";
-    });
-
-    const rolePill = $("#rolePill");
-
-    if (rolePill) {
-      rolePill.textContent =
-        info?.label || "ROLE BELUM DITETAPKAN";
     }
 
     currentUserRole = role;
@@ -384,14 +408,10 @@
     window.TARBIYAH_USER_ROLE = {
       ready: Boolean(role),
       name: role,
-      isAdmin,
+      isAdmin: admin,
       isSuperAdmin: role === "super_admin"
     };
   }
-
-  // ========================================================
-  // 08. LOAD USER PROFILE AND ROLE
-  // ========================================================
 
   async function hydrateUser() {
     const session = await resolveSession();
@@ -404,26 +424,56 @@
 
     const user = session.user;
 
-    renderUserIdentity(user);
+    const name =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.display_name ||
+      user.user_metadata?.name ||
+      user.email?.split("@")[0] ||
+      "Pengguna";
 
-    // Jangan menggunakan metadata sebagai otorisasi.
+    const initials = name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part.charAt(0))
+      .join("")
+      .toUpperCase();
+
+    ["userName", "sidebarName"].forEach(id => {
+      if ($(id)) {
+        $(id).textContent = name;
+      }
+    });
+
+    ["userAvatar", "sidebarAvatar"].forEach(id => {
+      if ($(id)) {
+        $(id).textContent = initials;
+      }
+    });
+
+    if ($("welcomeTitle")) {
+      $("welcomeTitle").textContent =
+        `Assalamu’alaikum, ${name}`;
+    }
+
+    // Role hanya dibaca dari database.
+    // Metadata akun tidak digunakan sebagai otorisasi.
     renderUserRole(null);
 
     try {
       const roles = await fetchUserRoles(user.id);
-
       const primaryRole = selectPrimaryRole(roles);
 
       renderUserRole(primaryRole);
 
       if (!primaryRole) {
         console.warn(
-          "[TARBIYAH] Role pengguna belum ditetapkan."
+          "[TARBIYAH] Pengguna belum memiliki role yang dikenali."
         );
 
         toast(
-          "Role akun belum ditetapkan. Hubungi administrator.",
-          "warning"
+          "Role akun belum ditetapkan. Hubungi administrator."
         );
       } else {
         console.info(
@@ -436,346 +486,96 @@
       renderUserRole(null);
 
       console.error(
-        "[TARBIYAH] Gagal membaca role:",
+        "[TARBIYAH] Gagal membaca role pengguna:",
         error
       );
 
       toast(
-        "Identitas akun berhasil dimuat, tetapi role belum dapat dibaca.",
-        "warning"
+        "Identitas akun berhasil dimuat, tetapi role belum dapat dibaca."
       );
     }
-
-    return user;
   }
 
-  // ========================================================
-  // 09. DASHBOARD SEARCH
-  // ========================================================
 
-  const searchRoutes = [
-    ["agenda", "./agenda-tarbiyah.html"],
-    ["jadwal", "./agenda-tarbiyah.html"],
-    ["materi", "./materi-pembelajaran.html"],
-    ["belajar", "./pembelajaran.html"],
-    ["pembelajaran", "./pembelajaran.html"],
-    ["berita", "./berita-pengumuman.html"],
-    ["pengumuman", "./berita-pengumuman.html"],
-    ["presensi", "./presensi-tarbiyah.html"],
-    ["absen", "./presensi-tarbiyah.html"],
-    ["galeri", "./galeri-foto-video.html"],
-    ["foto", "./galeri-foto-video.html"],
-    ["video", "./galeri-foto-video.html"],
-    ["diskusi", "./diskusi-tarbiyah.html"],
-    ["anggota", "./profil-anggota.html"],
-    ["profil", "./profil-anggota.html"],
-    ["kehadiran", "./kehadiran.html"],
-    ["catatan", "./catatan-refleksi.html"],
-    ["riwayat", "./riwayat-aktivitas.html"],
-    ["administrasi", "./dashboard-admin.html"],
-    ["pengaturan", "./administrasi-pengaturan.html"],
-    ["notifikasi", "./notifikasi.html"]
-  ];
+  // =====================================================
+  // LOGOUT
+  // =====================================================
 
-  function initializeSearch() {
-    const form = $("[data-dashboard-search-form]");
-    const input = $("[data-dashboard-search]");
+  async function logout() {
+    const buttons = [$("logoutMini")].filter(Boolean);
 
-    if (!form || !input) return;
-
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-
-      const query = normalize(input.value);
-
-      if (!query) {
-        input.focus();
-        return;
-      }
-
-      const found = searchRoutes.find(([keyword]) =>
-        query.includes(keyword)
-      );
-
-      if (!found) {
-        toast(
-          "Menu belum ditemukan. Coba kata kunci lain.",
-          "warning"
-        );
-        return;
-      }
-
-      const destination = found[1];
-
-      // Dashboard administrasi hanya untuk Admin.
-      if (
-        destination === "./dashboard-admin.html" &&
-        !["admin", "super_admin"].includes(currentUserRole)
-      ) {
-        toast(
-          "Anda tidak memiliki akses administrasi.",
-          "error"
-        );
-        return;
-      }
-
-      window.location.href = destination;
-    });
-
-    // Shortcut "/" untuk membuka pencarian.
-    document.addEventListener("keydown", event => {
-      const activeTag =
-        document.activeElement?.tagName;
-
-      const isTyping = [
-        "INPUT",
-        "TEXTAREA",
-        "SELECT"
-      ].includes(activeTag);
-
-      if (
-        event.key === "/" &&
-        !isTyping &&
-        !event.ctrlKey &&
-        !event.metaKey &&
-        !event.altKey
-      ) {
-        event.preventDefault();
-        input.focus();
-      }
-    });
-  }
-
-  // ========================================================
-  // 10. DASHBOARD CAROUSEL
-  // ========================================================
-
-  function initializeCarousel() {
-    const carousel = $("[data-dashboard-carousel]");
-
-    if (!carousel) return;
-
-    const track = $("[data-carousel-track]", carousel);
-
-    if (!track) return;
-
-    const slides = $$(".dashboard-slide", track);
-
-    const dots = $$("[data-carousel-dot]", carousel);
-
-    const previousButton =
-      $("[data-carousel-prev]", carousel);
-
-    const nextButton =
-      $("[data-carousel-next]", carousel);
-
-    if (!slides.length) return;
-
-    let currentIndex = 0;
-    let timer = null;
-
-    const duration = 6500;
-
-    function showSlide(index) {
-      currentIndex =
-        (index + slides.length) % slides.length;
-
-      track.style.transform =
-        `translateX(-${currentIndex * 100}%)`;
-
-      slides.forEach((slide, i) => {
-        slide.setAttribute(
-          "aria-hidden",
-          String(i !== currentIndex)
-        );
-      });
-
-      dots.forEach((dot, i) => {
-        const active = i === currentIndex;
-
-        dot.classList.toggle("active", active);
-
-        dot.setAttribute(
-          "aria-current",
-          active ? "true" : "false"
-        );
-      });
-    }
-
-    function stopAutoplay() {
-      if (timer !== null) {
-        window.clearInterval(timer);
-        timer = null;
-      }
-    }
-
-    function startAutoplay() {
-      stopAutoplay();
-
-      if (
-        document.hidden ||
-        slides.length < 2 ||
-        window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches
-      ) {
-        return;
-      }
-
-      timer = window.setInterval(() => {
-        showSlide(currentIndex + 1);
-      }, duration);
-    }
-
-    function moveTo(index) {
-      showSlide(index);
-      startAutoplay();
-    }
-
-    previousButton?.addEventListener("click", () => {
-      moveTo(currentIndex - 1);
-    });
-
-    nextButton?.addEventListener("click", () => {
-      moveTo(currentIndex + 1);
-    });
-
-    dots.forEach((dot, index) => {
-      dot.addEventListener("click", () => {
-        moveTo(index);
-      });
-    });
-
-    carousel.addEventListener("mouseenter", stopAutoplay);
-    carousel.addEventListener("mouseleave", startAutoplay);
-
-    carousel.addEventListener("focusin", stopAutoplay);
-    carousel.addEventListener("focusout", startAutoplay);
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        stopAutoplay();
-      } else {
-        startAutoplay();
-      }
-    });
-
-    showSlide(0);
-    startAutoplay();
-  }
-
-  // ========================================================
-  // 11. LOGOUT
-  // ========================================================
-
-  async function logout(button) {
-    if (button) {
+    buttons.forEach((button) => {
       button.disabled = true;
-    }
+      button.textContent = "…";
+    });
 
     try {
-      const auth = window.TARBIYAH_AUTH;
+      const authApi = window.TARBIYAH_AUTH;
 
-      if (typeof auth?.signOut === "function") {
-        const result = await auth.signOut();
-
-        if (result?.error) {
-          throw result.error;
-        }
-
+      if (typeof authApi?.signOut === "function") {
+        await authApi.signOut();
       } else {
-        const supabase = getSupabaseClient();
+        const client = [
+          window.supabaseClient,
+          window.TARBIYAH_SUPABASE,
+          window.supabase
+        ].find((c) => c?.auth?.signOut);
 
-        const { error } = await supabase.auth.signOut();
-
-        if (error) {
-          throw error;
+        if (!client) {
+          throw new Error(
+            "Fungsi logout Supabase tidak ditemukan."
+          );
         }
+
+        const { error } = await client.auth.signOut();
+
+        if (error) throw error;
       }
 
-      window.location.replace(
-        "./login-register.html"
-      );
+      location.replace("./login-register.html");
 
-    } catch (error) {
-      console.error(
-        "[TARBIYAH] Logout gagal:",
-        error
-      );
-
-      if (button) {
-        button.disabled = false;
-      }
+    } catch (err) {
+      console.error("[TARBIYAH] Logout gagal:", err);
 
       toast(
-        error?.message ||
-        "Logout gagal. Silakan coba kembali.",
-        "error"
+        err?.message ||
+        "Logout gagal. Silakan coba kembali."
       );
-    }
-  }
 
-  function initializeLogout() {
-    $$("[data-logout], #logoutMini").forEach(button => {
-      button.addEventListener("click", () => {
-        logout(button);
+      buttons.forEach((button) => {
+        button.disabled = false;
+        button.textContent = "↗";
       });
-    });
-  }
-
-  // ========================================================
-  // 12. DASHBOARD INITIALIZATION
-  // ========================================================
-
-  async function initializeDashboard() {
-    initializeDate();
-    initializeSearch();
-    initializeCarousel();
-    initializeLogout();
-
-    try {
-      await hydrateUser();
-
-      console.info(
-        "[TARBIYAH] Dashboard berhasil diinisialisasi."
-      );
-
-    } catch (error) {
-      console.error(
-        "[TARBIYAH] Gagal menginisialisasi identitas Dashboard:",
-        error
-      );
     }
   }
 
-  // ========================================================
-  // 13. PUBLIC DASHBOARD API
-  // ========================================================
+  $("logoutMini")?.addEventListener("click", logout);
 
-  window.TARBIYAH_DASHBOARD = {
-    initialize: initializeDashboard,
+  // =====================================================
+  // DATE & INITIALIZATION
+  // =====================================================
 
-    refreshUser: hydrateUser,
-
-    getCurrentRole() {
-      return currentUserRole;
-    },
-
-    logout
-  };
-
-  // ========================================================
-  // 14. START
-  // ========================================================
-
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializeDashboard,
-      { once: true }
-    );
-  } else {
-    initializeDashboard();
+  if ($("currentYear")) {
+    $("currentYear").textContent =
+      new Date().getFullYear();
   }
+
+  const today = new Intl.DateTimeFormat("id-ID", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  }).format(new Date());
+
+  if ($("todayLabel")) {
+    $("todayLabel").textContent = today.toUpperCase();
+  }
+
+  hydrateUser().catch((err) => {
+    console.warn(
+      "[TARBIYAH] Gagal memuat profil:",
+      err
+    );
+  });
 
 })();
