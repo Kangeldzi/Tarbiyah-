@@ -37,7 +37,7 @@
       title: "Dashboard",
       description: "Ringkasan aktivitas dan informasi TARBIYAH.",
       icon: "layout-dashboard",
-      url: "./dashboard.html"
+      url: "./dashboard.html",
       access: "member"
     },
 
