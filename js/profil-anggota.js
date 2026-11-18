@@ -1287,6 +1287,39 @@ async function loadAttendanceHistory() {
     container.appendChild(wrapper);
   };
 
+  
+async function loadAttendanceHistory() {
+  const container = $("attendanceHistory");
+
+  const totalKajianEl = $("totalKajian");
+  const totalAttendanceEl = $("totalAttendance");
+  const percentageEl = $("attendancePercentage");
+
+  // ==========================================
+  // 1. FUNGSI STATISTIK PROFIL
+  // ==========================================
+
+  const setStats = (total, present) => {
+    const percentage = total
+      ? Math.round((present / total) * 100)
+      : 0;
+
+    if (totalKajianEl) {
+      totalKajianEl.textContent =
+        total.toLocaleString("id-ID");
+    }
+
+    if (totalAttendanceEl) {
+      totalAttendanceEl.textContent =
+        present.toLocaleString("id-ID");
+    }
+
+    if (percentageEl) {
+      percentageEl.textContent =
+        percentage + "%";
+    }
+  };
+
   if (!container) {
     console.warn(
       "[TARBIYAH] Elemen #attendanceHistory tidak ditemukan."
@@ -1294,7 +1327,67 @@ async function loadAttendanceHistory() {
     return;
   }
 
-  container.replaceChildren();
+  // ==========================================
+  // 2. STATUS LOADING
+  // ==========================================
+
+  const showLoading = () => {
+    container.setAttribute("aria-busy", "true");
+
+    container.innerHTML = `
+      <div class="attendance-loading" role="status">
+
+        <span
+          class="attendance-loading-spinner"
+          aria-hidden="true">
+        </span>
+
+        <span class="attendance-loading-copy">
+
+          <strong>
+            Memuat riwayat kehadiran...
+          </strong>
+
+          <span>
+            Sistem sedang mengambil data kajian Anda.
+            Mohon tunggu sebentar.
+          </span>
+
+        </span>
+
+      </div>
+    `;
+  };
+
+  const finishLoading = () => {
+    container.setAttribute("aria-busy", "false");
+  };
+
+  // ==========================================
+  // 3. PESAN KOSONG / ERROR
+  // ==========================================
+
+  const showMessage = (title, description) => {
+    container.replaceChildren();
+
+    finishLoading();
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "empty-state";
+
+    const heading = document.createElement("strong");
+    heading.textContent = title;
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = description;
+
+    wrapper.append(heading, paragraph);
+    container.appendChild(wrapper);
+  };
+
+  // Mulai loading sebelum permintaan data.
+  showLoading();
+
 
   // ==========================================
   // 3. VALIDASI DATA ANGGOTA
@@ -1719,7 +1812,7 @@ async function loadAttendanceHistory() {
 
       container.appendChild(article);
     });
-
+    finishLoading();
     console.info(
       "[TARBIYAH] Riwayat profil berhasil dimuat.",
       {
