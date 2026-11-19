@@ -1,19 +1,23 @@
 
 /**
  * ============================================================
- * TARBIYAH — THEME MANAGER
- * File   : js/theme-manager.js
- * Versi  : 1.0.0
+ * TARBIYAH — UNIVERSAL THEME MANAGER
+ * File    : js/theme-manager.js
+ * Version : 2.0.0
  *
- * Fitur:
- * - Tema Gelap (Dark)
- * - Tema Terang (Light)
- * - Tema Sistem (System)
- * - Penyimpanan preferensi tema
- * - Deteksi preferensi perangkat
- * - Sinkronisasi antar-tab
- * - Integrasi module-shell.js
- * - Dukungan aksesibilitas
+ * MASTER:
+ * - Mengikuti tombol universal profil-anggota.html
+ * - Mendukung #btnTheme dan [data-theme-toggle]
+ * - Ikon tombol tidak diubah oleh JavaScript
+ * - Hanya file ini yang menangani klik pergantian tema
+ *
+ * Tema:
+ * - dark
+ * - light
+ * - system
+ *
+ * Storage:
+ * - tarbiyah_theme_preference
  * ============================================================
  */
 
@@ -25,274 +29,145 @@
     return;
   }
 
-  const VERSION = "1.0.0";
+  const VERSION = "2.0.0";
+  const STORAGE_KEY = "tarbiyah_theme_preference";
+  const ROOT = document.documentElement;
 
-  /* ==========================================================
-     1. KONFIGURASI
-  ========================================================== */
+  const TOGGLE_SELECTOR = [
+    "#btnTheme",
+    "[data-theme-toggle]"
+  ].join(",");
 
-  const CONFIG = {
-    storageKey: "tarbiyah_theme_preference",
+  const OPTION_SELECTOR = "[data-theme-option]";
 
-    defaultTheme: "dark",
+  const VALID_THEMES = ["dark", "light", "system"];
 
-    themes: ["dark", "light", "system"],
-
-    root: document.documentElement,
-
-    selectors: {
-      toggle: "[data-theme-toggle]",
-      icon: "[data-theme-icon]",
-      label: "[data-theme-label]",
-      option: "[data-theme-option]"
-    }
+  const state = {
+    preference: "dark",
+    activeTheme: "dark",
+    initialized: false,
+    storageAvailable: true,
+    mediaQuery: null,
+    controlsBound: false,
+    storageBound: false,
+    systemBound: false
   };
 
   /* ==========================================================
-     2. STATE
-  ========================================================== */
- const state = {
-  preference: CONFIG.defaultTheme,
-  activeTheme: "dark",
-  initialized: false,
-  systemMedia: null,
-  storageAvailable: true,
-
-  // Mencegah listener dipasang berulang kali
-  themeControlsBound: false
-};
-
-  /* ==========================================================
-     3. UTILITAS
+     UTILITAS
   ========================================================== */
 
-  function normalizeTheme(theme) {
-    if (typeof theme !== "string") {
-      return null;
-    }
+  function normalizeTheme(value) {
+    if (typeof value !== "string") return null;
 
-    const normalized = theme
-      .trim()
-      .toLowerCase();
+    const theme = value.trim().toLowerCase();
 
-    if (CONFIG.themes.includes(normalized)) {
-      return normalized;
-    }
-
-    return null;
+    return VALID_THEMES.includes(theme) ? theme : null;
   }
 
   function getSystemTheme() {
-    if (window.matchMedia) {
-      return window.matchMedia(
-        "(prefers-color-scheme: light)"
-      ).matches
-        ? "light"
-        : "dark";
-    }
+    if (!window.matchMedia) return "dark";
 
-    return "dark";
+    return window.matchMedia(
+      "(prefers-color-scheme: light)"
+    ).matches ? "light" : "dark";
   }
 
-  function dispatch(name, detail) {
+  function resolveTheme(preference) {
+    return preference === "system"
+      ? getSystemTheme()
+      : preference;
+  }
+
+  function emit(name, detail = {}) {
     document.dispatchEvent(
-      new CustomEvent(name, {
-        detail: detail || {}
-      })
+      new CustomEvent(name, { detail })
     );
   }
 
-  function safeStorageGet(key) {
+  function readStorage() {
     try {
-      return window.localStorage.getItem(key);
+      return window.localStorage.getItem(STORAGE_KEY);
     } catch (error) {
       state.storageAvailable = false;
-
       console.warn(
-        "[TARBIYAH THEME] Tidak dapat membaca localStorage:",
+        "[TARBIYAH THEME] Gagal membaca preferensi:",
         error
       );
-
       return null;
     }
   }
 
-  function safeStorageSet(key, value) {
+  function writeStorage(value) {
     try {
-      window.localStorage.setItem(key, value);
+      window.localStorage.setItem(STORAGE_KEY, value);
       state.storageAvailable = true;
       return true;
     } catch (error) {
       state.storageAvailable = false;
-
       console.warn(
-        "[TARBIYAH THEME] Tidak dapat menyimpan tema:",
+        "[TARBIYAH THEME] Gagal menyimpan preferensi:",
         error
       );
-
       return false;
     }
   }
 
   /* ==========================================================
-     4. MEMBACA PREFERENSI
+     WARNA BROWSER / PWA
   ========================================================== */
 
-  function readPreference() {
-    const saved = normalizeTheme(
-      safeStorageGet(CONFIG.storageKey)
-    );
-
-    return saved || CONFIG.defaultTheme;
-  }
-
-  /* ==========================================================
-     5. MENENTUKAN TEMA AKTIF
-  ========================================================== */
-
-  function resolveTheme(preference) {
-    if (preference === "system") {
-      return getSystemTheme();
-    }
-
-    return preference;
-  }
-
-  /* ==========================================================
-     6. MENERAPKAN TEMA
-  ========================================================== */
-
-  function applyTheme(theme, options) {
-    const preference = normalizeTheme(theme);
-
-    if (!preference) {
-      console.warn(
-        "[TARBIYAH THEME] Tema tidak dikenal:",
-        theme
-      );
-
-      return false;
-    }
-
-    const settings = options || {};
-
-    const previousPreference = state.preference;
-    const previousActiveTheme = state.activeTheme;
-
-    const activeTheme = resolveTheme(preference);
-
-    state.preference = preference;
-    state.activeTheme = activeTheme;
-
-    CONFIG.root.setAttribute(
-      "data-theme",
-      activeTheme
-    );
-
-    CONFIG.root.dataset.themePreference = preference;
-
-    if (document.body) {
-      document.body.setAttribute(
-        "data-theme",
-        activeTheme
-      );
-    }
-
-    updateThemeColor(activeTheme);
-    updateThemeControls();
-
-    if (settings.persist !== false) {
-      safeStorageSet(
-        CONFIG.storageKey,
-        preference
-      );
-    }
-
-    if (
-      previousPreference !== preference ||
-      previousActiveTheme !== activeTheme
-    ) {
-      dispatch("tarbiyah:theme-changed", {
-        preference,
-        activeTheme,
-        previousPreference,
-        previousActiveTheme
-      });
-    }
-
-    return true;
-  }
-
-  /* ==========================================================
-     7. WARNA BROWSER / PWA
-  ========================================================== */
-
-  function updateThemeColor(theme) {
+  function updateBrowserThemeColor(theme) {
     const meta = document.querySelector(
       'meta[name="theme-color"]'
     );
 
     if (!meta) return;
 
-    const color = theme === "light"
-      ? "#f4faf7"
-      : "#102a22";
-
-    meta.setAttribute("content", color);
+    meta.setAttribute(
+      "content",
+      theme === "light" ? "#f4faf7" : "#102a22"
+    );
   }
 
   /* ==========================================================
-     8. MEMPERBARUI KONTROL TEMA
+     SINKRONISASI TOMBOL MASTER
+     Jangan mengubah isi ikon ◐ atau struktur HTML tombol.
   ========================================================== */
 
   function updateThemeControls() {
     const buttons = document.querySelectorAll(
-      CONFIG.selectors.toggle
+      TOGGLE_SELECTOR
     );
 
     buttons.forEach(button => {
-      const icon = button.querySelector(
-        CONFIG.selectors.icon
-      );
-
-      const label = button.querySelector(
-        CONFIG.selectors.label
-      );
-
-      const iconName =
-        state.activeTheme === "light"
-          ? "sun"
-          : "moon";
-
-      const labelText = {
-        dark: "Tema gelap",
-        light: "Tema terang",
-        system: `Tema sistem (${state.activeTheme})`
-      }[state.preference];
-
-      if (icon) {
-        icon.dataset.icon = iconName;
-        icon.setAttribute("aria-hidden", "true");
-      }
-
-      if (label) {
-        label.textContent = labelText;
-      }
+      const label = state.preference === "system"
+        ? `Tema sistem (${state.activeTheme})`
+        : state.activeTheme === "light"
+          ? "Tema terang"
+          : "Tema gelap";
 
       button.setAttribute(
         "aria-label",
-        `Tema saat ini: ${labelText}. Klik untuk mengganti tema.`
+        `Mode tampilan: ${label}. Tekan untuk mengganti tema.`
       );
 
       button.setAttribute(
         "aria-pressed",
-        state.preference !== "system" ? "true" : "false"
+        state.activeTheme === "dark" ? "true" : "false"
       );
+
+      button.setAttribute(
+        "title",
+        label
+      );
+
+      // PENTING:
+      // Tidak mengubah textContent, innerHTML,
+      // ikon, class, atau struktur tombol master.
     });
 
-    document.querySelectorAll(
-      CONFIG.selectors.option
-    ).forEach(option => {
+    document.querySelectorAll(OPTION_SELECTOR).forEach(option => {
       const value = normalizeTheme(
         option.dataset.themeOption
       );
@@ -308,14 +183,66 @@
       }
     });
 
-    dispatch("tarbiyah:theme-controls-updated", {
+    emit("tarbiyah:theme-controls-updated", {
       preference: state.preference,
       activeTheme: state.activeTheme
     });
   }
 
   /* ==========================================================
-     9. MENGGANTI TEMA
+     MENERAPKAN TEMA
+  ========================================================== */
+
+  function applyTheme(theme, options = {}) {
+    const preference = normalizeTheme(theme);
+
+    if (!preference) {
+      console.warn(
+        "[TARBIYAH THEME] Preferensi tidak dikenal:",
+        theme
+      );
+      return false;
+    }
+
+    const previousPreference = state.preference;
+    const previousActiveTheme = state.activeTheme;
+
+    const activeTheme = resolveTheme(preference);
+
+    state.preference = preference;
+    state.activeTheme = activeTheme;
+
+    ROOT.setAttribute("data-theme", activeTheme);
+    ROOT.dataset.themePreference = preference;
+
+    if (document.body) {
+      document.body.setAttribute("data-theme", activeTheme);
+    }
+
+    updateBrowserThemeColor(activeTheme);
+    updateThemeControls();
+
+    if (options.persist !== false) {
+      writeStorage(preference);
+    }
+
+    if (
+      previousPreference !== preference ||
+      previousActiveTheme !== activeTheme
+    ) {
+      emit("tarbiyah:theme-changed", {
+        preference,
+        activeTheme,
+        previousPreference,
+        previousActiveTheme
+      });
+    }
+
+    return true;
+  }
+
+  /* ==========================================================
+     API PERGANTIAN TEMA
   ========================================================== */
 
   function setTheme(theme) {
@@ -323,11 +250,11 @@
   }
 
   function changeTheme() {
-    const nextTheme = state.activeTheme === "dark"
+    const next = state.activeTheme === "dark"
       ? "light"
       : "dark";
 
-    return setTheme(nextTheme);
+    return applyTheme(next);
   }
 
   function toggleTheme() {
@@ -335,7 +262,7 @@
   }
 
   function setSystemTheme() {
-    return setTheme("system");
+    return applyTheme("system");
   }
 
   function getTheme() {
@@ -347,146 +274,141 @@
   }
 
   /* ==========================================================
-     10. DETEKSI PERUBAHAN TEMA PERANGKAT
+     EVENT TOMBOL UNIVERSAL
+     HANYA theme-manager.js yang memasang event ini.
   ========================================================== */
 
-  function bindSystemTheme() {
-    if (!window.matchMedia) return;
+  function bindThemeControls() {
+    if (state.controlsBound) return;
 
-    state.systemMedia = window.matchMedia(
-      "(prefers-color-scheme: light)"
-    );
+    document.addEventListener("click", function (event) {
+      const target = event.target;
 
-    const handleChange = () => {
-      if (state.preference === "system") {
-        applyTheme("system", {
-          persist: false
-        });
-      }
-    };
+      if (!(target instanceof Element)) return;
 
-    if (typeof state.systemMedia.addEventListener === "function") {
-      state.systemMedia.addEventListener(
-        "change",
-        handleChange
-      );
-    } else if (typeof state.systemMedia.addListener === "function") {
-      state.systemMedia.addListener(handleChange);
-    }
-  }
+      const toggle = target.closest(TOGGLE_SELECTOR);
 
-  /* ==========================================================
-     11. EVENT KONTROL TEMA
-  ========================================================== */
-
- function bindThemeControls() {
-
-  // Jangan memasang listener lebih dari satu kali
-  if (state.themeControlsBound) {
-    return;
-  }
-
-  document.addEventListener("click", function (event) {
-
-    const target = event.target;
-
-    if (!(target instanceof Element)) {
-      return;
-    }
-
-    const toggle = target.closest(
-      CONFIG.selectors.toggle
-    );
-
-    if (toggle) {
-      event.preventDefault();
-
-      changeTheme();
-
-      return;
-    }
-
-    const option = target.closest(
-      CONFIG.selectors.option
-    );
-
-    if (option) {
-      event.preventDefault();
-
-      const theme = option.dataset.themeOption;
-
-      if (normalizeTheme(theme)) {
-        setTheme(theme);
-      }
-    }
-
-  });
-
-  state.themeControlsBound = true;
-
-  console.info(
-    "[TARBIYAH THEME] Event tombol tema berhasil dipasang."
-  );
-} 
-
-  /* ==========================================================
-     12. SINKRONISASI ANTAR-TAB
-  ========================================================== */
-
-  function bindStorageSync() {
-    window.addEventListener("storage", event => {
-      if (event.key !== CONFIG.storageKey) {
+      if (toggle) {
+        event.preventDefault();
+        changeTheme();
         return;
       }
 
-      const theme = normalizeTheme(event.newValue);
+      const option = target.closest(OPTION_SELECTOR);
 
-      if (theme) {
-        applyTheme(theme, {
-          persist: false
-        });
+      if (option) {
+        event.preventDefault();
+
+        const selectedTheme = normalizeTheme(
+          option.dataset.themeOption
+        );
+
+        if (selectedTheme) {
+          applyTheme(selectedTheme);
+        }
       }
     });
+
+    state.controlsBound = true;
+
+    console.info(
+      "[TARBIYAH THEME] Kontrol universal berhasil dipasang."
+    );
   }
 
   /* ==========================================================
-     13. INISIALISASI
+     DETEKSI TEMA PERANGKAT
   ========================================================== */
 
-  function initialize(options) {
-    if (state.initialized && !(options?.force)) {
-      return getTheme();
+  function bindSystemTheme() {
+    if (state.systemBound || !window.matchMedia) return;
+
+    state.mediaQuery = window.matchMedia(
+      "(prefers-color-scheme: light)"
+    );
+
+    const handleSystemChange = function () {
+      if (state.preference === "system") {
+        applyTheme("system", { persist: false });
+      }
+    };
+
+    if (
+      typeof state.mediaQuery.addEventListener === "function"
+    ) {
+      state.mediaQuery.addEventListener(
+        "change",
+        handleSystemChange
+      );
+    } else if (
+      typeof state.mediaQuery.addListener === "function"
+    ) {
+      state.mediaQuery.addListener(handleSystemChange);
     }
 
-    const preference = readPreference();
+    state.systemBound = true;
+  }
 
-    applyTheme(preference, {
-      persist: false
+  /* ==========================================================
+     SINKRONISASI ANTAR-TAB
+  ========================================================== */
+
+  function bindStorageSync() {
+    if (state.storageBound) return;
+
+    window.addEventListener("storage", function (event) {
+      if (event.key !== STORAGE_KEY) return;
+
+      const preference = normalizeTheme(event.newValue);
+
+      if (preference) {
+        applyTheme(preference, { persist: false });
+      }
     });
 
-    bindSystemTheme();
+    state.storageBound = true;
+  }
+
+  /* ==========================================================
+     INISIALISASI
+  ========================================================== */
+
+  function initialize(options = {}) {
+    if (state.initialized && !options.force) {
+      return state.activeTheme;
+    }
+
+    const saved = normalizeTheme(readStorage());
+    const preference = saved || "dark";
+
+    applyTheme(preference, { persist: false });
+
     bindThemeControls();
+    bindSystemTheme();
     bindStorageSync();
 
     state.initialized = true;
 
-    dispatch("tarbiyah:theme-ready", {
+    emit("tarbiyah:theme-ready", {
       preference: state.preference,
       activeTheme: state.activeTheme
     });
 
-    return getTheme();
+    console.info(
+      `[TARBIYAH THEME] Universal Manager aktif — v${VERSION}`
+    );
+
+    return state.activeTheme;
   }
 
   /* ==========================================================
-     14. API PUBLIK
+     API PUBLIK
   ========================================================== */
 
   const API = {
     version: VERSION,
 
     initialize,
-
     setTheme,
     changeTheme,
     toggleTheme,
@@ -508,17 +430,12 @@
     }
   };
 
-  /* ==========================================================
-     15. ALIAS GLOBAL
-     Mendukung integrasi dengan module-shell.js.
-  ========================================================== */
-
   window.TARBIYAH_THEME_MANAGER = API;
   window.TARBIYAH_THEME = API;
   window.ThemeManager = API;
 
   /* ==========================================================
-     16. AUTO INITIALIZATION
+     AUTO START
   ========================================================== */
 
   function start() {
@@ -534,9 +451,5 @@
   } else {
     start();
   }
-
-  console.info(
-    `[TARBIYAH THEME] Aktif — v${VERSION}`
-  );
 
 })(window, document);
