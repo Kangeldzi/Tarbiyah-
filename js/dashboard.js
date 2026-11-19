@@ -853,65 +853,50 @@
   }
 
   function renderUserIdentity(user) {
-    const name = getUserDisplayName(user);
-    const initials = getInitials(name);
+  const name = getUserDisplayName(user);
 
-    setTextForSelectors(
-      [
-        "#userName",
-        "#sidebarName",
-        "[data-user-name]",
-        "[data-sidebar-user-name]"
-      ],
-      name
-    );
+  // Nama pengguna pada Header dan Sidebar.
+  setTextForSelectors(
+    [
+      "#userName",
+      "#sidebarName",
+      "[data-user-name]",
+      "[data-sidebar-user-name]"
+    ],
+    name
+  );
 
-    setTextForSelectors(
-      [
-        "#welcomeTitle",
-        "[data-greeting-name]"
-      ],
-      name
-    );
+  // Nama pada sapaan Dashboard.
+  const welcome = byId("welcomeTitle");
 
-    setTextForSelectors(
-      [
-        "#userAvatar",
-        "#sidebarAvatar",
-        "[data-user-avatar]",
-        "[data-sidebar-avatar]"
-      ],
-      initials
-    );
-
-    const emailElements = $$(
-      "[data-user-email], #userEmail"
-    );
-
-    emailElements.forEach(element => {
-      element.textContent = user.email || "";
-    });
-
-    const welcome = byId("welcomeTitle");
-
-    if (
-      welcome &&
-      welcome.tagName !== "INPUT"
-    ) {
-      welcome.textContent =
-        `Assalamu’alaikum, ${name}`;
-    }
-
-    const greeting = $("[data-greeting-name]");
-
-    if (greeting) {
-      greeting.textContent = name;
-    }
-
-    document.body.classList.remove("auth-pending");
-
-    return name;
+  if (welcome) {
+    welcome.textContent = `Assalamu’alaikum, ${name}`;
   }
+
+  const greeting = $("[data-greeting-name]");
+
+  if (greeting) {
+    greeting.textContent = name;
+  }
+
+  // Email pengguna.
+  const emailElements = $$(
+    "[data-user-email], #userEmail"
+  );
+
+  emailElements.forEach(element => {
+    element.textContent = user.email || "";
+  });
+
+  // PENTING:
+  // Jangan mengubah isi elemen avatar di sini.
+  // Foto profil sepenuhnya ditangani oleh
+  // dashboard-profile-avatar.js.
+
+  document.body.classList.remove("auth-pending");
+
+  return name;
+}
 
   /* ==========================================================
      10. MENU ACCESS
