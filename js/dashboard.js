@@ -275,30 +275,36 @@
   };
 
   const ROLE_INFO = {
-    super_admin: {
-      label: "SUPER ADMIN",
-      description: "Super Administrator",
-      admin: true
-    },
+  super_admin: {
+    label: "SUPER ADMIN",
+    description: "Super Administrator",
+    admin: true
+  },
 
-    admin: {
-      label: "ADMIN",
-      description: "Administrator TARBIYAH",
-      admin: true
-    },
+  admin: {
+    label: "ADMIN",
+    description: "Administrator TARBIYAH",
+    admin: true
+  },
 
-    member: {
-      label: "ANGGOTA",
-      description: "Anggota TARBIYAH",
-      admin: false
-    },
+  mentor: {
+    label: "MENTOR",
+    description: "Pembina Anggota TARBIYAH",
+    admin: false
+  },
 
-    registered_user: {
-      label: "PENGGUNA TERDAFTAR",
-      description: "Pengguna Terdaftar",
-      admin: false
-    }
-  };
+  member: {
+    label: "ANGGOTA",
+    description: "Anggota TARBIYAH",
+    admin: false
+  },
+
+  registered_user: {
+    label: "PENGGUNA TERDAFTAR",
+    description: "Pengguna Terdaftar",
+    admin: false
+  }
+};
 
 
   // =====================================================
@@ -403,20 +409,16 @@
   }
 
   function selectPrimaryRole(roles) {
-    const priority = [
-      "super_admin",
-      "admin",
-      "member",
-      "registered_user"
-    ];
+  const priority = [
+    "super_admin",
+    "admin",
+    "mentor",
+    "member",
+    "registered_user"
+  ];
 
-    return (
-      priority.find((role) =>
-        roles.includes(role)
-      ) || null
-    );
-  }
-
+  return priority.find(role => roles.includes(role)) || null;
+}
 
   // =====================================================
   // RENDER USER ROLE
