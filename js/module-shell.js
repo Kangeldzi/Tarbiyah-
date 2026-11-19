@@ -1,120 +1,35 @@
-
-/* =========================================================
+/* ============================================================
    TARBIYAH — MODULE SHELL
-   File: js/module-shell.js
+   File    : js/module-shell.js
+   Versi   : 2.0.0
 
-   Pengelola:
+   Tanggung jawab:
    - Sidebar desktop dan mobile
    - Overlay sidebar
-   - Navigasi modul
-   - Navigasi bawah mobile
-   - Dropdown pengguna
-   - Pencarian navigasi
-   - Mode terang / gelap
-   - Penanda halaman aktif
-   - Integrasi dengan theme-manager.js
+   - Navigasi aktif
+   - Menu pengguna
+   - Pengaturan tema
+   - Keyboard Escape
+   - Kompatibilitas beberapa selector versi sebelumnya
 
-   ========================================================= */
+   Tidak mengelola:
+   - Autentikasi Supabase
+   - Pembacaan role
+   - Data anggota
+   - Carousel dashboard
+============================================================ */
 
-(function () {
+(() => {
   "use strict";
 
-  if (window.__TARBIYAH_MODULE_SHELL_INITIALIZED__) return;
-  window.__TARBIYAH_MODULE_SHELL_INITIALIZED__ = true;
+  if (window.__TARBIYAH_MODULE_SHELL_V2__) {
+    console.info("[TARBIYAH SHELL] Sudah diinisialisasi.");
+    return;
+  }
 
-  /* =======================================================
-     1. KONFIGURASI
-     ======================================================= */
+  window.__TARBIYAH_MODULE_SHELL_V2__ = true;
 
-  const CONFIG = {
-    mobileBreakpoint: 900,
-
-    /*
-     * theme-manager.js menjadi pengelola tema utama.
-     * module-shell.js hanya meminta perubahan tema melalui
-     * API yang tersedia dan tidak membuat penyimpanan kedua.
-     */
-    themeAttribute: "data-theme",
-
-    routes: {
-      dashboard: "./dashboard.html",
-      profil: "./profil-anggota.html",
-      agenda: "./agenda-tarbiyah.html",
-      pembelajaran: "./pembelajaran.html",
-      materi: "./materi-pembelajaran.html",
-      berita: "./berita-pengumuman.html",
-      presensi: "./presensi-tarbiyah.html",
-      galeri: "./galeri-foto-video.html",
-      diskusi: "./diskusi-tarbiyah.html",
-      donasi: "./donasi-infaq.html",
-      kehadiran: "./kehadiran.html",
-      catatan: "./catatan-refleksi.html",
-      notifikasi: "./notifikasi.html",
-      riwayat: "./riwayat-aktivitas.html",
-      administrasi: "./administrasi-pengaturan.html"
-    },
-
-    selectors: {
-      sidebar: [
-        "#appSidebar",
-        "#sidebar",
-        ".app-sidebar"
-      ],
-
-      overlay: [
-        "#sidebarScrim",
-        "#sidebarOverlay",
-        ".sidebar-overlay"
-      ],
-
-      menuToggle: [
-        "#menuOpen",
-        "#menuToggle",
-        "#sidebarToggle",
-        "[data-sidebar-toggle]"
-      ],
-
-      sidebarClose: [
-        "#menuClose",
-        "#sidebarClose",
-        "[data-sidebar-close]"
-      ],
-          
-      userMenu: [
-        "#userDropdown",
-        "#userMenu",
-        ".user-dropdown"
-      ],
-
-      userMenuToggle: [
-        "#userMenuToggle",
-        "[data-user-menu-toggle]"
-      ],
-
-      search: [
-        "#sidebarSearch",
-        "[data-sidebar-search]"
-      ],
-
-      themeToggle: [
-        "#btnTheme",
-        "#themeToggle",
-        "[data-theme-toggle]"
-      ]
-    }
-  };
-
-  const state = {
-    sidebarOpen: false,
-    userMenuOpen: false,
-    searchValue: "",
-    currentPage: null,
-    resizeTimer: null
-  };
-
-  /* =======================================================
-     2. UTILITAS DOM
-     ======================================================= */
+  const VERSION = "2.0.0";
 
   const $ = (selector, root = document) =>
     root.querySelector(selector);
@@ -122,143 +37,187 @@
   const $$ = (selector, root = document) =>
     Array.from(root.querySelectorAll(selector));
 
-  function firstElement(selectors) {
+  const CONFIG = {
+    mobileBreakpoint: 900,
+
+    selectors: {
+      sidebar: [
+        "#appSidebar",
+        "#sidebar",
+        "[data-sidebar]",
+        ".app-sidebar"
+      ],
+
+      overlay: [
+        "#sidebarScrim",
+        "#sidebarOverlay",
+        "[data-sidebar-overlay]",
+        ".sidebar-scrim",
+        ".sidebar-overlay"
+      ],
+
+      openButton: [
+        "#menuOpen",
+        "#menuToggle",
+        "[data-sidebar-toggle]",
+        ".sidebar-toggle"
+      ],
+
+      closeButton: [
+        "#menuClose",
+        "#sidebarClose",
+        "[data-sidebar-close]",
+        ".sidebar-close"
+      ],
+
+      themeButton: [
+        "#btnTheme",
+        "#themeToggle",
+        "[data-theme-toggle]"
+      ],
+
+      userMenuButton: [
+        "#userMenuToggle",
+        "[data-user-menu-toggle]"
+      ],
+
+      userMenuPanel: [
+        "#userMenu",
+        "[data-user-menu-panel]"
+      ],
+
+      shell: [
+        ".app-layout",
+        ".app-shell",
+        ".dashboard-layout",
+        "[data-app-shell]"
+      ]
+    }
+  };
+
+  const state = {
+    initialized: false,
+    sidebarOpen: false,
+    userMenuOpen: false,
+    desktopCollapsed: false
+  };
+
+  function first(selectors) {
     for (const selector of selectors) {
       const element = $(selector);
-
       if (element) return element;
     }
 
     return null;
   }
 
-  function allElements(selectors) {
-    return selectors.flatMap(selector => $$(selector));
-  }
+  function all(selectors) {
+    const found = [];
 
-  function log(...args) {
-    console.log("[TARBIYAH SHELL]", ...args);
+    selectors.forEach(selector => {
+      $$(selector).forEach(element => {
+        if (!found.includes(element)) {
+          found.push(element);
+        }
+      });
+    });
+
+    return found;
   }
 
   function isMobile() {
-    return window.matchMedia(
-      `(max-width: ${CONFIG.mobileBreakpoint}px)`
-    ).matches;
+    return window.matchMedia
+      ? window.matchMedia(
+          `(max-width: ${CONFIG.mobileBreakpoint}px)`
+        ).matches
+      : window.innerWidth <= CONFIG.mobileBreakpoint;
   }
-
-  function normalizePath(path) {
-    if (!path) return "";
-
-    try {
-      const url = new URL(path, window.location.href);
-
-      return url.pathname
-        .split("/")
-        .filter(Boolean)
-        .pop()
-        ?.toLowerCase() || "";
-    } catch {
-      return String(path)
-        .split("?")[0]
-        .split("/")
-        .pop()
-        .toLowerCase();
-    }
-  }
-
-  function getCurrentFilename() {
-    return normalizePath(window.location.pathname);
-  }
-
-  function setAriaExpanded(element, expanded) {
-    if (!element) return;
-
-    element.setAttribute(
-      "aria-expanded",
-      expanded ? "true" : "false"
-    );
-  }
-
-  /* =======================================================
-     3. SIDEBAR
-     ======================================================= */
 
   function getSidebar() {
-    return firstElement(CONFIG.selectors.sidebar);
+    return first(CONFIG.selectors.sidebar);
   }
 
   function getOverlay() {
-    return firstElement(CONFIG.selectors.overlay);
+    return first(CONFIG.selectors.overlay);
   }
 
-  function getMenuToggle() {
-    return firstElement(CONFIG.selectors.menuToggle);
+  function getShell() {
+    return first(CONFIG.selectors.shell);
   }
+
+  function setExpanded(buttons, expanded) {
+    buttons.forEach(button => {
+      button.setAttribute(
+        "aria-expanded",
+        String(Boolean(expanded))
+      );
+    });
+  }
+
+  /* ==========================================================
+     01. SIDEBAR MOBILE
+  ========================================================== */
 
   function openSidebar() {
     const sidebar = getSidebar();
     const overlay = getOverlay();
-    const toggle = getMenuToggle();
 
     if (!sidebar) {
-      warnMissingSidebar();
+      console.warn(
+        "[TARBIYAH SHELL] Elemen sidebar tidak ditemukan."
+      );
       return;
     }
 
     state.sidebarOpen = true;
 
-    sidebar.classList.add("is-open", "open", "active");
-
+    sidebar.classList.add("open", "is-open");
     sidebar.setAttribute("aria-hidden", "false");
 
     if (overlay) {
       overlay.hidden = false;
-      overlay.classList.add("is-visible", "active", "show");
+      overlay.classList.add("show", "active", "is-visible");
       overlay.setAttribute("aria-hidden", "false");
     }
 
-    document.body.classList.add("sidebar-open");
+    setExpanded(
+      all(CONFIG.selectors.openButton),
+      true
+    );
 
-    setAriaExpanded(toggle, true);
-
-    if (isMobile()) {
-      document.body.style.overflow = "hidden";
-    }
+    document.body.classList.add("menu-open");
+    document.documentElement.classList.add("sidebar-open");
   }
 
   function closeSidebar() {
     const sidebar = getSidebar();
     const overlay = getOverlay();
-    const toggle = getMenuToggle();
 
     state.sidebarOpen = false;
 
     if (sidebar) {
-      sidebar.classList.remove(
-        "is-open",
-        "open",
-        "active"
-      );
-
+      sidebar.classList.remove("open", "is-open");
       sidebar.setAttribute("aria-hidden", "true");
     }
 
     if (overlay) {
       overlay.classList.remove(
-        "is-visible",
+        "show",
         "active",
-        "show"
+        "is-visible"
       );
 
       overlay.setAttribute("aria-hidden", "true");
       overlay.hidden = true;
     }
 
-    document.body.classList.remove("sidebar-open");
+    setExpanded(
+      all(CONFIG.selectors.openButton),
+      false
+    );
 
-    document.body.style.removeProperty("overflow");
-
-    setAriaExpanded(toggle, false);
+    document.body.classList.remove("menu-open");
+    document.documentElement.classList.remove("sidebar-open");
   }
 
   function toggleSidebar() {
@@ -269,673 +228,485 @@
     }
   }
 
-  function warnMissingSidebar() {
-    log(
-      "Sidebar tidak ditemukan. Pastikan HTML menggunakan",
-      ".app-sidebar atau #appSidebar."
-    );
+  function bindSidebar() {
+    all(CONFIG.selectors.openButton).forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        toggleSidebar();
+      });
+    });
+
+    all(CONFIG.selectors.closeButton).forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        closeSidebar();
+      });
+    });
+
+    const overlay = getOverlay();
+
+    overlay?.addEventListener("click", closeSidebar);
+
+    const sidebar = getSidebar();
+
+    sidebar?.addEventListener("click", event => {
+      const link = event.target.closest("a");
+
+      if (link && isMobile()) {
+        closeSidebar();
+      }
+    });
   }
 
-  /* =======================================================
-     4. SIDEBAR DESKTOP COLLAPSE
-     ======================================================= */
+  /* ==========================================================
+     02. SIDEBAR DESKTOP COLLAPSE
+  ========================================================== */
 
-  function toggleSidebarCollapse() {
+  function toggleDesktopSidebar() {
     if (isMobile()) {
       toggleSidebar();
       return;
     }
 
-    const shell =
-      $(".app-shell") ||
-      $(".dashboard-layout") ||
-      document.body;
+    const shell = getShell();
 
-    const collapsed =
-      shell.classList.toggle("sidebar-collapsed");
+    if (!shell) return;
+
+    state.desktopCollapsed = !state.desktopCollapsed;
+
+    shell.classList.toggle(
+      "sidebar-collapsed",
+      state.desktopCollapsed
+    );
 
     document.body.classList.toggle(
       "sidebar-collapsed",
-      collapsed
+      state.desktopCollapsed
     );
+  }
 
-    const buttons = allElements([
-      "[data-sidebar-collapse]",
-      "#sidebarCollapse"
-    ]);
+  function bindDesktopCollapse() {
+    const buttons = $$(
+      "#sidebarCollapse, [data-sidebar-collapse]"
+    );
 
     buttons.forEach(button => {
-      setAriaExpanded(button, !collapsed);
-      button.setAttribute(
-        "aria-label",
-        collapsed
-          ? "Perluas sidebar"
-          : "Ciutkan sidebar"
-      );
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        toggleDesktopSidebar();
+      });
     });
   }
 
-  /* =======================================================
-     5. USER DROPDOWN
-     ======================================================= */
-
-  function getUserMenu() {
-    return firstElement(CONFIG.selectors.userMenu);
-  }
-
-  function getUserMenuToggle() {
-    return firstElement(CONFIG.selectors.userMenuToggle);
-  }
-
-  function openUserMenu() {
-    const menu = getUserMenu();
-    const toggle = getUserMenuToggle();
-
-    if (!menu) return;
-
-    state.userMenuOpen = true;
-
-    menu.classList.add("is-open", "open", "show");
-    menu.setAttribute("aria-hidden", "false");
-
-    setAriaExpanded(toggle, true);
-  }
-
-  function closeUserMenu() {
-    const menu = getUserMenu();
-    const toggle = getUserMenuToggle();
-
-    state.userMenuOpen = false;
-
-    if (menu) {
-      menu.classList.remove(
-        "is-open",
-        "open",
-        "show"
-      );
-
-      menu.setAttribute("aria-hidden", "true");
-    }
-
-    setAriaExpanded(toggle, false);
-  }
-
-  function toggleUserMenu() {
-    if (state.userMenuOpen) {
-      closeUserMenu();
-    } else {
-      openUserMenu();
-    }
-  }
-
-  /* =======================================================
-     6. NAVIGASI HALAMAN
-     ======================================================= */
-
-  const ROUTE_ALIASES = {
-    "dashboard.html": "dashboard",
-    "tarbiyah.html": "dashboard",
-
-    "profil-anggota.html": "profil",
-
-    "agenda-tarbiyah.html": "agenda",
-
-    "pembelajaran.html": "pembelajaran",
-
-    "materi-pembelajaran.html": "materi",
-
-    "berita-pengumuman.html": "berita",
-
-    "presensi-tarbiyah.html": "presensi",
-
-    "galeri-foto-video.html": "galeri",
-
-    "diskusi-tarbiyah.html": "diskusi",
-
-    "donasi-infaq.html": "donasi",
-
-    "kehadiran.html": "kehadiran",
-
-    "catatan-refleksi.html": "catatan",
-
-    "notifikasi.html": "notifikasi",
-
-    "riwayat-aktivitas.html": "riwayat",
-
-    "administrasi-pengaturan.html": "administrasi"
-  };
-
-  function getPageKeyFromFilename(filename) {
-    return ROUTE_ALIASES[filename] || null;
-  }
-
-  function getPageKeyFromElement(element) {
-    if (!element) return null;
-
-    const directKey =
-      element.dataset.module ||
-      element.dataset.page ||
-      element.dataset.route;
-
-    if (directKey && CONFIG.routes[directKey]) {
-      return directKey;
-    }
-
-    const href =
-      element.getAttribute("href") ||
-      element.dataset.href;
-
-    if (!href || href === "#") return null;
-
-    const filename = normalizePath(href);
-
-    return getPageKeyFromFilename(filename);
-  }
-
-  function navigateTo(pageKey) {
-    if (!pageKey || !CONFIG.routes[pageKey]) {
-      warnInvalidRoute(pageKey);
-      return;
-    }
-
-    const target = CONFIG.routes[pageKey];
-
-    if (
-      normalizePath(target) === getCurrentFilename()
-    ) {
-      closeSidebar();
-      closeUserMenu();
-      return;
-    }
-
-    window.location.assign(target);
-  }
-
-  function warnInvalidRoute(pageKey) {
-    console.warn(
-      "[TARBIYAH SHELL] Rute tidak dikenal:",
-      pageKey
-    );
-  }
-
-  function handleNavigationClick(event) {
-  const navLink = event.target.closest(
-    'a[data-module], a[data-page], a[data-route], a[data-nav-link], ' +
-    'button[data-module], button[data-page], button[data-route], button[data-nav-link]'
-  );
-
-  if (!navLink) return;
-
-  if (
-    navLink.tagName === "A" &&
-    navLink.getAttribute("href") &&
-    navLink.getAttribute("href") !== "#"
-  ) {
-    return;
-  }
-
-  const moduleName =
-    navLink.dataset.module ||
-    navLink.dataset.page ||
-    navLink.dataset.route;
-
-  if (!moduleName) return;
-
-  event.preventDefault();
-
-  if (
-    window.TARBIYAH_MODULES &&
-    typeof window.TARBIYAH_MODULES.navigate === "function"
-  ) {
-    window.TARBIYAH_MODULE.navigate(moduleName);
-  }
-     
-
-if (moduleAPI && typeof moduleAPI.navigate === "function") {
-  moduleAPI.navigate(moduleName);
-} else {
-  console.error(
-    "[TARBIYAH SHELL] API navigasi modul tidak tersedia."
-  );
-}
-  /* =======================================================
-     7. PENANDA MENU AKTIF
-     ======================================================= */
-
-  function markActiveNavigation() {
-    const filename = getCurrentFilename();
-
-    const pageKey =
-      getPageKeyFromFilename(filename);
-
-    state.currentPage = pageKey;
-
-    const navigationItems = $$(
-      [
-        "[data-module]",
-        "[data-page]",
-        "[data-route]",
-        "[data-nav-link]"
-      ].join(",")
-    );
-
-    navigationItems.forEach(item => {
-      const itemKey = getPageKeyFromElement(item);
-
-      const active = Boolean(
-        pageKey && itemKey === pageKey
-      );
-
-      item.classList.toggle("active", active);
-      item.classList.toggle("is-active", active);
-
-      if (active) {
-        item.setAttribute("aria-current", "page");
-      } else {
-        item.removeAttribute("aria-current");
-      }
-    });
-  }
-
-  /* =======================================================
-     8. PENCARIAN MENU SIDEBAR
-     ======================================================= */
-
-  function getSearchInput() {
-    return firstElement(CONFIG.selectors.search);
-  }
-
-  function getNavigationGroups() {
-    const sidebar = getSidebar();
-
-    if (!sidebar) return [];
-
-    return [
-      ...$$("[data-nav-item]", sidebar),
-      ...$$(".sidebar-nav-item", sidebar),
-      ...$$(".nav-item", sidebar)
-    ];
-  }
-
-  function searchNavigation(query) {
-    const normalized = String(query || "")
-      .trim()
-      .toLowerCase();
-
-    state.searchValue = normalized;
-
-    const items = getNavigationGroups();
-
-    items.forEach(item => {
-      const text = (
-        item.textContent ||
-        item.dataset.search ||
-        ""
-      ).toLowerCase();
-
-      const matches =
-        !normalized || text.includes(normalized);
-
-      item.hidden = !matches;
-      item.classList.toggle(
-        "search-hidden",
-        !matches
-      );
-    });
-
-    const emptyState = $(
-      "[data-sidebar-search-empty]"
-    );
-
-    if (emptyState) {
-      const visibleItems = items.filter(
-        item => !item.hidden
-      );
-
-      emptyState.hidden =
-        !normalized || visibleItems.length > 0;
-    }
-  }
-
-  function clearNavigationSearch() {
-    const input = getSearchInput();
-
-    if (input) input.value = "";
-
-    searchNavigation("");
-  }
-
-  /* =======================================================
-     9. MODE TEMA
-     ======================================================= */
+  /* ==========================================================
+     03. THEME MANAGER
+  ========================================================== */
 
   function getThemeManager() {
-    return window.TARBIYAH_THEME ||
+    return (
       window.TARBIYAH_THEME_MANAGER ||
+      window.TARBIYAH_THEME ||
       window.ThemeManager ||
-      null;
+      null
+    );
   }
 
   function getCurrentTheme() {
-    return document.documentElement.getAttribute(
-      CONFIG.themeAttribute
-    ) || "dark";
-  }
-
-  function applyThemeThroughManager(theme) {
     const manager = getThemeManager();
 
-    if (!manager) {
-      /*
-       * Fallback visual saja.
-       * Penyimpanan preferensi tetap menjadi tanggung
-       * jawab theme-manager.js.
-       */
-      document.documentElement.setAttribute(
-        CONFIG.themeAttribute,
-        theme
-      );
+    try {
+      if (typeof manager?.getTheme === "function") {
+        return manager.getTheme();
+      }
 
-      return;
+      if (typeof manager?.get === "function") {
+        return manager.get();
+      }
+    } catch (error) {
+      console.warn(
+        "[TARBIYAH SHELL] Gagal membaca tema:",
+        error
+      );
     }
 
-    const methods = [
-      "setTheme",
-      "changeTheme",
-      "applyTheme"
-    ];
+    return (
+      document.documentElement.dataset.theme ||
+      "dark"
+    );
+  }
 
-    for (const method of methods) {
-      if (typeof manager[method] === "function") {
-        manager[method](theme);
+  function applyFallbackTheme(nextTheme) {
+    const theme =
+      nextTheme === "light" ? "light" : "dark";
+
+    document.documentElement.dataset.theme = theme;
+
+    document.body?.setAttribute(
+      "data-theme",
+      theme
+    );
+
+    const metaTheme = $(
+      'meta[name="theme-color"]'
+    );
+
+    if (metaTheme) {
+      metaTheme.content =
+        theme === "dark" ? "#102a22" : "#f4faf7";
+    }
+  }
+
+  function changeTheme() {
+    const manager = getThemeManager();
+
+    try {
+      if (typeof manager?.toggleTheme === "function") {
+        manager.toggleTheme();
         return;
       }
+
+      if (typeof manager?.changeTheme === "function") {
+        manager.changeTheme();
+        return;
+      }
+
+      const current = getCurrentTheme();
+      const next = current === "dark" ? "light" : "dark";
+
+      if (typeof manager?.setTheme === "function") {
+        manager.setTheme(next);
+        return;
+      }
+
+      if (typeof manager?.set === "function") {
+        manager.set(next);
+        return;
+      }
+
+      applyFallbackTheme(next);
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH SHELL] Gagal mengganti tema:",
+        error
+      );
     }
-
-    warnThemeManagerMethod();
   }
 
-  function warnThemeManagerMethod() {
-    log(
-      "Theme manager tersedia tetapi tidak memiliki",
-      "API setTheme/changeTheme/applyTheme."
-    );
-  }
+  function updateThemeButtons() {
+    const theme = getCurrentTheme();
 
-  function toggleTheme() {
-    const current = getCurrentTheme();
-
-    const next =
-      current === "light"
-        ? "dark"
-        : "light";
-
-    applyThemeThroughManager(next);
-
-    updateThemeButtons(next);
-  }
-
-  function updateThemeButtons(theme = getCurrentTheme()) {
-    const buttons = allElements(
-      CONFIG.selectors.themeToggle
-    );
-
-    buttons.forEach(button => {
-      const isLight = theme === "light";
-
+    all(CONFIG.selectors.themeButton).forEach(button => {
       button.setAttribute(
         "aria-label",
-        isLight
-          ? "Aktifkan mode gelap"
-          : "Aktifkan mode terang"
+        theme === "dark"
+          ? "Aktifkan tema terang"
+          : "Aktifkan tema gelap"
       );
 
       button.setAttribute(
-        "aria-pressed",
-        isLight ? "true" : "false"
+        "title",
+        theme === "dark"
+          ? "Tema terang"
+          : "Tema gelap"
       );
 
-      const icon = $(
-        "[data-theme-icon]",
-        button
-      );
-
-      if (icon) {
-        icon.textContent = isLight ? "☀️" : "🌙";
-      }
-
-      const label = $(
-        "[data-theme-label]",
-        button
-      );
-
-      if (label) {
-        label.textContent = isLight
-          ? "Mode Terang"
-          : "Mode Gelap";
-      }
+      button.dataset.currentTheme = theme;
     });
   }
 
-  /* =======================================================
-     10. RESPONSIVE STATE
-     ======================================================= */
+  function bindTheme() {
+    all(CONFIG.selectors.themeButton).forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        changeTheme();
 
-  function handleResize() {
-    if (state.resizeTimer) {
-      clearTimeout(state.resizeTimer);
-    }
-
-    state.resizeTimer = setTimeout(() => {
-      if (!isMobile()) {
-        closeSidebar();
-      }
-
-      state.resizeTimer = null;
-    }, 120);
-  }
-
-  /* =======================================================
-     11. EVENT BINDING
-     ======================================================= */
-
-  function bindSidebarEvents() {
-    allElements(CONFIG.selectors.menuToggle)
-      .forEach(button => {
-        button.addEventListener("click", event => {
-          event.preventDefault();
-          toggleSidebar();
-        });
+        window.setTimeout(
+          updateThemeButtons,
+          50
+        );
       });
-
-    allElements(CONFIG.selectors.sidebarClose)
-      .forEach(button => {
-        button.addEventListener("click", event => {
-          event.preventDefault();
-          closeSidebar();
-        });
-      });
-
-    const overlay = getOverlay();
-
-    if (overlay) {
-      overlay.addEventListener("click", closeSidebar);
-    }
-
-    const collapseButtons = allElements([
-      "[data-sidebar-collapse]",
-      "#sidebarCollapse"
-    ]);
-
-    collapseButtons.forEach(button => {
-      button.addEventListener(
-        "click",
-        toggleSidebarCollapse
-      );
     });
+
+    const observer = new MutationObserver(() => {
+      updateThemeButtons();
+    });
+
+    observer.observe(
+      document.documentElement,
+      {
+        attributes: true,
+        attributeFilter: ["data-theme"]
+      }
+    );
+
+    updateThemeButtons();
   }
 
-  function bindUserMenuEvents() {
-    allElements(CONFIG.selectors.userMenuToggle)
-      .forEach(button => {
-        button.addEventListener("click", event => {
-          event.preventDefault();
-          event.stopPropagation();
+  /* ==========================================================
+     04. USER MENU
+  ========================================================== */
 
-          toggleUserMenu();
-        });
-      });
+  function getUserMenuButton() {
+    return first(CONFIG.selectors.userMenuButton);
+  }
+
+  function getUserMenuPanel() {
+    return first(CONFIG.selectors.userMenuPanel);
+  }
+
+  function closeUserMenu() {
+    const button = getUserMenuButton();
+    const panel = getUserMenuPanel();
+
+    state.userMenuOpen = false;
+
+    if (button) {
+      button.setAttribute("aria-expanded", "false");
+    }
+
+    if (panel) {
+      panel.hidden = true;
+      panel.classList.remove("show", "open");
+    }
+  }
+
+  function toggleUserMenu() {
+    const button = getUserMenuButton();
+    const panel = getUserMenuPanel();
+
+    if (!button || !panel) return;
+
+    state.userMenuOpen = !state.userMenuOpen;
+
+    panel.hidden = !state.userMenuOpen;
+
+    panel.classList.toggle(
+      "show",
+      state.userMenuOpen
+    );
+
+    panel.classList.toggle(
+      "open",
+      state.userMenuOpen
+    );
+
+    button.setAttribute(
+      "aria-expanded",
+      String(state.userMenuOpen)
+    );
+  }
+
+  function bindUserMenu() {
+    const button = getUserMenuButton();
+
+    button?.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleUserMenu();
+    });
 
     document.addEventListener("click", event => {
+      const panel = getUserMenuPanel();
+      const trigger = getUserMenuButton();
+
       if (!state.userMenuOpen) return;
 
-      const menu = getUserMenu();
-      const toggle = getUserMenuToggle();
+      if (
+        panel?.contains(event.target) ||
+        trigger?.contains(event.target)
+      ) {
+        return;
+      }
+
+      closeUserMenu();
+    });
+
+    getUserMenuPanel()?.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", closeUserMenu);
+    });
+  }
+
+  /* ==========================================================
+     05. NAVIGASI AKTIF
+  ========================================================== */
+
+  function getCurrentFileName() {
+    const path = window.location.pathname || "";
+    const parts = path.split("/").filter(Boolean);
+
+    return (
+      parts[parts.length - 1] ||
+      "dashboard.html"
+    ).toLowerCase();
+  }
+
+  function normalizeFileName(value) {
+    if (!value) return "";
+
+    try {
+      const url = new URL(value, window.location.href);
+      const parts = url.pathname.split("/").filter(Boolean);
+
+      return (
+        parts[parts.length - 1] || ""
+      ).toLowerCase();
+    } catch {
+      return String(value)
+        .split("?")[0]
+        .split("/")
+        .pop()
+        .toLowerCase();
+    }
+  }
+
+  function isDashboardFile(fileName) {
+    return [
+      "dashboard.html",
+      "tarbiyah.html",
+      "",
+      "index.html"
+    ].includes(fileName);
+  }
+
+  function markActiveNavigation() {
+    const currentFile = getCurrentFileName();
+
+    const links = $$(
+      "[data-nav-link], [data-module], .sidebar-link, .bottom-nav a, .mobile-bottom-nav a"
+    );
+
+    links.forEach(link => {
+      const href = link.getAttribute("href") || "";
+      const linkFile = normalizeFileName(href);
+
+      let active = false;
 
       if (
-        menu &&
-        !menu.contains(event.target) &&
-        !toggle?.contains(event.target)
+        isDashboardFile(currentFile) &&
+        (
+          link.dataset.module === "dashboard" ||
+          link.dataset.navLink === "dashboard" ||
+          isDashboardFile(linkFile)
+        )
       ) {
-        closeUserMenu();
+        active = true;
+      } else if (
+        linkFile &&
+        linkFile === currentFile
+      ) {
+        active = true;
+      }
+
+      link.classList.toggle("active", active);
+
+      if (active) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
       }
     });
   }
 
-  function bindNavigationEvents() {
-    document.addEventListener(
-      "click",
-      handleNavigationClick
-    );
-  }
+  /* ==========================================================
+     06. NAVIGASI MODUL
+  ========================================================== */
 
-  function bindSearchEvents() {
-    const input = getSearchInput();
-
-    if (!input) return;
-
-    input.addEventListener("input", event => {
-      searchNavigation(event.target.value);
-    });
-
-    input.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        clearNavigationSearch();
-        input.blur();
-      }
-    });
-
-    const clearButton = $(
-      "[data-sidebar-search-clear]"
-    );
-
-    if (clearButton) {
-      clearButton.addEventListener(
-        "click",
-        clearNavigationSearch
+  function bindModuleNavigation() {
+    document.addEventListener("click", event => {
+      const link = event.target.closest(
+        "[data-module], [data-nav-link]"
       );
-    }
-  }
 
-  
-function bindThemeEvents() {
+      if (!link) return;
 
-  /*
-   * Theme Manager menjadi satu-satunya pengendali
-   * pergantian Dark Mode dan Light Mode.
-   *
-   * module-shell.js hanya bertugas menyinkronkan
-   * tampilan tombol dengan tema yang sedang aktif.
-   */
+      const href = link.getAttribute("href") || "";
 
-  const observer = new MutationObserver(() => {
-    updateThemeButtons();
-  });
+      // Link dengan alamat nyata dibiarkan ditangani browser.
+      if (
+        href &&
+        href !== "#" &&
+        !href.startsWith("javascript:")
+      ) {
+        return;
+      }
 
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: [CONFIG.themeAttribute]
-  });
+      const moduleName =
+        link.dataset.module ||
+        link.dataset.navLink ||
+        "";
 
-  // Sinkronisasi tampilan tombol saat pertama kali dimuat.
-  updateThemeButtons();
-}
+      if (!moduleName) return;
 
+      const moduleAPI = window.TARBIYAH_MODULE;
 
-  function bindKeyboardEvents() {
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        closeSidebar();
-        closeUserMenu();
+      if (
+        moduleAPI &&
+        typeof moduleAPI.navigate === "function"
+      ) {
+        event.preventDefault();
+        moduleAPI.navigate(moduleName);
+      } else {
+        console.error(
+          "[TARBIYAH SHELL] API navigasi modul tidak tersedia."
+        );
       }
     });
   }
 
-  /* =======================================================
-     12. INISIALISASI
-     ======================================================= */
+  /* ==========================================================
+     07. KEYBOARD
+  ========================================================== */
+
+  function bindKeyboard() {
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+
+      closeSidebar();
+      closeUserMenu();
+    });
+  }
+
+  /* ==========================================================
+     08. RESPONSIVE
+  ========================================================== */
+
+  function bindResponsive() {
+    let previousMobileState = isMobile();
+
+    window.addEventListener("resize", () => {
+      const currentMobileState = isMobile();
+
+      if (currentMobileState !== previousMobileState) {
+        closeSidebar();
+        previousMobileState = currentMobileState;
+      }
+    });
+  }
+
+  /* ==========================================================
+     09. INITIALIZATION
+  ========================================================== */
 
   function initialize() {
-    bindSidebarEvents();
-    bindUserMenuEvents();
-    bindNavigationEvents();
-    bindSearchEvents();
-    bindThemeEvents();
-    bindKeyboardEvents();
+    if (state.initialized) return;
+
+    state.initialized = true;
+
+    bindSidebar();
+    bindDesktopCollapse();
+    bindTheme();
+    bindUserMenu();
+    bindModuleNavigation();
+    bindKeyboard();
+    bindResponsive();
 
     markActiveNavigation();
-    updateThemeButtons();
 
-    window.addEventListener(
-      "resize",
-      handleResize,
-      { passive: true }
+    console.info(
+      `[TARBIYAH SHELL] Versi ${VERSION} aktif.`
     );
-
-    log("Module shell berhasil diinisialisasi.");
   }
-
-  /* =======================================================
-     13. API PUBLIK
-     ======================================================= */
-
-  window.TARBIYAH_SHELL = {
-    initialize,
-
-    openSidebar,
-    closeSidebar,
-    toggleSidebar,
-
-    toggleSidebarCollapse,
-
-    openUserMenu,
-    closeUserMenu,
-    toggleUserMenu,
-
-    navigateTo,
-
-    markActiveNavigation,
-
-    searchNavigation,
-    clearNavigationSearch,
-
-    toggleTheme,
-    updateThemeButtons,
-
-    getState() {
-      return {
-        sidebarOpen: state.sidebarOpen,
-        userMenuOpen: state.userMenuOpen,
-        searchValue: state.searchValue,
-        currentPage: state.currentPage,
-        mobile: isMobile()
-      };
-    },
-
-    getRoutes() {
-      return { ...CONFIG.routes };
-    }
-  };
 
   if (document.readyState === "loading") {
     document.addEventListener(
@@ -946,5 +717,21 @@ function bindThemeEvents() {
   } else {
     initialize();
   }
+
+  /* ==========================================================
+     10. PUBLIC API
+  ========================================================== */
+
+  window.TARBIYAH_SHELL = Object.freeze({
+    version: VERSION,
+    initialize,
+    openSidebar,
+    closeSidebar,
+    toggleSidebar,
+    closeUserMenu,
+    markActiveNavigation,
+    updateThemeButtons,
+    isMobile
+  });
 
 })();
