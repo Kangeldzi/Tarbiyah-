@@ -490,7 +490,6 @@
     window.TARBIYAH_MODULE.navigate(moduleName);
   }
      
-const moduleAPI = window.TARBIYAH_MODULE;
 
 if (moduleAPI && typeof moduleAPI.navigate === "function") {
   moduleAPI.navigate(moduleName);
