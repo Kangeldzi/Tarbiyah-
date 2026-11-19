@@ -1,415 +1,655 @@
-
-/* =========================================================
+/* ============================================================
    TARBIYAH — DASHBOARD CONTROLLER
-   Versi integrasi:
-   - Sidebar dikendalikan module-shell.js
-   - Tema dikendalikan theme-manager.js
-   - Identitas dan role pengguna dari Supabase
-   - Carousel SVG konsisten
+   File    : js/dashboard.js
+   Versi   : 2.0.0
+
+   Tanggung jawab:
+   - Carousel dashboard
    - Pencarian menu
-   - Logout
-   - Tanggal dan tahun otomatis
-   ========================================================= */
+   - Session Supabase
+   - Pembacaan role dari user_roles -> roles(name)
+   - Identitas pengguna
+   - Penyaringan menu berdasarkan role
+   - Tombol logout
+   - Tanggal dan tahun
+
+   Role:
+   - super_admin
+   - admin
+   - mentor
+   - member
+   - registered_user
+
+   Supabase client:
+   window.tarbiyahSupabase
+
+   Tidak mengubah:
+   - Database
+   - RLS
+   - Role assignment
+   - Mentor assignment
+============================================================ */
 
 (() => {
   "use strict";
 
-  // =====================================================
-  // HELPER
-  // =====================================================
+  if (window.__TARBIYAH_DASHBOARD_V2__) {
+    console.info(
+      "[TARBIYAH DASHBOARD] Sudah diinisialisasi."
+    );
+    return;
+  }
 
-  const $ = (id) => document.getElementById(id);
+  window.__TARBIYAH_DASHBOARD_V2__ = true;
 
-  const toast = (message) => {
-    const region = $("toastRegion");
-    if (!region) return;
+  const VERSION = "2.0.0";
 
-    region.innerHTML = "";
+  const $ = (selector, root = document) =>
+    root.querySelector(selector);
 
-    const item = document.createElement("div");
-    item.className = "toast";
-    item.textContent = message;
+  const $$ = (selector, root = document) =>
+    Array.from(root.querySelectorAll(selector));
 
-    region.appendChild(item);
+  const byId = id =>
+    document.getElementById(id);
 
-    window.setTimeout(() => {
-      item.remove();
-    }, 3200);
+  const CONFIG = {
+    loginPage:
+      window.TARBIYAH_CONFIG?.LOGIN_PAGE ||
+      "./login-register.html",
+
+    dashboardPage:
+      window.TARBIYAH_CONFIG?.DASHBOARD_PAGE ||
+      "./dashboard.html",
+
+    roleTable: "user_roles",
+    roleRelation: "roles",
+    roleUserColumn: "user_id",
+
+    timezone: "Asia/Jakarta",
+
+    carouselInterval: 6500
   };
 
+  const state = {
+    initialized: false,
+    session: null,
+    user: null,
+    roles: [],
+    primaryRole: null,
+    roleReady: false,
+    carouselIndex: 0,
+    carouselTimer: null,
+    isLoggingOut: false
+  };
 
-  // =====================================================
-  // CAROUSEL — SVG ARROW CONSISTENT
-  // =====================================================
+  /* ==========================================================
+     01. NOTIFICATION / TOAST
+  ========================================================== */
 
-  const slides = [
-    {
-      kicker: "TARBIYAH • PEMBELAJARAN MUSLIM",
-      title: "Menuntut ilmu,<br><i>menumbuhkan ukhuwah.</i>",
-      desc: "Ruang bersama untuk belajar, berbagi, dan menguatkan langkah dalam kebaikan.",
-      link: "./pembelajaran.html",
-      action: "Jelajahi pembelajaran"
-    },
-    {
-      kicker: "AGENDA & KEGIATAN",
-      title: "Bersama dalam<br><i>majelis kebaikan.</i>",
-      desc: "Temukan jadwal kajian, pertemuan, dan aktivitas komunitas berikutnya.",
-      link: "./agenda-tarbiyah.html",
-      action: "Jelajahi agenda"
-    },
-    {
-      kicker: "KOMUNITAS TARBIYAH",
-      title: "Tumbuh bersama,<br><i>berbagi manfaat.</i>",
-      desc: "Kenali anggota, dokumentasikan perjalanan, dan kuatkan ukhuwah.",
-      link: "./profil-anggota.html",
-      action: "Kenali komunitas"
-    }
-  ];
+  function toast(message, type = "info") {
+    const region =
+      byId("toastRegion") ||
+      byId("toastContainer") ||
+      $("[data-toast-region]");
 
-  let slideIndex = 0;
-  let carouselTimer = null;
+    if (region) {
+      const item = document.createElement("div");
 
-  const slideHost = document.querySelector(".hero-slide");
-  const dots = [
-    ...document.querySelectorAll(".carousel-dot")
-  ];
+      item.className = "toast";
+      item.dataset.type = type;
+      item.setAttribute("role", "status");
+      item.textContent = String(message);
 
-  const carouselArrow = `
-    <svg
-      class="arrow-icon hero-arrow"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M5 12h14M13 5l7 7-7 7"></path>
-    </svg>
-  `;
+      region.appendChild(item);
 
-  function showSlide(index) {
-    if (!slides.length) return;
+      window.setTimeout(() => {
+        item.remove();
+      }, 4000);
 
-    slideIndex =
-      (index + slides.length) % slides.length;
-
-    const slide = slides[slideIndex];
-
-    const heroCopy =
-      slideHost?.querySelector(".hero-copy");
-
-    if (heroCopy) {
-      heroCopy.innerHTML = `
-        <span class="hero-kicker">
-          ${slide.kicker}
-        </span>
-
-        <h2>${slide.title}</h2>
-
-        <p>${slide.desc}</p>
-
-        <a
-          class="primary-button hero-link"
-          href="${slide.link}"
-        >
-          <span class="hero-link-label">
-            ${slide.action}
-          </span>
-
-          ${carouselArrow}
-        </a>
-      `;
+      return;
     }
 
-    dots.forEach((dot, index) => {
-      dot.classList.toggle(
-        "active",
-        index === slideIndex
-      );
+    if (typeof window.TARBIYAH_NOTIFY === "function") {
+      window.TARBIYAH_NOTIFY(message, type);
+      return;
+    }
 
-      dot.setAttribute(
-        "aria-current",
-        index === slideIndex ? "true" : "false"
+    console.info("[TARBIYAH]", message);
+  }
+
+  /* ==========================================================
+     02. DATE AND TIME
+  ========================================================== */
+
+  function updateDateInformation() {
+    const now = new Date();
+
+    const dateText = new Intl.DateTimeFormat("id-ID", {
+      timeZone: CONFIG.timezone,
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(now);
+
+    const todayLabel =
+      byId("todayLabel") ||
+      $("[data-dashboard-date]") ||
+      $("[data-today-label]");
+
+    if (todayLabel) {
+      todayLabel.textContent = dateText.toUpperCase();
+    }
+
+    const year = new Intl.DateTimeFormat("id-ID", {
+      timeZone: CONFIG.timezone,
+      year: "numeric"
+    }).format(now);
+
+    [
+      "currentYear",
+      "footerYear"
+    ].forEach(id => {
+      const element = byId(id);
+
+      if (element) {
+        element.textContent = year;
+      }
+    });
+
+    $$("[data-dashboard-year]").forEach(element => {
+      element.textContent = year;
+    });
+  }
+
+  /* ==========================================================
+     03. CAROUSEL
+  ========================================================== */
+
+  function getCarouselElements() {
+    const container =
+      $("[data-dashboard-carousel]") ||
+      $(".dashboard-carousel");
+
+    const track =
+      $("[data-carousel-track]", container || document) ||
+      $(".dashboard-carousel-track", container || document);
+
+    const slides = track
+      ? Array.from(track.children).filter(element =>
+          element.classList.contains("dashboard-slide") ||
+          element.matches("[data-carousel-slide]")
+        )
+      : [];
+
+    const previousButton =
+      $("[data-carousel-prev]", container || document);
+
+    const nextButton =
+      $("[data-carousel-next]", container || document);
+
+    const dots = $$(
+      "[data-carousel-dot], .dashboard-carousel-dots button",
+      container || document
+    );
+
+    return {
+      container,
+      track,
+      slides,
+      previousButton,
+      nextButton,
+      dots
+    };
+  }
+
+  function showCarouselSlide(index) {
+    const carousel = getCarouselElements();
+
+    if (
+      !carousel.track ||
+      carousel.slides.length === 0
+    ) {
+      return;
+    }
+
+    const total = carousel.slides.length;
+
+    state.carouselIndex =
+      (index + total) % total;
+
+    carousel.track.style.transform =
+      `translateX(-${state.carouselIndex * 100}%)`;
+
+    carousel.slides.forEach((slide, slideIndex) => {
+      const active =
+        slideIndex === state.carouselIndex;
+
+      slide.setAttribute(
+        "aria-hidden",
+        String(!active)
       );
     });
 
-    if ($("slideCounter")) {
-      $("slideCounter").textContent =
-        `0${slideIndex + 1} / 0${slides.length}`;
+    carousel.dots.forEach((dot, dotIndex) => {
+      const active =
+        dotIndex === state.carouselIndex;
+
+      dot.classList.toggle("active", active);
+
+      dot.setAttribute(
+        "aria-current",
+        active ? "true" : "false"
+      );
+    });
+
+    const counter =
+      byId("slideCounter") ||
+      $("[data-carousel-counter]");
+
+    if (counter) {
+      counter.textContent =
+        `${String(state.carouselIndex + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
     }
   }
 
   function stopCarousel() {
-    if (carouselTimer !== null) {
-      window.clearInterval(carouselTimer);
-      carouselTimer = null;
+    if (state.carouselTimer !== null) {
+      window.clearInterval(state.carouselTimer);
+      state.carouselTimer = null;
     }
   }
 
   function startCarousel() {
+    const carousel = getCarouselElements();
+
+    if (carousel.slides.length <= 1) return;
+
     stopCarousel();
 
-    if (document.hidden || slides.length <= 1) {
+    state.carouselTimer = window.setInterval(() => {
+      showCarouselSlide(state.carouselIndex + 1);
+    }, CONFIG.carouselInterval);
+  }
+
+  function initializeCarousel() {
+    const carousel = getCarouselElements();
+
+    if (
+      !carousel.track ||
+      carousel.slides.length === 0
+    ) {
       return;
     }
 
-    carouselTimer = window.setInterval(() => {
-      showSlide(slideIndex + 1);
-    }, 6500);
-  }
-
-  dots.forEach((dot, index) => {
-    dot.addEventListener("click", () => {
-      showSlide(index);
-      startCarousel();
-    });
-  });
-
-  showSlide(0);
-  startCarousel();
-
-  document.addEventListener(
-    "visibilitychange",
-    () => {
-      if (document.hidden) {
-        stopCarousel();
-      } else {
+    carousel.previousButton?.addEventListener(
+      "click",
+      () => {
+        showCarouselSlide(state.carouselIndex - 1);
         startCarousel();
       }
+    );
+
+    carousel.nextButton?.addEventListener(
+      "click",
+      () => {
+        showCarouselSlide(state.carouselIndex + 1);
+        startCarousel();
+      }
+    );
+
+    carousel.dots.forEach((dot, index) => {
+      dot.addEventListener("click", () => {
+        showCarouselSlide(index);
+        startCarousel();
+      });
+    });
+
+    carousel.container?.addEventListener(
+      "mouseenter",
+      stopCarousel
+    );
+
+    carousel.container?.addEventListener(
+      "mouseleave",
+      startCarousel
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      () => {
+        if (document.hidden) {
+          stopCarousel();
+        } else {
+          startCarousel();
+        }
+      }
+    );
+
+    showCarouselSlide(0);
+    startCarousel();
+  }
+
+  /* ==========================================================
+     04. SEARCH ROUTES
+  ========================================================== */
+
+  const SEARCH_ROUTES = [
+    {
+      keywords: ["dashboard", "beranda", "home"],
+      url: "./dashboard.html",
+      roles: ["super_admin", "admin", "mentor", "member", "registered_user"]
+    },
+    {
+      keywords: ["profil", "biodata", "akun saya"],
+      url: "./profil-anggota.html",
+      roles: ["super_admin", "admin", "mentor", "member", "registered_user"]
+    },
+    {
+      keywords: ["anggota binaan", "binaan"],
+      module: "anggota-binaan",
+      roles: ["super_admin", "admin", "mentor"]
+    },
+    {
+      keywords: ["pembinaan", "catatan pembinaan"],
+      module: "pembinaan",
+      roles: ["super_admin", "admin", "mentor"]
+    },
+    {
+      keywords: ["agenda", "jadwal", "kegiatan"],
+      url: "./agenda-tarbiyah.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["pembelajaran", "belajar"],
+      url: "./pembelajaran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["materi", "materi kajian"],
+      url: "./materi-pembelajaran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["kajian", "riwayat kajian"],
+      url: "./pembelajaran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["presensi", "absensi"],
+      url: "./presensi-tarbiyah.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["kehadiran", "riwayat kehadiran"],
+      url: "./kehadiran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["berita", "pengumuman"],
+      url: "./berita-pengumuman.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["galeri", "dokumentasi", "foto", "video"],
+      url: "./galeri-foto-video.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["diskusi"],
+      url: "./diskusi-tarbiyah.html",
+      roles: ["super_admin", "admin", "member"]
+    },
+    {
+      keywords: ["donasi", "infaq"],
+      url: "./donasi-infaq.html",
+      roles: ["super_admin", "admin", "member"]
+    },
+    {
+      keywords: ["notifikasi"],
+      url: "./notifikasi.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+    {
+      keywords: ["administrasi", "dashboard admin"],
+      url: "./dashboard-admin.html",
+      roles: ["super_admin", "admin"]
+    },
+    {
+      keywords: ["pengaturan akun", "pengaturan"],
+      url: "./administrasi-pengaturan.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
     }
-  );
-
-
-  // =====================================================
-  // SEARCH
-  // =====================================================
-
-  let currentUserRole = null;
-
-  const searchRoutes = [
-    ["agenda", "./agenda-tarbiyah.html"],
-    ["jadwal", "./agenda-tarbiyah.html"],
-    ["materi", "./materi-pembelajaran.html"],
-    ["belajar", "./pembelajaran.html"],
-    ["pembelajaran", "./pembelajaran.html"],
-    ["berita", "./berita-pengumuman.html"],
-    ["pengumuman", "./berita-pengumuman.html"],
-    ["presensi", "./presensi-tarbiyah.html"],
-    ["absen", "./presensi-tarbiyah.html"],
-    ["galeri", "./galeri-foto-video.html"],
-    ["foto", "./galeri-foto-video.html"],
-    ["video", "./galeri-foto-video.html"],
-    ["diskusi", "./diskusi-tarbiyah.html"],
-    ["anggota", "./profil-anggota.html"],
-    ["profil", "./profil-anggota.html"],
-    ["administrasi", "./dashboard-admin.html"],
-    ["pengaturan", "./administrasi-pengaturan.html"],
-    ["notifikasi", "./notifikasi.html"]
   ];
 
-  $("searchForm")?.addEventListener(
-    "submit",
-    (event) => {
+  function initializeSearch() {
+    const form =
+      byId("searchForm") ||
+      $("[data-dashboard-search-form]");
+
+    const input =
+      byId("globalSearch") ||
+      $("[data-dashboard-search]");
+
+    if (!form || !input) return;
+
+    form.addEventListener("submit", event => {
       event.preventDefault();
 
-      const query = (
-        $("globalSearch")?.value || ""
-      )
+      const query = String(input.value || "")
         .trim()
         .toLowerCase();
 
       if (!query) return;
 
-      const found = searchRoutes.find(([word]) =>
-        query.includes(word)
+      if (!state.roleReady || !state.primaryRole) {
+        toast(
+          "Role akun belum berhasil diverifikasi. Silakan tunggu atau muat ulang halaman.",
+          "warning"
+        );
+        return;
+      }
+
+      const found = SEARCH_ROUTES.find(route =>
+        route.keywords.some(keyword =>
+          query.includes(keyword)
+        )
       );
 
       if (!found) {
         toast(
-          "Belum ditemukan menu yang cocok. Coba kata kunci lain."
+          "Menu belum ditemukan. Coba kata kunci lain.",
+          "info"
         );
         return;
       }
 
-      const adminRoles = [
-        "admin",
-        "super_admin"
-      ];
-
-      if (
-        found[1] === "./dashboard-admin.html" &&
-        !adminRoles.includes(currentUserRole)
-      ) {
+      if (!found.roles.includes(state.primaryRole)) {
         toast(
-          "Anda tidak memiliki akses administrasi."
+          "Akun Anda belum memiliki izin untuk membuka menu tersebut.",
+          "error"
         );
         return;
       }
 
-      window.location.href = found[1];
-    }
-  );
+      if (found.url) {
+        window.location.href = found.url;
+        return;
+      }
 
-  // Shortcut keyboard untuk pencarian.
-  document.addEventListener("keydown", (event) => {
-    const activeTag =
-      document.activeElement?.tagName;
+      if (found.module) {
+        const moduleAPI = window.TARBIYAH_MODULE;
 
-    if (
-      event.key === "/" &&
-      !["INPUT", "TEXTAREA"].includes(activeTag)
-    ) {
-      event.preventDefault();
-      $("globalSearch")?.focus();
-    }
-  });
+        if (
+          moduleAPI &&
+          typeof moduleAPI.navigate === "function"
+        ) {
+          moduleAPI.navigate(found.module);
+        } else {
+          toast(
+            "Halaman modul tersebut belum terhubung.",
+            "warning"
+          );
+        }
+      }
+    });
 
+    document.addEventListener("keydown", event => {
+      const activeTag =
+        document.activeElement?.tagName;
 
-  // =====================================================
-  // USER IDENTITY & ROLE — SUPABASE DATABASE
-  // =====================================================
+      const typing =
+        ["INPUT", "TEXTAREA", "SELECT"].includes(activeTag) ||
+        document.activeElement?.isContentEditable;
 
-  const ROLE_CONFIG = {
-    table: "user_roles",
-    relation: "roles",
-    userIdColumn: "user_id",
-    roleNameColumn: "name"
-  };
-
-  const ROLE_INFO = {
-  super_admin: {
-    label: "SUPER ADMIN",
-    description: "Super Administrator",
-    admin: true
-  },
-
-  admin: {
-    label: "ADMIN",
-    description: "Administrator TARBIYAH",
-    admin: true
-  },
-
-  mentor: {
-    label: "MENTOR",
-    description: "Pembina Anggota TARBIYAH",
-    admin: false
-  },
-
-  member: {
-    label: "ANGGOTA",
-    description: "Anggota TARBIYAH",
-    admin: false
-  },
-
-  registered_user: {
-    label: "PENGGUNA TERDAFTAR",
-    description: "Pengguna Terdaftar",
-    admin: false
+      if (event.key === "/" && !typing) {
+        event.preventDefault();
+        input.focus();
+      }
+    });
   }
-};
 
-
-  // =====================================================
-  // SUPABASE CLIENT
-  // =====================================================
+  /* ==========================================================
+     05. SUPABASE CLIENT
+  ========================================================== */
 
   function getSupabaseClient() {
-    if (
-      window.TARBIYAH_BACKEND_READY &&
-      window.tarbiyahSupabase
-    ) {
-      return window.tarbiyahSupabase;
+    const client = window.tarbiyahSupabase;
+
+    if (!client) {
+      throw new Error(
+        "Supabase client belum tersedia. Periksa js/config.js dan js/supabase-client.js."
+      );
     }
 
-    throw new Error(
-      "Client Supabase TARBIYAH belum tersedia."
-    );
+    if (
+      window.TARBIYAH_BACKEND_READY === false
+    ) {
+      throw new Error(
+        "Backend TARBIYAH belum siap. Periksa konfigurasi Supabase."
+      );
+    }
+
+    if (
+      typeof client.from !== "function" ||
+      !client.auth
+    ) {
+      throw new Error(
+        "Supabase client belum siap digunakan."
+      );
+    }
+
+    return client;
   }
 
+  /* ==========================================================
+     06. AUTH SESSION
+  ========================================================== */
 
-  // =====================================================
-  // AUTH SESSION
-  // =====================================================
+  function extractSession(result) {
+    if (!result) return null;
+
+    if (result.session) {
+      return result.session;
+    }
+
+    if (result.data?.session) {
+      return result.data.session;
+    }
+
+    if (result.data?.user) {
+      return result.data;
+    }
+
+    if (result.user) {
+      return result;
+    }
+
+    return null;
+  }
 
   async function resolveSession() {
-    const guardedSession =
-      window.TARBIYAH_SESSION;
+    const guarded = window.TARBIYAH_SESSION;
 
-    if (guardedSession?.ready) {
-      return guardedSession.session || null;
+    if (guarded?.ready === true) {
+      const guardedSession =
+        guarded.session ||
+        (guarded.user ? { user: guarded.user } : null);
+
+      return guardedSession;
     }
 
-    const auth = window.TARBIYAH_AUTH;
+    const authAPI = window.TARBIYAH_AUTH;
 
-    if (
-      typeof auth?.getSession !== "function"
-    ) {
-      throw new Error(
-        "Modul TARBIYAH_AUTH belum tersedia."
-      );
-    }
+    if (typeof authAPI?.getSession === "function") {
+      const result = await authAPI.getSession();
 
-    const result = await auth.getSession();
-
-    if (result?.configured === false) {
-      throw new Error(
-        "Backend Supabase belum dikonfigurasi."
-      );
-    }
-
-    if (result?.error) {
-      throw result.error;
-    }
-
-    return (
-      result?.session ||
-      result?.data?.session ||
-      null
-    );
-  }
-
-
-  // =====================================================
-  // ROLE PROCESSING
-  // =====================================================
-
-  function normalizeRoleName(value) {
-    return String(value || "")
-      .trim()
-      .toLowerCase();
-  }
-
-  async function fetchUserRoles(userId) {
-    const supabase = getSupabaseClient();
-
-    const { data, error } = await supabase
-      .from(ROLE_CONFIG.table)
-      .select("role_id, roles(name)")
-      .eq(ROLE_CONFIG.userIdColumn, userId);
-
-    if (error) {
-      throw error;
-    }
-
-    if (!Array.isArray(data)) {
-      return [];
-    }
-
-    return data
-      .map((row) => {
-        const relation = row.roles;
-
-        const roleRecord = Array.isArray(relation)
-          ? relation[0]
-          : relation;
-
-        return normalizeRoleName(
-          roleRecord?.[ROLE_CONFIG.roleNameColumn]
+      if (result?.configured === false) {
+        throw new Error(
+          "Backend Supabase belum dikonfigurasi."
         );
-      })
-      .filter(Boolean);
+      }
+
+      if (result?.error) {
+        throw result.error;
+      }
+
+      return extractSession(result);
+    }
+
+    const client = getSupabaseClient();
+
+    const { data, error } =
+      await client.auth.getSession();
+
+    if (error) throw error;
+
+    return data?.session || null;
   }
 
-  function selectPrimaryRole(roles) {
-  const priority = [
+  /* ==========================================================
+     07. ROLE CONFIGURATION
+  ========================================================== */
+
+  const ROLE_INFO = {
+    super_admin: {
+      label: "SUPER ADMIN",
+      description: "Super Administrator",
+      isAdmin: true,
+      isSuperAdmin: true
+    },
+
+    admin: {
+      label: "ADMIN",
+      description: "Administrator TARBIYAH",
+      isAdmin: true,
+      isSuperAdmin: false
+    },
+
+    mentor: {
+      label: "MENTOR",
+      description: "Pembina Anggota TARBIYAH",
+      isAdmin: false,
+      isSuperAdmin: false
+    },
+
+    member: {
+      label: "ANGGOTA",
+      description: "Anggota TARBIYAH",
+      isAdmin: false,
+      isSuperAdmin: false
+    },
+
+    registered_user: {
+      label: "PENGGUNA TERDAFTAR",
+      description: "Pengguna Terdaftar",
+      isAdmin: false,
+      isSuperAdmin: false
+    }
+  };
+
+  const ROLE_PRIORITY = [
     "super_admin",
     "admin",
     "mentor",
@@ -417,196 +657,532 @@
     "registered_user"
   ];
 
-  return priority.find(role => roles.includes(role)) || null;
-}
+  /*
+    Daftar menu ini digunakan untuk mengatur tampilan navigasi.
+    Pemeriksaan keamanan sebenarnya tetap dilakukan di halaman
+    tujuan dan oleh Supabase RLS.
+  */
 
-  // =====================================================
-  // RENDER USER ROLE
-  // =====================================================
+  const ROLE_MENU_ACCESS = {
+    super_admin: [
+      "dashboard",
+      "profil",
+      "anggota",
+      "anggota-binaan",
+      "pembinaan",
+      "catatan",
+      "presensi",
+      "kehadiran",
+      "riwayat",
+      "kajian",
+      "pembelajaran",
+      "materi",
+      "agenda",
+      "berita",
+      "galeri",
+      "diskusi",
+      "donasi",
+      "notifikasi",
+      "administrasi",
+      "pengaturan",
+      "logout"
+    ],
 
-  function renderUserRole(role) {
-    const info = ROLE_INFO[role];
-    const admin = Boolean(info?.admin);
+    admin: [
+      "dashboard",
+      "profil",
+      "anggota",
+      "anggota-binaan",
+      "pembinaan",
+      "catatan",
+      "presensi",
+      "kehadiran",
+      "riwayat",
+      "kajian",
+      "pembelajaran",
+      "materi",
+      "agenda",
+      "berita",
+      "galeri",
+      "diskusi",
+      "donasi",
+      "notifikasi",
+      "administrasi",
+      "pengaturan",
+      "logout"
+    ],
 
-    // Default: akses administrasi disembunyikan.
-    if ($("adminLink")) {
-      $("adminLink").hidden = !admin;
-    }
+    mentor: [
+      "dashboard",
+      "profil",
+      "anggota-binaan",
+      "pembinaan",
+      "catatan",
+      "presensi",
+      "kehadiran",
+      "riwayat",
+      "kajian",
+      "pembelajaran",
+      "materi",
+      "agenda",
+      "berita",
+      "galeri",
+      "notifikasi",
+      "pengaturan",
+      "logout"
+    ],
 
-    if ($("adminBanner")) {
-      $("adminBanner").hidden = !admin;
-    }
+    member: [
+      "dashboard",
+      "profil",
+      "pembelajaran",
+      "materi",
+      "kajian",
+      "agenda",
+      "berita",
+      "galeri",
+      "diskusi",
+      "donasi",
+      "presensi",
+      "kehadiran",
+      "riwayat",
+      "notifikasi",
+      "pengaturan",
+      "logout"
+    ],
 
-    if ($("rolePill")) {
-      $("rolePill").textContent =
-        info?.label || "ROLE BELUM DITETAPKAN";
-    }
+    registered_user: [
+      "dashboard",
+      "profil",
+      "pengaturan",
+      "logout"
+    ]
+  };
 
-    if ($("sidebarRole")) {
-      $("sidebarRole").textContent =
-        info?.description || "Role belum ditetapkan";
-    }
-
-    currentUserRole = role;
-
-    window.TARBIYAH_USER_ROLE = {
-      ready: Boolean(role),
-      name: role,
-      isAdmin: admin,
-      isSuperAdmin: role === "super_admin"
-    };
+  function normalizeRole(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase();
   }
 
+  function selectPrimaryRole(roles) {
+    return ROLE_PRIORITY.find(role =>
+      roles.includes(role)
+    ) || null;
+  }
 
-  // =====================================================
-  // HYDRATE USER PROFILE
-  // =====================================================
+  /* ==========================================================
+     08. FETCH ROLE DARI SUPABASE
+  ========================================================== */
 
-  async function hydrateUser() {
-    const session = await resolveSession();
-
-    if (!session?.user) {
+  async function fetchUserRoles(userId) {
+    if (!userId) {
       throw new Error(
-        "Sesi pengguna tidak ditemukan."
+        "ID pengguna tidak tersedia."
       );
     }
 
-    const user = session.user;
+    const supabase = getSupabaseClient();
 
-    const name =
-      user.user_metadata?.full_name ||
-      user.user_metadata?.display_name ||
-      user.user_metadata?.name ||
-      user.email?.split("@")[0] ||
-      "Pengguna";
+    const { data, error } = await supabase
+      .from(CONFIG.roleTable)
+      .select("role_id, roles(name)")
+      .eq(CONFIG.roleUserColumn, userId);
 
-    const initials = name
+    if (error) throw error;
+
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    const roles = data
+      .map(row => {
+        const relation = row.roles;
+
+        const roleRecord = Array.isArray(relation)
+          ? relation[0]
+          : relation;
+
+        return normalizeRole(
+          roleRecord?.name
+        );
+      })
+      .filter(role =>
+        Object.prototype.hasOwnProperty.call(
+          ROLE_INFO,
+          role
+        )
+      );
+
+    return [...new Set(roles)];
+  }
+
+  /* ==========================================================
+     09. USER IDENTITY
+  ========================================================== */
+
+  function getUserDisplayName(user) {
+    const metadata = user?.user_metadata || {};
+
+    return (
+      metadata.full_name ||
+      metadata.display_name ||
+      metadata.name ||
+      user?.email?.split("@")[0] ||
+      "Pengguna TARBIYAH"
+    );
+  }
+
+  function getInitials(name) {
+    return String(name || "")
       .trim()
       .split(/\s+/)
       .filter(Boolean)
       .slice(0, 2)
-      .map((part) => part.charAt(0))
+      .map(part => part.charAt(0))
       .join("")
-      .toUpperCase();
+      .toUpperCase() || "T";
+  }
 
-    [
-      "userName",
-      "sidebarName"
-    ].forEach((id) => {
-      if ($(id)) {
-        $(id).textContent = name;
-      }
+  function setTextForSelectors(selectors, value) {
+    selectors.forEach(selector => {
+      $$(selector).forEach(element => {
+        element.textContent = value;
+      });
+    });
+  }
+
+  function renderUserIdentity(user) {
+    const name = getUserDisplayName(user);
+    const initials = getInitials(name);
+
+    setTextForSelectors(
+      [
+        "#userName",
+        "#sidebarName",
+        "[data-user-name]",
+        "[data-sidebar-user-name]"
+      ],
+      name
+    );
+
+    setTextForSelectors(
+      [
+        "#welcomeTitle",
+        "[data-greeting-name]"
+      ],
+      name
+    );
+
+    setTextForSelectors(
+      [
+        "#userAvatar",
+        "#sidebarAvatar",
+        "[data-user-avatar]",
+        "[data-sidebar-avatar]"
+      ],
+      initials
+    );
+
+    const emailElements = $$(
+      "[data-user-email], #userEmail"
+    );
+
+    emailElements.forEach(element => {
+      element.textContent = user.email || "";
     });
 
-    [
-      "userAvatar",
-      "sidebarAvatar"
-    ].forEach((id) => {
-      if ($(id)) {
-        $(id).textContent = initials;
-      }
-    });
+    const welcome = byId("welcomeTitle");
 
-    if ($("welcomeTitle")) {
-      $("welcomeTitle").textContent =
+    if (
+      welcome &&
+      welcome.tagName !== "INPUT"
+    ) {
+      welcome.textContent =
         `Assalamu’alaikum, ${name}`;
     }
 
-    // Jangan memberikan akses admin sebelum
-    // role berhasil dibaca dari database.
+    const greeting = $("[data-greeting-name]");
+
+    if (greeting) {
+      greeting.textContent = name;
+    }
+
+    document.body.classList.remove("auth-pending");
+
+    return name;
+  }
+
+  /* ==========================================================
+     10. MENU ACCESS
+  ========================================================== */
+
+  function getNavigationKey(element) {
+    const directKey =
+      element.dataset.navKey ||
+      element.dataset.navLink ||
+      element.dataset.module ||
+      element.dataset.menu;
+
+    if (directKey) {
+      return normalizeRole(directKey);
+    }
+
+    const href = element.getAttribute("href") || "";
+
+    const file = href
+      .split("?")[0]
+      .split("/")
+      .pop()
+      .toLowerCase();
+
+    const routeMap = {
+      "dashboard.html": "dashboard",
+      "tarbiyah.html": "dashboard",
+      "profil-anggota.html": "profil",
+      "agenda-tarbiyah.html": "agenda",
+      "pembelajaran.html": "pembelajaran",
+      "materi-pembelajaran.html": "materi",
+      "berita-pengumuman.html": "berita",
+      "galeri-foto-video.html": "galeri",
+      "diskusi-tarbiyah.html": "diskusi",
+      "donasi-infaq.html": "donasi",
+      "presensi-tarbiyah.html": "presensi",
+      "kehadiran.html": "kehadiran",
+      "catatan-refleksi.html": "catatan",
+      "riwayat-aktivitas.html": "riwayat",
+      "notifikasi.html": "notifikasi",
+      "dashboard-admin.html": "administrasi",
+      "administrasi-pengaturan.html": "pengaturan"
+    };
+
+    return routeMap[file] || "";
+  }
+
+  function canShowMenu(role, menuKey) {
+    const allowed =
+      ROLE_MENU_ACCESS[role] || [];
+
+    return allowed.includes(menuKey);
+  }
+
+  function applyRoleMenuAccess(role) {
+    const menuElements = $$(
+      "[data-nav-link], [data-module], [data-nav-key], [data-menu]"
+    );
+
+    menuElements.forEach(element => {
+      const key = getNavigationKey(element);
+
+      // Elemen yang tidak dapat dikenali tidak diubah.
+      if (!key) return;
+
+      const visible = canShowMenu(role, key);
+
+      element.hidden = !visible;
+      element.setAttribute(
+        "aria-hidden",
+        String(!visible)
+      );
+
+      if (visible) {
+        element.removeAttribute("inert");
+      } else {
+        element.setAttribute("inert", "");
+      }
+    });
+
+    // Tautan dan banner administrasi.
+    const isAdmin =
+      role === "admin" ||
+      role === "super_admin";
+
+    const adminElements = [
+      byId("adminLink"),
+      byId("adminBanner")
+    ].filter(Boolean);
+
+    adminElements.forEach(element => {
+      element.hidden = !isAdmin;
+    });
+
+    // Elemen yang secara eksplisit ditandai admin-only.
+    $$("[data-admin-only]").forEach(element => {
+      element.hidden = !isAdmin;
+    });
+
+    // Elemen khusus Super Admin.
+    $$("[data-super-admin-only]").forEach(element => {
+      element.hidden = role !== "super_admin";
+    });
+  }
+
+  /* ==========================================================
+     11. RENDER ROLE
+  ========================================================== */
+
+  function renderUserRole(role) {
+    const info = ROLE_INFO[role] || null;
+
+    state.primaryRole = info ? role : null;
+    state.roleReady = Boolean(info);
+
+    const roleLabel =
+      info?.label || "ROLE BELUM DITETAPKAN";
+
+    const roleDescription =
+      info?.description || "Role belum ditetapkan";
+
+    const rolePill = byId("rolePill");
+
+    if (rolePill) {
+      rolePill.textContent = roleLabel;
+    }
+
+    const sidebarRole =
+      byId("sidebarRole") ||
+      $("[data-sidebar-user-role]");
+
+    if (sidebarRole) {
+      sidebarRole.textContent = roleDescription;
+    }
+
+    const roleBadges = $$("[data-role-label]");
+
+    roleBadges.forEach(element => {
+      element.textContent = roleLabel;
+    });
+
+    applyRoleMenuAccess(state.primaryRole);
+
+    const roleState = {
+      ready: state.roleReady,
+      name: state.primaryRole,
+      label: roleLabel,
+      description: roleDescription,
+      isAdmin: Boolean(info?.isAdmin),
+      isSuperAdmin: Boolean(info?.isSuperAdmin),
+      isMentor: role === "mentor",
+      isMember: role === "member"
+    };
+
+    window.TARBIYAH_USER_ROLE = roleState;
+
+    document.dispatchEvent(
+      new CustomEvent("tarbiyah:role-ready", {
+        detail: roleState
+      })
+    );
+
+    window.dispatchEvent(
+      new CustomEvent("tarbiyah:role-ready", {
+        detail: roleState
+      })
+    );
+
+    return roleState;
+  }
+
+  /* ==========================================================
+     12. LOAD USER AND ROLE
+  ========================================================== */
+
+  async function hydrateUser() {
+    // Status aman sebelum role selesai dibaca.
     renderUserRole(null);
 
-    try {
-      const roles = await fetchUserRoles(user.id);
+    const session = await resolveSession();
 
-      const primaryRole =
-        selectPrimaryRole(roles);
+    if (!session?.user?.id) {
+      throw new Error(
+        "Sesi pengguna tidak ditemukan. Silakan masuk kembali."
+      );
+    }
 
-      renderUserRole(primaryRole);
+    state.session = session;
+    state.user = session.user;
 
-      if (!primaryRole) {
-        console.warn(
-          "[TARBIYAH] Pengguna belum memiliki role yang dikenali."
-        );
+    renderUserIdentity(session.user);
 
-        toast(
-          "Role akun belum ditetapkan. Hubungi administrator."
-        );
-      } else {
-        console.info(
-          "[TARBIYAH] Role pengguna berhasil dimuat:",
-          primaryRole
-        );
-      }
+    const roles = await fetchUserRoles(
+      session.user.id
+    );
 
-    } catch (error) {
+    state.roles = roles;
+
+    const primaryRole =
+      selectPrimaryRole(roles);
+
+    if (!primaryRole) {
       renderUserRole(null);
 
-      console.error(
-        "[TARBIYAH] Gagal membaca role pengguna:",
-        error
+      console.warn(
+        "[TARBIYAH] Role pengguna belum ditetapkan atau tidak dikenali."
       );
 
       toast(
-        "Identitas akun berhasil dimuat, tetapi role belum dapat dibaca."
+        "Role akun belum ditetapkan. Hubungi administrator TARBIYAH.",
+        "warning"
       );
+
+      return;
     }
+
+    renderUserRole(primaryRole);
+
+    console.info(
+      "[TARBIYAH] Identitas pengguna berhasil dimuat.",
+      {
+        userId: session.user.id,
+        role: primaryRole
+      }
+    );
   }
 
+  /* ==========================================================
+     13. LOGOUT
+  ========================================================== */
 
-  // =====================================================
-  // LOGOUT
-  // =====================================================
+  async function logout(button) {
+    if (state.isLoggingOut) return;
 
-  async function logout() {
-    const buttons = [
-      $("logoutMini")
-    ].filter(Boolean);
+    state.isLoggingOut = true;
 
-    buttons.forEach((button) => {
-      button.disabled = true;
-      button.textContent = "…";
+    const logoutButtons = $$(
+      "[data-logout], #logoutMini, #logoutBtn, #btnLogout"
+    );
+
+    logoutButtons.forEach(element => {
+      element.disabled = true;
+      element.setAttribute("aria-busy", "true");
     });
 
-    try {
-      const authApi = window.TARBIYAH_AUTH;
+    if (button) {
+      button.dataset.originalText =
+        button.textContent;
 
-      if (
-        typeof authApi?.signOut === "function"
-      ) {
-        const result = await authApi.signOut();
+      button.textContent = "Memproses...";
+    }
+
+    try {
+      const authAPI = window.TARBIYAH_AUTH;
+
+      if (typeof authAPI?.signOut === "function") {
+        const result = await authAPI.signOut();
 
         if (result?.error) {
           throw result.error;
         }
-
       } else {
-        const client = [
-          window.tarbiyahSupabase,
-          window.supabaseClient,
-          window.TARBIYAH_SUPABASE,
-          window.supabase
-        ].find((item) =>
-          typeof item?.auth?.signOut === "function"
-        );
-
-        if (!client) {
-          throw new Error(
-            "Fungsi logout Supabase tidak ditemukan."
-          );
-        }
+        const supabase = getSupabaseClient();
 
         const { error } =
-          await client.auth.signOut();
+          await supabase.auth.signOut();
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
       }
 
-      window.location.replace(
-        "./login-register.html"
-      );
+      window.location.replace(CONFIG.loginPage);
 
     } catch (error) {
       console.error(
@@ -616,61 +1192,162 @@
 
       toast(
         error?.message ||
-        "Logout gagal. Silakan coba kembali."
+        "Logout gagal. Silakan coba kembali.",
+        "error"
       );
 
-      buttons.forEach((button) => {
-        button.disabled = false;
-        button.textContent = "↗";
+      state.isLoggingOut = false;
+
+      logoutButtons.forEach(element => {
+        element.disabled = false;
+        element.removeAttribute("aria-busy");
       });
+
+      if (button?.dataset.originalText) {
+        button.textContent =
+          button.dataset.originalText;
+      }
     }
   }
 
-  $("logoutMini")?.addEventListener(
-    "click",
-    logout
-  );
-
-
-  // =====================================================
-  // DATE & YEAR
-  // =====================================================
-
-  if ($("currentYear")) {
-    $("currentYear").textContent =
-      new Date().getFullYear();
-  }
-
-  const today = new Intl.DateTimeFormat(
-    "id-ID",
-    {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      timeZone: "Asia/Jakarta"
-    }
-  ).format(new Date());
-
-  if ($("todayLabel")) {
-    $("todayLabel").textContent =
-      today.toUpperCase();
-  }
-
-
-  // =====================================================
-  // INITIALIZATION
-  // =====================================================
-
-  hydrateUser().catch((error) => {
-    console.warn(
-      "[TARBIYAH] Gagal memuat profil:",
-      error
+  function initializeLogout() {
+    const buttons = $$(
+      "[data-logout], #logoutMini, #logoutBtn, #btnLogout"
     );
+
+    buttons.forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        logout(button);
+      });
+    });
+  }
+
+  /* ==========================================================
+     14. DASHBOARD ROLE INFORMATION
+  ========================================================== */
+
+  function initializeRoleDashboard() {
+    document.addEventListener(
+      "tarbiyah:role-ready",
+      event => {
+        const role = event.detail?.name;
+
+        if (role === "mentor") {
+          document.body.dataset.dashboardRole = "mentor";
+
+          const heading = $(
+            "[data-dashboard-heading]"
+          );
+
+          if (heading) {
+            heading.textContent =
+              "Dashboard Pembinaan dan Pendampingan Anggota";
+          }
+
+          const welcomeDescription = $(
+            "[data-dashboard-description]"
+          );
+
+          if (welcomeDescription) {
+            welcomeDescription.textContent =
+              "Pantau anggota binaan, kehadiran, riwayat kajian, dan catatan pembinaan.";
+          }
+        } else if (role) {
+          document.body.dataset.dashboardRole = role;
+        } else {
+          delete document.body.dataset.dashboardRole;
+        }
+      }
+    );
+  }
+
+  /* ==========================================================
+     15. INITIALIZATION
+  ========================================================== */
+
+  async function initialize() {
+    if (state.initialized) return;
+
+    state.initialized = true;
+
+    updateDateInformation();
+    initializeCarousel();
+    initializeSearch();
+    initializeLogout();
+    initializeRoleDashboard();
+
+    try {
+      await hydrateUser();
+    } catch (error) {
+      renderUserRole(null);
+
+      console.error(
+        "[TARBIYAH DASHBOARD] Gagal memuat sesi atau role:",
+        error
+      );
+
+      toast(
+        error?.message ||
+        "Identitas pengguna belum dapat dimuat.",
+        "error"
+      );
+    }
+
+    console.info(
+      `[TARBIYAH DASHBOARD] Versi ${VERSION} aktif.`
+    );
+  }
+
+  /* ==========================================================
+     16. PUBLIC API
+  ========================================================== */
+
+  window.TARBIYAH_DASHBOARD = Object.freeze({
+    version: VERSION,
+
+    initialize,
+
+    getState() {
+      return {
+        user: state.user,
+        roles: [...state.roles],
+        primaryRole: state.primaryRole,
+        roleReady: state.roleReady
+      };
+    },
+
+    refreshRole: async function () {
+      if (!state.user?.id) {
+        throw new Error(
+          "Pengguna belum tersedia."
+        );
+      }
+
+      const roles = await fetchUserRoles(
+        state.user.id
+      );
+
+      state.roles = roles;
+
+      renderUserRole(
+        selectPrimaryRole(roles)
+      );
+
+      return state.primaryRole;
+    },
+
+    logout
   });
 
-  console.info(
-    "[TARBIYAH] Dashboard controller berhasil diinisialisasi."
-  );
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize,
+      { once: true }
+    );
+  } else {
+    initialize();
+  }
 
 })();
