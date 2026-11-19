@@ -487,10 +487,18 @@
     window.TARBIYAH_MODULES &&
     typeof window.TARBIYAH_MODULES.navigate === "function"
   ) {
-    window.TARBIYAH_MODULES.navigate(moduleName);
+    window.TARBIYAH_MODULE.navigate(moduleName);
   }
-}
+     
+const moduleAPI = window.TARBIYAH_MODULE;
 
+if (moduleAPI && typeof moduleAPI.navigate === "function") {
+  moduleAPI.navigate(moduleName);
+} else {
+  console.error(
+    "[TARBIYAH SHELL] API navigasi modul tidak tersedia."
+  );
+}
   /* =======================================================
      7. PENANDA MENU AKTIF
      ======================================================= */
