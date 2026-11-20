@@ -26,24 +26,96 @@
 
   <style>
     /* =========================================
-       CUSTOM PAGE LAYOUT (SESUAI STANDAR SHELL)
+       HEADER KHUSUS (MENGIKUTI PROFIL-ANGGOTA)
     ========================================= */
-    
-    /* Menghilangkan margin aneh bawaan body */
-    body {
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-      background: var(--bg-primary);
-    }
-
-    .app-shell {
+    .app-header {
       display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    /* Container Utama */
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-brand img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
+
+    .header-brand-text h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      color: var(--color-primary, #36b58a);
+      line-height: 1.1;
+      font-family: var(--font-heading);
+    }
+
+    .header-brand-text span {
+      display: block;
+      font-size: .75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* TOMBOL IKON (SESUAI REFERENSI GAMBAR) */
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
+    }
+
+    .icon-button svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* =========================================
+       LAYOUT UTAMA
+    ========================================= */
     .app-main {
       flex: 1;
       width: 100%;
@@ -52,15 +124,12 @@
       padding: 24px;
     }
 
-    /* =========================================
-       LEARNING PAGE CONTENT
-    ========================================= */
     .learning-page {
       width: 100%;
       padding-bottom: 35px;
     }
 
-    /* --- Header Halaman & Tombol Back --- */
+    /* --- Tombol Back & Judul Halaman --- */
     .learning-page-header {
       display: flex;
       align-items: center;
@@ -75,23 +144,23 @@
       width: 42px;
       height: 42px;
       flex: 0 0 42px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border: 1px solid var(--border-color);
       border-radius: 12px;
-      background: var(--bg-secondary, rgba(255,255,255,.04));
-      color: var(--text-primary, #fff);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
       cursor: pointer;
       text-decoration: none;
-      transition: background .18s ease, border-color .18s ease;
+      transition: all .2s ease;
     }
 
     .learning-back-btn:hover {
       background: var(--bg-tertiary);
-      border-color: var(--color-primary, #36b58a);
+      border-color: var(--color-primary);
     }
 
-    .learning-page-header h1 {
+    .learning-page-header h2 {
       margin: 0;
-      font-family: var(--font-heading, "Poppins", sans-serif);
+      font-family: var(--font-heading);
       font-size: clamp(1.05rem, 2.4vw, 1.2rem);
       font-weight: 700;
     }
@@ -99,7 +168,7 @@
     .learning-page-header small {
       display: block;
       margin-top: 2px;
-      color: var(--text-secondary, #aab5af);
+      color: var(--text-secondary);
       font-size: .78rem;
       font-weight: 500;
     }
@@ -110,15 +179,15 @@
       overflow: hidden;
       padding: clamp(22px, 4vw, 34px);
       margin-bottom: 24px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 20px;
       background:
-        radial-gradient(circle at 90% 10%, rgba(54,181,138,.2), transparent 38%),
-        var(--bg-secondary, rgba(255,255,255,.04));
+        radial-gradient(circle at 90% 10%, rgba(54,181,138,.15), transparent 38%),
+        var(--bg-secondary);
     }
 
     .learning-eyebrow {
-      color: var(--color-primary, #36b58a);
+      color: var(--color-primary);
       font-size: .75rem;
       font-weight: 700;
       letter-spacing: .09em;
@@ -126,7 +195,7 @@
 
     .learning-hero h2 {
       margin: 10px 0;
-      font-family: var(--font-heading, "Poppins", sans-serif);
+      font-family: var(--font-heading);
       font-size: clamp(1.5rem, 4vw, 2rem);
       color: var(--text-primary);
     }
@@ -134,8 +203,9 @@
     .learning-hero p {
       max-width: 680px;
       margin: 0;
-      color: var(--text-secondary, #aab5af);
+      color: var(--text-secondary);
       line-height: 1.7;
+      font-size: .9rem;
     }
 
     /* --- Search --- */
@@ -150,17 +220,17 @@
       min-width: 0;
       flex: 1;
       padding: 11px 14px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border: 1px solid var(--border-color);
       border-radius: 12px;
-      background: var(--bg-primary, rgba(255,255,255,.04));
-      color: var(--text-primary, #fff);
+      background: var(--bg-primary);
+      color: var(--text-primary);
       font: inherit;
       font-size: .88rem;
       outline: none;
     }
 
     .learning-search input:focus {
-      border-color: var(--color-primary, #36b58a);
+      border-color: var(--color-primary);
     }
 
     /* --- Filter chips --- */
@@ -173,20 +243,21 @@
 
     .learning-filter {
       padding: 9px 16px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border: 1px solid var(--border-color);
       border-radius: 30px;
-      background: var(--bg-primary, rgba(255,255,255,.04));
-      color: var(--text-secondary, #aab5af);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
       font: inherit;
       font-size: .82rem;
       font-weight: 600;
       cursor: pointer;
+      transition: all .2s ease;
     }
 
     .learning-filter[aria-pressed="true"] {
-      border-color: var(--color-primary, #36b58a);
+      border-color: var(--color-primary);
       background: rgba(54,181,138,.13);
-      color: var(--color-primary, #36b58a);
+      color: var(--color-primary);
     }
 
     /* --- Section --- */
@@ -200,15 +271,15 @@
       margin-bottom: 15px;
     }
 
-    .learning-section-heading h2 {
+    .learning-section-heading h3 {
       margin: 0;
-      font-family: var(--font-heading, "Poppins", sans-serif);
+      font-family: var(--font-heading);
       font-size: 1.08rem;
       color: var(--text-primary);
     }
 
     .learning-section-heading a {
-      color: var(--color-primary, #36b58a);
+      color: var(--color-primary);
       font-size: .82rem;
       font-weight: 600;
       text-decoration: none;
@@ -227,17 +298,17 @@
       gap: 12px;
       min-width: 0;
       padding: 17px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 15px;
-      background: var(--bg-secondary, rgba(255,255,255,.04));
-      color: var(--text-primary, #fff);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
       text-decoration: none;
       transition: transform .2s ease, border-color .2s ease;
     }
 
     .learning-category:hover {
       transform: translateY(-3px);
-      border-color: var(--color-primary, #36b58a);
+      border-color: var(--color-primary);
     }
 
     .learning-category[hidden] { display: none; }
@@ -254,16 +325,16 @@
     }
 
     .learning-category strong { display: block; font-size: .87rem; }
-    .learning-category small { display: block; margin-top: 4px; color: var(--text-secondary, #aab5af); font-size: .73rem; }
+    .learning-category small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: .73rem; }
 
     /* --- List --- */
     .learning-list { display: grid; gap: 13px; }
 
     .learning-empty {
       padding: 28px 18px;
-      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border: 1px dashed var(--border-color);
       border-radius: 17px;
-      color: var(--text-secondary, #aab5af);
+      color: var(--text-secondary);
       text-align: center;
       line-height: 1.7;
     }
@@ -275,9 +346,9 @@
       align-items: flex-start;
       gap: 14px;
       padding: 16px 18px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 16px;
-      background: var(--bg-secondary, rgba(255,255,255,.04));
+      background: var(--bg-secondary);
     }
 
     .learning-card-icon {
@@ -298,16 +369,16 @@
     /* --- Progress card --- */
     .learning-progress-card {
       padding: 20px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 17px;
-      background: var(--bg-secondary, rgba(255,255,255,.04));
+      background: var(--bg-secondary);
     }
 
     .learning-footer {
       padding: 24px 0 12px;
       margin-top: 30px;
-      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
-      color: var(--text-secondary, #aab5af);
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
       text-align: center;
       font-size: .78rem;
     }
@@ -332,37 +403,34 @@
   <div class="app-shell">
 
     <!-- =========================================
-         HEADER (BERSIH TANPA HAMBURGER & SIDEBAR)
+         HEADER (SAMA PERSIS DENGAN PROFIL ANGGOTA)
     ========================================== -->
     <header class="app-header">
-      <div class="app-header-left">
-        <a class="brand-link" href="./tarbiyah.html">
-          <span class="brand-logo-wrap">
-            <img class="brand-logo" src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-          </span>
-          <span class="brand-copy">
-            <span class="brand-name">TARBIYAH</span>
-            <span class="brand-description">Pembelajaran Muslim</span>
-          </span>
-        </a>
+      <div class="header-left">
+        <div class="header-brand">
+          <!-- Ganti src dengan path logo asli Anda jika berbeda -->
+          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+          <div class="header-brand-text">
+            <h1>TARBIYAH</h1>
+            <span>Pembelajaran</span>
+          </div>
+        </div>
       </div>
 
-      <div class="app-header-right">
-        <!-- Tombol Toggle Tema menggunakan class standar shell-icon-button -->
-        <button type="button" class="shell-icon-button" data-theme-toggle aria-label="Ganti tema">
-          ◐
+      <div class="header-right">
+        <!-- Tombol Tema -->
+        <button type="button" class="icon-button" data-theme-toggle aria-label="Ubah tema">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
         </button>
 
         <!-- Tombol Notifikasi -->
-        <a href="./notifikasi.html" class="shell-icon-button" aria-label="Notifikasi" style="text-decoration:none;">
-          ♧
-        </a>
-        
-        <!-- Tombol Profil User -->
-        <a href="./profil-anggota.html" class="shell-user" style="text-decoration:none;">
-          <span class="shell-user-avatar">
-            <img src="./assets/icons/icon-192.png" alt="Foto Profil">
-          </span>
+        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
+          <svg viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
         </a>
       </div>
     </header>
@@ -372,16 +440,16 @@
     ========================================== -->
     <main class="app-main learning-page">
 
-      <!-- Judul Halaman & Tombol Back (Sesuai Referensi) -->
+      <!-- Tombol Back & Judul -->
       <header class="learning-page-header">
         <a href="./dashboard.html" class="learning-back-btn" aria-label="Kembali ke Dashboard">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </a>
         <div>
-          <h1>Pembelajaran</h1>
+          <h2>Pembelajaran</h2>
           <small>TARBIYAH — Ilmu & Pembinaan Diri</small>
         </div>
       </header>
@@ -415,7 +483,7 @@
       <!-- Kategori Grid -->
       <section class="learning-section">
         <div class="learning-section-heading">
-          <h2>Kategori Pembelajaran</h2>
+          <h3>Kategori Pembelajaran</h3>
         </div>
         <div class="learning-category-grid" data-learning-categories>
           <a href="./materi-pembelajaran.html?category=akidah" class="learning-category" data-category="akidah">
@@ -448,7 +516,7 @@
       <!-- Program List -->
       <section class="learning-section">
         <div class="learning-section-heading">
-          <h2>Program Pembelajaran</h2>
+          <h3>Program Pembelajaran</h3>
           <a href="./agenda-tarbiyah.html">Lihat jadwal</a>
         </div>
         <div class="learning-list" data-learning-programs>
@@ -463,7 +531,7 @@
       <!-- Materi List -->
       <section class="learning-section">
         <div class="learning-section-heading">
-          <h2>Materi Terbaru</h2>
+          <h3>Materi Terbaru</h3>
           <a href="./materi-pembelajaran.html">Lihat semua materi</a>
         </div>
         <div class="learning-list" data-learning-materials>
@@ -477,12 +545,14 @@
       <!-- Progress Card -->
       <section class="learning-section">
         <div class="learning-section-heading">
-          <h2>Perkembangan Pembelajaran Saya</h2>
+          <h3>Perkembangan Pembelajaran Saya</h3>
         </div>
         <div class="learning-progress-card">
           <h3>Perjalanan Menuntut Ilmu</h3>
-          <p>Pantau aktivitas pembelajaran, kajian yang telah diikuti, dan riwayat kehadiran melalui halaman profil anggota.</p>
-          <div style="display:flex;gap:10px;margin-top:16px;">
+          <p style="color:var(--text-secondary);margin:8px 0 16px;font-size:.9rem;line-height:1.6;">
+            Pantau aktivitas pembelajaran, kajian yang telah diikuti, dan riwayat kehadiran melalui halaman profil anggota.
+          </p>
+          <div style="display:flex;gap:10px;">
             <a href="./profil-anggota.html" class="btn btn-primary">Lihat Profil Saya</a>
             <a href="./kehadiran.html" class="btn btn-secondary">Riwayat Kehadiran</a>
           </div>
@@ -495,28 +565,6 @@
       </footer>
 
     </main>
-
-    <!-- BOTTOM NAV (Hanya Tampil di HP) -->
-    <nav class="mobile-bottom-nav">
-      <div class="mobile-bottom-nav-inner">
-        <a href="./tarbiyah.html" class="mobile-nav-link">
-          <span class="mobile-nav-icon">⌂</span>
-          <span class="mobile-nav-label">Beranda</span>
-        </a>
-        <a href="./agenda-tarbiyah.html" class="mobile-nav-link">
-          <span class="mobile-nav-icon">▦</span>
-          <span class="mobile-nav-label">Agenda</span>
-        </a>
-        <a href="./materi-pembelajaran.html" class="mobile-nav-link">
-          <span class="mobile-nav-icon">▤</span>
-          <span class="mobile-nav-label">Materi</span>
-        </a>
-        <a href="./profil-anggota.html" class="mobile-nav-link is-active">
-          <span class="mobile-nav-icon">♙</span>
-          <span class="mobile-nav-label">Profil</span>
-        </a>
-      </div>
-    </nav>
 
   </div>
 
