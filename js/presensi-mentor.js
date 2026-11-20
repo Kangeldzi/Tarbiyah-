@@ -1,507 +1,1683 @@
+/* ============================================================
+   TARBIYAH — PRESENSI ANGGOTA BINAAN
+   File    : js/presensi-mentor.js
+   Versi   : 2.0.0 FINAL
 
-/* =========================================================
-   TARBIYAH — PRESENSI MENTOR
-   Versi 1.0.0
-   Menggunakan kajian_agenda dan kajian_attendance
-========================================================= */
+   Fitur:
+   - Pemeriksaan sesi login dan role pengguna
+   - Mentor hanya melihat anggota binaannya sendiri
+   - Admin dan Super Admin dapat melihat anggota sesuai RLS
+   - Memuat agenda kajian yang sudah dipublikasikan
+   - Menampilkan data presensi anggota
+   - Input presensi manual: hadir, izin, sakit, alpa
+   - Mengubah catatan presensi manual
+   - Mengunci catatan presensi QR
+   - Statistik presensi sesuai agenda yang dipilih
+
+   Tabel:
+   - user_roles
+   - mentor_assignments
+   - members
+   - profiles
+   - kajian_agenda
+   - kajian_attendance
+
+   Supabase client:
+   window.tarbiyahSupabase
+
+   Zona waktu tampilan:
+   Asia/Jakarta
+
+   Tidak mengubah:
+   - Struktur database
+   - RLS
+   - Role pengguna
+   - Penugasan Mentor
+============================================================ */
+
 (() => {
   "use strict";
 
-  if (window.__TARBIYAH_PRESENSI_MENTOR_V1__) return;
-  window.__TARBIYAH_PRESENSI_MENTOR_V1__ = true;
+  /* ==========================================================
+     01. PENCEGAHAN INISIALISASI GANDA
+  ========================================================== */
 
-  const $ = id => document.getElementById(id);
-  const supabase = window.tarbiyahSupabase;
+  if (window.__TARBIYAH_PRESENSI_MENTOR_V2__) {
+    console.info(
+      "[TARBIYAH PRESENSI MENTOR] Sudah diinisialisasi."
+    );
+    return;
+  }
+
+  window.__TARBIYAH_PRESENSI_MENTOR_V2__ = true;
+
+
+  /* ==========================================================
+     02. KONFIGURASI
+  ========================================================== */
+
+  const CONFIG = {
+    timezone: "Asia/Jakarta",
+
+    roleTable: "user_roles",
+
+    assignmentTable: "mentor_assignments",
+
+    memberTable: "members",
+
+    profileTable: "profiles",
+
+    agendaTable: "kajian_agenda",
+
+    attendanceTable: "kajian_attendance",
+
+    allowedRoles: [
+      "super_admin",
+      "admin",
+      "mentor"
+    ],
+
+    attendanceStatuses: [
+      "hadir",
+      "izin",
+      "sakit",
+      "alpa"
+    ]
+  };
+
+
+  /* ==========================================================
+     03. STATE
+  ========================================================== */
 
   const state = {
+    supabase: null,
+
     user: null,
-    role: null,
+
+    roles: [],
+
+    primaryRole: null,
+
+    assignments: [],
+
     members: [],
+
     agendas: [],
+
     attendance: [],
-    selectedAgendaId: "",
-    loading: false,
-    saving: new Set()
+
+    selectedAgendaId: null,
+
+    isLoading: false,
+
+    savingMembers: new Set()
   };
 
-  const STATUS_LABELS = {
-    hadir: "Hadir",
-    izin: "Izin",
-    sakit: "Sakit",
-    alpa: "Alpa"
+
+  /* ==========================================================
+     04. HELPER ELEMENT HTML
+  ========================================================== */
+
+  const $ = (selector, root = document) => {
+    return root.querySelector(selector);
   };
+
+  const byId = id => {
+    return document.getElementById(id);
+  };
+
+  function getElement(...selectors) {
+    for (const selector of selectors) {
+      const element = selector.startsWith("#")
+        ? document.getElementById(selector.slice(1))
+        : document.querySelector(selector);
+
+      if (element) return element;
+    }
+
+    return null;
+  }
+
+
+  /* ==========================================================
+     05. HELPER TEKS DAN HTML
+  ========================================================== */
 
   function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char]);
+    return String(value ?? "").replace(
+      /[&<>"']/g,
+      character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[character]
+    );
   }
 
-  function notify(message, type = "success") {
-    const box = $("pageMessage");
-    box.textContent = message;
-    box.className = `message show ${type}`;
-    window.clearTimeout(notify.timer);
-    notify.timer = window.setTimeout(() => {
-      box.className = "message";
-    }, 5000);
+
+  function normalizeRole(role) {
+    return String(role ?? "")
+      .trim()
+      .toLowerCase()
+      .replaceAll("-", "_")
+      .replaceAll(" ", "_");
   }
 
-  function formatDate(value, withTime = true) {
-    if (!value) return "—";
+
+  function getRoleName(roleRow) {
+    const relation = roleRow?.roles;
+
+    if (Array.isArray(relation)) {
+      return normalizeRole(relation[0]?.name);
+    }
+
+    return normalizeRole(relation?.name);
+  }
+
+
+  function formatDateTime(value) {
+    if (!value) return "-";
+
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "—";
+
+    if (Number.isNaN(date.getTime())) {
+      return "-";
+    }
 
     return new Intl.DateTimeFormat("id-ID", {
-      timeZone: "Asia/Jakarta",
-      day: "2-digit",
+      timeZone: CONFIG.timezone,
+      weekday: "long",
+      day: "numeric",
       month: "long",
       year: "numeric",
-      ...(withTime ? { hour: "2-digit", minute: "2-digit" } : {})
+      hour: "2-digit",
+      minute: "2-digit"
     }).format(date);
   }
 
-  function getMemberName(member) {
-    return member.profile?.full_name || "Anggota TARBIYAH";
-  }
 
-  async function initialize() {
-    try {
-      if (!supabase) {
-        throw new Error("Koneksi Supabase belum tersedia.");
-      }
+  function formatDate(value) {
+    if (!value) return "-";
 
-      const { data: authData, error: authError } =
-        await supabase.auth.getUser();
+    const date = new Date(value);
 
-      if (authError) throw authError;
-
-      if (!authData?.user) {
-        location.replace("./login-register.html");
-        return;
-      }
-
-      state.user = authData.user;
-
-      const { data: roleRows, error: roleError } = await supabase
-        .from("user_roles")
-        .select("role_id, roles(name)")
-        .eq("user_id", state.user.id);
-
-      if (roleError) throw roleError;
-
-      const roles = (roleRows || [])
-        .map(row => {
-          const relation = Array.isArray(row.roles)
-            ? row.roles[0]
-            : row.roles;
-          return relation?.name;
-        })
-        .filter(Boolean);
-
-      state.role = roles.includes("super_admin")
-        ? "super_admin"
-        : roles.includes("admin")
-          ? "admin"
-          : roles.includes("mentor")
-            ? "mentor"
-            : null;
-
-      if (!state.role) {
-        throw new Error("Menu ini hanya dapat diakses Mentor, Admin, dan Super Admin.");
-      }
-
-      document.body.classList.remove("auth-pending");
-
-      bindEvents();
-      await loadMembers();
-      await loadAgendas();
-
-    } catch (error) {
-      console.error("[TARBIYAH PRESENSI MENTOR]", error);
-      notify(error.message || "Gagal membuka halaman Presensi.", "error");
-      $("memberList").innerHTML =
-        '<div class="empty">Data belum dapat dimuat. Periksa koneksi atau hak akses akun.</div>';
-    }
-  }
-
-  async function loadMembers() {
-    let query = supabase
-      .from("mentor_assignments")
-      .select("id, mentor_user_id, member_id")
-      .eq("is_active", true);
-
-    if (state.role === "mentor") {
-      query = query.eq("mentor_user_id", state.user.id);
+    if (Number.isNaN(date.getTime())) {
+      return "-";
     }
 
-    const { data: assignments, error } = await query;
-    if (error) throw error;
+    return new Intl.DateTimeFormat("id-ID", {
+      timeZone: CONFIG.timezone,
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(date);
+  }
 
-    const memberIds = [...new Set(
-      (assignments || []).map(row => row.member_id).filter(Boolean)
-    )];
 
-    if (!memberIds.length) {
-      state.members = [];
-      renderMembers();
-      updateStats();
+  function getInitial(name) {
+    const text = String(name || "").trim();
+
+    if (!text) return "A";
+
+    return text
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(part => part.charAt(0).toUpperCase())
+      .join("");
+  }
+
+
+  /* ==========================================================
+     06. NOTIFIKASI
+  ========================================================== */
+
+  function notify(message, type = "info") {
+    if (typeof window.TARBIYAH_NOTIFY === "function") {
+      window.TARBIYAH_NOTIFY(message, type);
       return;
     }
 
-    const { data: members, error: memberError } = await supabase
-      .from("members")
-      .select("id, user_id, member_number, membership_status")
+    const region =
+      getElement(
+        "#toastRegion",
+        "#toastContainer",
+        "[data-toast-region]"
+      );
+
+    if (region) {
+      const item = document.createElement("div");
+
+      item.className = "toast";
+      item.dataset.type = type;
+      item.setAttribute("role", "status");
+      item.textContent = String(message);
+
+      region.appendChild(item);
+
+      window.setTimeout(() => {
+        item.remove();
+      }, 4000);
+
+      return;
+    }
+
+    console.info("[TARBIYAH]", message);
+  }
+
+
+  /* ==========================================================
+     07. PESAN HALAMAN
+  ========================================================== */
+
+  function setPageMessage(message, type = "info") {
+    const element = getElement(
+      "#pageMessage",
+      "[data-page-message]"
+    );
+
+    if (!element) return;
+
+    element.textContent = message;
+
+    element.className = "page-message";
+    element.dataset.type = type;
+
+    element.hidden = !message;
+  }
+
+
+  function clearPageMessage() {
+    const element = getElement(
+      "#pageMessage",
+      "[data-page-message]"
+    );
+
+    if (!element) return;
+
+    element.textContent = "";
+    element.hidden = true;
+  }
+
+
+  /* ==========================================================
+     08. VALIDASI SUPABASE
+  ========================================================== */
+
+  function getSupabaseClient() {
+    return (
+      window.tarbiyahSupabase ||
+      window.supabaseClient ||
+      window.TARBIYAH_SUPABASE ||
+      null
+    );
+  }
+
+
+  function validateSupabase() {
+    state.supabase = getSupabaseClient();
+
+    if (!state.supabase) {
+      throw new Error(
+        "Koneksi Supabase belum tersedia. Periksa js/supabase-client.js."
+      );
+    }
+
+    if (
+      !state.supabase.auth ||
+      typeof state.supabase.from !== "function"
+    ) {
+      throw new Error(
+        "Supabase client belum siap digunakan."
+      );
+    }
+
+    return state.supabase;
+  }
+
+
+  /* ==========================================================
+     09. PEMERIKSAAN LOGIN
+  ========================================================== */
+
+  async function loadCurrentUser() {
+    const supabase = validateSupabase();
+
+    const {
+      data,
+      error
+    } = await supabase.auth.getSession();
+
+    if (error) throw error;
+
+    const session = data?.session;
+
+    if (!session?.user) {
+      window.location.replace("./login-register.html");
+      return false;
+    }
+
+    state.user = session.user;
+
+    return true;
+  }
+
+
+  /* ==========================================================
+     10. PEMERIKSAAN ROLE
+  ========================================================== */
+
+  async function loadUserRoles() {
+    const supabase = state.supabase;
+
+    const {
+      data,
+      error
+    } = await supabase
+      .from(CONFIG.roleTable)
+      .select("role_id, roles(name)")
+      .eq("user_id", state.user.id);
+
+    if (error) throw error;
+
+    state.roles = (data || [])
+      .map(getRoleName)
+      .filter(Boolean);
+
+    state.primaryRole =
+      state.roles.includes("super_admin")
+        ? "super_admin"
+        : state.roles.includes("admin")
+          ? "admin"
+          : state.roles.includes("mentor")
+            ? "mentor"
+            : null;
+
+    const hasPermission = state.roles.some(role =>
+      CONFIG.allowedRoles.includes(role)
+    );
+
+    if (!hasPermission) {
+      throw new Error(
+        "Akses ditolak. Halaman ini hanya dapat digunakan oleh Mentor, Admin, atau Super Admin."
+      );
+    }
+
+    return true;
+  }
+
+
+  /* ==========================================================
+     11. MEMUAT PENUGASAN MENTOR
+  ========================================================== */
+
+  async function loadAssignments() {
+    const supabase = state.supabase;
+
+    let query = supabase
+      .from(CONFIG.assignmentTable)
+      .select(
+        "assignment_id, mentor_user_id, member_id, active"
+      )
+      .eq("active", true);
+
+    /*
+      Mentor:
+      Hanya mengambil penugasan miliknya sendiri.
+
+      Admin dan Super Admin:
+      Mengambil penugasan aktif sesuai RLS.
+    */
+
+    if (state.primaryRole === "mentor") {
+      query = query.eq(
+        "mentor_user_id",
+        state.user.id
+      );
+    }
+
+    const {
+      data,
+      error
+    } = await query;
+
+    if (error) throw error;
+
+    state.assignments = data || [];
+
+    return state.assignments;
+  }
+
+
+  /* ==========================================================
+     12. MEMUAT DATA ANGGOTA BINAAN
+  ========================================================== */
+
+  async function loadMembers() {
+    const supabase = state.supabase;
+
+    const memberIds = [
+      ...new Set(
+        state.assignments
+          .map(item => item.member_id)
+          .filter(Boolean)
+      )
+    ];
+
+    state.members = [];
+
+    if (!memberIds.length) {
+      return [];
+    }
+
+    const {
+      data: memberRows,
+      error: memberError
+    } = await supabase
+      .from(CONFIG.memberTable)
+      .select(
+        "id, user_id, member_number, membership_status"
+      )
       .in("id", memberIds);
 
     if (memberError) throw memberError;
 
-    const userIds = [...new Set(
-      (members || []).map(row => row.user_id).filter(Boolean)
-    )];
+    const members = memberRows || [];
 
-    let profiles = [];
+    const userIds = [
+      ...new Set(
+        members
+          .map(member => member.user_id)
+          .filter(Boolean)
+      )
+    ];
+
+    let profileRows = [];
 
     if (userIds.length) {
-      const { data, error: profileError } = await supabase
-        .from("profiles")
-        .select("id, full_name, username")
+      const {
+        data,
+        error
+      } = await supabase
+        .from(CONFIG.profileTable)
+        .select(
+          "id, full_name, username"
+        )
         .in("id", userIds);
 
-      if (profileError) throw profileError;
-      profiles = data || [];
+      if (error) throw error;
+
+      profileRows = data || [];
     }
 
-    const profileMap = new Map(profiles.map(row => [row.id, row]));
+    const profileMap = new Map(
+      profileRows.map(profile => [
+        profile.id,
+        profile
+      ])
+    );
 
-    state.members = (members || []).map(member => ({
-      ...member,
-      profile: profileMap.get(member.user_id) || {}
-    }));
+    state.members = members.map(member => {
+      const profile = profileMap.get(member.user_id);
+
+      return {
+        id: member.id,
+
+        user_id: member.user_id,
+
+        member_number:
+          member.member_number || "",
+
+        membership_status:
+          member.membership_status || "",
+
+        full_name:
+          profile?.full_name ||
+          profile?.username ||
+          "Anggota TARBIYAH",
+
+        username:
+          profile?.username || ""
+      };
+    });
 
     state.members.sort((a, b) =>
-      getMemberName(a).localeCompare(getMemberName(b), "id")
+      a.full_name.localeCompare(
+        b.full_name,
+        "id"
+      )
     );
+
+    return state.members;
   }
 
+
+  /* ==========================================================
+     13. MEMUAT AGENDA KAJIAN
+  ========================================================== */
+
   async function loadAgendas() {
-    const { data, error } = await supabase
-      .from("kajian_agenda")
-      .select("id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status")
+    const supabase = state.supabase;
+
+    const {
+      data,
+      error
+    } = await supabase
+      .from(CONFIG.agendaTable)
+      .select(
+        "id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status"
+      )
       .eq("status", "published")
-      .order("starts_at", { ascending: false })
+      .order("starts_at", {
+        ascending: false
+      })
       .limit(100);
 
     if (error) throw error;
 
     state.agendas = data || [];
-    renderAgendaOptions();
 
-    if (!state.agendas.length) {
-      $("memberList").innerHTML =
-        '<div class="empty">Belum ada agenda kajian berstatus Published. Agenda harus diterbitkan oleh Admin terlebih dahulu.</div>';
-      $("agendaInfo").hidden = true;
-      return;
-    }
-
-    const firstAgenda = state.agendas[0];
-    $("agendaSelect").value = firstAgenda.id;
-    await selectAgenda(firstAgenda.id);
+    return state.agendas;
   }
+
+
+  /* ==========================================================
+     14. MENAMPILKAN PILIHAN AGENDA
+  ========================================================== */
 
   function renderAgendaOptions() {
-    const select = $("agendaSelect");
+    const select = getElement(
+      "#agendaSelect",
+      "[data-agenda-select]"
+    );
 
-    if (!state.agendas.length) {
-      select.innerHTML = '<option value="">Belum ada agenda kajian</option>';
-      select.disabled = true;
-      return;
+    if (!select) {
+      throw new Error(
+        "Elemen agendaSelect tidak ditemukan pada presensi-mentor.html."
+      );
     }
 
-    select.disabled = false;
-    select.innerHTML =
-      '<option value="">Pilih agenda kajian</option>' +
-      state.agendas.map(agenda => {
-        const label = `${agenda.title} — ${formatDate(agenda.starts_at)}`;
-        return `<option value="${escapeHTML(agenda.id)}">${escapeHTML(label)}</option>`;
-      }).join("");
+    const previousValue = state.selectedAgendaId;
+
+    select.replaceChildren();
+
+    const defaultOption = document.createElement("option");
+
+    defaultOption.value = "";
+    defaultOption.textContent = state.agendas.length
+      ? "Pilih agenda kajian"
+      : "Belum ada agenda yang dipublikasikan";
+
+    select.appendChild(defaultOption);
+
+    state.agendas.forEach(agenda => {
+      const option = document.createElement("option");
+
+      option.value = agenda.id;
+
+      option.textContent =
+        `${agenda.title || "Agenda Kajian"} — ${formatDate(agenda.starts_at)}`;
+
+      select.appendChild(option);
+    });
+
+    const previousExists = state.agendas.some(
+      agenda => agenda.id === previousValue
+    );
+
+    if (previousExists) {
+      select.value = previousValue;
+    } else if (state.agendas.length) {
+      select.value = state.agendas[0].id;
+    } else {
+      select.value = "";
+    }
+
+    state.selectedAgendaId = select.value || null;
+
+    select.disabled = state.agendas.length === 0;
   }
 
-  function renderAgendaInfo(agenda) {
-    const info = $("agendaInfo");
+
+  /* ==========================================================
+     15. INFORMASI AGENDA TERPILIH
+  ========================================================== */
+
+  function renderAgendaInfo() {
+    const container = getElement(
+      "#agendaInfo",
+      "[data-agenda-info]"
+    );
+
+    if (!container) return;
+
+    const agenda = state.agendas.find(
+      item => item.id === state.selectedAgendaId
+    );
 
     if (!agenda) {
-      info.hidden = true;
-      info.textContent = "";
+      container.innerHTML = `
+        <div class="agenda-info-empty">
+          Belum ada agenda kajian yang dipilih.
+        </div>
+      `;
+
       return;
     }
 
-    const location = agenda.location_name ||
-      agenda.location_address || "Lokasi belum ditentukan";
+    container.innerHTML = `
+      <div class="agenda-info-card">
 
-    info.innerHTML = `
-      <strong>${escapeHTML(agenda.title)}</strong><br>
-      📅 ${escapeHTML(formatDate(agenda.starts_at))}<br>
-      🕒 Selesai: ${escapeHTML(formatDate(agenda.ends_at))}<br>
-      📍 ${escapeHTML(location)}
-      ${agenda.speaker_name
-        ? `<br>🎙️ Pemateri: ${escapeHTML(agenda.speaker_name)}`
-        : ""}
+        <div class="agenda-info-title">
+          ${escapeHTML(agenda.title || "Agenda Kajian")}
+        </div>
+
+        <div class="agenda-info-row">
+          <span>📅</span>
+          <span>${escapeHTML(formatDateTime(agenda.starts_at))}</span>
+        </div>
+
+        ${
+          agenda.ends_at
+            ? `
+              <div class="agenda-info-row">
+                <span>⏰</span>
+                <span>Selesai: ${escapeHTML(formatDateTime(agenda.ends_at))}</span>
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          agenda.speaker_name
+            ? `
+              <div class="agenda-info-row">
+                <span>🎙️</span>
+                <span>${escapeHTML(agenda.speaker_name)}</span>
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          agenda.location_name
+            ? `
+              <div class="agenda-info-row">
+                <span>📍</span>
+                <span>${escapeHTML(agenda.location_name)}</span>
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          agenda.description
+            ? `
+              <div class="agenda-info-description">
+                ${escapeHTML(agenda.description)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
     `;
-
-    info.hidden = false;
   }
 
-  async function selectAgenda(agendaId) {
-    state.selectedAgendaId = agendaId;
-    const agenda = state.agendas.find(item => item.id === agendaId);
-    renderAgendaInfo(agenda);
 
-    if (!agenda) {
-      state.attendance = [];
-      renderMembers();
-      updateStats();
-      return;
+  /* ==========================================================
+     16. MEMUAT DATA PRESENSI AGENDA
+  ========================================================== */
+
+  async function loadAttendance() {
+    const supabase = state.supabase;
+
+    state.attendance = [];
+
+    if (
+      !state.selectedAgendaId ||
+      !state.members.length
+    ) {
+      return [];
     }
 
-    if (!state.members.length) {
-      renderMembers();
-      updateStats();
-      return;
-    }
+    const memberIds = state.members.map(
+      member => member.id
+    );
 
-    $("memberList").innerHTML =
-      '<div class="empty">Memuat data kehadiran...</div>';
-
-    const memberIds = state.members.map(member => member.id);
-
-    const { data, error } = await supabase
-      .from("kajian_attendance")
-      .select("id, agenda_id, member_id, token_id, scanned_by, attended_at, attendance_method, manual_reason, attendance_status")
-      .eq("agenda_id", agendaId)
+    const {
+      data,
+      error
+    } = await supabase
+      .from(CONFIG.attendanceTable)
+      .select(
+        "id, agenda_id, member_id, token_id, scanned_by, attended_at, attendance_method, manual_reason, attendance_status"
+      )
+      .eq("agenda_id", state.selectedAgendaId)
       .in("member_id", memberIds);
 
     if (error) throw error;
 
     state.attendance = data || [];
-    renderMembers();
-    updateStats();
+
+    return state.attendance;
   }
 
-  function getAttendance(memberId) {
-    return state.attendance.find(row => row.member_id === memberId) || null;
+
+  /* ==========================================================
+     17. MENCARI CATATAN PRESENSI ANGGOTA
+  ========================================================== */
+
+  function getAttendanceForMember(memberId) {
+    return state.attendance.find(
+      record => record.member_id === memberId
+    ) || null;
   }
 
-  function renderMembers() {
-    const list = $("memberList");
 
-    if (!state.members.length) {
-      list.innerHTML =
-        '<div class="empty">Belum ada anggota binaan aktif yang ditugaskan kepada akun ini.</div>';
-      return;
-    }
+  /* ==========================================================
+     18. STATUS PRESENSI
+  ========================================================== */
 
-    if (!state.selectedAgendaId) {
-      list.innerHTML =
-        '<div class="empty">Pilih agenda kajian untuk menampilkan daftar presensi.</div>';
-      return;
-    }
+  function getStatusLabel(status) {
+    const labels = {
+      hadir: "Hadir",
+      izin: "Izin",
+      sakit: "Sakit",
+      alpa: "Alpa"
+    };
 
-    list.innerHTML = state.members.map(member => {
-      const record = getAttendance(member.id);
-      const isQR = record?.attendance_method === "qr" || Boolean(record?.token_id);
-      const isLocked = isQR;
-      const status = record?.attendance_status || "hadir";
-      const badge = !record
-        ? '<span class="record-badge locked">Belum diabsen</span>'
-        : isQR
-          ? '<span class="record-badge qr">Presensi QR</span>'
-          : '<span class="record-badge">Presensi Manual</span>';
+    return labels[status] || "Belum diabsen";
+  }
 
-      const note = record?.manual_reason || "";
 
-      return `
-        <article class="member-card" data-member-card="${escapeHTML(member.id)}">
-          <div class="member-name">${escapeHTML(getMemberName(member))}</div>
-          <div class="member-number">
-            Nomor Anggota: ${escapeHTML(member.member_number || "Belum tersedia")}
+  function getStatusClass(status) {
+    const classes = {
+      hadir: "status-hadir",
+      izin: "status-izin",
+      sakit: "status-sakit",
+      alpa: "status-alpa"
+    };
+
+    return classes[status] || "status-empty";
+  }
+
+
+  function getStatusOptions(selectedStatus) {
+    return CONFIG.attendanceStatuses
+      .map(status => `
+        <option
+          value="${status}"
+          ${selectedStatus === status ? "selected" : ""}
+        >
+          ${getStatusLabel(status)}
+        </option>
+      `)
+      .join("");
+  }
+
+
+  /* ==========================================================
+     19. MENAMPILKAN KARTU ANGGOTA
+  ========================================================== */
+
+  function renderMemberCard(member) {
+    const record = getAttendanceForMember(member.id);
+
+    /*
+      Catatan hanya dianggap dapat diedit jika:
+      attendance_method = manual
+      DAN token_id kosong.
+
+      Catatan QR atau catatan lain dikunci.
+    */
+
+    const isManual =
+      record?.attendance_method === "manual" &&
+      !record?.token_id;
+
+    const isLocked =
+      Boolean(record) && !isManual;
+
+    const status = record?.attendance_status || "";
+
+    const badge = !record
+      ? `
+        <span class="record-badge locked">
+          Belum diabsen
+        </span>
+      `
+      : isManual
+        ? `
+          <span class="record-badge">
+            Presensi Manual
+          </span>
+        `
+        : `
+          <span class="record-badge qr">
+            Presensi Terkunci
+          </span>
+        `;
+
+    const disabledAttribute = isLocked
+      ? "disabled"
+      : "";
+
+    const reasonValue = record?.manual_reason || "";
+
+    const attendedAt = record?.attended_at
+      ? formatDateTime(record.attended_at)
+      : "";
+
+    return `
+      <article
+        class="mentor-member-card"
+        data-member-id="${escapeHTML(member.id)}"
+      >
+
+        <div class="member-card-header">
+
+          <div class="member-avatar">
+            ${escapeHTML(getInitial(member.full_name))}
           </div>
 
-          ${badge}
+          <div class="member-identity">
 
-          <label class="field">
+            <h3>
+              ${escapeHTML(member.full_name)}
+            </h3>
+
+            <p>
+              ${
+                member.member_number
+                  ? `No. Anggota: ${escapeHTML(member.member_number)}`
+                  : "Anggota TARBIYAH"
+              }
+            </p>
+
+            ${
+              member.username
+                ? `
+                  <small>
+                    @${escapeHTML(member.username)}
+                  </small>
+                `
+                : ""
+            }
+
+          </div>
+
+          <div class="member-record-badge">
+            ${badge}
+          </div>
+
+        </div>
+
+
+        <div class="member-attendance-form">
+
+          <label class="attendance-field">
+
             <span>Status Kehadiran</span>
-            <select data-status="${escapeHTML(member.id)}" ${isLocked ? "disabled" : ""}>
-              ${Object.entries(STATUS_LABELS).map(([value, label]) =>
-                `<option value="${value}" ${status === value ? "selected" : ""}>${label}</option>`
-              ).join("")}
+
+            <select
+              class="attendance-status"
+              ${disabledAttribute}
+            >
+              <option value="">
+                Pilih status kehadiran
+              </option>
+
+              ${getStatusOptions(status)}
+
             </select>
+
           </label>
 
-          <label class="field">
-            <span>Keterangan Presensi Manual (wajib)</span>
+
+          <label class="attendance-field">
+
+            <span>Keterangan / Alasan Presensi Manual</span>
+
             <textarea
-              data-reason="${escapeHTML(member.id)}"
+              class="manual-reason"
+              rows="2"
               maxlength="1000"
               placeholder="Contoh: Presensi manual oleh Mentor."
-              ${isLocked ? "disabled" : ""}
-            >${escapeHTML(note)}</textarea>
+              ${disabledAttribute}
+            >${escapeHTML(reasonValue)}</textarea>
+
           </label>
 
-          <div class="member-actions">
-            <button
-              type="button"
-              class="btn btn-save"
-              data-save-attendance="${escapeHTML(member.id)}"
-              ${isLocked ? "disabled" : ""}
-            >Simpan Presensi</button>
-            ${record?.attended_at
-              ? `<span class="locked-note">Tercatat: ${escapeHTML(formatDate(record.attended_at))}</span>`
-              : ""}
-          </div>
 
-          ${isLocked
-            ? '<div class="locked-note">Presensi ini berasal dari QR dan dikunci agar catatan QR tidak diubah melalui presensi manual.</div>'
-            : ""}
-        </article>
-      `;
-    }).join("");
+          ${
+            isLocked
+              ? `
+                <div class="attendance-locked-message">
+                  🔒 Catatan ini tidak dapat diubah melalui
+                  Presensi Mentor karena bukan catatan presensi manual.
+                </div>
+              `
+              : `
+                <button
+                  type="button"
+                  class="btn-save-attendance"
+                  data-save-attendance
+                >
+                  Simpan Presensi
+                </button>
+              `
+          }
+
+
+          ${
+            attendedAt
+              ? `
+                <div class="attendance-time">
+                  Terakhir tercatat: ${escapeHTML(attendedAt)}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+      </article>
+    `;
   }
 
-  function updateStats() {
+
+  /* ==========================================================
+     20. MENAMPILKAN SELURUH ANGGOTA
+  ========================================================== */
+
+  function renderMembers() {
+    const container = getElement(
+      "#memberList",
+      "[data-member-list]"
+    );
+
+    if (!container) {
+      throw new Error(
+        "Elemen memberList tidak ditemukan pada presensi-mentor.html."
+      );
+    }
+
+    if (!state.selectedAgendaId) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📅</div>
+          <h3>Pilih Agenda Kajian</h3>
+          <p>
+            Silakan pilih agenda kajian untuk melihat
+            daftar presensi anggota binaan.
+          </p>
+        </div>
+      `;
+
+      updateStatistics();
+
+      return;
+    }
+
+    if (!state.members.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">♙</div>
+          <h3>Belum Ada Anggota Binaan</h3>
+          <p>
+            Belum ada anggota yang ditugaskan
+            kepada Mentor ini.
+          </p>
+        </div>
+      `;
+
+      updateStatistics();
+
+      return;
+    }
+
+    container.innerHTML = state.members
+      .map(renderMemberCard)
+      .join("");
+
+    updateStatistics();
+  }
+
+
+  /* ==========================================================
+     21. STATISTIK PRESENSI
+  ========================================================== */
+
+  function updateStatisticElement(selectors, value) {
+    const element = getElement(...selectors);
+
+    if (element) {
+      element.textContent = String(value);
+    }
+  }
+
+
+  function updateStatistics() {
     const total = state.members.length;
-    let present = 0;
-    let excused = 0;
-    let pending = 0;
 
-    state.members.forEach(member => {
-      const record = getAttendance(member.id);
-      const status = record?.attendance_status;
+    const counts = {
+      hadir: 0,
+      izin: 0,
+      sakit: 0,
+      alpa: 0
+    };
 
-      if (!record) pending++;
-      else if (status === "hadir") present++;
-      else if (status === "izin" || status === "sakit") excused++;
+    state.attendance.forEach(record => {
+      const status = record.attendance_status;
+
+      if (Object.prototype.hasOwnProperty.call(counts, status)) {
+        counts[status]++;
+      }
     });
 
-    $("statMembers").textContent = total;
-    $("statPresent").textContent = present;
-    $("statExcused").textContent = excused;
-    $("statPending").textContent = pending;
+    const recorded =
+      counts.hadir +
+      counts.izin +
+      counts.sakit +
+      counts.alpa;
+
+    const percentage = total
+      ? Math.round((counts.hadir / total) * 100)
+      : 0;
+
+    updateStatisticElement(
+      ["#statTotal", "#totalMembers", "[data-stat-total]"],
+      total
+    );
+
+    updateStatisticElement(
+      ["#statHadir", "#totalHadir", "[data-stat-hadir]"],
+      counts.hadir
+    );
+
+    updateStatisticElement(
+      ["#statIzin", "#totalIzin", "[data-stat-izin]"],
+      counts.izin
+    );
+
+    updateStatisticElement(
+      ["#statSakit", "#totalSakit", "[data-stat-sakit]"],
+      counts.sakit
+    );
+
+    updateStatisticElement(
+      ["#statAlpa", "#totalAlpa", "[data-stat-alpa]"],
+      counts.alpa
+    );
+
+    updateStatisticElement(
+      ["#statBelum", "#totalBelum", "[data-stat-belum]"],
+      Math.max(0, total - recorded)
+    );
+
+    updateStatisticElement(
+      ["#statPersentase", "[data-stat-persentase]"],
+      `${percentage}%`
+    );
   }
 
-  async function saveAttendance(memberId, button) {
+
+  /* ==========================================================
+     22. MENYIMPAN PRESENSI MANUAL
+  ========================================================== */
+
+  async function saveManualAttendance(memberId, card) {
+    const supabase = state.supabase;
+
+    if (!state.user?.id) {
+      throw new Error(
+        "Sesi pengguna tidak ditemukan. Silakan login kembali."
+      );
+    }
+
     if (!state.selectedAgendaId) {
-      notify("Pilih agenda kajian terlebih dahulu.", "error");
-      return;
+      throw new Error(
+        "Silakan pilih agenda kajian terlebih dahulu."
+      );
     }
 
-    if (state.saving.has(memberId)) return;
+    const member = state.members.find(
+      item => item.id === memberId
+    );
 
-    const record = getAttendance(memberId);
-
-    if (record && (
-      record.attendance_method === "qr" ||
-      record.token_id
-    )) {
-      notify("Catatan presensi QR tidak dapat diubah melalui menu manual.", "error");
-      return;
+    if (!member) {
+      throw new Error(
+        "Data anggota tidak ditemukan."
+      );
     }
 
-    const statusElement = document.querySelector(
-      `[data-status="${CSS.escape(memberId)}"]`
-    );
-    const reasonElement = document.querySelector(
-      `[data-reason="${CSS.escape(memberId)}"]`
-    );
+    const statusInput = $(".attendance-status", card);
 
-    const attendanceStatus = statusElement?.value;
-    const manualReason = reasonElement?.value.trim();
+    const reasonInput = $(".manual-reason", card);
 
-    if (!["hadir", "izin", "sakit", "alpa"].includes(attendanceStatus)) {
-      notify("Pilih status kehadiran yang valid.", "error");
-      return;
+    if (!statusInput || !reasonInput) {
+      throw new Error(
+        "Form presensi tidak ditemukan."
+      );
+    }
+
+    const attendanceStatus = statusInput.value;
+
+    const manualReason = reasonInput.value.trim();
+
+    if (!CONFIG.attendanceStatuses.includes(attendanceStatus)) {
+      throw new Error(
+        "Silakan pilih status kehadiran yang valid."
+      );
     }
 
     if (!manualReason) {
-      notify("Keterangan presensi manual wajib diisi.", "error");
-      reasonElement?.focus();
+      throw new Error(
+        "Keterangan atau alasan presensi manual wajib diisi."
+      );
+    }
+
+    const existingRecord =
+      getAttendanceForMember(memberId);
+
+    /*
+      Pengamanan tambahan:
+      Catatan QR tidak boleh diperbarui melalui halaman ini.
+    */
+
+    if (
+      existingRecord &&
+      !(
+        existingRecord.attendance_method === "manual" &&
+        !existingRecord.token_id
+      )
+    ) {
+      throw new Error(
+        "Catatan presensi ini terkunci dan tidak dapat diubah melalui Presensi Mentor."
+      );
+    }
+
+    if (existingRecord) {
+
+      /*
+        UPDATE:
+        Hanya memperbarui dua kolom yang diizinkan
+        oleh aturan keamanan Mentor.
+      */
+
+      const {
+        error
+      } = await supabase
+        .from(CONFIG.attendanceTable)
+        .update({
+          attendance_status: attendanceStatus,
+          manual_reason: manualReason
+        })
+        .eq("id", existingRecord.id)
+        .eq("agenda_id", state.selectedAgendaId)
+        .eq("member_id", memberId);
+
+      if (error) throw error;
+
+    } else {
+
+      /*
+        INSERT:
+        Presensi baru selalu menggunakan metode manual.
+        token_id harus NULL.
+        manual_reason wajib terisi.
+      */
+
+      const {
+        error
+      } = await supabase
+        .from(CONFIG.attendanceTable)
+        .insert({
+          agenda_id: state.selectedAgendaId,
+
+          member_id: memberId,
+
+          scanned_by: state.user.id,
+
+          attended_at: new Date().toISOString(),
+
+          token_id: null,
+
+          attendance_method: "manual",
+
+          manual_reason: manualReason,
+
+          attendance_status: attendanceStatus
+        });
+
+      if (error) throw error;
+    }
+
+    return true;
+  }
+
+
+  /* ==========================================================
+     23. EVENT SIMPAN PRESENSI
+  ========================================================== */
+
+  function setupAttendanceEvents() {
+    const container = getElement(
+      "#memberList",
+      "[data-member-list]"
+    );
+
+    if (!container) return;
+
+    if (container.dataset.eventsReady === "true") {
       return;
     }
 
-    state.saving.add(memberId);
-    if (button) button.disabled = true;
+    container.dataset.eventsReady = "true";
+
+    container.addEventListener("click", async event => {
+      const button = event.target.closest(
+        "[data-save-attendance]"
+      );
+
+      if (!button) return;
+
+      const card = button.closest(
+        "[data-member-id]"
+      );
+
+      if (!card) return;
+
+      const memberId = card.dataset.memberId;
+
+      if (!memberId) return;
+
+      if (state.savingMembers.has(memberId)) {
+        return;
+      }
+
+      state.savingMembers.add(memberId);
+
+      const originalText = button.textContent;
+
+      button.disabled = true;
+      button.textContent = "Menyimpan...";
+
+      try {
+        await saveManualAttendance(
+          memberId,
+          card
+        );
+
+        notify(
+          "Presensi anggota berhasil disimpan.",
+          "success"
+        );
+
+        /*
+          Muat ulang catatan dari database
+          setelah proses penyimpanan berhasil.
+        */
+
+        await loadAttendance();
+
+        renderMembers();
+
+      } catch (error) {
+        console.error(
+          "[TARBIYAH PRESENSI MENTOR] Gagal menyimpan:",
+          error
+        );
+
+        notify(
+          error?.message ||
+          "Presensi gagal disimpan.",
+          "error"
+        );
+
+        button.disabled = false;
+        button.textContent = originalText;
+
+      } finally {
+        state.savingMembers.delete(memberId);
+      }
+    });
+  }
+
+
+  /* ==========================================================
+     24. EVENT PERUBAHAN AGENDA
+  ========================================================== */
+
+  function setupAgendaEvents() {
+    const select = getElement(
+      "#agendaSelect",
+      "[data-agenda-select]"
+    );
+
+    if (!select) return;
+
+    if (select.dataset.eventsReady === "true") {
+      return;
+    }
+
+    select.dataset.eventsReady = "true";
+
+    select.addEventListener("change", async () => {
+      state.selectedAgendaId = select.value || null;
+
+      setPageMessage(
+        "Memuat data presensi agenda...",
+        "info"
+      );
+
+      try {
+        renderAgendaInfo();
+
+        await loadAttendance();
+
+        renderMembers();
+
+        clearPageMessage();
+
+      } catch (error) {
+        console.error(
+          "[TARBIYAH PRESENSI MENTOR] Gagal mengganti agenda:",
+          error
+        );
+
+        setPageMessage(
+          error?.message ||
+          "Gagal memuat data presensi agenda.",
+          "error"
+        );
+      }
+    });
+  }
+
+
+  /* ==========================================================
+     25. MEMUAT ULANG DATA
+  ========================================================== */
+
+  async function refreshAttendance() {
+    if (!state.selectedAgendaId) {
+      return;
+    }
+
+    await loadAttendance();
+
+    renderMembers();
+  }
+
+
+  /* ==========================================================
+     26. TOMBOL REFRESH
+  ========================================================== */
+
+  function setupRefreshButton() {
+    const button = getElement(
+      "#btnRefreshAttendance",
+      "#refreshAttendance",
+      "[data-refresh-attendance]"
+    );
+
+    if (!button) return;
+
+    if (button.dataset.eventsReady === "true") {
+      return;
+    }
+
+    button.dataset.eventsReady = "true";
+
+    button.addEventListener("click", async () => {
+      const originalText = button.textContent;
+
+      button.disabled = true;
+      button.textContent = "Memuat...";
+
+      try {
+        await refreshAttendance();
+
+        notify(
+          "Data presensi berhasil diperbarui.",
+          "success"
+        );
+
+      } catch (error) {
+        console.error(error);
+
+        notify(
+          error?.message ||
+          "Gagal memperbarui data presensi.",
+          "error"
+        );
+
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    });
+  }
+
+
+  /* ==========================================================
+     27. TAMPILAN KETIKA TIDAK ADA AGENDA
+  ========================================================== */
+
+  function renderNoAgenda() {
+    const container = getElement(
+      "#memberList",
+      "[data-member-list]"
+    );
+
+    if (container) {
+      container.innerHTML = `
+        <div class="empty-state">
+
+          <div class="empty-state-icon">📅</div>
+
+          <h3>Belum Ada Agenda Kajian</h3>
+
+          <p>
+            Belum ditemukan agenda kajian dengan status
+            dipublikasikan. Admin perlu mempublikasikan
+            agenda terlebih dahulu.
+          </p>
+
+        </div>
+      `;
+    }
+
+    updateStatistics();
+  }
+
+
+  /* ==========================================================
+     28. PROSES UTAMA
+  ========================================================== */
+
+  async function initialize() {
+    if (state.isLoading) return;
+
+    state.isLoading = true;
+
+    setPageMessage(
+      "Menghubungkan ke TARBIYAH...",
+      "info"
+    );
 
     try {
-      let result;
 
-      if (record) {
-        result = await supabase
-          .from("kajian_attendance")
-          .update({
-            attendance_status: attendanceStatus,
-            manual_reason: manualReason
-          })
-          .eq("id", record.id)
-          .eq("member_id", memberId)
-          .select("id")
-          .maybeSingle();
+      /* A. Validasi sesi login */
+
+      const loggedIn = await loadCurrentUser();
+
+      if (!loggedIn) return;
+
+
+      /* B. Validasi role */
+
+      setPageMessage(
+        "Memeriksa hak akses pengguna...",
+        "info"
+      );
+
+      await loadUserRoles();
+
+
+      /* C. Memuat penugasan Mentor */
+
+      setPageMessage(
+        "Memuat data anggota binaan...",
+        "info"
+      );
+
+      await loadAssignments();
+
+
+      /* D. Memuat anggota */
+
+      await loadMembers();
+
+
+      /* E. Memuat agenda kajian */
+
+      setPageMessage(
+        "Memuat agenda kajian...",
+        "info"
+      );
+
+      await loadAgendas();
+
+
+      /* F. Menampilkan agenda */
+
+      renderAgendaOptions();
+
+      renderAgendaInfo();
+
+
+      /* G. Memuat presensi agenda terpilih */
+
+      if (state.selectedAgendaId) {
+        setPageMessage(
+          "Memuat catatan presensi anggota...",
+          "info"
+        );
+
+        await loadAttendance();
+
+        renderMembers();
+
       } else {
-        result = await supabase
-          .from("kajian_attendance")
-          .insert({
-            agenda_id: state.selectedAgendaId,
-            member_id: memberId,
-            scanned_by: state.user.id,
-            token_id: null,
-            attendance_method: "manual",
-            manual_reason: manualReason,
-            attendance_status: attendanceStatus
-          })
-          .select("id")
-          .single();
+        state.attendance = [];
+
+        renderNoAgenda();
       }
 
-      if (result.error) throw result.error;
 
-      if (!result.data?.id) {
-        throw new Error("Data tidak tersimpan. Periksa hak akses Mentor pada anggota ini.");
-      }
+      /* H. Menyiapkan event */
 
-      await selectAgenda(state.selectedAgendaId);
-      notify(`Presensi ${getMemberName(
-        state.members.find(member => member.id === memberId)
-      )} berhasil disimpan.`);
+      setupAttendanceEvents();
+
+      setupAgendaEvents();
+
+      setupRefreshButton();
+
+
+      /* I. Informasi halaman */
+
+      clearPageMessage();
+
+      console.info(
+        "[TARBIYAH PRESENSI MENTOR] Berhasil diinisialisasi.",
+        {
+          role: state.roles,
+          jumlahPenugasan: state.assignments.length,
+          jumlahAnggota: state.members.length,
+          jumlahAgenda: state.agendas.length,
+          agendaTerpilih: state.selectedAgendaId
+        }
+      );
 
     } catch (error) {
-      console.error("[SIMPAN PRESENSI]", error);
-      notify(error.message || "Gagal menyimpan presensi.", "error");
+
+      console.error(
+        "[TARBIYAH PRESENSI MENTOR] Inisialisasi gagal:",
+        error
+      );
+
+      setPageMessage(
+        error?.message ||
+        "Terjadi kesalahan saat memuat halaman Presensi Mentor.",
+        "error"
+      );
+
+      notify(
+        error?.message ||
+        "Halaman Presensi Mentor gagal dimuat.",
+        "error"
+      );
+
     } finally {
-      state.saving.delete(memberId);
-      if (button) button.disabled = false;
+      state.isLoading = false;
     }
   }
 
-  function bindEvents() {
-    $("agendaSelect").addEventListener("change", async event => {
-      try {
-        await selectAgenda(event.target.value);
-      } catch (error) {
-        console.error("[PILIH AGENDA]", error);
-        notify(error.message || "Gagal memuat presensi agenda.", "error");
-      }
-    });
 
-    $("memberList").addEventListener("click", event => {
-      const button = event.target.closest("[data-save-attendance]");
-      if (!button) return;
+  /* ==========================================================
+     29. EVENT KETIKA HALAMAN SIAP
+  ========================================================== */
 
-      saveAttendance(button.dataset.saveAttendance, button);
-    });
+  function start() {
+    initialize();
   }
 
-  document.addEventListener("DOMContentLoaded", initialize);
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      start,
+      { once: true }
+    );
+  } else {
+    start();
+  }
+
+
+  /* ==========================================================
+     30. API INTERNAL UNTUK DEBUGGING
+  ========================================================== */
+
+  window.TARBIYAH_PRESENSI_MENTOR = {
+    version: "2.0.0",
+
+    refresh: refreshAttendance,
+
+    getState() {
+      return {
+        roles: [...state.roles],
+
+        jumlahPenugasan:
+          state.assignments.length,
+
+        jumlahAnggota:
+          state.members.length,
+
+        jumlahAgenda:
+          state.agendas.length,
+
+        agendaTerpilih:
+          state.selectedAgendaId,
+
+        jumlahPresensi:
+          state.attendance.length
+      };
+    }
+  };
+
 })();
