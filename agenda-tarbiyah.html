@@ -278,26 +278,77 @@
       border-radius: 9px;
       color: var(--text-secondary, #aab5af);
       font-size: .78rem;
+      border: 1px solid transparent;
+      transition: background .18s ease, border-color .18s ease, color .18s ease;
     }
 
     .agenda-calendar-day.heading {
       min-height: 30px;
       color: var(--text-primary, #fff);
       font-weight: 700;
+      border: none;
     }
 
+    .agenda-calendar-day.is-empty { visibility: hidden; }
+
+    /* HARI INI (hijau transparan) — tetap dipertahankan */
     .agenda-calendar-day.today {
       background: rgba(54,181,138,.17);
       color: var(--color-primary, #36b58a);
       font-weight: 800;
     }
 
-    .agenda-calendar-day.has-event {
-      border: 1px solid var(--color-primary, #36b58a);
+    /* =========================================
+       PENANDA AGENDA KAJIAN (PERSISTEN)
+       Tidak hilang walau tanggal sudah lewat.
+       Prioritas visual di atas .today.
+    ========================================= */
+
+    /* Agenda akan datang — hijau primary */
+    .agenda-calendar-day.has-event.is-upcoming {
+      background: rgba(54,181,138,.22);
+      border-color: var(--color-primary, #36b58a);
       color: var(--color-primary, #36b58a);
+      font-weight: 800;
     }
 
-    .agenda-calendar-day.is-empty { visibility: hidden; }
+    /* Agenda berlangsung — amber/oranye */
+    .agenda-calendar-day.has-event.is-ongoing {
+      background: rgba(245,158,11,.22);
+      border-color: #f59e0b;
+      color: #f59e0b;
+      font-weight: 800;
+    }
+
+    /* Agenda selesai — tetap terlihat, warna redup */
+    .agenda-calendar-day.has-event.is-finished {
+      background: rgba(148,163,184,.18);
+      border-color: rgba(148,163,184,.55);
+      color: var(--text-secondary, #aab5af);
+      font-weight: 700;
+    }
+
+    /* Hari ini + ada agenda → tetap tampil penanda agenda,
+       tambahkan ring tipis agar "hari ini" tetap terbaca */
+    .agenda-calendar-day.today.has-event {
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.35);
+    }
+
+    /* Tanggal yang sedang dipilih (klik) */
+    .agenda-calendar-day.is-selected {
+      outline: 2px solid var(--color-primary, #36b58a);
+      outline-offset: 1px;
+    }
+
+    /* Dot penanda jumlah agenda (opsional, tampil jika > 0) */
+    .agenda-calendar-day .event-dot {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      margin-top: 2px;
+      border-radius: 50%;
+      background: currentColor;
+    }
 
     /* --- Detail panel --- */
     .agenda-detail-panel {
@@ -332,7 +383,7 @@
       text-decoration: none;
     }
 
-    /* --- Event card (dibuat oleh JS) --- */
+    /* --- Event card --- */
     .agenda-card {
       padding: 16px 18px;
       border: 1px solid var(--border-color, rgba(255,255,255,.1));
@@ -403,7 +454,7 @@
     }
 
     /* =========================================
-       BOTTOM NAV (MOBILE) — DIPERBAIKI
+       BOTTOM NAV (MOBILE)
     ========================================= */
     .mobile-bottom-nav {
       display: none;
@@ -497,7 +548,7 @@
 <div class="app-shell" data-module-shell>
 
   <!-- =====================================
-       SIDEBAR (SATU SAJA — duplikat dihapus)
+       SIDEBAR (SATU SAJA)
   ====================================== -->
   <aside class="app-sidebar" data-sidebar aria-label="Navigasi utama">
 
@@ -586,7 +637,7 @@
   ====================================== -->
   <main class="app-main agenda-page">
 
-    <!-- PAGE HEADER (pengganti breadcrumb yang bocor) -->
+    <!-- PAGE HEADER (pengganti breadcrumb) -->
     <header class="agenda-page-header">
       <a href="./dashboard.html" class="agenda-back-btn" aria-label="Kembali ke Dashboard">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -661,6 +712,30 @@
           <div class="agenda-calendar-day heading">Jum</div>
           <div class="agenda-calendar-day heading">Sab</div>
         </div>
+
+        <!-- LEGENDA -->
+        <div class="agenda-calendar-legend" style="
+          display:flex;flex-wrap:wrap;gap:14px;
+          margin-top:14px;padding-top:12px;
+          border-top:1px solid var(--border-color, rgba(255,255,255,.08));
+          font-size:.72rem;color:var(--text-secondary,#aab5af);">
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:14px;height:14px;border-radius:5px;
+                         background:rgba(54,181,138,.17);"></span> Hari ini
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:14px;height:14px;border-radius:5px;
+                         background:rgba(54,181,138,.22);border:1px solid var(--color-primary,#36b58a);"></span> Agenda akan datang
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:14px;height:14px;border-radius:5px;
+                         background:rgba(245,158,11,.22);border:1px solid #f59e0b;"></span> Berlangsung
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:6px;">
+            <span style="display:inline-block;width:14px;height:14px;border-radius:5px;
+                         background:rgba(148,163,184,.18);border:1px solid rgba(148,163,184,.55);"></span> Selesai
+          </span>
+        </div>
       </div>
     </section>
 
@@ -716,7 +791,7 @@
   </main>
 
   <!-- =====================================
-       MOBILE BOTTOM NAV — DIPERBAIKI
+       MOBILE BOTTOM NAV
   ====================================== -->
   <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
     <a href="./tarbiyah.html" data-module="dashboard">
@@ -771,8 +846,7 @@
 <script src="./js/pwa.js"></script>
 
 <!-- =====================================
-     AGENDA PAGE LOGIC — FILTER, SEARCH, KALENDER
-     (Modul mandiri, tidak mengganggu script existing)
+     AGENDA PAGE LOGIC
 ====================================== -->
 <script>
 (function () {
@@ -782,10 +856,11 @@
      STATE
   ----------------------------------------- */
   const state = {
-    events: [],           // diisi dari backend nanti
+    events: [],
     filter: "all",
     query: "",
-    calendarDate: new Date()
+    calendarDate: new Date(),
+    selectedDate: null      // ymd string atau null
   };
 
   const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni",
@@ -795,17 +870,12 @@
      UTIL
   ----------------------------------------- */
   function pad(n) { return String(n).padStart(2, "0"); }
-
   function ymd(date) {
     return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
   }
 
-  function startOfDay(d) {
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  }
-
-  function getStatus(ev) {
-    const now = new Date();
+  function getStatus(ev, refNow) {
+    const now = refNow || new Date();
     const start = ev.start ? new Date(ev.start) : null;
     const end   = ev.end   ? new Date(ev.end)   : start;
     if (!start) return "upcoming";
@@ -819,6 +889,43 @@
     const d = new Date(dt);
     if (isNaN(d)) return "—";
     return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+
+  /* -----------------------------------------
+     MAP: tanggal -> daftar event
+     (menandai SEMUA tanggal dalam rentang
+      start..end, agar event multi-hari ikut
+      ter-highlight di setiap harinya)
+  ----------------------------------------- */
+  function buildEventDateMap(events) {
+    const map = new Map(); // ymd -> [event]
+    events.forEach((ev) => {
+      if (!ev.start) return;
+      const start = new Date(ev.start);
+      if (isNaN(start)) return;
+      const end = ev.end ? new Date(ev.end) : new Date(start);
+
+      // iterasi per hari dari start ke end (inklusif)
+      const cursor = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      const last   = new Date(end.getFullYear(),   end.getMonth(),   end.getDate());
+
+      // safety: batasi maksimum 60 hari per event agar tidak infinite loop
+      let guard = 0;
+      while (cursor <= last && guard < 60) {
+        const key = ymd(cursor);
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(ev);
+        cursor.setDate(cursor.getDate() + 1);
+        guard++;
+      }
+    });
+    return map;
   }
 
   /* -----------------------------------------
@@ -844,13 +951,9 @@
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // event tanggal (berdasarkan state.events)
-    const eventDates = new Set();
-    state.events.forEach((ev) => {
-      if (ev.start) eventDates.add(ymd(new Date(ev.start)));
-    });
-
+    const eventMap = buildEventDateMap(state.events);
     const todayStr = ymd(new Date());
+    const now = new Date();
 
     // sel kosong sebelum tanggal 1
     for (let i = 0; i < firstDay; i++) {
@@ -866,19 +969,54 @@
       cell.textContent = d;
 
       const cellDate = ymd(new Date(year, month, d));
-      if (cellDate === todayStr) cell.classList.add("today");
-      if (eventDates.has(cellDate)) cell.classList.add("has-event");
 
-      // klik tanggal → filter agenda pada tanggal itu
+      if (cellDate === todayStr) cell.classList.add("today");
+      if (cellDate === state.selectedDate) cell.classList.add("is-selected");
+
+      const dayEvents = eventMap.get(cellDate) || [];
+      if (dayEvents.length) {
+        cell.classList.add("has-event");
+
+        // Tentukan warna berdasarkan status event yang PALING RELEVAN:
+        // prioritas: ongoing > upcoming > finished
+        // (jika ada event berlangsung, tandai berlangsung)
+        const statuses = dayEvents.map((ev) => getStatus(ev, now));
+        let dayStatus = "finished";
+        if (statuses.includes("ongoing")) dayStatus = "ongoing";
+        else if (statuses.includes("upcoming")) dayStatus = "upcoming";
+
+        cell.classList.add("is-" + dayStatus);
+
+        // tooltip: daftar judul agenda
+        cell.title = dayEvents.map((ev) => ev.title || "Agenda").join(" • ");
+      }
+
+      // klik tanggal
       cell.style.cursor = "pointer";
       cell.addEventListener("click", () => {
+        state.selectedDate = cellDate;
         state.filter = "all";
         state.query = "";
-        // filter event yang jatuh pada tanggal ini
+
+        // reset chip filter ke "Semua"
+        document.querySelectorAll("[data-agenda-filter]").forEach((b) => {
+          b.setAttribute("aria-pressed", b.dataset.agendaFilter === "all" ? "true" : "false");
+        });
+        const si = document.querySelector("[data-agenda-search]");
+        if (si) si.value = "";
+
         const filtered = state.events.filter((ev) => {
           if (!ev.start) return false;
-          return ymd(new Date(ev.start)) === cellDate;
+          // event dianggap "di tanggal ini" jika tanggal itu berada dalam rentang start..end
+          const start = new Date(ev.start);
+          const end = ev.end ? new Date(ev.end) : new Date(start);
+          const target = new Date(cellDate + "T00:00:00");
+          const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+          const e = new Date(end.getFullYear(),   end.getMonth(),   end.getDate());
+          return target >= s && target <= e;
         });
+
+        renderCalendar(); // refresh selected state
         renderList(filtered, "Agenda pada " + formatDate(cellDate));
       });
 
@@ -928,12 +1066,6 @@
     }).join("");
   }
 
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, (c) => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-
   /* -----------------------------------------
      FILTER + SEARCH
   ----------------------------------------- */
@@ -957,7 +1089,6 @@
       });
     }
 
-    // urutkan berdasarkan tanggal
     filtered.sort((a, b) => new Date(a.start || 0) - new Date(b.start || 0));
 
     const labelMap = {
@@ -967,7 +1098,12 @@
       finished: "Agenda Selesai"
     };
 
-    renderList(filtered, labelMap[state.filter] || "Agenda");
+    // jika sedang memfilter dari tanggal terpilih, abaikan label filter global
+    if (state.selectedDate) {
+      renderList(filtered, "Agenda pada " + formatDate(state.selectedDate));
+    } else {
+      renderList(filtered, labelMap[state.filter] || "Agenda");
+    }
   }
 
   /* -----------------------------------------
@@ -980,6 +1116,8 @@
       });
       btn.setAttribute("aria-pressed", "true");
       state.filter = btn.dataset.agendaFilter || "all";
+      state.selectedDate = null; // lepas filter tanggal
+      renderCalendar();
       applyFilterAndSearch();
     });
   });
@@ -994,6 +1132,8 @@
     searchForm.addEventListener("submit", (e) => {
       e.preventDefault();
       state.query = searchInput ? searchInput.value : "";
+      state.selectedDate = null;
+      renderCalendar();
       applyFilterAndSearch();
     });
   }
@@ -1001,6 +1141,8 @@
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       state.query = searchInput.value;
+      state.selectedDate = null;
+      renderCalendar();
       applyFilterAndSearch();
     });
   }
@@ -1035,16 +1177,12 @@
 
   /* -----------------------------------------
      INISIALISASI
-     (Kalender & daftar langsung dirender;
-      events kosong → tampil empty state)
   ----------------------------------------- */
   renderCalendar();
   applyFilterAndSearch();
 
   /* -----------------------------------------
      API PUBLIK UNTUK BACKEND
-     Contoh pemakaian di js/module.js:
-       window.AgendaPage.setEvents([...]);
   ----------------------------------------- */
   window.AgendaPage = {
     setEvents(list) {
