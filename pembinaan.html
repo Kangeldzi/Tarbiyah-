@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a22">
+  <title>Pembinaan — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    body { margin:0; font-family:Inter,Arial,sans-serif; }
+    .guidance-wrap { max-width:1100px; margin:auto; padding:24px 18px 50px; }
+    .guidance-top { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:22px; }
+    .guidance-top h1 { margin:0; font-size:clamp(24px,4vw,34px); }
+    .guidance-top p { margin:7px 0 0; opacity:.72; }
+    .guidance-btn { border:0; border-radius:12px; padding:11px 16px; cursor:pointer; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:7px; }
+    .guidance-primary { background:#087f5b; color:white; }
+    .guidance-secondary { background:rgba(128,128,128,.15); color:inherit; }
+    .guidance-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(280px,.85fr); gap:18px; align-items:start; }
+    .guidance-card { border:1px solid rgba(128,128,128,.2); border-radius:18px; padding:20px; background:var(--surface,rgba(128,128,128,.07)); }
+    .guidance-card h2 { margin:0 0 16px; font-size:19px; }
+    .guidance-field { display:block; margin:0 0 14px; }
+    .guidance-field span { display:block; margin-bottom:7px; font-size:13px; font-weight:700; }
+    .guidance-field input,.guidance-field select,.guidance-field textarea {
+      width:100%; box-sizing:border-box; padding:12px; border:1px solid rgba(128,128,128,.3);
+      border-radius:11px; background:var(--input-bg,rgba(128,128,128,.1)); color:inherit;
+      font:inherit; outline:none;
+    }
+    .guidance-field textarea { min-height:125px; resize:vertical; }
+    .guidance-field input:focus,.guidance-field select:focus,.guidance-field textarea:focus { border-color:#10a875; }
+    .guidance-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
+    .guidance-stat { border:1px solid rgba(128,128,128,.18); border-radius:14px; padding:14px; }
+    .guidance-stat small { display:block; opacity:.7; }
+    .guidance-stat strong { display:block; font-size:24px; margin-top:5px; }
+    .guidance-list { display:grid; gap:12px; }
+    .guidance-item { border:1px solid rgba(128,128,128,.2); border-radius:14px; padding:15px; }
+    .guidance-item h3 { margin:0 0 7px; font-size:16px; }
+    .guidance-item p { white-space:pre-wrap; line-height:1.55; margin:8px 0; opacity:.85; }
+    .guidance-meta { font-size:12px; opacity:.7; display:flex; flex-wrap:wrap; gap:10px; }
+    .guidance-item-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .guidance-empty { text-align:center; opacity:.7; padding:24px 10px; }
+    .guidance-message { padding:12px 14px; border-radius:12px; margin-bottom:14px; display:none; }
+    .guidance-message.show { display:block; }
+    .guidance-message.error { background:rgba(220,50,50,.12); color:#e66; }
+    .guidance-message.success { background:rgba(16,168,117,.13); color:#20b887; }
+    .guidance-status { display:inline-block; border-radius:30px; padding:4px 9px; font-size:11px; font-weight:700; background:rgba(16,168,117,.13); }
+    .guidance-status.done { background:rgba(30,150,90,.17); }
+    .guidance-status.pending { background:rgba(200,150,30,.16); }
+    @media(max-width:760px) { .guidance-grid { grid-template-columns:1fr; } }
+    @media(max-width:420px) { .guidance-stats { grid-template-columns:1fr 1fr; } }
+  </style>
+</head>
+
+<body class="auth-pending">
+  <main class="guidance-wrap">
+    <header class="guidance-top">
+      <div>
+        <h1>✎ Pembinaan</h1>
+        <p>Catatan perkembangan dan tindak lanjut anggota binaan.</p>
+      </div>
+      <a class="guidance-btn guidance-secondary" href="./dashboard.html">
+        ← Kembali ke Dashboard
+      </a>
+    </header>
+
+    <div id="guidanceMessage" class="guidance-message" role="status"></div>
+
+    <section class="guidance-stats">
+      <div class="guidance-stat">
+        <small>Anggota Binaan</small>
+        <strong id="statMembers">0</strong>
+      </div>
+      <div class="guidance-stat">
+        <small>Total Catatan</small>
+        <strong id="statNotes">0</strong>
+      </div>
+      <div class="guidance-stat">
+        <small>Dalam Proses</small>
+        <strong id="statProgress">0</strong>
+      </div>
+    </section>
+
+    <div class="guidance-grid">
+      <section class="guidance-card">
+        <h2 id="formHeading">Tambah Catatan Pembinaan</h2>
+
+        <form id="guidanceForm">
+          <input type="hidden" id="noteId">
+
+          <label class="guidance-field">
+            <span>Anggota Binaan</span>
+            <select id="memberSelect" required>
+              <option value="">Memuat anggota binaan...</option>
+            </select>
+          </label>
+
+          <label class="guidance-field">
+            <span>Judul Pembinaan</span>
+            <input id="noteTitle" type="text" maxlength="150"
+              placeholder="Contoh: Perkembangan pembelajaran pekan ini" required>
+          </label>
+
+          <label class="guidance-field">
+            <span>Catatan Pembinaan</span>
+            <textarea id="noteContent" maxlength="10000"
+              placeholder="Tuliskan hasil pembinaan, perkembangan, arahan, atau hal yang perlu diperhatikan..." required></textarea>
+          </label>
+
+          <label class="guidance-field">
+            <span>Status Perkembangan</span>
+            <select id="progressStatus" required>
+              <option value="belum_dimulai">Belum dimulai</option>
+              <option value="berjalan" selected>Berjalan</option>
+              <option value="selesai">Selesai</option>
+            </select>
+          </label>
+
+          <label class="guidance-field">
+            <span>Jadwal Tindak Lanjut (opsional)</span>
+            <input id="followUpAt" type="datetime-local">
+          </label>
+
+          <div style="display:flex;gap:9px;flex-wrap:wrap">
+            <button class="guidance-btn guidance-primary" id="saveNoteBtn" type="submit">
+              Simpan Catatan
+            </button>
+            <button class="guidance-btn guidance-secondary" id="cancelEditBtn" type="button" hidden>
+              Batal Edit
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="guidance-card">
+        <h2>Riwayat Pembinaan</h2>
+        <div class="guidance-list" id="guidanceList">
+          <div class="guidance-empty">Memuat catatan pembinaan...</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/pwa.js"></script>
+  <script src="./js/pembinaan.js"></script>
+</body>
+</html>
