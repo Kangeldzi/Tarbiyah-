@@ -413,42 +413,38 @@
      11. MEMUAT PENUGASAN MENTOR
   ========================================================== */
 
-  async function loadAssignments() {
-    const supabase = state.supabase;
+async function loadAssignments() {
+  const supabase = state.supabase;
 
-    let query = supabase
-      .from(CONFIG.assignmentTable)
-      .select(
-        "assignment_id, mentor_user_id, member_id, active"
-      )
-      .eq("active", true);
+  let query = supabase
+    .from(CONFIG.assignmentTable)
+    .select("mentor_user_id, member_id, active")
+    .eq("active", true);
 
-    /*
-      Mentor:
-      Hanya mengambil penugasan miliknya sendiri.
+  /*
+    Mentor hanya mengambil penugasan miliknya sendiri.
+    Admin dan Super Admin mengikuti batasan RLS.
+  */
 
-      Admin dan Super Admin:
-      Mengambil penugasan aktif sesuai RLS.
-    */
-
-    if (state.primaryRole === "mentor") {
-      query = query.eq(
-        "mentor_user_id",
-        state.user.id
-      );
-    }
-
-    const {
-      data,
-      error
-    } = await query;
-
-    if (error) throw error;
-
-    state.assignments = data || [];
-
-    return state.assignments;
+  if (state.primaryRole === "mentor") {
+    query = query.eq(
+      "mentor_user_id",
+      state.user.id
+    );
   }
+
+  const {
+    data,
+    error
+  } = await query;
+
+  if (error) throw error;
+
+  state.assignments = data || [];
+
+  return state.assignments;
+}
+
 
 
   /* ==========================================================
