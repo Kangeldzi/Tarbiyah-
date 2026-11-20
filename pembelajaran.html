@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -26,12 +25,66 @@
   <link rel="stylesheet" href="./css/module-shell.css">
 
   <style>
+    /* =========================================
+       LEARNING PAGE — STYLING LOKAL
+       (memakai CSS variable universal TARBIYAH)
+    ========================================= */
+
     .learning-page {
       width: 100%;
       min-width: 0;
       padding-bottom: 35px;
     }
 
+    /* --- Page header (pengganti breadcrumb) --- */
+    .learning-page-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .learning-back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 12px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-primary, #fff);
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .learning-back-btn:hover {
+      background: rgba(54, 181, 138, .14);
+      border-color: var(--color-primary, #36b58a);
+      transform: translateX(-2px);
+    }
+
+    .learning-back-btn:active {
+      transform: translateX(0) scale(.96);
+    }
+
+    .learning-page-header h1 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(1.05rem, 2.4vw, 1.2rem);
+      font-weight: 700;
+    }
+
+    .learning-page-header small {
+      display: block;
+      margin-top: 2px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .78rem;
+      font-weight: 500;
+    }
+
+    /* --- Hero --- */
     .learning-hero {
       position: relative;
       overflow: hidden;
@@ -51,7 +104,7 @@
       letter-spacing: .09em;
     }
 
-    .learning-hero h1 {
+    .learning-hero h2 {
       margin: 10px 0;
       font-family: "Poppins", sans-serif;
       font-size: clamp(1.5rem, 4vw, 2rem);
@@ -64,6 +117,7 @@
       line-height: 1.7;
     }
 
+    /* --- Search --- */
     .learning-search {
       display: flex;
       width: min(100%, 480px);
@@ -74,11 +128,65 @@
     .learning-search input {
       min-width: 0;
       flex: 1;
+      padding: 11px 14px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 12px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-primary, #fff);
+      font: inherit;
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
     }
 
-    .learning-section {
-      margin-top: 28px;
+    .learning-search input:focus {
+      border-color: var(--color-primary, #36b58a);
+      box-shadow: 0 0 0 3px rgba(54,181,138,.15);
     }
+
+    .learning-search input::placeholder {
+      color: var(--text-secondary, #aab5af);
+      opacity: .75;
+    }
+
+    /* --- Filter chips (baru) --- */
+    .learning-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .learning-filter {
+      padding: 9px 16px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 30px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-secondary, #aab5af);
+      font: inherit;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease;
+    }
+
+    .learning-filter:hover {
+      border-color: var(--color-primary, #36b58a);
+      color: var(--text-primary, #fff);
+    }
+
+    .learning-filter:active {
+      transform: scale(.97);
+    }
+
+    .learning-filter[aria-pressed="true"] {
+      border-color: var(--color-primary, #36b58a);
+      background: rgba(54,181,138,.13);
+      color: var(--color-primary, #36b58a);
+    }
+
+    /* --- Section --- */
+    .learning-section { margin-top: 28px; }
 
     .learning-section-heading {
       display: flex;
@@ -101,6 +209,7 @@
       text-decoration: none;
     }
 
+    /* --- Category grid --- */
     .learning-category-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -119,13 +228,16 @@
       color: var(--text-primary, #fff);
       text-align: left;
       text-decoration: none;
-      transition: transform .2s ease, border-color .2s ease;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
     }
 
     .learning-category:hover {
       transform: translateY(-3px);
       border-color: var(--color-primary, #36b58a);
+      box-shadow: 0 6px 20px rgba(54,181,138,.12);
     }
+
+    .learning-category[hidden] { display: none; }
 
     .learning-category-icon {
       display: grid;
@@ -150,10 +262,8 @@
       font-size: .73rem;
     }
 
-    .learning-list {
-      display: grid;
-      gap: 13px;
-    }
+    /* --- List --- */
+    .learning-list { display: grid; gap: 13px; }
 
     .learning-empty {
       padding: 28px 18px;
@@ -170,6 +280,64 @@
       font-size: 2rem;
     }
 
+    /* --- Card item (dibuat oleh JS) --- */
+    .learning-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 18px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 16px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      transition: border-color .18s ease, transform .18s ease;
+    }
+
+    .learning-card:hover {
+      border-color: rgba(54,181,138,.4);
+      transform: translateY(-1px);
+    }
+
+    .learning-card-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(54,181,138,.13);
+      font-size: 1.4rem;
+    }
+
+    .learning-card-body { flex: 1; min-width: 0; }
+
+    .learning-card-body h3 {
+      margin: 0 0 5px;
+      font-family: "Poppins", sans-serif;
+      font-size: .96rem;
+    }
+
+    .learning-card-body p {
+      margin: 0 0 8px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .85rem;
+      line-height: 1.6;
+    }
+
+    .learning-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .76rem;
+    }
+
+    .learning-card-meta a {
+      color: var(--color-primary, #36b58a);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* --- Progress card --- */
     .learning-progress-card {
       padding: 20px;
       border: 1px solid var(--border-color, rgba(255,255,255,.1));
@@ -196,6 +364,7 @@
       margin-top: 16px;
     }
 
+    /* --- Footer --- */
     .learning-footer {
       padding: 24px 0 12px;
       margin-top: 30px;
@@ -205,6 +374,59 @@
       font-size: .78rem;
     }
 
+    /* =========================================
+       BOTTOM NAV (MOBILE) — DIPERBAIKI
+    ========================================= */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 900;
+      padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
+      background: var(--surface-color, #102a22);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+      }
+    }
+
+    .mobile-bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 8px 4px;
+      border-radius: 12px;
+      color: var(--text-secondary, #aab5af);
+      text-decoration: none;
+      font-size: .68rem;
+      font-weight: 600;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .mobile-bottom-nav a svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    .mobile-bottom-nav a:active,
+    .mobile-bottom-nav a[data-active="true"] {
+      background: rgba(54,181,138,.14);
+      color: var(--color-primary, #36b58a);
+    }
+
+    /* --- Responsive --- */
     @media (max-width: 760px) {
       .learning-category-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -212,32 +434,12 @@
     }
 
     @media (max-width: 640px) {
-      .learning-page {
-        padding-bottom: 90px;
-      }
-
-      .learning-search {
-        width: 100%;
-      }
-
-      .learning-category {
-        padding: 13px 10px;
-        gap: 9px;
-      }
-
-      .learning-category-icon {
-        width: 37px;
-        height: 37px;
-        font-size: 1.1rem;
-      }
-
-      .learning-category strong {
-        font-size: .78rem;
-      }
-
-      .learning-category small {
-        font-size: .68rem;
-      }
+      .learning-page { padding-bottom: 90px; }
+      .learning-search { width: 100%; }
+      .learning-category { padding: 13px 10px; gap: 9px; }
+      .learning-category-icon { width: 37px; height: 37px; font-size: 1.1rem; }
+      .learning-category strong { font-size: .78rem; }
+      .learning-category small { font-size: .68rem; }
     }
 
     @media (max-width: 350px) {
@@ -346,7 +548,7 @@
           <span>Agenda & Jadwal</span>
         </a>
 
-        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
+        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item active">
           <span>▤</span>
           <span>Pembelajaran</span>
         </a>
@@ -420,59 +622,71 @@
     <!-- MAIN CONTENT -->
     <main class="app-main learning-page">
 
-      <div class="module-breadcrumb">
-        <a href="./tarbiyah.html">Beranda</a>
-        <span>›</span>
-        <span>Pembelajaran</span>
-      </div>
+      <!-- PAGE HEADER (pengganti breadcrumb yang bocor) -->
+      <header class="learning-page-header">
+        <a href="./dashboard.html" class="learning-back-btn" aria-label="Kembali ke Dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </a>
+
+        <div>
+          <h1>Pembelajaran</h1>
+          <small>TARBIYAH — Ilmu &amp; Pembinaan Diri</small>
+        </div>
+      </header>
 
       <!-- HERO -->
       <section class="learning-hero">
-
-        <span class="learning-eyebrow">📖 ILMU & PEMBINAAN DIRI</span>
-
-        <h1>Ruang Pembelajaran TARBIYAH</h1>
-
+        <span class="learning-eyebrow">📖 ILMU &amp; PEMBINAAN DIRI</span>
+        <h2>Ruang Pembelajaran TARBIYAH</h2>
         <p>
           Tempat menambah ilmu, memperdalam pemahaman Islam,
           membangun kebiasaan baik, dan bertumbuh bersama dalam ukhuwah.
         </p>
-
       </section>
 
       <!-- SEARCH -->
-      <form class="learning-search" data-learning-search-form>
-
+      <form class="learning-search" data-learning-search-form role="search">
         <input
           type="search"
-          placeholder="Cari program atau pembelajaran..."
+          placeholder="Cari program, kategori, atau materi..."
           aria-label="Cari pembelajaran"
           data-learning-search>
-
-        <button type="submit" class="btn btn-primary">
-          Cari
-        </button>
-
+        <button type="submit" class="btn btn-primary">Cari</button>
       </form>
+
+      <!-- FILTER KATEGORI (baru — fungsional) -->
+      <section class="learning-filters" aria-label="Filter kategori">
+        <button type="button" class="learning-filter" data-learning-filter="all" aria-pressed="true">Semua</button>
+        <button type="button" class="learning-filter" data-learning-filter="akidah" aria-pressed="false">Akidah &amp; Tauhid</button>
+        <button type="button" class="learning-filter" data-learning-filter="ibadah" aria-pressed="false">Fikih Ibadah</button>
+        <button type="button" class="learning-filter" data-learning-filter="quran" aria-pressed="false">Al-Qur'an</button>
+        <button type="button" class="learning-filter" data-learning-filter="hadis" aria-pressed="false">Hadis</button>
+        <button type="button" class="learning-filter" data-learning-filter="akhlak" aria-pressed="false">Akhlak &amp; Adab</button>
+        <button type="button" class="learning-filter" data-learning-filter="sejarah" aria-pressed="false">Sejarah Islam</button>
+      </section>
 
       <!-- CATEGORIES -->
       <section class="learning-section">
-
         <div class="learning-section-heading">
           <h2>Kategori Pembelajaran</h2>
         </div>
 
-        <div class="learning-category-grid">
+        <div class="learning-category-grid" data-learning-categories>
 
-          <a href="./materi-pembelajaran.html?category=akidah" class="learning-category">
+          <a href="./materi-pembelajaran.html?category=akidah" class="learning-category" data-category="akidah">
             <span class="learning-category-icon">🌙</span>
             <span>
-              <strong>Akidah & Tauhid</strong>
+              <strong>Akidah &amp; Tauhid</strong>
               <small>Dasar keimanan</small>
             </span>
           </a>
 
-          <a href="./materi-pembelajaran.html?category=ibadah" class="learning-category">
+          <a href="./materi-pembelajaran.html?category=ibadah" class="learning-category" data-category="ibadah">
             <span class="learning-category-icon">🕌</span>
             <span>
               <strong>Fikih Ibadah</strong>
@@ -480,15 +694,15 @@
             </span>
           </a>
 
-          <a href="./materi-pembelajaran.html?category=quran" class="learning-category">
+          <a href="./materi-pembelajaran.html?category=quran" class="learning-category" data-category="quran">
             <span class="learning-category-icon">📖</span>
             <span>
               <strong>Al-Qur'an</strong>
-              <small>Tilawah & tadabbur</small>
+              <small>Tilawah &amp; tadabbur</small>
             </span>
           </a>
 
-          <a href="./materi-pembelajaran.html?category=hadis" class="learning-category">
+          <a href="./materi-pembelajaran.html?category=hadis" class="learning-category" data-category="hadis">
             <span class="learning-category-icon">📚</span>
             <span>
               <strong>Hadis</strong>
@@ -496,131 +710,122 @@
             </span>
           </a>
 
-          <a href="./materi-pembelajaran.html?category=akhlak" class="learning-category">
+          <a href="./materi-pembelajaran.html?category=akhlak" class="learning-category" data-category="akhlak">
             <span class="learning-category-icon">🌱</span>
             <span>
-              <strong>Akhlak & Adab</strong>
+              <strong>Akhlak &amp; Adab</strong>
               <small>Pembinaan karakter</small>
             </span>
           </a>
 
-          <a href="./materi-pembelajaran.html?category=sejarah" class="learning-category">
+          <a href="./materi-pembelajaran.html?category=sejarah" class="learning-category" data-category="sejarah">
             <span class="learning-category-icon">🏛️</span>
             <span>
               <strong>Sejarah Islam</strong>
-              <small>Sirah & peradaban</small>
+              <small>Sirah &amp; peradaban</small>
             </span>
           </a>
 
         </div>
-
       </section>
 
       <!-- PROGRAMS -->
       <section class="learning-section">
-
         <div class="learning-section-heading">
           <h2>Program Pembelajaran</h2>
           <a href="./agenda-tarbiyah.html">Lihat jadwal</a>
         </div>
 
         <div class="learning-list" data-learning-programs>
-
           <div class="learning-empty">
             <span class="learning-empty-icon">🌿</span>
             <strong>Program pembelajaran akan ditampilkan di sini.</strong>
             <br>
             Informasi program akan dimuat dari database TARBIYAH.
           </div>
-
         </div>
-
       </section>
 
       <!-- MATERIALS -->
       <section class="learning-section">
-
         <div class="learning-section-heading">
           <h2>Materi Terbaru</h2>
           <a href="./materi-pembelajaran.html">Lihat semua materi</a>
         </div>
 
         <div class="learning-list" data-learning-materials>
-
           <div class="learning-empty">
             <span class="learning-empty-icon">📚</span>
             Belum ada materi yang ditampilkan.
           </div>
-
         </div>
-
       </section>
 
       <!-- MEMBER PROGRESS -->
       <section class="learning-section">
-
         <div class="learning-section-heading">
           <h2>Perkembangan Pembelajaran Saya</h2>
         </div>
 
         <div class="learning-progress-card">
-
           <h3>Perjalanan Menuntut Ilmu</h3>
-
           <p>
             Pantau aktivitas pembelajaran, kajian yang telah diikuti,
             dan riwayat kehadiran melalui halaman profil anggota.
           </p>
-
           <div class="learning-progress-links">
-
-            <a href="./profil-anggota.html" class="btn btn-primary">
-              Lihat Profil Saya
-            </a>
-
-            <a href="./kehadiran.html" class="btn btn-secondary">
-              Riwayat Kehadiran
-            </a>
-
+            <a href="./profil-anggota.html" class="btn btn-primary">Lihat Profil Saya</a>
+            <a href="./kehadiran.html" class="btn btn-secondary">Riwayat Kehadiran</a>
           </div>
-
         </div>
-
       </section>
 
       <!-- FOOTER -->
       <footer class="learning-footer">
         <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
-        <small>
-          © <span data-dashboard-year>2026</span> TARBIYAH — Pembelajaran Muslim
-        </small>
+        <small>© <span data-dashboard-year>2026</span> TARBIYAH — Pembelajaran Muslim</small>
       </footer>
 
     </main>
 
-    <!-- MOBILE BOTTOM NAV -->
+    <!-- =====================================
+         MOBILE BOTTOM NAV — DIPERBAIKI
+    ====================================== -->
     <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
-
       <a href="./tarbiyah.html" data-module="dashboard">
-        <span>⌂</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.5 12 3l9 7.5"/>
+          <path d="M5 9.5V21h14V9.5"/>
+        </svg>
         <small>Beranda</small>
       </a>
 
       <a href="./agenda-tarbiyah.html" data-module="agenda">
-        <span>▦</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="4.5" width="18" height="16" rx="2"/>
+          <line x1="3" y1="9.5" x2="21" y2="9.5"/>
+          <line x1="8" y1="2.5" x2="8" y2="6.5"/>
+          <line x1="16" y1="2.5" x2="16" y2="6.5"/>
+        </svg>
         <small>Agenda</small>
       </a>
 
       <a href="./materi-pembelajaran.html" data-module="materi">
-        <span>▤</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5h16v14H4z"/>
+          <line x1="8" y1="9" x2="16" y2="9"/>
+          <line x1="8" y1="13" x2="14" y2="13"/>
+        </svg>
         <small>Materi</small>
       </a>
 
       <a href="./profil-anggota.html" data-module="profil">
-        <span>♙</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5"/>
+          <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
+        </svg>
         <small>Profil</small>
       </a>
-
     </nav>
 
   </div>
@@ -637,6 +842,231 @@
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
+
+  <!-- =====================================
+       LEARNING PAGE LOGIC
+       (filter kategori + search + render list)
+  ====================================== -->
+  <script>
+  (function () {
+    "use strict";
+
+    /* -----------------------------------------
+       STATE
+    ----------------------------------------- */
+    const state = {
+      categories: [],   // diisi dari backend nanti
+      programs: [],     // program pembelajaran
+      materials: [],    // materi terbaru
+      filter: "all",
+      query: ""
+    };
+
+    /* -----------------------------------------
+       UTIL
+    ----------------------------------------- */
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    const CATEGORY_ICONS = {
+      akidah: "🌙",
+      ibadah: "🕌",
+      quran: "📖",
+      hadis: "📚",
+      akhlak: "🌱",
+      sejarah: "🏛️",
+      default: "📘"
+    };
+
+    function categoryIcon(cat) {
+      return CATEGORY_ICONS[cat] || CATEGORY_ICONS.default;
+    }
+
+    /* -----------------------------------------
+       FILTER KATEGORI (grid utama)
+    ----------------------------------------- */
+    function applyCategoryFilter() {
+      const q = state.query.trim().toLowerCase();
+      const cat = state.filter;
+
+      document.querySelectorAll("[data-learning-categories] .learning-category")
+        .forEach((el) => {
+          const elCat = el.dataset.category || "";
+          const text = el.textContent.toLowerCase();
+
+          const matchCat = cat === "all" || elCat === cat;
+          const matchQ = !q || text.includes(q);
+
+          el.hidden = !(matchCat && matchQ);
+        });
+    }
+
+    /* -----------------------------------------
+       RENDER: PROGRAM LIST
+    ----------------------------------------- */
+    const programsEl = document.querySelector("[data-learning-programs]");
+
+    function renderPrograms() {
+      if (!programsEl) return;
+
+      const q = state.query.trim().toLowerCase();
+      let list = state.programs.slice();
+
+      if (state.filter !== "all") {
+        list = list.filter((p) => (p.category || "") === state.filter);
+      }
+
+      if (q) {
+        list = list.filter((p) => {
+          const hay = ((p.title || "") + " " + (p.description || "")).toLowerCase();
+          return hay.includes(q);
+        });
+      }
+
+      if (!list.length) {
+        programsEl.innerHTML = `
+          <div class="learning-empty">
+            <span class="learning-empty-icon">🌿</span>
+            <strong>Belum ada program yang cocok.</strong><br>
+            Coba ubah filter kategori atau kata pencarian.
+          </div>`;
+        return;
+      }
+
+      programsEl.innerHTML = list.map((p) => `
+        <article class="learning-card">
+          <div class="learning-card-icon">${categoryIcon(p.category)}</div>
+          <div class="learning-card-body">
+            <h3>${escapeHtml(p.title || "Program Pembelajaran")}</h3>
+            <p>${escapeHtml(p.description || "")}</p>
+            <div class="learning-card-meta">
+              ${p.schedule ? `<span>🗓️ ${escapeHtml(p.schedule)}</span>` : ""}
+              ${p.mentor ? `<span>👤 ${escapeHtml(p.mentor)}</span>` : ""}
+              ${p.link ? `<a href="${escapeHtml(p.link)}">Detail →</a>` : ""}
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    /* -----------------------------------------
+       RENDER: MATERIAL LIST
+    ----------------------------------------- */
+    const materialsEl = document.querySelector("[data-learning-materials]");
+
+    function renderMaterials() {
+      if (!materialsEl) return;
+
+      const q = state.query.trim().toLowerCase();
+      let list = state.materials.slice();
+
+      if (state.filter !== "all") {
+        list = list.filter((m) => (m.category || "") === state.filter);
+      }
+
+      if (q) {
+        list = list.filter((m) => {
+          const hay = ((m.title || "") + " " + (m.description || "")).toLowerCase();
+          return hay.includes(q);
+        });
+      }
+
+      if (!list.length) {
+        materialsEl.innerHTML = `
+          <div class="learning-empty">
+            <span class="learning-empty-icon">📚</span>
+            Belum ada materi yang cocok.
+          </div>`;
+        return;
+      }
+
+      materialsEl.innerHTML = list.map((m) => `
+        <article class="learning-card">
+          <div class="learning-card-icon">${categoryIcon(m.category)}</div>
+          <div class="learning-card-body">
+            <h3>${escapeHtml(m.title || "Materi Kajian")}</h3>
+            <p>${escapeHtml(m.description || "")}</p>
+            <div class="learning-card-meta">
+              ${m.author ? `<span>✍️ ${escapeHtml(m.author)}</span>` : ""}
+              ${m.link ? `<a href="${escapeHtml(m.link)}">Baca →</a>` : ""}
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    /* -----------------------------------------
+       APPLY ALL
+    ----------------------------------------- */
+    function applyAll() {
+      applyCategoryFilter();
+      renderPrograms();
+      renderMaterials();
+    }
+
+    /* -----------------------------------------
+       EVENT LISTENER: FILTER CHIPS
+    ----------------------------------------- */
+    document.querySelectorAll("[data-learning-filter]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-learning-filter]").forEach((b) => {
+          b.setAttribute("aria-pressed", "false");
+        });
+        btn.setAttribute("aria-pressed", "true");
+        state.filter = btn.dataset.learningFilter || "all";
+        applyAll();
+      });
+    });
+
+    /* -----------------------------------------
+       EVENT LISTENER: SEARCH
+    ----------------------------------------- */
+    const searchForm  = document.querySelector("[data-learning-search-form]");
+    const searchInput = document.querySelector("[data-learning-search]");
+
+    if (searchForm) {
+      searchForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        state.query = searchInput ? searchInput.value : "";
+        applyAll();
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        state.query = searchInput.value;
+        applyAll();
+      });
+    }
+
+    /* -----------------------------------------
+       INISIALISASI
+    ----------------------------------------- */
+    applyAll();
+
+    /* -----------------------------------------
+       API PUBLIK UNTUK BACKEND
+    ----------------------------------------- */
+    window.LearningPage = {
+      setPrograms(list) {
+        state.programs = Array.isArray(list) ? list : [];
+        renderPrograms();
+      },
+      setMaterials(list) {
+        state.materials = Array.isArray(list) ? list : [];
+        renderMaterials();
+      },
+      setCategories(list) {
+        // opsional: bila ingin render kategori dari DB juga
+        state.categories = Array.isArray(list) ? list : [];
+      },
+      getState() { return state; }
+    };
+  })();
+  </script>
 
 </body>
 </html>
