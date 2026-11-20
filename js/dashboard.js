@@ -933,6 +933,7 @@
       "diskusi-tarbiyah.html": "diskusi",
       "donasi-infaq.html": "donasi",
       "presensi-tarbiyah.html": "presensi",
+      "presensi-mentor.html": "presensi-mentor",
       "kehadiran.html": "kehadiran",
       "catatan-refleksi.html": "catatan",
       "riwayat-aktivitas.html": "riwayat",
