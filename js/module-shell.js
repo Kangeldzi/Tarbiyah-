@@ -1,18 +1,27 @@
+
 /* ============================================================
    TARBIYAH — MODULE SHELL
    File    : js/module-shell.js
-   Versi   : 2.0.0
+   Versi   : 2.1.0
 
    Tanggung jawab:
    - Sidebar desktop dan mobile
    - Overlay sidebar
    - Navigasi aktif
    - Menu pengguna
-   - Pengaturan tema
    - Keyboard Escape
    - Kompatibilitas beberapa selector versi sebelumnya
+   - Responsive layout
 
-   Tidak mengelola:
+   PENTING:
+   Pengaturan tema sepenuhnya dikelola oleh:
+   js/tarbiyah-theme.js
+
+   File ini TIDAK mengelola:
+   - Tombol tema
+   - Pergantian Dark / Light Mode
+   - Penyimpanan tema
+   - MutationObserver tema
    - Autentikasi Supabase
    - Pembacaan role
    - Data anggota
@@ -22,14 +31,14 @@
 (() => {
   "use strict";
 
-  if (window.__TARBIYAH_MODULE_SHELL_V2__) {
+  if (window.__TARBIYAH_MODULE_SHELL_V21__) {
     console.info("[TARBIYAH SHELL] Sudah diinisialisasi.");
     return;
   }
 
-  window.__TARBIYAH_MODULE_SHELL_V2__ = true;
+  window.__TARBIYAH_MODULE_SHELL_V21__ = true;
 
-  const VERSION = "2.0.0";
+  const VERSION = "2.1.0";
 
   const $ = (selector, root = document) =>
     root.querySelector(selector);
@@ -70,12 +79,6 @@
         ".sidebar-close"
       ],
 
-      themeButton: [
-        "#btnTheme",
-        "#themeToggle",
-        "[data-theme-toggle]"
-      ],
-
       userMenuButton: [
         "#userMenuToggle",
         "[data-user-menu-toggle]"
@@ -101,6 +104,10 @@
     userMenuOpen: false,
     desktopCollapsed: false
   };
+
+  /* ==========================================================
+     00. SELECTOR HELPERS
+  ========================================================== */
 
   function first(selectors) {
     for (const selector of selectors) {
@@ -176,7 +183,13 @@
 
     if (overlay) {
       overlay.hidden = false;
-      overlay.classList.add("show", "active", "is-visible");
+
+      overlay.classList.add(
+        "show",
+        "active",
+        "is-visible"
+      );
+
       overlay.setAttribute("aria-hidden", "false");
     }
 
@@ -230,6 +243,12 @@
 
   function bindSidebar() {
     all(CONFIG.selectors.openButton).forEach(button => {
+      if (button.dataset.shellSidebarBound === "true") {
+        return;
+      }
+
+      button.dataset.shellSidebarBound = "true";
+
       button.addEventListener("click", event => {
         event.preventDefault();
         toggleSidebar();
@@ -237,6 +256,12 @@
     });
 
     all(CONFIG.selectors.closeButton).forEach(button => {
+      if (button.dataset.shellSidebarBound === "true") {
+        return;
+      }
+
+      button.dataset.shellSidebarBound = "true";
+
       button.addEventListener("click", event => {
         event.preventDefault();
         closeSidebar();
@@ -245,17 +270,30 @@
 
     const overlay = getOverlay();
 
-    overlay?.addEventListener("click", closeSidebar);
+    if (
+      overlay &&
+      overlay.dataset.shellSidebarBound !== "true"
+    ) {
+      overlay.dataset.shellSidebarBound = "true";
+      overlay.addEventListener("click", closeSidebar);
+    }
 
     const sidebar = getSidebar();
 
-    sidebar?.addEventListener("click", event => {
-      const link = event.target.closest("a");
+    if (
+      sidebar &&
+      sidebar.dataset.shellSidebarBound !== "true"
+    ) {
+      sidebar.dataset.shellSidebarBound = "true";
 
-      if (link && isMobile()) {
-        closeSidebar();
-      }
-    });
+      sidebar.addEventListener("click", event => {
+        const link = event.target.closest("a");
+
+        if (link && isMobile()) {
+          closeSidebar();
+        }
+      });
+    }
   }
 
   /* ==========================================================
@@ -291,6 +329,12 @@
     );
 
     buttons.forEach(button => {
+      if (button.dataset.shellCollapseBound === "true") {
+        return;
+      }
+
+      button.dataset.shellCollapseBound = "true";
+
       button.addEventListener("click", event => {
         event.preventDefault();
         toggleDesktopSidebar();
@@ -299,152 +343,7 @@
   }
 
   /* ==========================================================
-     03. THEME MANAGER
-  ========================================================== */
-
-  function getThemeManager() {
-    return (
-      window.TARBIYAH_THEME_MANAGER ||
-      window.TARBIYAH_THEME ||
-      window.ThemeManager ||
-      null
-    );
-  }
-
-  function getCurrentTheme() {
-    const manager = getThemeManager();
-
-    try {
-      if (typeof manager?.getTheme === "function") {
-        return manager.getTheme();
-      }
-
-      if (typeof manager?.get === "function") {
-        return manager.get();
-      }
-    } catch (error) {
-      console.warn(
-        "[TARBIYAH SHELL] Gagal membaca tema:",
-        error
-      );
-    }
-
-    return (
-      document.documentElement.dataset.theme ||
-      "dark"
-    );
-  }
-
-  function applyFallbackTheme(nextTheme) {
-    const theme =
-      nextTheme === "light" ? "light" : "dark";
-
-    document.documentElement.dataset.theme = theme;
-
-    document.body?.setAttribute(
-      "data-theme",
-      theme
-    );
-
-    const metaTheme = $(
-      'meta[name="theme-color"]'
-    );
-
-    if (metaTheme) {
-      metaTheme.content =
-        theme === "dark" ? "#102a22" : "#f4faf7";
-    }
-  }
-
-  function changeTheme() {
-    const manager = getThemeManager();
-
-    try {
-      if (typeof manager?.toggleTheme === "function") {
-        manager.toggleTheme();
-        return;
-      }
-
-      if (typeof manager?.changeTheme === "function") {
-        manager.changeTheme();
-        return;
-      }
-
-      const current = getCurrentTheme();
-      const next = current === "dark" ? "light" : "dark";
-
-      if (typeof manager?.setTheme === "function") {
-        manager.setTheme(next);
-        return;
-      }
-
-      if (typeof manager?.set === "function") {
-        manager.set(next);
-        return;
-      }
-
-      applyFallbackTheme(next);
-
-    } catch (error) {
-      console.error(
-        "[TARBIYAH SHELL] Gagal mengganti tema:",
-        error
-      );
-    }
-  }
-
-  function updateThemeButtons() {
-    const theme = getCurrentTheme();
-
-    all(CONFIG.selectors.themeButton).forEach(button => {
-      button.setAttribute(
-        "aria-label",
-        theme === "dark"
-          ? "Aktifkan tema terang"
-          : "Aktifkan tema gelap"
-      );
-
-      button.setAttribute(
-        "title",
-        theme === "dark"
-          ? "Tema terang"
-          : "Tema gelap"
-      );
-
-      button.dataset.currentTheme = theme;
-    });
-  }
-
-  function bindTheme() {
-    all(CONFIG.selectors.themeButton).forEach(button => {
-      button.addEventListener("click", event => {
-        event.preventDefault();
-        changeTheme();
-
-        window.setTimeout(
-          updateThemeButtons,
-          50
-        );
-      });
-    });
-
-    const observer = new MutationObserver(() => {
-      updateThemeButtons();
-    });
-
-    observer.observe(
-      document.documentElement,
-      {
-        attributes: true,
-        attributeFilter: ["data-theme"]
-      }
-    );
-
-    updateThemeButtons();
-  }
-
-  /* ==========================================================
-     04. USER MENU
+     03. USER MENU
   ========================================================== */
 
   function getUserMenuButton() {
@@ -500,35 +399,51 @@
   function bindUserMenu() {
     const button = getUserMenuButton();
 
-    button?.addEventListener("click", event => {
-      event.preventDefault();
-      event.stopPropagation();
-      toggleUserMenu();
-    });
+    if (
+      button &&
+      button.dataset.shellUserMenuBound !== "true"
+    ) {
+      button.dataset.shellUserMenuBound = "true";
 
-    document.addEventListener("click", event => {
-      const panel = getUserMenuPanel();
-      const trigger = getUserMenuButton();
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleUserMenu();
+      });
+    }
 
-      if (!state.userMenuOpen) return;
+    if (!document.body.dataset.shellUserMenuDocumentBound) {
+      document.body.dataset.shellUserMenuDocumentBound = "true";
 
-      if (
-        panel?.contains(event.target) ||
-        trigger?.contains(event.target)
-      ) {
+      document.addEventListener("click", event => {
+        const panel = getUserMenuPanel();
+        const trigger = getUserMenuButton();
+
+        if (!state.userMenuOpen) return;
+
+        if (
+          panel?.contains(event.target) ||
+          trigger?.contains(event.target)
+        ) {
+          return;
+        }
+
+        closeUserMenu();
+      });
+    }
+
+    getUserMenuPanel()?.querySelectorAll("a").forEach(link => {
+      if (link.dataset.shellUserMenuLinkBound === "true") {
         return;
       }
 
-      closeUserMenu();
-    });
-
-    getUserMenuPanel()?.querySelectorAll("a").forEach(link => {
+      link.dataset.shellUserMenuLinkBound = "true";
       link.addEventListener("click", closeUserMenu);
     });
   }
 
   /* ==========================================================
-     05. NAVIGASI AKTIF
+     04. NAVIGASI AKTIF
   ========================================================== */
 
   function getCurrentFileName() {
@@ -551,6 +466,7 @@
       return (
         parts[parts.length - 1] || ""
       ).toLowerCase();
+
     } catch {
       return String(value)
         .split("?")[0]
@@ -591,6 +507,7 @@
         )
       ) {
         active = true;
+
       } else if (
         linkFile &&
         linkFile === currentFile
@@ -609,10 +526,16 @@
   }
 
   /* ==========================================================
-     06. NAVIGASI MODUL
+     05. NAVIGASI MODUL
   ========================================================== */
 
   function bindModuleNavigation() {
+    if (document.body.dataset.shellModuleNavigationBound) {
+      return;
+    }
+
+    document.body.dataset.shellModuleNavigationBound = "true";
+
     document.addEventListener("click", event => {
       const link = event.target.closest(
         "[data-module], [data-nav-link]"
@@ -646,6 +569,7 @@
       ) {
         event.preventDefault();
         moduleAPI.navigate(moduleName);
+
       } else {
         console.error(
           "[TARBIYAH SHELL] API navigasi modul tidak tersedia."
@@ -655,10 +579,16 @@
   }
 
   /* ==========================================================
-     07. KEYBOARD
+     06. KEYBOARD
   ========================================================== */
 
   function bindKeyboard() {
+    if (document.body.dataset.shellKeyboardBound) {
+      return;
+    }
+
+    document.body.dataset.shellKeyboardBound = "true";
+
     document.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
 
@@ -668,10 +598,16 @@
   }
 
   /* ==========================================================
-     08. RESPONSIVE
+     07. RESPONSIVE
   ========================================================== */
 
   function bindResponsive() {
+    if (window.__TARBIYAH_SHELL_RESPONSIVE_BOUND__) {
+      return;
+    }
+
+    window.__TARBIYAH_SHELL_RESPONSIVE_BOUND__ = true;
+
     let previousMobileState = isMobile();
 
     window.addEventListener("resize", () => {
@@ -685,7 +621,7 @@
   }
 
   /* ==========================================================
-     09. INITIALIZATION
+     08. INITIALIZATION
   ========================================================== */
 
   function initialize() {
@@ -695,7 +631,10 @@
 
     bindSidebar();
     bindDesktopCollapse();
-    bindTheme();
+
+    // Tidak ada bindTheme() di sini.
+    // Tema hanya dikendalikan tarbiyah-theme.js.
+
     bindUserMenu();
     bindModuleNavigation();
     bindKeyboard();
@@ -705,6 +644,10 @@
 
     console.info(
       `[TARBIYAH SHELL] Versi ${VERSION} aktif.`
+    );
+
+    console.info(
+      "[TARBIYAH SHELL] Pengaturan tema diserahkan kepada TARBIYAH_THEME_CONTROLLER."
     );
   }
 
@@ -719,7 +662,7 @@
   }
 
   /* ==========================================================
-     10. PUBLIC API
+     09. PUBLIC API
   ========================================================== */
 
   window.TARBIYAH_SHELL = Object.freeze({
@@ -730,7 +673,6 @@
     toggleSidebar,
     closeUserMenu,
     markActiveNavigation,
-    updateThemeButtons,
     isMobile
   });
 
