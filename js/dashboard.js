@@ -347,10 +347,10 @@
       roles: ["super_admin", "admin", "mentor", "member", "registered_user"]
     },
     {
-      keywords: ["anggota binaan", "binaan"],
-      module: "anggota-binaan",
-      roles: ["super_admin", "admin", "mentor"]
-    },
+  keywords: ["anggota binaan", "binaan"],
+  url: "./anggota-binaan.html",
+  roles: ["super_admin", "admin", "mentor"]
+},
     {
       keywords: ["pembinaan", "catatan pembinaan"],
       module: "pembinaan",
