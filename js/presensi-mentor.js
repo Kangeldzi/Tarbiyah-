@@ -418,14 +418,16 @@ async function loadAssignments() {
 
   let query = supabase
     .from(CONFIG.assignmentTable)
-    .select("mentor_user_id, member_id, active")
-    .eq("active", true);
+    .select(`
+      id,
+      mentor_user_id,
+      member_id,
+      is_active,
+      notes
+    `)
+    .eq("is_active", true);
 
-  /*
-    Mentor hanya mengambil penugasan miliknya sendiri.
-    Admin dan Super Admin mengikuti batasan RLS.
-  */
-
+  // Mentor hanya melihat anggota binaannya sendiri.
   if (state.primaryRole === "mentor") {
     query = query.eq(
       "mentor_user_id",
@@ -438,13 +440,24 @@ async function loadAssignments() {
     error
   } = await query;
 
-  if (error) throw error;
+  if (error) {
+    console.error(
+      "[PRESENSI BINAAN] Gagal memuat penugasan:",
+      error
+    );
+
+    throw error;
+  }
 
   state.assignments = data || [];
 
+  console.info(
+    "[PRESENSI BINAAN] Penugasan berhasil dimuat:",
+    state.assignments.length
+  );
+
   return state.assignments;
 }
-
 
 
   /* ==========================================================
