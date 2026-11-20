@@ -26,7 +26,7 @@
 
   <style>
     /* =========================================
-       HEADER KHUSUS (MENGIKUTI PROFIL-ANGGOTA)
+       HEADER & UI (IDENTIK DENGAN PROFIL-ANGGOTA)
     ========================================= */
     .app-header {
       display: flex;
@@ -95,22 +95,14 @@
       background: var(--bg-secondary);
       color: var(--text-primary);
       cursor: pointer;
+      font-size: 1.25rem; /* Ukuran ikon teks */
+      text-decoration: none;
       transition: all .2s ease;
     }
 
     .icon-button:hover {
       border-color: var(--color-primary);
       background: var(--bg-tertiary);
-    }
-
-    .icon-button svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
     }
 
     /* =========================================
@@ -403,13 +395,12 @@
   <div class="app-shell">
 
     <!-- =========================================
-         HEADER (SAMA PERSIS DENGAN PROFIL ANGGOTA)
+         HEADER (IDENTIK DENGAN REFERENSI)
     ========================================== -->
     <header class="app-header">
       <div class="header-left">
         <div class="header-brand">
-          <!-- Ganti src dengan path logo asli Anda jika berbeda -->
-          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+          <img src="./assets/icons/tarbiyah-mark.svg" alt="Logo TARBIYAH">
           <div class="header-brand-text">
             <h1>TARBIYAH</h1>
             <span>Pembelajaran</span>
@@ -418,19 +409,14 @@
       </div>
 
       <div class="header-right">
-        <!-- Tombol Tema -->
-        <button type="button" class="icon-button" data-theme-toggle aria-label="Ubah tema">
-          <svg viewBox="0 0 24 24">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
+        <!-- Tombol Tema: Teks '◐' akan diganti otomatis oleh JS menjadi ☀ / ☾ -->
+        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
+          ◐
         </button>
 
         <!-- Tombol Notifikasi -->
         <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
-          <svg viewBox="0 0 24 24">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
+          ♧
         </a>
       </div>
     </header>
@@ -443,10 +429,7 @@
       <!-- Tombol Back & Judul -->
       <header class="learning-page-header">
         <a href="./dashboard.html" class="learning-back-btn" aria-label="Kembali ke Dashboard">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
+          ←
         </a>
         <div>
           <h2>Pembelajaran</h2>
@@ -574,7 +557,10 @@
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
-  <script src="./js/theme-manager.js"></script>
+  
+  <!-- SCRIPT TEMA (Menggunakan file yang sudah Anda buat) -->
+  <script src="./js/tarbiyah-theme.js"></script>
+
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
