@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Agenda dan jadwal kegiatan TARBIYAH — Pembelajaran Muslim">
+  <meta name="application-name" content="TARBIYAH">
+
+  <title>Agenda & Jadwal — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
+  <link rel="stylesheet" href="./css/module.css">
+  <link rel="stylesheet" href="./css/module-shell.css">
+
+  <style>
+    /* =========================================
+       AGENDA PAGE — STYLING LOKAL
+       (memakai CSS variable universal TARBIYAH)
+    ========================================= */
+
+    .agenda-page {
+      width: 100%;
+      min-width: 0;
+      padding-bottom: 35px;
+    }
+
+    /* --- Page header (pengganti breadcrumb) --- */
+    .agenda-page-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .agenda-back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 12px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-primary, #fff);
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .agenda-back-btn:hover {
+      background: rgba(54, 181, 138, .14);
+      border-color: var(--color-primary, #36b58a);
+      transform: translateX(-2px);
+    }
+
+    .agenda-back-btn:active {
+      transform: translateX(0) scale(.96);
+    }
+
+    .agenda-page-header h1 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(1.05rem, 2.4vw, 1.2rem);
+      font-weight: 700;
+    }
+
+    .agenda-page-header small {
+      display: block;
+      margin-top: 2px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .78rem;
+      font-weight: 500;
+    }
+
+    /* --- Hero --- */
+    .agenda-hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(22px, 4vw, 34px);
+      margin-bottom: 22px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 90% 15%, rgba(54,181,138,.2), transparent 38%),
+        var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .agenda-eyebrow {
+      color: var(--color-primary, #36b58a);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+    }
+
+    .agenda-hero h2 {
+      margin: 10px 0;
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+
+    .agenda-hero p {
+      max-width: 650px;
+      margin: 0;
+      color: var(--text-secondary, #aab5af);
+      line-height: 1.7;
+    }
+
+    /* --- Toolbar & search --- */
+    .agenda-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .agenda-search {
+      display: flex;
+      flex: 1;
+      min-width: min(100%, 230px);
+      max-width: 460px;
+      gap: 8px;
+    }
+
+    .agenda-search input {
+      min-width: 0;
+      flex: 1;
+      padding: 11px 14px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 12px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-primary, #fff);
+      font: inherit;
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .agenda-search input:focus {
+      border-color: var(--color-primary, #36b58a);
+      box-shadow: 0 0 0 3px rgba(54,181,138,.15);
+    }
+
+    .agenda-search input::placeholder {
+      color: var(--text-secondary, #aab5af);
+      opacity: .75;
+    }
+
+    /* --- Filter chips --- */
+    .agenda-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .agenda-filter {
+      padding: 9px 16px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 30px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      color: var(--text-secondary, #aab5af);
+      font: inherit;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease;
+    }
+
+    .agenda-filter:hover {
+      border-color: var(--color-primary, #36b58a);
+      color: var(--text-primary, #fff);
+    }
+
+    .agenda-filter:active {
+      transform: scale(.97);
+    }
+
+    .agenda-filter[aria-pressed="true"] {
+      border-color: var(--color-primary, #36b58a);
+      background: rgba(54,181,138,.13);
+      color: var(--color-primary, #36b58a);
+    }
+
+    /* --- Section --- */
+    .agenda-section { margin-top: 25px; }
+
+    .agenda-section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .agenda-section-heading h2 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: 1.05rem;
+    }
+
+    .agenda-list { display: grid; gap: 14px; }
+
+    .agenda-empty {
+      padding: 28px 18px;
+      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border-radius: 17px;
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .agenda-empty-icon {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+
+    /* --- Calendar --- */
+    .agenda-calendar {
+      padding: 18px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 17px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .agenda-calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .agenda-calendar-header h3 { margin: 0; font-size: .95rem; }
+
+    .agenda-calendar-nav { display: flex; gap: 7px; }
+
+    .agenda-calendar-nav button {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-primary, #fff);
+      cursor: pointer;
+      transition: background .18s ease, border-color .18s ease;
+    }
+
+    .agenda-calendar-nav button:hover {
+      background: rgba(54,181,138,.14);
+      border-color: var(--color-primary, #36b58a);
+    }
+
+    .agenda-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .agenda-calendar-day {
+      display: grid;
+      min-height: 38px;
+      place-items: center;
+      border-radius: 9px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .78rem;
+    }
+
+    .agenda-calendar-day.heading {
+      min-height: 30px;
+      color: var(--text-primary, #fff);
+      font-weight: 700;
+    }
+
+    .agenda-calendar-day.today {
+      background: rgba(54,181,138,.17);
+      color: var(--color-primary, #36b58a);
+      font-weight: 800;
+    }
+
+    .agenda-calendar-day.has-event {
+      border: 1px solid var(--color-primary, #36b58a);
+      color: var(--color-primary, #36b58a);
+    }
+
+    .agenda-calendar-day.is-empty { visibility: hidden; }
+
+    /* --- Detail panel --- */
+    .agenda-detail-panel {
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 17px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+    }
+
+    .agenda-detail-panel h3 { margin-top: 0; }
+
+    .agenda-detail-content {
+      color: var(--text-secondary, #aab5af);
+      font-size: .88rem;
+      line-height: 1.7;
+    }
+
+    .agenda-location {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .82rem;
+    }
+
+    .agenda-location a {
+      color: var(--color-primary, #36b58a);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* --- Event card (dibuat oleh JS) --- */
+    .agenda-card {
+      padding: 16px 18px;
+      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border-radius: 16px;
+      background: var(--surface-color, rgba(255,255,255,.04));
+      transition: border-color .18s ease, transform .18s ease;
+    }
+
+    .agenda-card:hover {
+      border-color: rgba(54,181,138,.4);
+      transform: translateY(-1px);
+    }
+
+    .agenda-card h3 {
+      margin: 0 0 6px;
+      font-family: "Poppins", sans-serif;
+      font-size: .98rem;
+    }
+
+    .agenda-card p {
+      margin: 0 0 8px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .85rem;
+      line-height: 1.6;
+    }
+
+    .agenda-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--text-secondary, #aab5af);
+      font-size: .78rem;
+    }
+
+    .agenda-card-status {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+    }
+
+    .agenda-card-status.upcoming {
+      background: rgba(54,181,138,.15);
+      color: var(--color-primary, #36b58a);
+    }
+
+    .agenda-card-status.ongoing {
+      background: rgba(245,158,11,.15);
+      color: #f59e0b;
+    }
+
+    .agenda-card-status.finished {
+      background: rgba(148,163,184,.18);
+      color: var(--text-secondary, #aab5af);
+    }
+
+    /* --- Footer --- */
+    .agenda-footer {
+      padding: 24px 0 12px;
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
+      color: var(--text-secondary, #aab5af);
+      text-align: center;
+      font-size: .78rem;
+    }
+
+    /* =========================================
+       BOTTOM NAV (MOBILE) — DIPERBAIKI
+    ========================================= */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 900;
+      padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
+      background: var(--surface-color, #102a22);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+      }
+    }
+
+    .mobile-bottom-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 8px 4px;
+      border-radius: 12px;
+      color: var(--text-secondary, #aab5af);
+      text-decoration: none;
+      font-size: .68rem;
+      font-weight: 600;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .mobile-bottom-nav a svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    .mobile-bottom-nav a:active,
+    .mobile-bottom-nav a[data-active="true"] {
+      background: rgba(54,181,138,.14);
+      color: var(--color-primary, #36b58a);
+    }
+
+    /* --- Mobile tweaks --- */
+    @media (max-width: 640px) {
+      .agenda-page { padding-bottom: 90px; }
+      .agenda-toolbar, .agenda-search { width: 100%; max-width: none; }
+      .agenda-toolbar > .btn { width: 100%; }
+      .agenda-calendar { padding: 12px 8px; }
+      .agenda-calendar-grid { gap: 3px; }
+      .agenda-calendar-day { min-height: 35px; font-size: .72rem; }
+    }
+
+    /* =========================================
+       PERBAIKAN SIDEBAR DAN LOGO
+    ========================================= */
+    .app-shell { position: relative; min-height: 100vh; }
+    .app-sidebar { box-sizing: border-box; z-index: 1000; }
+
+    .app-sidebar .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      text-decoration: none;
+    }
+
+    .app-sidebar .brand-logo img {
+      display: block;
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px;
+      max-width: 40px;
+      flex: 0 0 40px;
+      object-fit: contain;
+    }
+
+    .app-main { min-width: 0; width: 100%; }
+  </style>
+</head>
+
+<body class="auth-pending">
+
+<div class="app-shell" data-module-shell>
+
+  <!-- =====================================
+       SIDEBAR (SATU SAJA — duplikat dihapus)
+  ====================================== -->
+  <aside class="app-sidebar" data-sidebar aria-label="Navigasi utama">
+
+    <div class="sidebar-header">
+      <a href="./tarbiyah.html" class="brand-logo">
+        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+        <span>TARBIYAH</span>
+      </a>
+      <button type="button" data-sidebar-close aria-label="Tutup menu">×</button>
+    </div>
+
+    <div class="sidebar-profile">
+      <img src="./assets/icons/icon-192.png" alt="Foto profil anggota"
+           class="sidebar-avatar" data-sidebar-avatar>
+      <div class="sidebar-profile-info">
+        <strong data-sidebar-user-name>Anggota TARBIYAH</strong>
+        <small data-sidebar-user-role>Anggota</small>
+      </div>
+    </div>
+
+    <nav class="sidebar-navigation">
+      <p class="sidebar-nav-heading">MENU UTAMA</p>
+
+      <a href="./tarbiyah.html" data-module="dashboard" class="sidebar-nav-item">
+        <span>⌂</span><span>Beranda</span>
+      </a>
+      <a href="./profil-anggota.html" data-module="profil" class="sidebar-nav-item">
+        <span>♙</span><span>Profil Anggota</span>
+      </a>
+      <a href="./agenda-tarbiyah.html" data-module="agenda" class="sidebar-nav-item active">
+        <span>▦</span><span>Agenda &amp; Jadwal</span>
+      </a>
+      <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
+        <span>▤</span><span>Pembelajaran</span>
+      </a>
+      <a href="./materi-pembelajaran.html" data-module="materi" class="sidebar-nav-item">
+        <span>▧</span><span>Materi Kajian</span>
+      </a>
+      <a href="./berita-pengumuman.html" data-module="berita" class="sidebar-nav-item">
+        <span>▥</span><span>Berita &amp; Pengumuman</span>
+      </a>
+      <a href="./presensi-tarbiyah.html" data-module="presensi" class="sidebar-nav-item">
+        <span>✓</span><span>Presensi</span>
+      </a>
+
+      <p class="sidebar-nav-heading">KOMUNITAS</p>
+      <a href="./galeri-foto-video.html" data-module="galeri" class="sidebar-nav-item">
+        <span>▣</span><span>Galeri Dokumentasi</span>
+      </a>
+      <a href="./diskusi-tarbiyah.html" data-module="diskusi" class="sidebar-nav-item">
+        <span>☷</span><span>Ruang Diskusi</span>
+      </a>
+      <a href="./donasi-infaq.html" data-module="donasi" class="sidebar-nav-item">
+        <span>♡</span><span>Infaq &amp; Donasi</span>
+      </a>
+
+      <p class="sidebar-nav-heading">AKUN &amp; AKTIVITAS</p>
+      <a href="./kehadiran.html" data-module="kehadiran" class="sidebar-nav-item">
+        <span>◷</span><span>Riwayat Kehadiran</span>
+      </a>
+      <a href="./catatan-refleksi.html" data-module="catatan" class="sidebar-nav-item">
+        <span>✎</span><span>Catatan Refleksi</span>
+      </a>
+      <a href="./riwayat-aktivitas.html" data-module="riwayat" class="sidebar-nav-item">
+        <span>↻</span><span>Riwayat Aktivitas</span>
+      </a>
+      <a href="./administrasi-pengaturan.html" data-module="administrasi" class="sidebar-nav-item">
+        <span>⚙</span><span>Pengaturan</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button type="button" class="sidebar-logout" data-logout>
+        ⇥ Keluar dari Akun
+      </button>
+      <small>© <span data-dashboard-year>2026</span> TARBIYAH</small>
+    </div>
+
+  </aside>
+
+  <!-- OVERLAY SIDEBAR -->
+  <div class="sidebar-overlay" data-sidebar-overlay aria-hidden="true"></div>
+
+  <!-- =====================================
+       MAIN CONTENT
+  ====================================== -->
+  <main class="app-main agenda-page">
+
+    <!-- PAGE HEADER (pengganti breadcrumb yang bocor) -->
+    <header class="agenda-page-header">
+      <a href="./dashboard.html" class="agenda-back-btn" aria-label="Kembali ke Dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </a>
+
+      <div>
+        <h1>Agenda &amp; Jadwal</h1>
+        <small>TARBIYAH — Kegiatan &amp; Ukhuwah</small>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="agenda-hero">
+      <span class="agenda-eyebrow">🌿 KEGIATAN &amp; UKHUWAH</span>
+      <h2>Jadwal Kegiatan TARBIYAH</h2>
+      <p>
+        Temukan jadwal kajian, kegiatan pembelajaran, pertemuan anggota,
+        dan agenda kebersamaan komunitas TARBIYAH.
+      </p>
+    </section>
+
+    <!-- TOOLBAR -->
+    <section class="agenda-toolbar">
+      <form class="agenda-search" data-agenda-search-form role="search">
+        <input
+          type="search"
+          placeholder="Cari nama atau lokasi kegiatan..."
+          aria-label="Cari agenda"
+          data-agenda-search>
+        <button type="submit" class="btn btn-primary">Cari</button>
+      </form>
+
+      <button type="button" class="btn btn-primary" data-agenda-create hidden>
+        + Tambah Agenda
+      </button>
+    </section>
+
+    <!-- FILTER -->
+    <section class="agenda-filters" aria-label="Filter agenda">
+      <button type="button" class="agenda-filter" data-agenda-filter="all" aria-pressed="true">Semua</button>
+      <button type="button" class="agenda-filter" data-agenda-filter="upcoming" aria-pressed="false">Akan Datang</button>
+      <button type="button" class="agenda-filter" data-agenda-filter="ongoing" aria-pressed="false">Berlangsung</button>
+      <button type="button" class="agenda-filter" data-agenda-filter="finished" aria-pressed="false">Selesai</button>
+    </section>
+
+    <!-- CALENDAR -->
+    <section class="agenda-section">
+      <div class="agenda-section-heading">
+        <h2>Kalender Kegiatan</h2>
+      </div>
+
+      <div class="agenda-calendar">
+        <div class="agenda-calendar-header">
+          <h3 data-agenda-calendar-title>Kalender</h3>
+          <div class="agenda-calendar-nav">
+            <button type="button" data-agenda-calendar-prev aria-label="Bulan sebelumnya">‹</button>
+            <button type="button" data-agenda-calendar-next aria-label="Bulan berikutnya">›</button>
+          </div>
+        </div>
+
+        <div class="agenda-calendar-grid" data-agenda-calendar-grid aria-label="Tanggal kalender">
+          <div class="agenda-calendar-day heading">Min</div>
+          <div class="agenda-calendar-day heading">Sen</div>
+          <div class="agenda-calendar-day heading">Sel</div>
+          <div class="agenda-calendar-day heading">Rab</div>
+          <div class="agenda-calendar-day heading">Kam</div>
+          <div class="agenda-calendar-day heading">Jum</div>
+          <div class="agenda-calendar-day heading">Sab</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPCOMING EVENTS -->
+    <section class="agenda-section">
+      <div class="agenda-section-heading">
+        <h2 data-agenda-list-title>Agenda Mendatang</h2>
+        <span data-agenda-count class="agenda-card-meta"></span>
+      </div>
+
+      <div class="agenda-list" data-agenda-list>
+        <div class="agenda-empty">
+          <span class="agenda-empty-icon">📅</span>
+          <strong>Belum ada agenda yang ditampilkan.</strong><br>
+          Agenda kegiatan akan muncul setelah data tersedia di database.
+        </div>
+      </div>
+    </section>
+
+    <!-- SELECTED DATE / EVENT DETAIL -->
+    <section class="agenda-detail-panel" data-agenda-detail hidden>
+      <h3 data-agenda-detail-title>Detail Agenda</h3>
+      <div class="agenda-detail-content" data-agenda-detail-content></div>
+      <div class="agenda-location" data-agenda-detail-location></div>
+    </section>
+
+    <!-- LOCATION INFORMATION -->
+    <section class="agenda-section">
+      <div class="agenda-section-heading">
+        <h2>Informasi Lokasi Kegiatan</h2>
+      </div>
+
+      <div class="agenda-detail-panel">
+        <h3>Petunjuk Lokasi</h3>
+        <p class="agenda-detail-content">
+          Lokasi kegiatan akan dicantumkan pada setiap agenda.
+          Jika pengelola menyediakan koordinat atau alamat lokasi,
+          anggota dapat membuka petunjuk arah melalui Google Maps.
+        </p>
+        <div class="agenda-location" data-agenda-general-location>
+          <span>📍</span>
+          <span>Lokasi mengikuti informasi masing-masing agenda.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="agenda-footer">
+      <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
+      <small>© <span data-dashboard-year>2026</span> TARBIYAH — Pembelajaran Muslim</small>
+    </footer>
+
+  </main>
+
+  <!-- =====================================
+       MOBILE BOTTOM NAV — DIPERBAIKI
+  ====================================== -->
+  <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
+    <a href="./tarbiyah.html" data-module="dashboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5"/>
+        <path d="M5 9.5V21h14V9.5"/>
+      </svg>
+      <small>Beranda</small>
+    </a>
+
+    <a href="./agenda-tarbiyah.html" data-module="agenda" data-active="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="4.5" width="18" height="16" rx="2"/>
+        <line x1="3" y1="9.5" x2="21" y2="9.5"/>
+        <line x1="8" y1="2.5" x2="8" y2="6.5"/>
+        <line x1="16" y1="2.5" x2="16" y2="6.5"/>
+      </svg>
+      <small>Agenda</small>
+    </a>
+
+    <a href="./materi-pembelajaran.html" data-module="materi">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 5h16v14H4z"/>
+        <line x1="8" y1="9" x2="16" y2="9"/>
+        <line x1="8" y1="13" x2="14" y2="13"/>
+      </svg>
+      <small>Materi</small>
+    </a>
+
+    <a href="./profil-anggota.html" data-module="profil">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.5"/>
+        <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
+      </svg>
+      <small>Profil</small>
+    </a>
+  </nav>
+
+</div>
+
+<!-- =====================================
+     SUPABASE & APPLICATION SCRIPTS
+====================================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./js/config.js"></script>
+<script src="./js/supabase-client.js"></script>
+<script src="./js/auth.js"></script>
+<script src="./js/auth-guard.js"></script>
+<script src="./js/theme-manager.js"></script>
+<script src="./js/module.js"></script>
+<script src="./js/module-shell.js"></script>
+<script src="./js/pwa.js"></script>
+
+<!-- =====================================
+     AGENDA PAGE LOGIC — FILTER, SEARCH, KALENDER
+     (Modul mandiri, tidak mengganggu script existing)
+====================================== -->
+<script>
+(function () {
+  "use strict";
+
+  /* -----------------------------------------
+     STATE
+  ----------------------------------------- */
+  const state = {
+    events: [],           // diisi dari backend nanti
+    filter: "all",
+    query: "",
+    calendarDate: new Date()
+  };
+
+  const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni",
+                  "Juli","Agustus","September","Oktober","November","Desember"];
+
+  /* -----------------------------------------
+     UTIL
+  ----------------------------------------- */
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  function ymd(date) {
+    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+  }
+
+  function startOfDay(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function getStatus(ev) {
+    const now = new Date();
+    const start = ev.start ? new Date(ev.start) : null;
+    const end   = ev.end   ? new Date(ev.end)   : start;
+    if (!start) return "upcoming";
+    if (now < start) return "upcoming";
+    if (now > end)   return "finished";
+    return "ongoing";
+  }
+
+  function formatDate(dt) {
+    if (!dt) return "—";
+    const d = new Date(dt);
+    if (isNaN(d)) return "—";
+    return d.getDate() + " " + MONTHS[d.getMonth()] + " " + d.getFullYear();
+  }
+
+  /* -----------------------------------------
+     RENDER: KALENDER
+  ----------------------------------------- */
+  const calendarGrid  = document.querySelector("[data-agenda-calendar-grid]");
+  const calendarTitle = document.querySelector("[data-agenda-calendar-title]");
+
+  function renderCalendar() {
+    if (!calendarGrid || !calendarTitle) return;
+
+    const base = state.calendarDate;
+    const year  = base.getFullYear();
+    const month = base.getMonth();
+
+    calendarTitle.textContent = MONTHS[month] + " " + year;
+
+    // Hapus sel tanggal lama (sisakan 7 heading)
+    Array.from(calendarGrid.children).forEach((el) => {
+      if (!el.classList.contains("heading")) el.remove();
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // event tanggal (berdasarkan state.events)
+    const eventDates = new Set();
+    state.events.forEach((ev) => {
+      if (ev.start) eventDates.add(ymd(new Date(ev.start)));
+    });
+
+    const todayStr = ymd(new Date());
+
+    // sel kosong sebelum tanggal 1
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("div");
+      empty.className = "agenda-calendar-day is-empty";
+      calendarGrid.appendChild(empty);
+    }
+
+    // sel tanggal
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cell = document.createElement("div");
+      cell.className = "agenda-calendar-day";
+      cell.textContent = d;
+
+      const cellDate = ymd(new Date(year, month, d));
+      if (cellDate === todayStr) cell.classList.add("today");
+      if (eventDates.has(cellDate)) cell.classList.add("has-event");
+
+      // klik tanggal → filter agenda pada tanggal itu
+      cell.style.cursor = "pointer";
+      cell.addEventListener("click", () => {
+        state.filter = "all";
+        state.query = "";
+        // filter event yang jatuh pada tanggal ini
+        const filtered = state.events.filter((ev) => {
+          if (!ev.start) return false;
+          return ymd(new Date(ev.start)) === cellDate;
+        });
+        renderList(filtered, "Agenda pada " + formatDate(cellDate));
+      });
+
+      calendarGrid.appendChild(cell);
+    }
+  }
+
+  /* -----------------------------------------
+     RENDER: DAFTAR AGENDA
+  ----------------------------------------- */
+  const listEl      = document.querySelector("[data-agenda-list]");
+  const listTitleEl = document.querySelector("[data-agenda-list-title]");
+  const countEl     = document.querySelector("[data-agenda-count]");
+
+  function renderList(events, customTitle) {
+    if (!listEl) return;
+
+    if (listTitleEl) listTitleEl.textContent = customTitle || "Agenda";
+    if (countEl) countEl.textContent = events.length ? events.length + " kegiatan" : "";
+
+    if (!events.length) {
+      listEl.innerHTML = `
+        <div class="agenda-empty">
+          <span class="agenda-empty-icon">📅</span>
+          <strong>Tidak ada agenda yang cocok.</strong><br>
+          Coba ubah filter atau kata pencarian.
+        </div>`;
+      return;
+    }
+
+    listEl.innerHTML = events.map((ev) => {
+      const status = getStatus(ev);
+      const statusLabel =
+        status === "upcoming" ? "Akan Datang" :
+        status === "ongoing"  ? "Berlangsung" : "Selesai";
+
+      return `
+        <article class="agenda-card">
+          <h3>${escapeHtml(ev.title || "Agenda TARBIYAH")}</h3>
+          <p>${escapeHtml(ev.description || "")}</p>
+          <div class="agenda-card-meta">
+            <span>📅 ${formatDate(ev.start)}</span>
+            ${ev.location ? `<span>📍 ${escapeHtml(ev.location)}</span>` : ""}
+            <span class="agenda-card-status ${status}">${statusLabel}</span>
+          </div>
+        </article>`;
+    }).join("");
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+
+  /* -----------------------------------------
+     FILTER + SEARCH
+  ----------------------------------------- */
+  function applyFilterAndSearch() {
+    const q = state.query.trim().toLowerCase();
+
+    let filtered = state.events.slice();
+
+    if (state.filter !== "all") {
+      filtered = filtered.filter((ev) => getStatus(ev) === state.filter);
+    }
+
+    if (q) {
+      filtered = filtered.filter((ev) => {
+        const hay = (
+          (ev.title || "") + " " +
+          (ev.description || "") + " " +
+          (ev.location || "")
+        ).toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    // urutkan berdasarkan tanggal
+    filtered.sort((a, b) => new Date(a.start || 0) - new Date(b.start || 0));
+
+    const labelMap = {
+      all: "Semua Agenda",
+      upcoming: "Agenda Mendatang",
+      ongoing: "Agenda Berlangsung",
+      finished: "Agenda Selesai"
+    };
+
+    renderList(filtered, labelMap[state.filter] || "Agenda");
+  }
+
+  /* -----------------------------------------
+     EVENT LISTENER: FILTER CHIPS
+  ----------------------------------------- */
+  document.querySelectorAll("[data-agenda-filter]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-agenda-filter]").forEach((b) => {
+        b.setAttribute("aria-pressed", "false");
+      });
+      btn.setAttribute("aria-pressed", "true");
+      state.filter = btn.dataset.agendaFilter || "all";
+      applyFilterAndSearch();
+    });
+  });
+
+  /* -----------------------------------------
+     EVENT LISTENER: SEARCH
+  ----------------------------------------- */
+  const searchForm  = document.querySelector("[data-agenda-search-form]");
+  const searchInput = document.querySelector("[data-agenda-search]");
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      state.query = searchInput ? searchInput.value : "";
+      applyFilterAndSearch();
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      state.query = searchInput.value;
+      applyFilterAndSearch();
+    });
+  }
+
+  /* -----------------------------------------
+     EVENT LISTENER: KALENDER NAVIGASI
+  ----------------------------------------- */
+  const prevBtn = document.querySelector("[data-agenda-calendar-prev]");
+  const nextBtn = document.querySelector("[data-agenda-calendar-next]");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      state.calendarDate = new Date(
+        state.calendarDate.getFullYear(),
+        state.calendarDate.getMonth() - 1,
+        1
+      );
+      renderCalendar();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      state.calendarDate = new Date(
+        state.calendarDate.getFullYear(),
+        state.calendarDate.getMonth() + 1,
+        1
+      );
+      renderCalendar();
+    });
+  }
+
+  /* -----------------------------------------
+     INISIALISASI
+     (Kalender & daftar langsung dirender;
+      events kosong → tampil empty state)
+  ----------------------------------------- */
+  renderCalendar();
+  applyFilterAndSearch();
+
+  /* -----------------------------------------
+     API PUBLIK UNTUK BACKEND
+     Contoh pemakaian di js/module.js:
+       window.AgendaPage.setEvents([...]);
+  ----------------------------------------- */
+  window.AgendaPage = {
+    setEvents(list) {
+      state.events = Array.isArray(list) ? list : [];
+      renderCalendar();
+      applyFilterAndSearch();
+    },
+    getState() { return state; }
+  };
+})();
+</script>
+
+</body>
+</html>
