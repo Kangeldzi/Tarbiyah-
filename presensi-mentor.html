@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102a22">
+  <meta name="description" content="Presensi anggota binaan TARBIYAH">
+  <title>Presensi Binaan — TARBIYAH</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/icon-192.png">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/theme.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+    }
+    .mentor-attendance {
+      max-width: 1050px;
+      margin: auto;
+      padding: 24px 16px 50px;
+    }
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .page-head h1 {
+      margin: 0;
+      font-size: clamp(23px, 4vw, 33px);
+    }
+    .page-head p {
+      margin: 7px 0 0;
+      opacity: .72;
+    }
+    .btn {
+      border: 0;
+      border-radius: 11px;
+      padding: 11px 15px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .btn-back, .btn-light {
+      background: rgba(128,128,128,.15);
+      color: inherit;
+    }
+    .btn-save {
+      color: white;
+      background: #087f5b;
+    }
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+    .panel {
+      border: 1px solid rgba(128,128,128,.2);
+      border-radius: 17px;
+      padding: 18px;
+      margin-bottom: 17px;
+      background: var(--surface, rgba(128,128,128,.07));
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+    .agenda-select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px;
+      border: 1px solid rgba(128,128,128,.3);
+      border-radius: 11px;
+      background: var(--input-bg, rgba(128,128,128,.1));
+      color: inherit;
+      font: inherit;
+    }
+    .agenda-info {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 11px;
+      background: rgba(16,168,117,.09);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 17px;
+    }
+    .stat {
+      border: 1px solid rgba(128,128,128,.2);
+      border-radius: 13px;
+      padding: 13px;
+    }
+    .stat small {
+      display: block;
+      opacity: .7;
+    }
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 5px;
+    }
+    .member-list {
+      display: grid;
+      gap: 12px;
+    }
+    .member-card {
+      border: 1px solid rgba(128,128,128,.2);
+      border-radius: 14px;
+      padding: 15px;
+    }
+    .member-name {
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+    .member-number {
+      opacity: .65;
+      font-size: 12px;
+      margin-bottom: 13px;
+    }
+    .field {
+      display: block;
+      margin-top: 10px;
+    }
+    .field span {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .field select, .field textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px;
+      border: 1px solid rgba(128,128,128,.3);
+      border-radius: 10px;
+      background: var(--input-bg, rgba(128,128,128,.1));
+      color: inherit;
+      font: inherit;
+    }
+    .field textarea {
+      min-height: 65px;
+      resize: vertical;
+    }
+    .member-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .record-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: rgba(16,168,117,.13);
+      color: #20b887;
+      font-weight: 700;
+    }
+    .record-badge.qr {
+      background: rgba(70,130,220,.14);
+      color: #69a5f5;
+    }
+    .record-badge.locked {
+      background: rgba(180,140,50,.14);
+      color: #d6ad55;
+    }
+    .message {
+      display: none;
+      padding: 12px;
+      border-radius: 11px;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .message.show { display: block; }
+    .message.error {
+      color: #e66;
+      background: rgba(220,50,50,.12);
+    }
+    .message.success {
+      color: #20b887;
+      background: rgba(16,168,117,.12);
+    }
+    .empty {
+      text-align: center;
+      opacity: .7;
+      padding: 25px 12px;
+      line-height: 1.6;
+    }
+    .locked-note {
+      font-size: 12px;
+      opacity: .72;
+      margin-top: 9px;
+    }
+    @media(max-width:650px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .panel { padding: 14px; }
+    }
+  </style>
+</head>
+
+<body class="auth-pending">
+  <main class="mentor-attendance">
+    <header class="page-head">
+      <div>
+        <h1>✓ Presensi Binaan</h1>
+        <p>Kelola kehadiran anggota binaan pada kegiatan kajian.</p>
+      </div>
+      <a class="btn btn-back" href="./dashboard.html">
+        ← Kembali ke Dashboard
+      </a>
+    </header>
+
+    <div id="pageMessage" class="message" role="status"></div>
+
+    <section class="panel">
+      <h2>Pilih Agenda Kajian</h2>
+      <select id="agendaSelect" class="agenda-select" required>
+        <option value="">Memuat agenda kajian...</option>
+      </select>
+      <div id="agendaInfo" class="agenda-info" hidden></div>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <small>Anggota Binaan</small>
+        <strong id="statMembers">0</strong>
+      </div>
+      <div class="stat">
+        <small>Hadir</small>
+        <strong id="statPresent">0</strong>
+      </div>
+      <div class="stat">
+        <small>Izin / Sakit</small>
+        <strong id="statExcused">0</strong>
+      </div>
+      <div class="stat">
+        <small>Belum Diabsen</small>
+        <strong id="statPending">0</strong>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Daftar Kehadiran Anggota</h2>
+      <div id="memberList" class="member-list">
+        <div class="empty">Memuat daftar anggota binaan...</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/theme-manager.js"></script>
+  <script src="./js/pwa.js"></script>
+  <script src="./js/presensi-mentor.js"></script>
+</body>
+</html>
