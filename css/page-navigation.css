@@ -74,17 +74,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  font-size: 20px;
-  font-weight: 700;
+  width: 20px !important;
+  height: 20px !important;
+  flex: 0 0 20px;
 }
 
-/* Menyesuaikan SVG di dalam ikon */
+/* KUNCI PERBAIKAN: Memaksa SVG mengecil dan tidak melar */
 .tarbiyah-page-nav__icon svg {
-  width: 20px;
-  height: 20px;
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
   stroke-width: 2.5;
+  display: block;
   transition: transform 220ms ease;
 }
 
