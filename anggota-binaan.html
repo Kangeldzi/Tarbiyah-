@@ -319,9 +319,26 @@
         </p>
       </div>
 
-      <a class="guidance-btn guidance-secondary" href="./dashboard.html">
-        ← Kembali ke Dashboard
-      </a>
+  <button
+  type="button"
+  id="btnBackDashboard"
+  onclick="window.location.href = new URL('./dashboard.html', window.location.href).href"
+  style="
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 18px;
+    border:0;
+    border-radius:12px;
+    background:#087f5b;
+    color:#ffffff;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+  "
+>
+  ← Kembali ke Dashboard
+</button>
       
     </header>
 
