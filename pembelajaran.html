@@ -28,6 +28,24 @@
     /* =========================================
        HEADER & UI (IDENTIK DENGAN PROFIL-ANGGOTA)
     ========================================= */
+    /* Kunci ukuran logo agar tidak pecah/melar */
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .brand-logo-wrap .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
     .app-header {
       display: flex;
       align-items: center;
@@ -394,13 +412,16 @@
 
   <div class="app-shell">
 
-    <!-- =========================================
-         HEADER (IDENTIK DENGAN REFERENSI)
+      <!-- =========================================
+         HEADER (PERBAIKAN LOGO)
     ========================================== -->
     <header class="app-header">
       <div class="header-left">
         <div class="header-brand">
-          <img src="./assets/icons/tarbiyah-mark.svg" alt="Logo TARBIYAH">
+          <!-- Logo dibungkus brand-logo-wrap agar ukurannya terkunci rapi -->
+          <div class="brand-logo-wrap">
+            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+          </div>
           <div class="header-brand-text">
             <h1>TARBIYAH</h1>
             <span>Pembelajaran</span>
@@ -409,17 +430,15 @@
       </div>
 
       <div class="header-right">
-        <!-- Tombol Tema: Teks '◐' akan diganti otomatis oleh JS menjadi ☀ / ☾ -->
         <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
           ◐
         </button>
 
-        <!-- Tombol Notifikasi -->
         <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
           ♧
         </a>
       </div>
-    </header>
+    </header>  
 
     <!-- =========================================
          MAIN CONTENT
