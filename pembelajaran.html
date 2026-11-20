@@ -26,146 +26,67 @@
 
   <style>
     /* =========================================
-       FIX LAYOUT & OVERRIDE CSS EXTERNAL
+       FIX LAYOUT DENGAN STANDAR CSS ANDA
     ========================================= */
     
-    /* Paksa layout shell agar tidak bertumpuk */
     .app-shell {
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
 
-    /* FIX HEADER: Kunci ukuran logo agar tidak bocor/raksasa */
+    /* Header diambil dari standar, logo menggunakan struktur .brand-logo-wrap */
     .app-header {
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
-      padding: 12px 16px !important;
+      padding: 12px 20px !important;
       position: sticky !important;
       top: 0 !important;
       z-index: 100 !important;
-      background: var(--surface-color, #102a22) !important;
+      background: var(--bg-secondary, #0b1713) !important;
       border-bottom: 1px solid var(--border-color, rgba(255,255,255,.1)) !important;
-      height: 64px !important; /* Kunci tinggi header */
+      height: 70px !important;
     }
 
-    .brand-logo-header {
-      display: flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      text-decoration: none !important;
-      overflow: hidden !important;
-    }
-
-    .brand-logo-header img {
-      width: 36px !important;
-      height: 36px !important;
-      max-width: 36px !important;
-      flex: 0 0 36px !important;
-      object-fit: contain !important;
-      display: block !important;
-    }
-
-    .brand-logo-text {
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: center !important;
-      line-height: 1.2 !important;
-      min-width: 0 !important;
-    }
-
-    .brand-logo-text strong {
-      color: var(--text-primary, #fff) !important;
-      font-family: "Poppins", sans-serif !important;
-      font-size: 1rem !important;
-      white-space: nowrap !important;
-    }
-
-    .brand-logo-text small {
-      color: var(--color-primary, #36b58a) !important;
-      font-size: .65rem !important;
-      white-space: nowrap !important;
-    }
-
-    .app-header-actions {
+    /* KUNCI PERBAIKAN: Membungkus img ke dalam wrap yang ukurannya sudah pasti */
+    .app-header .brand-link {
       display: flex !important;
       align-items: center !important;
       gap: 12px !important;
+      text-decoration: none !important;
     }
 
-    .app-header-menu {
-      background: transparent;
-      border: none;
-      color: var(--text-primary, #fff);
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 0 10px 0 0;
+    .app-header .brand-logo-wrap {
+      width: 40px !important;
+      height: 40px !important;
+      min-width: 40px !important;
+      border-radius: 12px !important;
+    }
+
+    .app-header .brand-logo {
+      width: 80% !important;
+      height: 80% !important;
+      object-fit: contain !important;
+    }
+
+    .app-main {
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      padding: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
     }
 
     /* =========================================
        LEARNING PAGE CONTENT
     ========================================= */
-    .app-main {
-      flex: 1;
-      width: 100%;
-      min-width: 0;
-      padding: 16px;
-    }
-
     .learning-page {
       width: 100%;
       padding-bottom: 35px;
-      max-width: 900px;
-      margin: 0 auto;
     }
 
-    /* --- Page header (Back Button) --- */
-    .learning-page-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .learning-back-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.12));
-      border-radius: 12px;
-      background: var(--surface-color, rgba(255,255,255,.04));
-      color: var(--text-primary, #fff);
-      cursor: pointer;
-      transition: background .18s ease, border-color .18s ease, transform .18s ease;
-      text-decoration: none;
-    }
-
-    .learning-back-btn:hover {
-      background: rgba(54, 181, 138, .14);
-      border-color: var(--color-primary, #36b58a);
-      transform: translateX(-2px);
-    }
-
-    .learning-page-header h1 {
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      font-size: clamp(1.05rem, 2.4vw, 1.2rem);
-      font-weight: 700;
-    }
-
-    .learning-page-header small {
-      display: block;
-      margin-top: 2px;
-      color: var(--text-secondary, #aab5af);
-      font-size: .78rem;
-      font-weight: 500;
-    }
-
-    /* --- Hero --- */
     .learning-hero {
       position: relative;
       overflow: hidden;
@@ -175,7 +96,7 @@
       border-radius: 20px;
       background:
         radial-gradient(circle at 90% 10%, rgba(54,181,138,.2), transparent 38%),
-        var(--surface-color, rgba(255,255,255,.04));
+        var(--bg-secondary, rgba(255,255,255,.04));
     }
 
     .learning-eyebrow {
@@ -212,17 +133,15 @@
       padding: 11px 14px;
       border: 1px solid var(--border-color, rgba(255,255,255,.12));
       border-radius: 12px;
-      background: var(--surface-color, rgba(255,255,255,.04));
+      background: var(--bg-primary, rgba(255,255,255,.04));
       color: var(--text-primary, #fff);
       font: inherit;
       font-size: .88rem;
       outline: none;
-      transition: border-color .18s ease, box-shadow .18s ease;
     }
 
     .learning-search input:focus {
       border-color: var(--color-primary, #36b58a);
-      box-shadow: 0 0 0 3px rgba(54,181,138,.15);
     }
 
     /* --- Filter chips --- */
@@ -237,13 +156,12 @@
       padding: 9px 16px;
       border: 1px solid var(--border-color, rgba(255,255,255,.12));
       border-radius: 30px;
-      background: var(--surface-color, rgba(255,255,255,.04));
+      background: var(--bg-primary, rgba(255,255,255,.04));
       color: var(--text-secondary, #aab5af);
       font: inherit;
       font-size: .82rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background .18s ease, color .18s ease, border-color .18s ease;
     }
 
     .learning-filter[aria-pressed="true"] {
@@ -269,13 +187,6 @@
       font-size: 1.08rem;
     }
 
-    .learning-section-heading a {
-      color: var(--color-primary, #36b58a);
-      font-size: .82rem;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
     /* --- Category grid --- */
     .learning-category-grid {
       display: grid;
@@ -291,17 +202,15 @@
       padding: 17px;
       border: 1px solid var(--border-color, rgba(255,255,255,.1));
       border-radius: 15px;
-      background: var(--surface-color, rgba(255,255,255,.04));
+      background: var(--bg-secondary, rgba(255,255,255,.04));
       color: var(--text-primary, #fff);
-      text-align: left;
       text-decoration: none;
-      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      transition: transform .2s ease, border-color .2s ease;
     }
 
     .learning-category:hover {
       transform: translateY(-3px);
       border-color: var(--color-primary, #36b58a);
-      box-shadow: 0 6px 20px rgba(54,181,138,.12);
     }
 
     .learning-category[hidden] { display: none; }
@@ -317,17 +226,8 @@
       font-size: 1.35rem;
     }
 
-    .learning-category strong {
-      display: block;
-      font-size: .87rem;
-    }
-
-    .learning-category small {
-      display: block;
-      margin-top: 4px;
-      color: var(--text-secondary, #aab5af);
-      font-size: .73rem;
-    }
+    .learning-category strong { display: block; font-size: .87rem; }
+    .learning-category small { display: block; margin-top: 4px; color: var(--text-secondary, #aab5af); font-size: .73rem; }
 
     /* --- List --- */
     .learning-list { display: grid; gap: 13px; }
@@ -341,13 +241,8 @@
       line-height: 1.7;
     }
 
-    .learning-empty-icon {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 2rem;
-    }
+    .learning-empty-icon { display: block; margin-bottom: 10px; font-size: 2rem; }
 
-    /* --- Card item --- */
     .learning-card {
       display: flex;
       align-items: flex-start;
@@ -355,7 +250,7 @@
       padding: 16px 18px;
       border: 1px solid var(--border-color, rgba(255,255,255,.1));
       border-radius: 16px;
-      background: var(--surface-color, rgba(255,255,255,.04));
+      background: var(--bg-secondary, rgba(255,255,255,.04));
     }
 
     .learning-card-icon {
@@ -370,29 +265,17 @@
     }
 
     .learning-card-body { flex: 1; min-width: 0; }
-
-    .learning-card-body h3 {
-      margin: 0 0 5px;
-      font-family: "Poppins", sans-serif;
-      font-size: .96rem;
-    }
-
-    .learning-card-body p {
-      margin: 0 0 8px;
-      color: var(--text-secondary, #aab5af);
-      font-size: .85rem;
-      line-height: 1.6;
-    }
+    .learning-card-body h3 { margin: 0 0 5px; font-family: "Poppins", sans-serif; font-size: .96rem; }
+    .learning-card-body p { margin: 0 0 8px; color: var(--text-secondary, #aab5af); font-size: .85rem; line-height: 1.6; }
 
     /* --- Progress card --- */
     .learning-progress-card {
       padding: 20px;
       border: 1px solid var(--border-color, rgba(255,255,255,.1));
       border-radius: 17px;
-      background: var(--surface-color, rgba(255,255,255,.04));
+      background: var(--bg-secondary, rgba(255,255,255,.04));
     }
 
-    /* --- Footer --- */
     .learning-footer {
       padding: 24px 0 12px;
       margin-top: 30px;
@@ -402,70 +285,17 @@
       font-size: .78rem;
     }
 
-    /* =========================================
-       BOTTOM NAV (MOBILE)
-    ========================================= */
-    .mobile-bottom-nav {
-      display: none;
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      z-index: 900;
-      padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
-      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
-      background: var(--surface-color, #102a22);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    @media (max-width: 768px) {
-      .mobile-bottom-nav {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 4px;
-      }
-      .learning-page { padding-bottom: 90px; }
-    }
-
-    .mobile-bottom-nav a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      padding: 8px 4px;
-      border-radius: 12px;
-      color: var(--text-secondary, #aab5af);
-      text-decoration: none;
-      font-size: .68rem;
-      font-weight: 600;
-    }
-
-    .mobile-bottom-nav a svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-    }
-
-    .mobile-bottom-nav a[data-active="true"] {
-      background: rgba(54,181,138,.14);
-      color: var(--color-primary, #36b58a);
-    }
-
     /* Responsive */
     @media (max-width: 760px) {
       .learning-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 640px) {
+      .app-main { padding: 16px; }
       .learning-search { width: 100%; }
       .learning-category { padding: 13px 10px; gap: 9px; }
       .learning-category-icon { width: 37px; height: 37px; font-size: 1.1rem; }
       .learning-category strong { font-size: .78rem; }
       .learning-category small { font-size: .68rem; }
-    }
-    @media (max-width: 350px) {
-      .learning-category-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -474,37 +304,37 @@
 
   <div class="app-shell">
 
-    <!-- HEADER (FIXED) -->
+    <!-- HEADER (DIPERBAIKI) -->
     <header class="app-header">
-      <button class="app-header-menu" type="button" data-sidebar-toggle aria-label="Buka navigasi">
+      <button class="app-header-menu" type="button" data-sidebar-toggle aria-label="Buka navigasi" style="background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer;">
         ☰
       </button>
 
-      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
-        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-        <span class="brand-logo-text">
-          <strong>TARBIYAH</strong>
-          <small>Pembelajaran Muslim</small>
+      <!-- MENGGUNAKAN STRUKTUR BRAND-LOGO.CSS YANG BENAR -->
+      <a class="brand-link" href="./tarbiyah.html">
+        <span class="brand-logo-wrap">
+          <img class="brand-logo" src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+        </span>
+        <span class="brand-copy">
+          <span class="brand-name">TARBIYAH</span>
+          <span class="brand-description">Pembelajaran Muslim</span>
         </span>
       </a>
 
-      <div class="app-header-actions">
-        <button type="button" class="app-header-action" data-theme-toggle aria-label="Ganti tema">
+      <div class="app-header-actions" style="display:flex;align-items:center;gap:12px;">
+        <button type="button" class="app-header-action" data-theme-toggle aria-label="Ganti tema" style="background:none;border:none;color:var(--text-primary);font-size:1.2rem;cursor:pointer;">
           ◐
         </button>
-        <a href="./notifikasi.html" class="app-header-action notification-action" aria-label="Notifikasi">
+        <a href="./notifikasi.html" class="app-header-action" aria-label="Notifikasi" style="color:var(--text-primary);font-size:1.2rem;text-decoration:none;">
           ♧
         </a>
-        <button type="button" class="app-header-user" data-user-menu-toggle aria-label="Menu akun">
-          <img src="./assets/icons/icon-192.png" alt="Foto profil" data-user-avatar>
-        </button>
       </div>
     </header>
 
     <!-- SIDEBAR OVERLAY -->
     <div class="sidebar-overlay" data-sidebar-overlay aria-hidden="true"></div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (Sesuai Standar) -->
     <aside class="app-sidebar" aria-label="Navigasi utama">
       <div class="sidebar-profile">
         <img src="./assets/icons/icon-192.png" alt="Foto profil anggota" class="sidebar-avatar" data-sidebar-avatar>
@@ -545,18 +375,12 @@
     <!-- MAIN CONTENT -->
     <main class="app-main learning-page">
 
-      <header class="learning-page-header">
-        <a href="./dashboard.html" class="learning-back-btn" aria-label="Kembali ke Dashboard">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </a>
-        <div>
-          <h1>Pembelajaran</h1>
-          <small>TARBIYAH — Ilmu & Pembinaan Diri</small>
-        </div>
-      </header>
+      <!-- BREADCRUMB (Sesuai standar module.css) -->
+      <div class="module-breadcrumb" style="margin-bottom: 20px;">
+        <a href="./dashboard.html">Beranda</a>
+        <span class="module-breadcrumb-separator">›</span>
+        <span>Pembelajaran</span>
+      </div>
 
       <section class="learning-hero">
         <span class="learning-eyebrow">📖 ILMU & PEMBINAAN DIRI</span>
@@ -648,7 +472,7 @@
         <div class="learning-progress-card">
           <h3>Perjalanan Menuntut Ilmu</h3>
           <p>Pantau aktivitas pembelajaran, kajian yang telah diikuti, dan riwayat kehadiran melalui halaman profil anggota.</p>
-          <div class="learning-progress-links" style="display:flex;gap:10px;margin-top:16px;">
+          <div style="display:flex;gap:10px;margin-top:16px;">
             <a href="./profil-anggota.html" class="btn btn-primary">Lihat Profil Saya</a>
             <a href="./kehadiran.html" class="btn btn-secondary">Riwayat Kehadiran</a>
           </div>
@@ -661,26 +485,6 @@
       </footer>
 
     </main>
-
-    <!-- MOBILE BOTTOM NAV -->
-    <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
-      <a href="./tarbiyah.html" data-module="dashboard">
-        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
-        <small>Beranda</small>
-      </a>
-      <a href="./agenda-tarbiyah.html" data-module="agenda">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="2.5" x2="8" y2="6.5"/><line x1="16" y1="2.5" x2="16" y2="6.5"/></svg>
-        <small>Agenda</small>
-      </a>
-      <a href="./materi-pembelajaran.html" data-module="materi">
-        <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg>
-        <small>Materi</small>
-      </a>
-      <a href="./profil-anggota.html" data-module="profil" data-active="true">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg>
-        <small>Profil</small>
-      </a>
-    </nav>
 
   </div>
 
@@ -695,7 +499,6 @@
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
 
-  <!-- LOGIC JS PEMBELAJARAN -->
   <script>
   (function () {
     "use strict";
@@ -741,10 +544,6 @@
           <div class="learning-card-body">
             <h3>${escapeHtml(p.title || "Program Pembelajaran")}</h3>
             <p>${escapeHtml(p.description || "")}</p>
-            <div class="learning-card-meta">
-              ${p.schedule ? `<span>🗓️ ${escapeHtml(p.schedule)}</span>` : ""}
-              ${p.mentor ? `<span>👤 ${escapeHtml(p.mentor)}</span>` : ""}
-            </div>
           </div>
         </article>
       `).join("");
