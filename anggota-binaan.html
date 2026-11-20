@@ -319,26 +319,30 @@
         </p>
       </div>
 
-  <button
-  type="button"
+  <a
   id="btnBackDashboard"
-  onclick="window.location.href = new URL('./dashboard.html', window.location.href).href"
+  href="https://tarbiyah-tauhid.vercel.app/dashboard.html"
+  onclick="window.location.assign(this.href); return false;"
   style="
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:12px 18px;
-    border:0;
-    border-radius:12px;
-    background:#087f5b;
-    color:#ffffff;
-    font-weight:700;
-    cursor:pointer;
-    text-decoration:none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 12px;
+    background: #087f5b;
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto;
   "
 >
   ← Kembali ke Dashboard
-</button>
+</a>
       
     </header>
 
