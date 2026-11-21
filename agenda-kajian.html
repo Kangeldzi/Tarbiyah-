@@ -27,32 +27,26 @@
   <script src="./js/auth-guard.js"></script>
   <script src="./js/tarbiyah-theme.js"></script>
 
-  <!-- ERUDA CONSOLE: DEBUGGING TARBIYAH -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  window.addEventListener("load", function () {
-    if (window.eruda) {
-      window.eruda.init();
-      console.info("[TARBIYAH] Eruda Console berhasil diaktifkan.");
-    } else {
-      console.error("[TARBIYAH] Eruda gagal dimuat.");
-    }
-  });
-</script>
-  
-</head>
-
 <body class="agenda-page">
   <a class="agenda-skip-link" href="#mainContent">Lewati ke konten</a>
 
   <header class="agenda-header">
-    <a class="agenda-brand" href="./dashboard.html" aria-label="Kembali ke Dashboard TARBIYAH">
-      <span class="agenda-brand-mark">ت</span>
-      <span>
-        <strong>TARBIYAH</strong>
-        <small>Ruang Pengelolaan Kajian</small>
-      </span>
-    </a>
+  
+<a class="agenda-brand" href="./dashboard.html" aria-label="Kembali ke Dashboard TARBIYAH">
+  <span class="agenda-brand-mark">
+    <img
+      src="./assets/icons/icon-192.png"
+      alt="Logo TARBIYAH"
+      width="44"
+      height="44"
+    >
+  </span>
+  <span>
+    <strong>TARBIYAH</strong>
+    <small>Ruang Pengelolaan Kajian</small>
+  </span>
+</a>
+  
 
     <div class="agenda-header-actions">
       <span class="agenda-role-chip" id="userRole">MEMERIKSA AKSES...</span>
