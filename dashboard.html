@@ -667,24 +667,33 @@ window.addEventListener("unhandledrejection", function (event) {
   <!-- =====================================
        DASHBOARD SCRIPTS
   ====================================== -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  if (window.eruda && !window.__TARBIYAH_ERUDA_READY__) {
+    window.eruda.init();
+    window.__TARBIYAH_ERUDA_READY__ = true;
+  }
+</script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- UNIVERSAL THEME MANAGER -->
+<script src="./js/theme-manager.js"></script>
 
-<script src="./js/config.js"></script>
-<script src="./js/supabase-client.js"></script>
-<script src="./js/auth.js"></script>
-<script src="./js/auth-guard.js"></script>
-
-<!-- PENGENDALI TEMA UTAMA -->
+<!-- LEGACY THEME COMPATIBILITY -->
 <script src="./js/tarbiyah-theme.js"></script>
 
+<!-- MODULE MANAGER -->
 <script src="./js/module.js"></script>
 
-<!-- SIDEBAR, NAVIGASI, DAN MENU -->
+<!-- SIDEBAR AND NAVIGATION -->
 <script src="./js/module-shell.js"></script>
 
+<!-- DASHBOARD CONTROLLER -->
 <script src="./js/dashboard.js"></script>
+
+<!-- PROFILE AVATAR -->
 <script src="./js/dashboard-profile-avatar.js"></script>
+
+<!-- PWA -->
 <script src="./js/pwa.js"></script>
 
 </body>
