@@ -163,9 +163,20 @@ window.addEventListener("unhandledrejection", function (event) {
       </a>
 
       <a class="side-link" href="./agenda-tarbiyah.html" data-nav-link>
-        <span class="side-icon">▦</span>
-        <span>Agenda Tarbiyah</span>
-      </a>
+  <span class="side-icon">▦</span>
+  <span>Agenda Tarbiyah</span>
+</a>
+
+<!-- MENU KHUSUS PENGELOLA AGENDA -->
+<a
+  class="side-link"
+  href="./agenda-kajian.html"
+  data-nav-key="agenda-kajian-manage"
+  hidden
+>
+  <span class="side-icon">🗓</span>
+  <span>Kelola Agenda Kajian</span>
+</a>
 
       <a class="side-link" href="./pembelajaran.html" data-nav-link>
         <span class="side-icon">▤</span>
@@ -387,6 +398,17 @@ window.addEventListener("unhandledrejection", function (event) {
             <small>Jadwal kegiatan</small>
           </a>
 
+          <a
+  class="quick-card"
+  href="./agenda-kajian.html"
+  data-nav-key="agenda-kajian-manage"
+  hidden
+>
+  <span class="quick-icon teal">🗓</span>
+  <strong>Kelola Kajian</strong>
+  <small>Buat & atur agenda kajian</small>
+</a>
+          
           <a class="quick-card" href="./pembelajaran.html">
             <span class="quick-icon blue">▤</span>
             <strong>Pembelajaran</strong>
