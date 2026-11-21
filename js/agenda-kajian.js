@@ -1,4 +1,3 @@
-
 /* ============================================================
    TARBIYAH — PENGELOLAAN AGENDA KAJIAN
    File       : js/agenda-kajian.js
@@ -535,15 +534,19 @@
         throw new Error("Waktu selesai harus setelah waktu mulai.");
       }
 
-      const payload = {
-        title: $("title").value.trim(),
-        description: $("description").value.trim() || null,
-        speaker_name: $("speakerName").value.trim() || null,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        location_name: $("locationName").value.trim() || null,
-        location_address: $("locationAddress").value.trim() || null
-      };
+      
+const payload = {
+    title: $("title").value.trim(),
+    description: $("description").value.trim() || null,
+    speaker_name: $("speakerName").value.trim() || null,
+    starts_at: startsAt,
+    ends_at: endsAt,
+    location_name: $("locationName").value.trim() || null,
+    location_address: $("locationAddress").value.trim() || null,
+    status: "published",
+    created_by: state.user.id
+};
+
 
       if (!payload.title) {
         throw new Error("Judul agenda wajib diisi.");
