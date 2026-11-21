@@ -7,12 +7,12 @@
   <meta name="description" content="Riwayat Kehadiran Anggota TARBIYAH">
   <title>Riwayat Kehadiran | TARBIYAH</title>
   
-<!-- ERUDA CONSOLE - DEBUG SEMENTARA -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-  console.log("[TARBIYAH] Eruda Console aktif.");
-</script>
+  <!-- ERUDA CONSOLE - DEBUG SEMENTARA -->
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+    console.log("[TARBIYAH] Eruda Console aktif.");
+  </script>
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  <!-- TAMBAHAN CSS UNTUK TOMBOL BACK UNIVERSAL -->
   <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
@@ -481,18 +482,21 @@
 
 <body>
   <main class="attendance-page" data-module="kehadiran">
-    
-    <header class="attendance-header">
-      <div>
-        <div class="attendance-badge">REKAM JEJAK KEGIATAN</div>
-        <h1>Riwayat Kehadiran</h1>
-        <p>
-          Lihat perjalanan keikutsertaan Anda dalam kajian,
-          pembelajaran, dan kegiatan TARBIYAH.
-        </p>
-      </div>
-    
-    <!-- Sisa kode kehadiran lainnya tetap dipertahankan... -->
+
+    <!-- 1. TOMBOL BACK UNIVERSAL (Diletakkan di luar header agar aman & pasti bisa diklik) -->
+    <div class="page-header-nav" style="margin-bottom: 24px; position: relative; z-index: 9999;">
+      <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+        <span class="tarbiyah-page-nav__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </span>
+        <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+      </a>
+    </div>
+
+    <!-- 2. HEADER ASLI (Hanya ada satu, tidak dobel) -->
     <header class="attendance-header">
       <div>
         <div class="attendance-badge">REKAM JEJAK KEGIATAN</div>
@@ -503,24 +507,12 @@
         </p>
       </div>
 
-          <!-- TOMBOL BACK DIPERBAIKI (ANTI-BLOKIR) -->
-    <div class="page-header-nav" style="margin-bottom: 24px; position: relative; z-index: 9999;">
-      <a href="./dashboard.html" class="tarbiyah-page-nav__button" style="pointer-events: auto; cursor: pointer;" aria-label="Kembali ke Dashboard">
-        <span class="tarbiyah-page-nav__icon" style="pointer-events: none;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </span>
-        <span class="tarbiyah-page-nav__label" style="pointer-events: none;">Kembali ke Dashboard</span>
-      </a>
-    </div>
-      
       <button class="attendance-button" id="refreshAttendance" type="button">
         ↻ Perbarui
       </button>
     </header>
 
+    <!-- 3. KONTEN ASLI (TIDAK DIUBAH) -->
     <section class="attendance-summary">
       <article class="summary-card">
         <div class="summary-icon">📚</div>
@@ -607,6 +599,7 @@
     </section>
   </main>
 
+  <!-- SCRIPTS (TIDAK DIUBAH) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
