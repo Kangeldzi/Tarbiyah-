@@ -481,19 +481,6 @@
 
 <body>
   <main class="attendance-page" data-module="kehadiran">
-
-    <!-- ⬇️ SISIPKAN TOMBOL BACK DI SINI ⬇️ -->
-    <div class="page-header-nav" style="margin-bottom: 24px;">
-      <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
-        <span class="tarbiyah-page-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </span>
-        <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
-      </a>
-    </div>
     
     <header class="attendance-header">
       <div>
@@ -521,6 +508,19 @@
         </p>
       </div>
 
+          <!-- TOMBOL BACK DIPERBAIKI (ANTI-BLOKIR) -->
+    <div class="page-header-nav" style="margin-bottom: 24px; position: relative; z-index: 9999;">
+      <a href="./dashboard.html" class="tarbiyah-page-nav__button" style="pointer-events: auto; cursor: pointer;" aria-label="Kembali ke Dashboard">
+        <span class="tarbiyah-page-nav__icon" style="pointer-events: none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </span>
+        <span class="tarbiyah-page-nav__label" style="pointer-events: none;">Kembali ke Dashboard</span>
+      </a>
+    </div>
+      
       <button class="attendance-button" id="refreshAttendance" type="button">
         ↻ Perbarui
       </button>
