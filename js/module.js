@@ -174,6 +174,42 @@
       url: "./administrasi-pengaturan.html",
       access: "admin"
     }
+
+      "agenda-kajian-manage": {
+      id: "agenda-kajian-manage",
+      title: "Kelola Agenda Kajian",
+      description: "Membuat, mengubah, mengarsipkan, dan memulihkan agenda kajian.",
+      icon: "calendar-cog",
+      url: "./agenda-kajian.html",
+      access: "admin"
+    },
+
+    "anggota-binaan": {
+      id: "anggota-binaan",
+      title: "Anggota Binaan",
+      description: "Daftar anggota yang berada dalam pembinaan mentor.",
+      icon: "users",
+      url: "./anggota-binaan.html",
+      access: "mentor"
+    },
+
+    pembinaan: {
+      id: "pembinaan",
+      title: "Pembinaan",
+      description: "Pengelolaan kegiatan pembinaan anggota.",
+      icon: "graduation-cap",
+      url: "./pembinaan.html",
+      access: "mentor"
+    },
+
+    "presensi-mentor": {
+      id: "presensi-mentor",
+      title: "Presensi Binaan",
+      description: "Pemantauan kehadiran anggota binaan.",
+      icon: "clipboard-check",
+      url: "./presensi-mentor.html",
+      access: "mentor"
+    }
   };
 
   /* ==========================================================
@@ -219,6 +255,10 @@
 
     "administrasi-pengaturan": "administrasi",
     pengaturan: "administrasi"
+
+    "agenda-kajian": "agenda-kajian-manage",
+    "kelola-agenda-kajian": "agenda-kajian-manage",
+    "presensi-binaan": "presensi-mentor"
   };
 
   /* ==========================================================
