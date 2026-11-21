@@ -86,18 +86,23 @@ body.agenda-page {
   gap: 12px;
 }
 
+
 .agenda-brand-mark {
-  display: grid;
   width: 44px;
   height: 44px;
-  place-items: center;
-  color: #062015;
-  background: linear-gradient(145deg, #73e6ae, #1ca56c);
-  border-radius: 14px;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: 25px;
-  font-weight: 800;
-  box-shadow: 0 0 24px rgba(53, 199, 138, .20);
+  flex: 0 0 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.agenda-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .agenda-brand strong,
