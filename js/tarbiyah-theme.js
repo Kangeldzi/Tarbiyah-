@@ -1,179 +1,80 @@
 
 /* =========================================================
-   TARBIYAH — SHARED THEME CONTROLLER
-   Acuan tampilan: profil-anggota.js
-   Versi: 1.0.0
-   Fungsi: Pengendali Dark Mode dan Light Mode bersama
+   TARBIYAH — LEGACY THEME COMPATIBILITY BRIDGE
+   Versi: 2.0.1
+   Pengendali utama: js/theme-manager.js
 ========================================================= */
 
-(function () {
+(function (window, document) {
   "use strict";
 
-  if (window.TARBIYAH_THEME_CONTROLLER) {
-    window.TARBIYAH_THEME_CONTROLLER.init();
-    return;
+  function getManager() {
+    return window.TARBIYAH_THEME_MANAGER ||
+      window.TARBIYAH_THEME ||
+      window.ThemeManager ||
+      null;
   }
 
-  const CONFIG = {
-    STORAGE_KEY: "tarbiyah-theme",
-    ATTRIBUTE: "data-theme",
-    DEFAULT_THEME: "dark",
-    BUTTON_ID: "btnTheme"
-  };
+  function apply(theme, persist = true) {
+    const manager = getManager();
 
-  let currentTheme = CONFIG.DEFAULT_THEME;
-  let initialized = false;
-
-  function normalizeTheme(theme) {
-    return theme === "light" ? "light" : "dark";
-  }
-
-  function readSavedTheme() {
-    try {
-      return normalizeTheme(
-        localStorage.getItem(CONFIG.STORAGE_KEY) ||
-        CONFIG.DEFAULT_THEME
+    if (!manager) {
+      console.warn(
+        "[TARBIYAH THEME] theme-manager.js belum dimuat."
       );
-    } catch (error) {
-      console.warn("[TARBIYAH THEME] Tidak dapat membaca tema:", error);
-      return CONFIG.DEFAULT_THEME;
-    }
-  }
-
-  function saveTheme(theme) {
-    try {
-      localStorage.setItem(CONFIG.STORAGE_KEY, theme);
-    } catch (error) {
-      console.warn("[TARBIYAH THEME] Tidak dapat menyimpan tema:", error);
-    }
-  }
-
-  function updateThemeButton() {
-    const button = document.getElementById(CONFIG.BUTTON_ID);
-    if (!button) return;
-
-    // Sama seperti perilaku tombol pada profil-anggota.js
-    button.textContent = currentTheme === "dark" ? "☀" : "☾";
-
-    button.setAttribute(
-      "aria-label",
-      currentTheme === "dark"
-        ? "Aktifkan Light Mode"
-        : "Aktifkan Dark Mode"
-    );
-
-    button.setAttribute(
-      "title",
-      currentTheme === "dark"
-        ? "Ganti ke Light Mode"
-        : "Ganti ke Dark Mode"
-    );
-  }
-
-  function applyTheme(theme, shouldSave = false) {
-    currentTheme = normalizeTheme(theme);
-
-    document.documentElement.setAttribute(
-      CONFIG.ATTRIBUTE,
-      currentTheme
-    );
-
-    if (document.body) {
-      document.body.setAttribute(
-        CONFIG.ATTRIBUTE,
-        currentTheme
-      );
+      return false;
     }
 
-    const themeColor = document.querySelector(
-      'meta[name="theme-color"]'
-    );
-
-    if (themeColor) {
-      themeColor.setAttribute(
-        "content",
-        currentTheme === "dark" ? "#102a22" : "#f2f7f4"
-      );
-    }
-
-    if (shouldSave) {
-      saveTheme(currentTheme);
-    }
-
-    updateThemeButton();
-
-    document.dispatchEvent(
-      new CustomEvent("tarbiyah:themechange", {
-        detail: { theme: currentTheme }
-      })
-    );
-
-    return currentTheme;
-  }
-
-  function toggleTheme() {
-    const nextTheme =
-      currentTheme === "dark" ? "light" : "dark";
-
-    return applyTheme(nextTheme, true);
-  }
-
-  function setTheme(theme) {
-    return applyTheme(theme, true);
-  }
-
-  function handleStorageChange(event) {
-    if (event.key !== CONFIG.STORAGE_KEY) return;
-
-    applyTheme(
-      event.newValue || CONFIG.DEFAULT_THEME,
-      false
-    );
-  }
-
-  function bindButton() {
-    const button = document.getElementById(CONFIG.BUTTON_ID);
-    if (!button || button.dataset.themeControllerBound === "true") {
-      updateThemeButton();
-      return;
-    }
-
-    button.dataset.themeControllerBound = "true";
-
-    button.addEventListener("click", function (event) {
-      event.preventDefault();
-      toggleTheme();
+    return manager.applyTheme(theme, {
+      persist
     });
-
-    updateThemeButton();
   }
 
   function init() {
-    if (!initialized) {
-      applyTheme(readSavedTheme(), false);
-      window.addEventListener("storage", handleStorageChange);
-      initialized = true;
+    const manager = getManager();
+
+    if (!manager) {
+      console.warn(
+        "[TARBIYAH THEME] Menunggu Universal Theme Manager."
+      );
+      return null;
     }
 
-    // Tombol diikat setelah elemen HTML tersedia.
-    bindButton();
+    if (!manager.getState().initialized) {
+      manager.initialize();
+    }
 
-    return currentTheme;
+    return manager.getTheme();
   }
 
   const API = {
     init,
-    applyTheme,
-    toggleTheme,
-    setTheme,
-    getTheme: function () {
-      return currentTheme;
+
+    applyTheme(theme, shouldSave = false) {
+      return apply(theme, shouldSave);
     },
-    getState: function () {
-      return {
-        theme: currentTheme,
-        initialized
-      };
+
+    setTheme(theme) {
+      return getManager()?.setTheme(theme) ?? false;
+    },
+
+    toggleTheme() {
+      return getManager()?.toggleTheme() ?? false;
+    },
+
+    getTheme() {
+      return getManager()?.getTheme() || "dark";
+    },
+
+    getState() {
+      const manager = getManager();
+
+      return manager
+        ? manager.getState()
+        : {
+            theme: "dark",
+            initialized: false
+          };
     }
   };
 
@@ -187,4 +88,4 @@
     init();
   }
 
-})();
+})(window, document);
