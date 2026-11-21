@@ -1,137 +1,171 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#102a22">
-  <title>Pengelolaan Agenda — TARBIYAH</title>
+  <meta name="description" content="Pengelolaan agenda kajian TARBIYAH">
+  <title>Kelola Agenda Kajian — TARBIYAH</title>
+
   <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/icons/tarbiyah-mark.svg" type="image/svg+xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/agenda-kajian.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/tarbiyah-theme.js"></script>
 </head>
-<body class="auth-pending">
 
-  <main class="agenda-page">
-    <header class="agenda-header">
-      <a class="agenda-back" href="./tarbiyah.html">← Dashboard</a>
-      <div class="agenda-brand">
-        <span class="agenda-brand-mark">T</span>
-        <div>
-          <strong>TARBIYAH</strong>
-          <small>Pembelajaran Muslim</small>
-        </div>
-      </div>
-      <span class="agenda-role" id="userRole">Memeriksa akses...</span>
-    </header>
+<body class="agenda-page">
+  <a class="agenda-skip-link" href="#mainContent">Lewati ke konten</a>
 
+  <header class="agenda-header">
+    <a class="agenda-brand" href="./dashboard.html" aria-label="Kembali ke Dashboard TARBIYAH">
+      <span class="agenda-brand-mark">ت</span>
+      <span>
+        <strong>TARBIYAH</strong>
+        <small>Ruang Pengelolaan Kajian</small>
+      </span>
+    </a>
+
+    <div class="agenda-header-actions">
+      <span class="agenda-role-chip" id="userRole">MEMERIKSA AKSES...</span>
+      <a class="agenda-back-link" href="./dashboard.html">← Dashboard</a>
+    </div>
+  </header>
+
+  <main class="agenda-main" id="mainContent">
     <section class="agenda-hero">
       <div>
-        <span class="agenda-eyebrow">MANAJEMEN KEGIATAN</span>
-        <h1>Pengelolaan Agenda</h1>
-        <p>Buat dan kelola jadwal kajian serta kegiatan TARBIYAH.</p>
+        <p class="agenda-eyebrow">PANEL PENGELOLA</p>
+        <h1>Kelola Agenda <span>Kajian</span></h1>
+        <p class="agenda-hero-description">
+          Buat, terbitkan, dan perbarui jadwal kajian TARBIYAH.
+          Semua waktu agenda menggunakan zona waktu WIB.
+        </p>
       </div>
-      <div class="agenda-hero-icon">▦</div>
+
+      <div class="agenda-hero-icon" aria-hidden="true">🗓</div>
     </section>
 
-    <div id="agendaNotice" class="agenda-notice" role="status" hidden></div>
+    <section class="agenda-status-panel" aria-live="polite">
+      <div class="agenda-status-indicator" id="connectionIndicator"></div>
+      <div class="agenda-status-copy">
+        <strong id="connectionTitle">Menghubungkan ke layanan...</strong>
+        <span id="connectionDescription">Memeriksa sesi dan koneksi aplikasi.</span>
+      </div>
+      <button class="agenda-button agenda-button-ghost agenda-refresh-top" id="refreshButton" type="button" disabled>
+        ↻ Muat ulang
+      </button>
+    </section>
+
+    <div class="agenda-notice" id="agendaNotice" role="status" aria-live="polite" hidden></div>
 
     <section class="agenda-layout">
       <article class="agenda-panel agenda-form-panel">
         <div class="agenda-panel-heading">
           <div>
-            <span class="agenda-eyebrow">FORMULIR AGENDA</span>
+            <p class="agenda-eyebrow">FORMULIR AGENDA</p>
             <h2 id="formHeading">Buat Agenda Baru</h2>
           </div>
-          <span class="agenda-live-label">● TERBIT</span>
+          <span class="agenda-panel-icon">✦</span>
         </div>
 
-        <form id="agendaForm">
+        <form id="agendaForm" novalidate>
           <input type="hidden" id="agendaId">
 
-          <label for="title">Judul Agenda <span>*</span></label>
-          <input id="title" name="title" maxlength="180" required
-                 placeholder="Contoh: Kajian Tauhid dan Aqidah">
+          <div class="agenda-field">
+            <label for="title">Judul kajian <span>*</span></label>
+            <input id="title" name="title" type="text" maxlength="180" placeholder="Contoh: Kajian Tauhid dan Keimanan" required>
+          </div>
 
-          <label for="description">Deskripsi Kegiatan</label>
-          <textarea id="description" name="description" rows="4"
-                    placeholder="Tuliskan keterangan agenda..."></textarea>
+          <div class="agenda-field">
+            <label for="description">Deskripsi kajian</label>
+            <textarea id="description" name="description" rows="4" maxlength="3000" placeholder="Tuliskan ringkasan atau informasi kajian..."></textarea>
+          </div>
 
-          <label for="speakerName">Pemateri / Penanggung Jawab</label>
-          <input id="speakerName" name="speaker_name" maxlength="180"
-                 placeholder="Nama pemateri">
+          <div class="agenda-field">
+            <label for="speakerName">Pemateri / Ustaz</label>
+            <input id="speakerName" name="speaker_name" type="text" maxlength="150" placeholder="Nama pemateri">
+          </div>
 
           <div class="agenda-field-grid">
-            <div>
-              <label for="startsAt">Waktu Mulai <span>*</span></label>
-              <input id="startsAt" type="datetime-local" required>
+            <div class="agenda-field">
+              <label for="startsAt">Waktu mulai <span>*</span></label>
+              <input id="startsAt" name="starts_at" type="datetime-local" required>
             </div>
-            <div>
-              <label for="endsAt">Waktu Selesai <span>*</span></label>
-              <input id="endsAt" type="datetime-local" required>
+
+            <div class="agenda-field">
+              <label for="endsAt">Waktu selesai <span>*</span></label>
+              <input id="endsAt" name="ends_at" type="datetime-local" required>
             </div>
           </div>
-          <p class="agenda-help">
-            Waktu menggunakan WIB (Asia/Jakarta). Agenda malam dan kegiatan
-            yang melewati tengah malam tetap diperbolehkan.
-          </p>
 
-          <label for="locationName">Nama Lokasi</label>
-          <input id="locationName" maxlength="180"
-                 placeholder="Contoh: Masjid Al-Ikhlas">
+          <p class="agenda-field-hint">Waktu yang dimasukkan dianggap sebagai WIB (Asia/Jakarta), bukan zona waktu perangkat.</p>
 
-          <label for="locationAddress">Alamat Lokasi</label>
-          <textarea id="locationAddress" rows="3"
-                    placeholder="Alamat lengkap atau tautan lokasi Google Maps"></textarea>
+          <div class="agenda-field">
+            <label for="locationName">Nama lokasi</label>
+            <input id="locationName" name="location_name" type="text" maxlength="180" placeholder="Contoh: Masjid / Aula / Rumah Belajar">
+          </div>
+
+          <div class="agenda-field">
+            <label for="locationAddress">Alamat atau tautan Google Maps</label>
+            <textarea id="locationAddress" name="location_address" rows="2" maxlength="1000" placeholder="Masukkan alamat lengkap atau tautan Google Maps"></textarea>
+          </div>
 
           <div class="agenda-form-actions">
-            <button type="submit" class="agenda-button agenda-button-primary"
-                    id="saveButton">Terbitkan Agenda</button>
-            <button type="button" class="agenda-button agenda-button-muted"
-                    id="cancelEditButton" hidden>Batal Edit</button>
+            <button class="agenda-button agenda-button-primary" id="saveButton" type="submit" disabled>
+              Terbitkan Agenda
+            </button>
+            <button class="agenda-button agenda-button-secondary" id="cancelEditButton" type="button" hidden>
+              Batal mengubah
+            </button>
           </div>
-          <p class="agenda-help">
-            Agenda yang disimpan akan langsung tampil pada halaman Agenda
-            Anggota dan dapat dipilih di Presensi Binaan.
-          </p>
         </form>
+
+        <div class="agenda-form-footnote">
+          <span>*</span> Wajib diisi. Agenda yang disimpan akan berstatus <strong>published</strong>.
+        </div>
       </article>
 
-      <article class="agenda-panel agenda-list-panel">
-        <div class="agenda-panel-heading">
+      <section class="agenda-panel agenda-list-panel">
+        <div class="agenda-panel-heading agenda-list-heading">
           <div>
-            <span class="agenda-eyebrow">DATABASE TARBIYAH</span>
-            <h2>Daftar Agenda</h2>
+            <p class="agenda-eyebrow">DATABASE KAJIAN</p>
+            <h2>Daftar Agenda Terbit</h2>
+            <p class="agenda-list-subtitle">Agenda yang sudah diterbitkan dan tersimpan di Supabase.</p>
           </div>
-          <button type="button" id="refreshButton"
-                  class="agenda-refresh" aria-label="Muat ulang">↻</button>
+          <span class="agenda-count" id="agendaCount">0 agenda</span>
         </div>
 
-        <div class="agenda-list-meta">
-          <span id="agendaCount">Memuat agenda...</span>
-          <span class="agenda-live-label">AGENDA TERBIT</span>
+        <div class="agenda-list" id="agendaList" aria-live="polite">
+          <div class="agenda-empty">
+            <span>◷</span>
+            <strong>Menyiapkan daftar agenda</strong>
+            <p>Mohon tunggu sebentar...</p>
+          </div>
         </div>
-
-        <div id="agendaList" class="agenda-list">
-          <div class="agenda-empty">Menghubungkan ke database...</div>
-        </div>
-      </article>
+      </section>
     </section>
 
     <footer class="agenda-footer">
-      TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah.
+      <span>© <span id="currentYear">2026</span> TARBIYAH</span>
+      <span>Belajar, Bertumbuh, dan Berukhuwah.</span>
     </footer>
   </main>
 
-  <script src="./js/config.js"></script>
-  <script src="./js/supabase-client.js"></script>
-  <script src="./js/auth.js"></script>
-  <script src="./js/auth-guard.js"></script>
-  <script src="./js/theme-manager.js"></script>
-  <script src="./js/module.js"></script>
-  <script src="./js/module-shell.js"></script>
   <script src="./js/agenda-kajian.js"></script>
   <script src="./js/pwa.js"></script>
 </body>
