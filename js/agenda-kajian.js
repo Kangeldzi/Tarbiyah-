@@ -24,15 +24,16 @@
   const $ = (id) => document.getElementById(id);
 
   const state = {
-    client: null,
-    user: null,
-    role: null,
-    agendas: [],
-    editingId: null,
-    busy: false,
-    initialized: false
-  };
-
+  supabase: null,
+  user: null,
+  role: null,
+  agendas: [],
+  editingId: null,
+  busy: false,
+  initialized: false,
+  view: "published"
+};
+   
   /* ============================================================
      1. UTILITAS DASAR
   ============================================================ */
@@ -743,101 +744,163 @@ const payload = {
   /* ============================================================
      14. INISIALISASI HALAMAN
   ============================================================ */
-
   async function initialize() {
+    // Mencegah proses inisialisasi berjalan lebih dari satu kali.
     if (state.initialized) return;
+
     state.initialized = true;
 
-    $("currentYear").textContent = String(new Date().getFullYear());
-
-    setConnection(
-      "loading",
-      "Menyiapkan halaman agenda",
-      "Memeriksa koneksi Supabase dan sesi akun."
-    );
-
-    disableForm();
-    bindEvents();
+    const agendaList = $("agendaList");
+    const agendaForm = $("agendaForm");
+    const cancelEditButton = $("cancelEditButton");
+    const refreshButton = $("refreshButton");
 
     try {
-      await waitForSupabaseClient();
+      // 1. Pastikan elemen HTML utama tersedia.
+      if (!agendaList || !agendaForm || !refreshButton) {
+        throw new Error(
+          "Elemen halaman agenda tidak ditemukan. Periksa agenda-kajian.html."
+        );
+      }
 
-      setConnection(
-        "loading",
-        "Memeriksa autentikasi",
-        "Memastikan akun sudah masuk ke TARBIYAH."
-      );
+      // 2. Hubungkan Supabase.
+      state.supabase = getClient();
 
-      state.user = await getAuthenticatedUser();
+      // 3. Tunggu Auth Guard memastikan sesi pengguna.
+      const guarded = await waitForGuard();
+      const user = guarded?.user;
 
-      setConnection(
-        "loading",
-        "Memeriksa hak akses",
-        "Memastikan akun memiliki izin pengelolaan agenda."
-      );
+      if (!user?.id) {
+        throw new Error(
+          "Sesi login tidak ditemukan. Silakan masuk kembali."
+        );
+      }
 
+      state.user = user;
+
+      // 4. Periksa hak akses pengguna.
       await loadUserRole();
 
-      setConnection(
-        "loading",
-        "Memuat agenda kajian",
-        "Mengambil daftar agenda dari database."
-      );
+      // 5. Pasang event listener formulir.
+      agendaForm.addEventListener("submit", saveAgenda);
 
-      enableForm();
+      if (cancelEditButton) {
+        cancelEditButton.addEventListener("click", resetForm);
+      }
 
+      // 6. Pasang event listener tombol muat ulang.
+      refreshButton.addEventListener("click", async () => {
+        if (state.busy) return;
+
+        try {
+          hideNotice();
+
+          await loadAgendas();
+
+          notify("Daftar agenda berhasil diperbarui.");
+
+        } catch (error) {
+          console.error(
+            "[TARBIYAH AGENDA] Gagal memuat ulang:",
+            error
+          );
+
+          notify(
+            error?.message ||
+              "Gagal memuat ulang daftar agenda.",
+            "error"
+          );
+        }
+      });
+
+      // 7. Tampilkan status bahwa agenda sedang dimuat.
+      agendaList.innerHTML = `
+        <div class="agenda-empty">
+          Memuat data agenda...
+        </div>
+      `;
+
+      // 8. Ambil data agenda dari Supabase.
       try {
         await loadAgendas();
 
-        setConnection(
-          "ready",
-          "Terhubung dan siap digunakan",
-          `Login sebagai ${state.role.replaceAll("_", " ")}. Data agenda berhasil dimuat.`
+        console.info(
+          "[TARBIYAH AGENDA] Data agenda berhasil dimuat."
         );
 
       } catch (loadError) {
-        console.error("[TARBIYAH AGENDA] Gagal memuat daftar:", loadError);
-
-        setConnection(
-          "error",
-          "Koneksi tersedia, tetapi data agenda gagal dimuat",
-          getErrorMessage(loadError)
+        console.error(
+          "[TARBIYAH AGENDA] Gagal memuat daftar:",
+          loadError
         );
 
-        showNotice(getErrorMessage(loadError), "error");
-
-        $("agendaList").innerHTML = `
+        agendaList.innerHTML = `
           <div class="agenda-empty">
             <span>!</span>
             <strong>Data agenda belum dapat ditampilkan</strong>
-            <p>Periksa struktur tabel dan izin SELECT pada RLS Supabase, lalu tekan Muat ulang.</p>
-          </div>`;
+            <p>
+              Periksa struktur tabel dan izin SELECT
+              pada RLS Supabase, kemudian tekan Muat Ulang.
+            </p>
+          </div>
+        `;
+
+        notify(
+          loadError?.message ||
+            "Data agenda gagal dimuat dari database.",
+          "error"
+        );
       }
 
-      log("Halaman siap.", {
-        userId: state.user.id,
-        role: state.role
-      });
-
-    } catch (error) {
-      console.error("[TARBIYAH AGENDA] Inisialisasi gagal:", error);
-
-      setConnection(
-        "error",
-        "Halaman belum siap digunakan",
-        getErrorMessage(error)
+      // 9. Catat bahwa halaman telah siap.
+      console.info(
+        "[TARBIYAH AGENDA] Modul siap digunakan.",
+        {
+          userId: state.user.id,
+          role: state.role,
+          agendaCount: state.agendas.length
+        }
       );
 
-      showNotice(getErrorMessage(error), "error");
+    } catch (error) {
+      console.error(
+        "[TARBIYAH AGENDA] Inisialisasi gagal:",
+        error
+      );
 
-      $("agendaList").innerHTML = `
-        <div class="agenda-empty">
-          <span>!</span>
-          <strong>Pengelolaan agenda belum dapat diaktifkan</strong>
-          <p>Periksa pesan kesalahan di atas. Halaman tidak akan mengalihkan Anda secara otomatis.</p>
-        </div>`;
+      state.initialized = false;
 
-      disableForm();
+      notify(
+        error?.message ||
+          "Halaman agenda gagal diinisialisasi.",
+        "error"
+      );
+
+      if (agendaList) {
+        agendaList.innerHTML = `
+          <div class="agenda-empty">
+            <span>!</span>
+            <strong>Pengelolaan agenda belum dapat diaktifkan</strong>
+            <p>
+              Periksa koneksi Supabase, sesi login,
+              hak akses pengguna, dan pesan kesalahan.
+            </p>
+          </div>
+        `;
+      }
+
+      // Nonaktifkan formulir jika proses inisialisasi gagal.
+      if (agendaForm) {
+        agendaForm
+          .querySelectorAll("input, textarea, select, button")
+          .forEach((element) => {
+            element.disabled = true;
+          });
+      }
+
+      if (refreshButton) {
+        refreshButton.disabled = true;
+      }
     }
   }
 
