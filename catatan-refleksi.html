@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -10,33 +9,137 @@
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CSS Utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  
+  <!-- CSS Navigasi Tombol Back Universal -->
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
+    /* =========================================
+       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
+    ========================================= */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* KUNCI LOGO AGAR TIDAK PECAH */
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .brand-logo-wrap .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-brand-text h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      color: var(--color-primary, #36b58a);
+      line-height: 1.1;
+      font-family: var(--font-heading);
+    }
+
+    .header-brand-text span {
+      display: block;
+      font-size: .75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1.25rem;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
+    }
+
+    /* =========================================
+       LAYOUT UTAMA
+    ========================================= */
+    .app-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Jarak aman untuk tombol back */
+    .page-header-nav {
+      margin-bottom: 30px;
+    }
+
+    /* --- Konten Spesifik Refleksi --- */
     :root {
-      --reflection-green: #10b981;
-      --reflection-muted: var(--text-muted, #94a3b8);
-      --reflection-card: var(--surface, #172b25);
-      --reflection-border: var(--border, rgba(255,255,255,.09));
-    }
-
-    body {
-      font-family: Inter, sans-serif;
-    }
-
-    .reflection-page {
-      width: min(1100px, 100%);
-      margin: auto;
-      padding: 24px 18px 100px;
+      --reflection-green: var(--color-primary, #10b981);
+      --reflection-muted: var(--text-secondary, #94a3b8);
+      --reflection-card: var(--bg-secondary, #172b25);
+      --reflection-border: var(--border-color, rgba(255,255,255,.09));
     }
 
     .reflection-header {
@@ -48,9 +151,10 @@
       margin-bottom: 22px;
     }
 
-    .reflection-header h1 {
+    .reflection-header h2 {
       font: 800 clamp(1.4rem, 4vw, 2rem) Poppins, sans-serif;
       margin: 0 0 7px;
+      color: var(--text-primary);
     }
 
     .reflection-header p {
@@ -89,9 +193,10 @@
       margin-bottom: 18px;
     }
 
-    .reflection-panel h2 {
+    .reflection-panel h3 {
       font: 700 1rem Poppins, sans-serif;
       margin: 0 0 7px;
+      color: var(--text-primary);
     }
 
     .reflection-subtitle {
@@ -114,8 +219,10 @@
     .reflection-field label {
       font-size: .79rem;
       font-weight: 700;
+      color: var(--text-primary);
     }
 
+    /* Perbaikan Input & Textarea agar menyesuaikan tema */
     .reflection-field input,
     .reflection-field select,
     .reflection-field textarea {
@@ -124,8 +231,8 @@
       padding: 12px 13px;
       border: 1px solid var(--reflection-border);
       border-radius: 11px;
-      background: transparent;
-      color: inherit;
+      background: var(--bg-primary); /* Menyesuaikan tema background */
+      color: var(--text-primary); /* Teks menyesuaikan tema */
       font: 400 .84rem Inter, sans-serif;
       outline: none;
     }
@@ -143,9 +250,10 @@
       line-height: 1.65;
     }
 
+    /* Perbaikan Dropdown Option di Light Mode */
     .reflection-field select option {
-      color: #172b25;
-      background: white;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
     }
 
     .reflection-button {
@@ -220,11 +328,11 @@
       gap: 12px;
     }
 
-    .reflection-card {
+    .reflection-card-item {
       border: 1px solid var(--reflection-border);
       border-radius: 14px;
       padding: 15px;
-      background: rgba(255,255,255,.02);
+      background: var(--bg-primary); /* Menyesuaikan tema background */
     }
 
     .reflection-card-top {
@@ -234,11 +342,12 @@
       gap: 10px;
     }
 
-    .reflection-card h3 {
+    .reflection-card-item h4 {
       font-size: .88rem;
       line-height: 1.4;
       margin: 0 0 7px;
       overflow-wrap: anywhere;
+      color: var(--text-primary);
     }
 
     .reflection-meta {
@@ -305,6 +414,16 @@
       text-align: right;
     }
 
+    /* --- Footer --- */
+    .app-footer {
+      padding: 24px 0 12px;
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      text-align: center;
+      font-size: .78rem;
+    }
+
     @media(max-width: 760px) {
       .reflection-layout {
         grid-template-columns: 1fr;
@@ -312,8 +431,8 @@
     }
 
     @media(max-width: 520px) {
-      .reflection-page {
-        padding: 19px 13px 90px;
+      .app-main {
+        padding: 16px;
       }
 
       .reflection-panel {
@@ -327,157 +446,217 @@
   </style>
 </head>
 
-<body>
-  <main class="reflection-page" data-module="catatan">
+<body class="auth-pending">
 
-    <header class="reflection-header">
-      <div>
-        <div class="reflection-label">📖 RUANG PEMBELAJARAN PRIBADI</div>
-        <h1>Catatan & Refleksi</h1>
-        <p>
-          Simpan pelajaran, rangkuman kajian, dan refleksi
-          perjalanan belajar Anda bersama TARBIYAH.
-        </p>
+  <div class="app-shell">
+
+    <!-- =========================================
+         HEADER (STANDAR UNIVERSAL TARBIYAH)
+    ========================================== -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-logo-wrap">
+            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+          </div>
+          <div class="header-brand-text">
+            <h1>TARBIYAH</h1>
+            <span>Catatan & Refleksi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
+          ◐
+        </button>
+        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
+          ♧
+        </a>
       </div>
     </header>
 
-    <div class="reflection-layout">
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+    <main class="app-main">
 
-      <section>
-        <div class="reflection-panel">
-          <h2 id="formHeading">✍️ Tulis Catatan Baru</h2>
-          <p class="reflection-subtitle">
-            Catatan ini ditujukan untuk akun Anda sendiri.
+      <!-- 1. TOMBOL BACK (UKURAN SVG TERKUNCI & JARAK AMAN) -->
+      <div class="page-header-nav">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+          <span class="tarbiyah-page-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+        </a>
+      </div>
+
+      <!-- 2. HEADER HALAMAN -->
+      <header class="reflection-header">
+        <div>
+          <div class="reflection-label">📖 RUANG PEMBELAJARAN PRIBADI</div>
+          <h2>Catatan & Refleksi</h2>
+          <p>
+            Simpan pelajaran, rangkuman kajian, dan refleksi
+            perjalanan belajar Anda bersama TARBIYAH.
           </p>
-
-          <div class="reflection-message" id="reflectionMessage" role="status"></div>
-
-          <form class="reflection-form" id="reflectionForm">
-
-            <div class="reflection-field">
-              <label for="reflectionTitle">Judul Catatan</label>
-              <input
-                type="text"
-                id="reflectionTitle"
-                maxlength="150"
-                placeholder="Contoh: Pelajaran dari Kajian Tauhid"
-                required
-              >
-            </div>
-
-            <div class="reflection-field">
-              <label for="reflectionCategory">Kategori</label>
-              <select id="reflectionCategory" required>
-                <option value="Kajian">Kajian</option>
-                <option value="Akidah">Akidah</option>
-                <option value="Akhlak">Akhlak</option>
-                <option value="Ibadah">Ibadah</option>
-                <option value="Al-Qur'an">Al-Qur'an</option>
-                <option value="Hadis">Hadis</option>
-                <option value="Refleksi Pribadi">Refleksi Pribadi</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
-            </div>
-
-            <div class="reflection-field">
-              <label for="reflectionDate">Tanggal Catatan</label>
-              <input type="date" id="reflectionDate" required>
-            </div>
-
-            <div class="reflection-field">
-              <label for="reflectionContent">Isi Catatan / Refleksi</label>
-              <textarea
-                id="reflectionContent"
-                maxlength="20000"
-                placeholder="Tuliskan materi, poin penting, pelajaran yang diperoleh, atau refleksi pribadi..."
-                required
-              ></textarea>
-              <div class="reflection-count" id="characterCount">
-                0 / 20.000 karakter
-              </div>
-            </div>
-
-            <div class="reflection-actions">
-              <button class="reflection-button" id="saveReflection" type="submit">
-                💾 Simpan Catatan
-              </button>
-
-              <button
-                class="reflection-button secondary"
-                id="cancelEdit"
-                type="button"
-                hidden
-              >
-                Batalkan Edit
-              </button>
-            </div>
-
-          </form>
         </div>
+      </header>
 
-        <div class="reflection-tip">
-          <strong>Pengingat:</strong> gunakan ruang ini untuk menyimpan
-          pelajaran yang bermanfaat dan mengevaluasi perkembangan
-          pembelajaran pribadi secara berkala.
-        </div>
-      </section>
+      <!-- 3. KONTEN UTAMA -->
+      <div class="reflection-layout">
 
-      <section class="reflection-panel">
-        <div class="reflection-card-top" style="margin-bottom:16px">
-          <div>
-            <h2>📚 Catatan Saya</h2>
-            <p class="reflection-subtitle" style="margin:5px 0 0">
-              Daftar catatan yang tersimpan pada akun Anda.
+        <section>
+          <div class="reflection-panel">
+            <h3 id="formHeading">✍️ Tulis Catatan Baru</h3>
+            <p class="reflection-subtitle">
+              Catatan ini ditujukan untuk akun Anda sendiri.
             </p>
+
+            <div class="reflection-message" id="reflectionMessage" role="status"></div>
+
+            <form class="reflection-form" id="reflectionForm">
+
+              <div class="reflection-field">
+                <label for="reflectionTitle">Judul Catatan</label>
+                <input
+                  type="text"
+                  id="reflectionTitle"
+                  maxlength="150"
+                  placeholder="Contoh: Pelajaran dari Kajian Tauhid"
+                  required
+                >
+              </div>
+
+              <div class="reflection-field">
+                <label for="reflectionCategory">Kategori</label>
+                <select id="reflectionCategory" required>
+                  <option value="Kajian">Kajian</option>
+                  <option value="Akidah">Akidah</option>
+                  <option value="Akhlak">Akhlak</option>
+                  <option value="Ibadah">Ibadah</option>
+                  <option value="Al-Qur'an">Al-Qur'an</option>
+                  <option value="Hadis">Hadis</option>
+                  <option value="Refleksi Pribadi">Refleksi Pribadi</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+
+              <div class="reflection-field">
+                <label for="reflectionDate">Tanggal Catatan</label>
+                <input type="date" id="reflectionDate" required>
+              </div>
+
+              <div class="reflection-field">
+                <label for="reflectionContent">Isi Catatan / Refleksi</label>
+                <textarea
+                  id="reflectionContent"
+                  maxlength="20000"
+                  placeholder="Tuliskan materi, poin penting, pelajaran yang diperoleh, atau refleksi pribadi..."
+                  required
+                ></textarea>
+                <div class="reflection-count" id="characterCount">
+                  0 / 20.000 karakter
+                </div>
+              </div>
+
+              <div class="reflection-actions">
+                <button class="reflection-button" id="saveReflection" type="submit">
+                  💾 Simpan Catatan
+                </button>
+
+                <button
+                  class="reflection-button secondary"
+                  id="cancelEdit"
+                  type="button"
+                  hidden
+                >
+                  Batalkan Edit
+                </button>
+              </div>
+
+            </form>
           </div>
-          <span class="reflection-category" id="reflectionTotal">0 Catatan</span>
-        </div>
 
-        <div class="reflection-field" style="margin-bottom:14px">
-          <label for="reflectionSearch">Cari Catatan</label>
-          <input
-            type="search"
-            id="reflectionSearch"
-            placeholder="Cari judul atau isi catatan..."
-          >
-        </div>
-
-        <div class="reflection-field" style="margin-bottom:16px">
-          <label for="reflectionFilter">Filter Kategori</label>
-          <select id="reflectionFilter">
-            <option value="all">Semua Kategori</option>
-            <option value="Kajian">Kajian</option>
-            <option value="Akidah">Akidah</option>
-            <option value="Akhlak">Akhlak</option>
-            <option value="Ibadah">Ibadah</option>
-            <option value="Al-Qur'an">Al-Qur'an</option>
-            <option value="Hadis">Hadis</option>
-            <option value="Refleksi Pribadi">Refleksi Pribadi</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-
-        <div class="reflection-list" id="reflectionList">
-          <div class="reflection-empty">
-            <span>⏳</span>
-            Memuat catatan Anda...
+          <div class="reflection-tip">
+            <strong>Pengingat:</strong> gunakan ruang ini untuk menyimpan
+            pelajaran yang bermanfaat dan mengevaluasi perkembangan
+            pembelajaran pribadi secara berkala.
           </div>
-        </div>
-      </section>
+        </section>
 
-    </div>
-  </main>
+        <section class="reflection-panel">
+          <div class="reflection-card-top" style="margin-bottom:16px">
+            <div>
+              <h3>📚 Catatan Saya</h3>
+              <p class="reflection-subtitle" style="margin:5px 0 0">
+                Daftar catatan yang tersimpan pada akun Anda.
+              </p>
+            </div>
+            <span class="reflection-category" id="reflectionTotal">0 Catatan</span>
+          </div>
 
+          <div class="reflection-field" style="margin-bottom:14px">
+            <label for="reflectionSearch">Cari Catatan</label>
+            <input
+              type="search"
+              id="reflectionSearch"
+              placeholder="Cari judul atau isi catatan..."
+            >
+          </div>
+
+          <div class="reflection-field" style="margin-bottom:16px">
+            <label for="reflectionFilter">Filter Kategori</label>
+            <select id="reflectionFilter">
+              <option value="all">Semua Kategori</option>
+              <option value="Kajian">Kajian</option>
+              <option value="Akidah">Akidah</option>
+              <option value="Akhlak">Akhlak</option>
+              <option value="Ibadah">Ibadah</option>
+              <option value="Al-Qur'an">Al-Qur'an</option>
+              <option value="Hadis">Hadis</option>
+              <option value="Refleksi Pribadi">Refleksi Pribadi</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+
+          <div class="reflection-list" id="reflectionList">
+            <div class="reflection-empty">
+              <span>⏳</span>
+              Memuat catatan Anda...
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="app-footer">
+        <p>© <span data-current-year></span> TARBIYAH — Pembelajaran Muslim</p>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- SUPABASE & SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
-  <script src="./js/theme-manager.js"></script>
+  
+  <!-- SCRIPT TEMA -->
+  <script src="./js/tarbiyah-theme.js"></script>
+  
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
 
+  <!-- LOGIC JS REFLEKSI -->
   <script>
     (() => {
       "use strict";
@@ -601,14 +780,14 @@
 
         filtered.forEach(note => {
           const card = document.createElement("article");
-          card.className = "reflection-card";
+          card.className = "reflection-card-item";
 
           const top = document.createElement("div");
           top.className = "reflection-card-top";
 
           const heading = document.createElement("div");
 
-          const title = document.createElement("h3");
+          const title = document.createElement("h4");
           title.textContent = note[CONFIG.titleColumn] || "Tanpa Judul";
 
           const meta = document.createElement("div");
