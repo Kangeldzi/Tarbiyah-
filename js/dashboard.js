@@ -164,35 +164,45 @@
   }
 
   /* ==========================================================
-     03. CAROUSEL
+     03. CAROUSEL — HTML DASHBOARD COMPATIBLE
   ========================================================== */
 
   function getCarouselElements() {
     const container =
+      $(".hero-carousel") ||
       $("[data-dashboard-carousel]") ||
       $(".dashboard-carousel");
 
-    const track =
-      $("[data-carousel-track]", container || document) ||
-      $(".dashboard-carousel-track", container || document);
+    if (!container) {
+      return {
+        container: null,
+        track: null,
+        slides: [],
+        previousButton: null,
+        nextButton: null,
+        dots: []
+      };
+    }
 
-    const slides = track
-      ? Array.from(track.children).filter(element =>
-          element.classList.contains("dashboard-slide") ||
-          element.matches("[data-carousel-slide]")
-        )
-      : [];
+    const track =
+      $("[data-carousel-track]", container) ||
+      $(".dashboard-carousel-track", container);
+
+    // Struktur HTML TARBIYAH saat ini:
+    // .hero-slide berada langsung di dalam .hero-carousel.
+    const slides = Array.from(
+      container.querySelectorAll(
+        ".hero-slide, .dashboard-slide, [data-carousel-slide]"
+      )
+    );
 
     const previousButton =
-      $("[data-carousel-prev]", container || document);
+      $("[data-carousel-prev]", container);
 
     const nextButton =
-      $("[data-carousel-next]", container || document);
+      $("[data-carousel-next]", container);
 
-    const dots = $$(
-      "[data-carousel-dot], .dashboard-carousel-dots button",
-      container || document
-    );
+    const dots = $$(".carousel-dot, [data-carousel-dot]", container);
 
     return {
       container,
@@ -207,10 +217,7 @@
   function showCarouselSlide(index) {
     const carousel = getCarouselElements();
 
-    if (
-      !carousel.track ||
-      carousel.slides.length === 0
-    ) {
+    if (!carousel.container || !carousel.slides.length) {
       return;
     }
 
@@ -219,12 +226,10 @@
     state.carouselIndex =
       (index + total) % total;
 
-    carousel.track.style.transform =
-      `translateX(-${state.carouselIndex * 100}%)`;
-
     carousel.slides.forEach((slide, slideIndex) => {
-      const active =
-        slideIndex === state.carouselIndex;
+      const active = slideIndex === state.carouselIndex;
+
+      slide.classList.toggle("active", active);
 
       slide.setAttribute(
         "aria-hidden",
@@ -233,8 +238,7 @@
     });
 
     carousel.dots.forEach((dot, dotIndex) => {
-      const active =
-        dotIndex === state.carouselIndex;
+      const active = dotIndex === state.carouselIndex;
 
       dot.classList.toggle("active", active);
 
@@ -246,7 +250,7 @@
 
     const counter =
       byId("slideCounter") ||
-      $("[data-carousel-counter]");
+      $("[data-carousel-counter]", carousel.container);
 
     if (counter) {
       counter.textContent =
@@ -264,9 +268,18 @@
   function startCarousel() {
     const carousel = getCarouselElements();
 
-    if (carousel.slides.length <= 1) return;
-
     stopCarousel();
+
+    if (carousel.slides.length <= 1) {
+      return;
+    }
+
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
 
     state.carouselTimer = window.setInterval(() => {
       showCarouselSlide(state.carouselIndex + 1);
@@ -276,28 +289,29 @@
   function initializeCarousel() {
     const carousel = getCarouselElements();
 
-    if (
-      !carousel.track ||
-      carousel.slides.length === 0
-    ) {
+    if (!carousel.container || !carousel.slides.length) {
+      console.warn(
+        "[TARBIYAH CAROUSEL] Elemen Carousel tidak ditemukan."
+      );
       return;
     }
 
-    carousel.previousButton?.addEventListener(
-      "click",
-      () => {
-        showCarouselSlide(state.carouselIndex - 1);
-        startCarousel();
-      }
-    );
+    // Hindari memasang event berulang.
+    if (carousel.container.dataset.carouselInitialized === "true") {
+      return;
+    }
 
-    carousel.nextButton?.addEventListener(
-      "click",
-      () => {
-        showCarouselSlide(state.carouselIndex + 1);
-        startCarousel();
-      }
-    );
+    carousel.container.dataset.carouselInitialized = "true";
+
+    carousel.previousButton?.addEventListener("click", () => {
+      showCarouselSlide(state.carouselIndex - 1);
+      startCarousel();
+    });
+
+    carousel.nextButton?.addEventListener("click", () => {
+      showCarouselSlide(state.carouselIndex + 1);
+      startCarousel();
+    });
 
     carousel.dots.forEach((dot, index) => {
       dot.addEventListener("click", () => {
@@ -306,31 +320,43 @@
       });
     });
 
-    carousel.container?.addEventListener(
+    carousel.container.addEventListener(
       "mouseenter",
       stopCarousel
     );
 
-    carousel.container?.addEventListener(
+    carousel.container.addEventListener(
       "mouseleave",
       startCarousel
     );
 
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (document.hidden) {
-          stopCarousel();
-        } else {
-          startCarousel();
-        }
-      }
+    carousel.container.addEventListener(
+      "focusin",
+      stopCarousel
     );
+
+    carousel.container.addEventListener(
+      "focusout",
+      startCarousel
+    );
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopCarousel();
+      } else {
+        startCarousel();
+      }
+    });
 
     showCarouselSlide(0);
     startCarousel();
-  }
 
+    console.info(
+      `[TARBIYAH CAROUSEL] Berhasil diinisialisasi: ${carousel.slides.length} slide.`
+    );
+  }
+  
+   
   /* ==========================================================
      04. SEARCH ROUTES
   ========================================================== */
@@ -370,6 +396,25 @@
   ],
   url: "./agenda-kajian.html",
   roles: ["super_admin", "admin", "mentor"]
+},
+
+     {
+  keywords: [
+    "kelola agenda kajian",
+    "kelola kajian",
+    "buat agenda kajian",
+    "arsip kajian"
+  ],
+  url: "./agenda-kajian.html"
+},
+{
+  keywords: [
+    "agenda tarbiyah",
+    "jadwal kegiatan",
+    "agenda",
+    "jadwal"
+  ],
+  url: "./agenda-tarbiyah.html"
 },
     {
       keywords: ["pembelajaran", "belajar"],
@@ -1240,8 +1285,7 @@
   /* ==========================================================
      14. DASHBOARD ROLE INFORMATION
   ========================================================== */
-
-  function initializeRoleDashboard() {
+   function initializeRoleDashboard() {
     document.addEventListener(
       "tarbiyah:role-ready",
       event => {
