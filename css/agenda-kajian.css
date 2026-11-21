@@ -710,3 +710,26 @@ body.agenda-page {
     animation-iteration-count: 1 !important;
   }
 }
+
+.agenda-tabs {
+    display: flex;
+    gap: 10px;
+    margin: 18px 0;
+    flex-wrap: wrap;
+}
+
+.agenda-tabs button {
+    padding: 10px 16px;
+    border: 1px solid var(--border-color, #d5e5dc);
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.agenda-tabs button.active {
+    background: #087f5b;
+    border-color: #087f5b;
+    color: #fff;
+}
