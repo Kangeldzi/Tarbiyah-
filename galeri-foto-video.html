@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -10,26 +9,141 @@
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CSS Utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  
+  <!-- CSS Navigasi Tombol Back Universal -->
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
+    /* =========================================
+       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
+    ========================================= */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* KUNCI LOGO AGAR TIDAK PECAH */
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .brand-logo-wrap .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-brand-text h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      color: var(--color-primary, #36b58a);
+      line-height: 1.1;
+      font-family: var(--font-heading);
+    }
+
+    .header-brand-text span {
+      display: block;
+      font-size: .75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1.25rem;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
+    }
+
+    /* =========================================
+       LAYOUT UTAMA
+    ========================================= */
+    .app-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Jarak aman untuk tombol back */
+    .page-header-nav {
+      margin-bottom: 30px;
+    }
+
+    /* --- Hero Section --- */
     .gallery-hero {
       padding: 27px;
-      margin-bottom: 22px;
-      border-radius: 22px;
+      margin-bottom: 24px;
+      border-radius: 20px;
       color: #fff;
       background: linear-gradient(130deg, #075b43, #123c31 60%, #102a22);
       position: relative;
       overflow: hidden;
+      border: 1px solid var(--border-color);
     }
 
     .gallery-hero::after {
@@ -42,10 +156,11 @@
       pointer-events: none;
     }
 
-    .gallery-hero h1 {
-      font-family: Poppins, sans-serif;
-      font-size: clamp(24px, 4vw, 34px);
+    .gallery-hero h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 4vw, 32px);
       margin: 0 0 9px;
+      color: #fff;
     }
 
     .gallery-hero p {
@@ -53,8 +168,10 @@
       color: #d8eee5;
       line-height: 1.7;
       margin: 0;
+      font-size: .95rem;
     }
 
+    /* --- Toolbar (Search & Filter) --- */
     .gallery-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -65,10 +182,10 @@
     .gallery-search,
     .gallery-filter {
       padding: 13px 15px;
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 12px;
-      background: var(--surface-color, #18372d);
-      color: var(--text-color, #fff);
+      background: var(--bg-primary);
+      color: var(--text-primary);
       font: inherit;
       outline: none;
     }
@@ -84,21 +201,23 @@
 
     .gallery-search:focus,
     .gallery-filter:focus {
-      border-color: #20b486;
-      box-shadow: 0 0 0 3px rgba(32,180,134,.13);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(54,181,138,.15);
     }
 
+    /* --- Gallery Grid --- */
     .gallery-section {
       padding: 18px;
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 17px;
-      background: var(--card-bg, var(--surface-color, #18372d));
+      background: var(--bg-secondary);
     }
 
-    .gallery-section h2 {
-      font-family: Poppins, sans-serif;
+    .gallery-section h3 {
+      font-family: var(--font-heading);
       font-size: 17px;
       margin: 0 0 15px;
+      color: var(--text-primary);
     }
 
     .gallery-grid {
@@ -109,16 +228,16 @@
 
     .gallery-card {
       min-width: 0;
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 14px;
       overflow: hidden;
-      background: var(--surface-color, #18372d);
+      background: var(--bg-primary);
       transition: transform .2s, border-color .2s;
     }
 
     .gallery-card:hover {
       transform: translateY(-3px);
-      border-color: #20b486;
+      border-color: var(--color-primary);
     }
 
     .gallery-preview {
@@ -126,9 +245,8 @@
       place-items: center;
       width: 100%;
       aspect-ratio: 4 / 3;
-      background:
-        linear-gradient(135deg, rgba(32,180,134,.13), rgba(16,42,34,.7));
-      color: var(--muted-color, #aabbb3);
+      background: linear-gradient(135deg, rgba(54,181,138,.13), rgba(16,42,34,.7));
+      color: var(--text-secondary);
       font-size: 32px;
     }
 
@@ -144,36 +262,38 @@
       padding: 12px;
     }
 
-    .gallery-card-info h3 {
+    .gallery-card-info h4 {
       font-size: 13px;
       margin: 0 0 7px;
       line-height: 1.5;
+      color: var(--text-primary);
     }
 
     .gallery-card-info p {
       font-size: 11px;
-      color: var(--muted-color, #aabbb3);
+      color: var(--text-secondary);
       margin: 0;
     }
 
     .gallery-empty {
       grid-column: 1 / -1;
       padding: 30px 15px;
-      border: 1px dashed var(--border-color, #355347);
+      border: 1px dashed var(--border-color);
       border-radius: 12px;
-      color: var(--muted-color, #aabbb3);
+      color: var(--text-secondary);
       text-align: center;
       font-size: 13px;
       line-height: 1.7;
     }
 
+    /* --- Gallery Detail Modal/Box --- */
     .gallery-detail {
       display: none;
       margin-top: 18px;
       padding: 18px;
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 16px;
-      background: var(--card-bg, var(--surface-color, #18372d));
+      background: var(--bg-secondary);
     }
 
     .gallery-detail.is-visible {
@@ -188,19 +308,26 @@
       margin-bottom: 12px;
     }
 
-    .gallery-detail-header h2 {
-      font-family: Poppins, sans-serif;
+    .gallery-detail-header h3 {
+      font-family: var(--font-heading);
       font-size: 17px;
       margin: 0;
+      color: var(--text-primary);
     }
 
     .gallery-close {
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 9px;
       padding: 7px 11px;
       background: transparent;
-      color: var(--text-color, #fff);
+      color: var(--text-primary);
       cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .gallery-close:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--color-primary);
     }
 
     .gallery-detail-media {
@@ -222,142 +349,166 @@
     }
 
     .gallery-detail-caption {
-      color: var(--muted-color, #aabbb3);
+      color: var(--text-secondary);
       font-size: 13px;
       line-height: 1.7;
       margin-top: 12px;
     }
 
+    /* --- Footer --- */
+    .app-footer {
+      padding: 24px 0 12px;
+      margin-top: 30px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      text-align: center;
+      font-size: .78rem;
+    }
+
+    /* Responsive */
     @media(max-width: 850px) {
       .gallery-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
-
-    @media(max-width: 480px) {
-      .gallery-hero {
-        padding: 21px;
-      }
-
-      .gallery-section {
-        padding: 13px;
-      }
-
-      .gallery-grid {
-        gap: 9px;
-      }
-
-      .gallery-card-info {
-        padding: 10px;
-      }
-
-      .gallery-card-info h3 {
-        font-size: 12px;
-      }
+    @media(max-width: 640px) {
+      .app-main { padding: 16px; }
+      .gallery-hero { padding: 21px; }
+      .gallery-section { padding: 13px; }
+      .gallery-grid { gap: 9px; }
+      .gallery-card-info { padding: 10px; }
+      .gallery-card-info h4 { font-size: 12px; }
     }
   </style>
 </head>
 
-<body>
-  <div class="app-shell" data-module-shell>
-    <aside class="sidebar" data-sidebar>
-      <div class="sidebar-header">
-        <a href="./tarbiyah.html" class="brand-logo">
-          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-          <span>TARBIYAH</span>
-        </a>
-        <button type="button" data-sidebar-close aria-label="Tutup menu">×</button>
+<body class="auth-pending">
+
+  <div class="app-shell">
+
+    <!-- =========================================
+         HEADER (STANDAR UNIVERSAL TARBIYAH)
+    ========================================== -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-logo-wrap">
+            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+          </div>
+          <div class="header-brand-text">
+            <h1>TARBIYAH</h1>
+            <span>Galeri Dokumentasi</span>
+          </div>
+        </div>
       </div>
 
-      <nav class="sidebar-nav" aria-label="Navigasi utama">
-        <a href="./tarbiyah.html">Dashboard</a>
-        <a href="./profil-anggota.html">Profil Anggota</a>
-        <a href="./agenda-tarbiyah.html">Agenda Tarbiyah</a>
-        <a href="./pembelajaran.html">Pembelajaran</a>
-        <a href="./berita-pengumuman.html">Berita & Pengumuman</a>
-        <a href="./presensi-tarbiyah.html">Presensi</a>
-        <a href="./galeri-foto-video.html" class="active">Galeri</a>
-        <a href="./diskusi-tarbiyah.html">Diskusi</a>
-        <a href="./notifikasi.html">Notifikasi</a>
-      </nav>
-    </aside>
+      <div class="header-right">
+        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
+          ◐
+        </button>
+        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
+          ♧
+        </a>
+      </div>
+    </header>
 
-    <div class="sidebar-overlay" data-sidebar-overlay></div>
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+    <main class="app-main">
 
-    <main class="main-content">
-      <header class="topbar">
-        <button type="button" data-sidebar-toggle aria-label="Buka menu">☰</button>
+      <!-- 1. TOMBOL BACK (UKURAN SVG TERKUNCI & JARAK AMAN) -->
+      <div class="page-header-nav">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+          <span class="tarbiyah-page-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+        </a>
+      </div>
 
-        <div class="topbar-title">
-          <strong>Galeri Foto & Video</strong>
-          <small>Dokumentasi kegiatan TARBIYAH</small>
-        </div>
-
-        <div class="topbar-actions">
-          <button type="button" data-theme-toggle aria-label="Ganti tema">◐</button>
-          <a href="./notifikasi.html" aria-label="Notifikasi">♧</a>
-        </div>
-      </header>
-
-      <section class="page-content">
-        <section class="gallery-hero">
-          <h1>Galeri Dokumentasi</h1>
-          <p>
-            Kenang kembali perjalanan kegiatan, kajian, dan kebersamaan
-            anggota TARBIYAH melalui dokumentasi foto dan video.
-          </p>
-        </section>
-
-        <form class="gallery-toolbar" data-gallery-search-form>
-          <input
-            class="gallery-search"
-            type="search"
-            name="q"
-            placeholder="Cari dokumentasi..."
-            aria-label="Cari dokumentasi"
-            data-gallery-search
-          >
-
-          <select class="gallery-filter" aria-label="Filter media" data-gallery-type>
-            <option value="">Semua media</option>
-            <option value="image">Foto</option>
-            <option value="video">Video</option>
-          </select>
-        </form>
-
-        <section class="gallery-section">
-          <h2>Dokumentasi Kegiatan</h2>
-
-          <div class="gallery-grid" data-gallery-grid>
-            <div class="gallery-empty">
-              <div style="font-size:30px;margin-bottom:10px;">▧</div>
-              Belum ada dokumentasi yang tersedia.
-              Foto dan video akan ditampilkan setelah data
-              serta Supabase Storage dihubungkan.
-            </div>
-          </div>
-        </section>
-
-        <section class="gallery-detail" data-gallery-detail aria-live="polite">
-          <div class="gallery-detail-header">
-            <h2 data-gallery-detail-title>Pratinjau Dokumentasi</h2>
-            <button class="gallery-close" type="button" data-gallery-close>
-              Tutup
-            </button>
-          </div>
-
-          <div class="gallery-detail-media" data-gallery-detail-media></div>
-
-          <div class="gallery-detail-caption" data-gallery-detail-caption></div>
-        </section>
+      <!-- 2. HERO SECTION -->
+      <section class="gallery-hero">
+        <h2>Galeri Dokumentasi</h2>
+        <p>
+          Kenang kembali perjalanan kegiatan, kajian, dan kebersamaan
+          anggota TARBIYAH melalui dokumentasi foto dan video.
+        </p>
       </section>
 
+      <!-- 3. TOOLS (SEARCH & FILTER) -->
+      <form class="gallery-toolbar" data-gallery-search-form>
+        <input
+          class="gallery-search"
+          type="search"
+          name="q"
+          placeholder="Cari dokumentasi..."
+          aria-label="Cari dokumentasi"
+          data-gallery-search
+        >
+
+        <select class="gallery-filter" aria-label="Filter media" data-gallery-type>
+          <option value="">Semua media</option>
+          <option value="image">Foto</option>
+          <option value="video">Video</option>
+        </select>
+      </form>
+
+      <!-- 4. KONTEN GALERI -->
+      <section class="gallery-section">
+        <h3>Dokumentasi Kegiatan</h3>
+
+        <div class="gallery-grid" data-gallery-grid>
+          <div class="gallery-empty">
+            <div style="font-size:30px;margin-bottom:10px;">▧</div>
+            Belum ada dokumentasi yang tersedia.
+            Foto dan video akan ditampilkan setelah data
+            serta Supabase Storage dihubungkan.
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. DETAIL / PRATINJAU -->
+      <section class="gallery-detail" data-gallery-detail aria-live="polite">
+        <div class="gallery-detail-header">
+          <h3 data-gallery-detail-title>Pratinjau Dokumentasi</h3>
+          <button class="gallery-close" type="button" data-gallery-close>
+            Tutup
+          </button>
+        </div>
+
+        <div class="gallery-detail-media" data-gallery-detail-media></div>
+
+        <div class="gallery-detail-caption" data-gallery-detail-caption></div>
+      </section>
+
+      <!-- FOOTER -->
       <footer class="app-footer">
         <p>© <span data-current-year></span> TARBIYAH — Pembelajaran Muslim</p>
       </footer>
+
     </main>
+
   </div>
 
+  <!-- SUPABASE & SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  
+  <!-- SCRIPT TEMA -->
+  <script src="./js/tarbiyah-theme.js"></script>
+  
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+  <!-- LOGIC JS GALERI -->
   <script>
     (() => {
       const year = document.querySelector("[data-current-year]");
@@ -387,15 +538,5 @@
       }
     })();
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./js/config.js"></script>
-  <script src="./js/supabase-client.js"></script>
-  <script src="./js/auth.js"></script>
-  <script src="./js/auth-guard.js"></script>
-  <script src="./js/theme-manager.js"></script>
-  <script src="./js/module.js"></script>
-  <script src="./js/module-shell.js"></script>
-  <script src="./js/pwa.js"></script>
 </body>
 </html>
