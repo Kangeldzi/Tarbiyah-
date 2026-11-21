@@ -527,6 +527,17 @@
   function getSupabaseClient() {
     const client = window.tarbiyahSupabase;
 
+     console.log("[AGENDA DIAGNOSTIK CLIENT]", {
+  url: location.href,
+  tarbiyahSupabase: typeof window.tarbiyahSupabase,
+  supabaseClient: typeof window.supabaseClient,
+  TARBIYAH_SUPABASE: typeof window.TARBIYAH_SUPABASE,
+  clientDitemukan: !!client,
+  authTersedia: typeof client?.auth,
+  fromTersedia: typeof client?.from,
+  backendReady: window.TARBIYAH_BACKEND_READY
+});
+     
     if (!client) {
       throw new Error(
         "Supabase client belum tersedia. Periksa js/config.js dan js/supabase-client.js."
