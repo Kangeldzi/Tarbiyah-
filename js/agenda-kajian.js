@@ -310,17 +310,41 @@
      6. TAUTAN GOOGLE MAPS
   ============================================================ */
 
-  function getMapURL(address) {
+  
+function getMapURL(address) {
     const value = String(address || "").trim();
     if (!value) return "";
 
-    if (/^https:\/\/(www\.)?google\.[^/]+\/maps/i.test(value)) {
-      return value;
+    // 1. Tautan pendek Google Maps
+    if (/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps)\//i.test(value)) {
+        return value;
     }
 
+    // 2. Tautan Google Maps lengkap
+    if (/^https?:\/\/(www\.)?google\.[^/]+\/maps/i.test(value)) {
+        return value;
+    }
+
+    // 3. Koordinat GPS (latitude, longitude)
+    const coordinateMatch = value.match(
+        /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/
+    );
+
+    if (coordinateMatch) {
+        const lat = Number(coordinateMatch[1]);
+        const lng = Number(coordinateMatch[2]);
+
+        if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+            return "https://www.google.com/maps/search/?api=1&query=" +
+                encodeURIComponent(lat + "," + lng);
+        }
+    }
+
+    // 4. Nama tempat atau alamat biasa
     return "https://www.google.com/maps/search/?api=1&query=" +
-      encodeURIComponent(value);
-  }
+        encodeURIComponent(value);
+}
+
 
   /* ============================================================
      7. MEMUAT AGENDA DARI SUPABASE
