@@ -361,6 +361,16 @@
       url: "./agenda-tarbiyah.html",
       roles: ["super_admin", "admin", "mentor", "member"]
     },
+
+   {
+  keywords: [
+    "kelola agenda kajian",
+    "agenda kajian",
+    "buat agenda kajian"
+  ],
+  url: "./agenda-kajian.html",
+  roles: ["super_admin", "admin", "mentor"]
+},
     {
       keywords: ["pembelajaran", "belajar"],
       url: "./pembelajaran.html",
@@ -676,6 +686,7 @@
       "kehadiran",
       "riwayat",
       "kajian",
+      "agenda-kajian-manage",
       "pembelajaran",
       "materi",
       "agenda",
@@ -701,6 +712,7 @@
       "kehadiran",
       "riwayat",
       "kajian",
+      "agenda-kajian-manage",
       "pembelajaran",
       "materi",
       "agenda",
@@ -725,6 +737,7 @@
       "kehadiran",
       "riwayat",
       "kajian",
+      "agenda-kajian-manage", 
       "pembelajaran",
       "materi",
       "agenda",
@@ -928,6 +941,7 @@
       "dashboard.html": "dashboard",
       "tarbiyah.html": "dashboard",
       "profil-anggota.html": "profil",
+      "agenda-kajian.html": "agenda-kajian-manage",
       "agenda-tarbiyah.html": "agenda",
       "pembelajaran.html": "pembelajaran",
       "materi-pembelajaran.html": "materi",
