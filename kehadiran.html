@@ -228,6 +228,12 @@
       padding: 9px 13px;
       font: 700 .73rem Inter, sans-serif;
       cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .attendance-tab:hover {
+      border-color: var(--attendance-green);
+      color: var(--attendance-green);
     }
 
     .attendance-tab.active {
@@ -253,6 +259,12 @@
       background: var(--attendance-card);
       font: inherit;
       font-size: .8rem;
+      outline: none;
+    }
+
+    .attendance-filters input:focus,
+    .attendance-filters select:focus {
+      border-color: var(--attendance-green);
     }
 
     .attendance-filters input {
@@ -482,11 +494,20 @@
 <body>
   <main class="attendance-page" data-module="kehadiran">
 
-      <section class="notification-hero">
-        <div class="notification-eyebrow">✦ TARBIYAH MEMBER CENTER</div>
-        <!-- Sisa kode hero dan notifikasi tetap dipertahankan... -->
+    <!-- 1. TOMBOL BACK UNIVERSAL -->
+    <div class="page-header-nav" style="margin-bottom: 24px;">
+      <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+        <span class="tarbiyah-page-nav__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </span>
+        <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+      </a>
+    </div>
 
-    <!-- 2. HEADER ASLI (Hanya ada satu, tidak dobel) -->
+    <!-- 2. HEADER ASLI -->
     <header class="attendance-header">
       <div>
         <div class="attendance-badge">REKAM JEJAK KEGIATAN</div>
@@ -497,29 +518,12 @@
         </p>
       </div>
 
-      <div id="app-shell">
-    <main class="notification-page">
-
-      <!-- ⬇️ SISIPKAN TOMBOL BACK DI SINI ⬇️ -->
-      <div class="page-header-nav" style="margin-bottom: 24px; position: relative; z-index: 9999;">
-        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
-          <span class="tarbiyah-page-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </span>
-          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
-        </a>
-      </div>
-      <!-- ⬆️ BATAS AKHIR TOMBOL BACK ⬆️ -->
-      
       <button class="attendance-button" id="refreshAttendance" type="button">
         ↻ Perbarui
       </button>
     </header>
 
-    <!-- 3. KONTEN ASLI (TIDAK DIUBAH) -->
+    <!-- 3. KONTEN ASLI -->
     <section class="attendance-summary">
       <article class="summary-card">
         <div class="summary-icon">📚</div>
@@ -606,7 +610,7 @@
     </section>
   </main>
 
-  <!-- SCRIPTS (TIDAK DIUBAH) -->
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
