@@ -378,8 +378,26 @@
       return state.activeTheme;
     }
 
-    const saved = normalizeTheme(readStorage());
-    const preference = saved || "dark";
+    let saved = normalizeTheme(readStorage());
+
+// Migrasi dari penyimpanan tema versi lama.
+if (!saved) {
+  try {
+    const legacyTheme = localStorage.getItem("tarbiyah-theme");
+    saved = normalizeTheme(legacyTheme);
+
+    if (saved) {
+      writeStorage(saved);
+    }
+  } catch (error) {
+    console.warn(
+      "[TARBIYAH THEME] Migrasi tema lama gagal:",
+      error
+    );
+  }
+}
+
+const preference = saved || "dark";
 
     applyTheme(preference, { persist: false });
 
@@ -433,7 +451,16 @@
   window.TARBIYAH_THEME_MANAGER = API;
   window.TARBIYAH_THEME = API;
   window.ThemeManager = API;
-
+  window.TARBIYAH_THEME_CONTROLLER = {
+  init: () => API.initialize(),
+  applyTheme: (theme, shouldSave = false) =>
+    API.applyTheme(theme, { persist: shouldSave }),
+  setTheme: theme => API.setTheme(theme),
+  toggleTheme: () => API.toggleTheme(),
+  getTheme: () => API.getTheme(),
+  getState: () => API.getState()
+};
+  
   /* ==========================================================
      AUTO START
   ========================================================== */
