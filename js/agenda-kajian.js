@@ -351,44 +351,81 @@ function getMapURL(address) {
   ============================================================ */
 
   async function loadAgendas() {
-    const list = $("agendaList");
+    $("agendaList").innerHTML =
+        '<div class="agenda-empty">Memuat data agenda...</div>';
 
-    if (list) {
-      list.innerHTML = `
-        <div class="agenda-empty">
-          <span>◷</span>
-          <strong>Memuat agenda kajian...</strong>
-          <p>Mengambil data dari database.</p>
-        </div>`;
-    }
+    const { data, error } = await state.supabase
+        .from(TABLE)
+        .select(
+            "id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status"
+        )
+        .eq("status", state.view)
+        .order("starts_at", { ascending: true })
+        .limit(200);
 
-    const { data, error } = await state.client
-      .from(TABLE)
-      .select(
-        "id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status"
-      )
-      .eq("status", "published")
-      .order("starts_at", { ascending: true })
-      .limit(200);
+    if (error) throw error;
 
-    if (error) {
-      throw new Error(
-        "Data agenda gagal dimuat: " + getErrorMessage(error)
-      );
-    }
-
-    state.agendas = Array.isArray(data) ? data : [];
+    state.agendas = data || [];
     renderAgendas();
-
-    log("Agenda berhasil dimuat.", {
-      total: state.agendas.length
-    });
-  }
+}
 
   /* ============================================================
      8. MENAMPILKAN DAFTAR AGENDA
   ============================================================ */
+async function changeAgendaStatus(id, newStatus) {
+    if (state.busy) return;
 
+    const item = state.agendas.find(
+        agenda => String(agenda.id) === String(id)
+    );
+
+    if (!item) return;
+
+    const isArchive = newStatus === "archived";
+
+    const message = isArchive
+        ? `Arsipkan agenda "${item.title}"? Agenda tidak akan dihapus permanen.`
+        : `Pulihkan agenda "${item.title}" agar tampil kembali dalam daftar aktif?`;
+
+    if (!window.confirm(message)) return;
+
+    try {
+        setBusy(true);
+
+        const { data, error } = await state.supabase
+            .from(TABLE)
+            .update({ status: newStatus })
+            .eq("id", id)
+            .select("id")
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+            throw new Error(
+                "Status agenda tidak berubah. Periksa izin UPDATE dan SELECT RLS."
+            );
+        }
+
+        await loadAgendas();
+
+        notify(
+            isArchive
+                ? "Agenda berhasil diarsipkan."
+                : "Agenda berhasil dipulihkan."
+        );
+
+    } catch (error) {
+        console.error("[TARBIYAH AGENDA] Arsip gagal:", error);
+        notify(
+            error.message || "Status agenda gagal diperbarui.",
+            "error"
+        );
+    } finally {
+        setBusy(false);
+    }
+}
+   
   function renderAgendas() {
     const list = $("agendaList");
     const count = $("agendaCount");
@@ -457,14 +494,29 @@ function getMapURL(address) {
           }
 
           <div class="agenda-card-actions">
-            <button
-              class="agenda-edit-button"
-              type="button"
-              data-edit-id="${escapeHTML(item.id)}">
-              ✎ Ubah Agenda
+    ${
+        state.view === "published"
+        ? `
+            <button type="button"
+                data-edit-id="${escapeHTML(item.id)}">
+                Ubah Agenda
             </button>
-            ${mapLink}
-          </div>
+
+            <button type="button"
+                data-archive-id="${escapeHTML(item.id)}">
+                Arsipkan Agenda
+            </button>
+        `
+        : `
+            <button type="button"
+                data-restore-id="${escapeHTML(item.id)}">
+                Pulihkan Agenda
+            </button>
+        `
+    }
+
+    ${mapLink}
+</div>
         </article>`;
     }).join("");
 
