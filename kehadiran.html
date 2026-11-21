@@ -26,7 +26,6 @@
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
-  <!-- TAMBAHAN CSS UNTUK TOMBOL BACK UNIVERSAL -->
   <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
@@ -483,18 +482,9 @@
 <body>
   <main class="attendance-page" data-module="kehadiran">
 
-    <!-- 1. TOMBOL BACK UNIVERSAL (Diletakkan di luar header agar aman & pasti bisa diklik) -->
-    <div class="page-header-nav" style="margin-bottom: 24px; position: relative; z-index: 9999;">
-      <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
-        <span class="tarbiyah-page-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </span>
-        <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
-      </a>
-    </div>
+      <section class="notification-hero">
+        <div class="notification-eyebrow">✦ TARBIYAH MEMBER CENTER</div>
+        <!-- Sisa kode hero dan notifikasi tetap dipertahankan... -->
 
     <!-- 2. HEADER ASLI (Hanya ada satu, tidak dobel) -->
     <header class="attendance-header">
@@ -507,6 +497,23 @@
         </p>
       </div>
 
+      <div id="app-shell">
+    <main class="notification-page">
+
+      <!-- ⬇️ SISIPKAN TOMBOL BACK DI SINI ⬇️ -->
+      <div class="page-header-nav" style="margin-bottom: 24px; position: relative; z-index: 9999;">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+          <span class="tarbiyah-page-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+        </a>
+      </div>
+      <!-- ⬆️ BATAS AKHIR TOMBOL BACK ⬆️ -->
+      
       <button class="attendance-button" id="refreshAttendance" type="button">
         ↻ Perbarui
       </button>
