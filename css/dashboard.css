@@ -722,3 +722,200 @@ html[data-theme="light"] {
   inset: 0;
 }
   
+
+/* =========================================================
+   TARBIYAH DASHBOARD — INTEGRATION OVERRIDES
+   ========================================================= */
+
+/* Sidebar links: menu utama dan menu Mentor */
+.app-sidebar .side-link,
+.app-sidebar .sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  margin: 3px 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--text-secondary, #a7c8ba);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color .2s ease,
+    background .2s ease,
+    border-color .2s ease,
+    transform .2s ease;
+}
+
+.app-sidebar .side-link:hover,
+.app-sidebar .sidebar-link:hover {
+  color: var(--text-primary, #f0fff7);
+  background: rgba(52, 211, 153, .09);
+  border-color: rgba(52, 211, 153, .18);
+  transform: translateX(2px);
+}
+
+.app-sidebar .side-link.active,
+.app-sidebar .sidebar-link.active {
+  color: var(--accent, #6ee7b7);
+  background: rgba(52, 211, 153, .13);
+  border-color: rgba(52, 211, 153, .24);
+}
+
+.app-sidebar .side-icon,
+.app-sidebar .sidebar-link > span:first-child {
+  display: inline-flex;
+  flex: 0 0 24px;
+  width: 24px;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+/* Header theme toggle */
+.header-icon-button {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color, rgba(110, 231, 183, .2));
+  border-radius: 13px;
+  color: var(--text-primary, #f0fff7);
+  background: var(--bg-card, #102a22);
+  font-size: 19px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.header-icon-button:hover {
+  border-color: var(--accent, #6ee7b7);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, .1);
+}
+
+/* Avatar consistency */
+.header-user-avatar,
+.sidebar-profile-avatar {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border: 2px solid var(--accent, #6ee7b7);
+  border-radius: 50%;
+  background: var(--bg-card, #102a22);
+}
+
+.sidebar-profile-avatar {
+  width: 42px;
+  height: 42px;
+}
+
+.header-user-avatar img,
+.sidebar-profile-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-active-indicator {
+  position: absolute;
+  right: 0;
+  bottom: 1px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--bg-card, #102a22);
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+/* Sidebar bottom actions */
+.app-sidebar .logout-mini {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 1px solid var(--border-color, rgba(110, 231, 183, .2));
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-secondary, #a7c8ba);
+  cursor: pointer;
+}
+
+.app-sidebar .logout-mini:hover {
+  color: #fff;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, .12);
+}
+
+.app-sidebar .logout-mini svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Carousel slide state */
+.hero-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-carousel .hero-slide {
+  display: none;
+  animation: tarbiyahSlideIn .45s ease both;
+}
+
+.hero-carousel .hero-slide.active {
+  display: flex;
+}
+
+.hero-carousel .carousel-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, .45);
+  cursor: pointer;
+  transition: width .2s ease, background .2s ease;
+}
+
+.hero-carousel .carousel-dot.active {
+  width: 25px;
+  border-radius: 20px;
+  background: var(--accent, #6ee7b7);
+}
+
+@keyframes tarbiyahSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-carousel .hero-slide {
+    animation: none;
+  }
+}
