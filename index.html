@@ -478,56 +478,40 @@
   <script src="./js/splash.js"></script>
   <script src="./js/pwa.js"></script>
 
-  <!-- LOGIKA SPLASH & OVERLAY -->
+     <!-- SCRIPT LOGIKA SPLASH & OVERLAY (REVISI FINAL) -->
   <script>
-    (() => {
-      'use strict';
-
+    document.addEventListener("DOMContentLoaded", () => {
       // 1. Tahun Otomatis
       const yearElement = document.querySelector('[data-current-year]');
-      if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
-      }
+      if (yearElement) yearElement.textContent = new Date().getFullYear();
 
-      // 2. Ambil Elemen
       const overlay = document.querySelector('[data-splash-overlay]');
       const closeButton = document.querySelector('[data-splash-overlay-close]');
       const enterButton = document.querySelector('[data-splash-enter]');
-      const loadingText = document.querySelector('[data-splash-loading]');
       const progressFill = document.querySelector('[data-splash-progress]');
       const progressTrack = document.querySelector('[data-splash-progress-track]');
+      const loadingText = document.querySelector('[data-splash-loading]');
 
-      // Pastikan overlay tampil pertama kali
-      if (overlay) {
-        overlay.classList.add('is-visible');
-      }
-
-      // 3. Logika Tombol "Lanjut..." (Menutup Overlay)
-      if (overlay && closeButton) {
-        closeButton.addEventListener('click', () => {
+      // 2. LOGIKA TOMBOL "LANJUT..." (Menutup Overlay)
+      if (closeButton && overlay) {
+        closeButton.addEventListener('click', (e) => {
+          e.preventDefault();
           overlay.classList.remove('is-visible');
-          
-          // Setelah overlay ditutup, picu progress bar untuk jalan (jika belum jalan)
-          // Opsional: Jika Anda ingin loading bar berjalan setelah klik lanjut
           startLoading(); 
         });
       }
 
-      // 4. Logika Loading Bar
+      // 3. LOGIKA LOADING BAR
       let progress = 0;
-      let interval;
       let hasStartedLoading = false;
 
       function startLoading() {
         if (hasStartedLoading) return;
         hasStartedLoading = true;
 
-        // Teks loading berubah
-        if (loadingText) {
-          loadingText.textContent = "Menyiapkan ruang Tarbiyah...";
-        }
+        if (loadingText) loadingText.textContent = "Menyiapkan ruang Tarbiyah...";
 
-        interval = setInterval(() => {
+        const interval = setInterval(() => {
           progress += Math.floor(Math.random() * 15) + 5; 
           if (progress > 100) progress = 100;
           
@@ -538,61 +522,28 @@
             clearInterval(interval);
             if (loadingText) loadingText.textContent = "Alhamdulillah, ruang belajar siap.";
             
-            // Tampilkan tombol Masuk Sekarang
+            // TAMPILKAN TOMBOL MASUK SEKARANG
             if (enterButton) {
               enterButton.classList.add('is-visible');
             }
           }
-        }, 200);
+        }, 150); // Dipercepat sedikit agar tidak terlalu lama menunggu
       }
 
-      // 5. Logika Tombol "Masuk Sekarang" (Pindah Halaman)
+      // 4. LOGIKA TOMBOL "MASUK SEKARANG" (PINDAH HALAMAN)
       if (enterButton) {
-        enterButton.addEventListener('click', () => {
-          window.location.href = './login-register.html';
+        enterButton.addEventListener('click', (e) => {
+          e.preventDefault(); // Mencegah aksi bawaan
+          
+          // Mengubah teks tombol sebagai indikator loading
+          enterButton.innerHTML = "<span>Memuat...</span>";
+          
+          // Paksa pindah halaman
+          window.location.assign('./login-register.html'); 
         });
       }
-
-      // 6. Animasi Kilauan Acak pada Logo Pembuka
-      const logo = document.querySelector(".splash-logo-frame");
-      if (logo) {
-        const directions = ["shine-left", "shine-right", "shine-up", "shine-down"];
-        let previousDirection = "";
-        let shineTimer = null;
-
-        function playRandomShine() {
-          let nextDirection;
-          do {
-            nextDirection = directions[Math.floor(Math.random() * directions.length)];
-          } while (directions.length > 1 && nextDirection === previousDirection);
-
-          previousDirection = nextDirection;
-          logo.classList.remove(...directions);
-          void logo.offsetWidth;
-          logo.classList.add(nextDirection);
-        }
-
-        function startShine() {
-          stopShine();
-          playRandomShine();
-          shineTimer = window.setInterval(playRandomShine, 3000);
-        }
-
-        function stopShine() {
-          if (shineTimer !== null) {
-            window.clearInterval(shineTimer);
-            shineTimer = null;
-          }
-        }
-
-        startShine();
-
-        document.addEventListener("visibilitychange", () => {
-          if (document.hidden) stopShine();
-          else startShine();
-        });
-      }
-    })();
+    }); 
+        
   </script>
 </body>
 </html>
