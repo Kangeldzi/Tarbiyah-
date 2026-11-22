@@ -134,60 +134,31 @@
      SINKRONISASI TOMBOL MASTER
      Jangan mengubah isi ikon ◐ atau struktur HTML tombol.
   ========================================================== */
+function updateThemeControls() {
+  const buttons = document.querySelectorAll(TOGGLE_SELECTOR);
 
-  function updateThemeControls() {
-    const buttons = document.querySelectorAll(
-      TOGGLE_SELECTOR
+  buttons.forEach(button => {
+    const isDark = state.activeTheme === "dark";
+
+    // Ikon menunjukkan tema yang bisa dipilih berikutnya.
+    button.textContent = isDark ? "☀" : "☾";
+
+    button.setAttribute(
+      "aria-label",
+      isDark ? "Ganti ke mode terang" : "Ganti ke mode gelap"
     );
 
-    buttons.forEach(button => {
-      const label = state.preference === "system"
-        ? `Tema sistem (${state.activeTheme})`
-        : state.activeTheme === "light"
-          ? "Tema terang"
-          : "Tema gelap";
+    button.setAttribute(
+      "title",
+      isDark ? "Ganti ke mode terang" : "Ganti ke mode gelap"
+    );
 
-      button.setAttribute(
-        "aria-label",
-        `Mode tampilan: ${label}. Tekan untuk mengganti tema.`
-      );
-
-      button.setAttribute(
-        "aria-pressed",
-        state.activeTheme === "dark" ? "true" : "false"
-      );
-
-      button.setAttribute(
-        "title",
-        label
-      );
-
-      // PENTING:
-      // Tidak mengubah textContent, innerHTML,
-      // ikon, class, atau struktur tombol master.
-    });
-
-    document.querySelectorAll(OPTION_SELECTOR).forEach(option => {
-      const value = normalizeTheme(
-        option.dataset.themeOption
-      );
-
-      const active = value === state.preference;
-
-      option.classList.toggle("is-active", active);
-
-      if (active) {
-        option.setAttribute("aria-current", "true");
-      } else {
-        option.removeAttribute("aria-current");
-      }
-    });
-
-    emit("tarbiyah:theme-controls-updated", {
-      preference: state.preference,
-      activeTheme: state.activeTheme
-    });
-  }
+    button.setAttribute(
+      "aria-pressed",
+      String(isDark)
+    );
+  });
+}
 
   /* ==========================================================
      MENERAPKAN TEMA
