@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -10,26 +9,143 @@
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CSS Utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  
+  <!-- CSS Navigasi Tombol Back Universal -->
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
+    /* =========================================
+       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
+    ========================================= */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* KUNCI LOGO AGAR TIDAK PECAH */
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .brand-logo-wrap .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-brand-text h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      color: var(--color-primary, #36b58a);
+      line-height: 1.1;
+      font-family: var(--font-heading);
+    }
+
+    .header-brand-text span {
+      display: block;
+      font-size: .75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1.25rem;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
+    }
+
+    /* =========================================
+       LAYOUT UTAMA
+    ========================================= */
+    .app-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Jarak aman untuk tombol back */
+    .page-header-nav {
+      margin-bottom: 30px;
+    }
+
+    /* =========================================
+       KONTEN PRESENSI (TIDAK DIUBAH)
+    ========================================= */
     .attendance-hero {
       padding: 27px;
       margin-bottom: 22px;
-      border-radius: 22px;
+      border-radius: 20px;
       color: #fff;
       background: linear-gradient(130deg, #075b43, #123c31 60%, #102a22);
       position: relative;
       overflow: hidden;
+      border: 1px solid var(--border-color);
     }
 
     .attendance-hero::after {
@@ -43,10 +159,11 @@
       pointer-events: none;
     }
 
-    .attendance-hero h1 {
-      font-family: Poppins, sans-serif;
-      font-size: clamp(24px, 4vw, 34px);
+    .attendance-hero h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 4vw, 32px);
       margin: 0 0 9px;
+      color: #fff;
     }
 
     .attendance-hero p {
@@ -54,6 +171,7 @@
       color: #d8eee5;
       line-height: 1.7;
       margin: 0;
+      font-size: .95rem;
     }
 
     .attendance-stats {
@@ -65,23 +183,23 @@
 
     .attendance-stat {
       padding: 17px;
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 15px;
-      background: var(--card-bg, var(--surface-color, #18372d));
+      background: var(--bg-secondary);
     }
 
     .attendance-stat span {
       display: block;
-      color: var(--muted-color, #aabbb3);
+      color: var(--text-secondary);
       font-size: 12px;
       margin-bottom: 8px;
     }
 
     .attendance-stat strong {
       display: block;
-      font-family: Poppins, sans-serif;
+      font-family: var(--font-heading);
       font-size: 24px;
-      color: #39d6a5;
+      color: var(--color-primary);
     }
 
     .attendance-layout {
@@ -94,90 +212,26 @@
     .attendance-panel {
       min-width: 0;
       padding: 18px;
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 17px;
-      background: var(--card-bg, var(--surface-color, #18372d));
+      background: var(--bg-secondary);
     }
 
-    .attendance-panel h2 {
-      font-family: Poppins, sans-serif;
+    .attendance-panel h3 {
+      font-family: var(--font-heading);
       font-size: 17px;
       margin: 0 0 15px;
+      color: var(--text-primary);
     }
 
     .attendance-empty {
       padding: 24px 12px;
-      border: 1px dashed var(--border-color, #355347);
+      border: 1px dashed var(--border-color);
       border-radius: 12px;
       text-align: center;
-      color: var(--muted-color, #aabbb3);
+      color: var(--text-secondary);
       font-size: 13px;
       line-height: 1.7;
-    }
-
-    .attendance-form {
-      display: grid;
-      gap: 13px;
-    }
-
-    .attendance-field {
-      display: grid;
-      gap: 7px;
-    }
-
-    .attendance-field label {
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .attendance-field input,
-    .attendance-field select,
-    .attendance-field textarea {
-      width: 100%;
-      min-width: 0;
-      padding: 12px 13px;
-      border: 1px solid var(--border-color, #355347);
-      border-radius: 11px;
-      background: var(--surface-color, #18372d);
-      color: var(--text-color, #fff);
-      font: inherit;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .attendance-field input:focus,
-    .attendance-field select:focus,
-    .attendance-field textarea:focus {
-      border-color: #20b486;
-      box-shadow: 0 0 0 3px rgba(32,180,134,.12);
-    }
-
-    .attendance-field textarea {
-      resize: vertical;
-      min-height: 85px;
-    }
-
-    .attendance-submit {
-      border: 0;
-      border-radius: 11px;
-      padding: 13px 16px;
-      color: #fff;
-      background: linear-gradient(135deg, #07865f, #16a779);
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .attendance-submit:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .attendance-notice {
-      min-height: 20px;
-      font-size: 12px;
-      line-height: 1.6;
-      color: var(--muted-color, #aabbb3);
     }
 
     .attendance-history-toolbar {
@@ -192,12 +246,13 @@
       min-width: 0;
       flex: 1 1 140px;
       padding: 11px 12px;
-      border: 1px solid var(--border-color, #355347);
+      border: 1px solid var(--border-color);
       border-radius: 10px;
-      background: var(--surface-color, #18372d);
-      color: var(--text-color, #fff);
+      background: var(--bg-primary);
+      color: var(--text-primary);
       font: inherit;
       font-size: 12px;
+      outline: none;
     }
 
     .attendance-table-wrap {
@@ -215,12 +270,12 @@
     .attendance-table th,
     .attendance-table td {
       padding: 12px 10px;
-      border-bottom: 1px solid var(--border-color, #355347);
+      border-bottom: 1px solid var(--border-color);
       white-space: nowrap;
     }
 
     .attendance-table th {
-      color: var(--muted-color, #aabbb3);
+      color: var(--text-secondary);
       font-weight: 600;
     }
 
@@ -228,1030 +283,288 @@
       display: inline-block;
       padding: 5px 9px;
       border-radius: 20px;
-      color: #39d6a5;
-      background: rgba(32,180,134,.13);
+      color: var(--color-primary);
+      background: rgba(54,181,138,.13);
       font-size: 10px;
       font-weight: 700;
     }
 
+    /* =========================================
+       SCANNER QR & LAINNYA (TIDAK DIUBAH)
+    ========================================= */
+    .attendance-scanner { display: grid; gap: 18px; }
+    .scanner-admin-panel { display: grid; gap: 16px; }
+    .scanner-agenda-select { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); font: inherit; outline: none; }
+    .scanner-agenda-info { display: grid; gap: 7px; padding: 14px; border: 1px solid rgba(16,185,129,.24); border-radius: 14px; background: rgba(16,185,129,.07); }
+    .scanner-agenda-info strong { color: var(--text-primary); font-size: 15px; }
+    .scanner-agenda-info span { color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
+    .scanner-camera-box { width: 100%; max-width: 560px; margin: 0 auto; overflow: hidden; border: 1px solid rgba(16,185,129,.3); border-radius: 18px; background: #07130f; }
+    #qr-reader { width: 100%; min-height: 260px; color: #fff; }
+    #qr-reader video { width: 100% !important; border-radius: 12px; object-fit: cover; }
+    #qr-reader__dashboard { display: none !important; }
+    #qr-reader__scan_region { min-height: 240px; }
+    #qr-reader__scan_region img { display: none !important; }
+    .scanner-camera-placeholder { display: grid; min-height: 260px; place-items: center; padding: 24px; color: #a9b8b0; text-align: center; }
+    .scanner-camera-placeholder .camera-icon { display: grid; width: 64px; height: 64px; margin: 0 auto 12px; place-items: center; border: 1px solid rgba(16,185,129,.35); border-radius: 20px; background: rgba(16,185,129,.12); color: #34d399; font-size: 28px; }
+    .scanner-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+    .scanner-button { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 8px; padding: 11px 18px; border: 1px solid transparent; border-radius: 12px; font: inherit; font-weight: 700; cursor: pointer; transition: .2s ease; }
+    .scanner-button:disabled { cursor: not-allowed; opacity: .45; }
+    .scanner-button-primary { background: #059669; color: #fff; }
+    .scanner-button-primary:not(:disabled):hover { background: #047857; box-shadow: 0 0 18px rgba(16,185,129,.25); }
+    .scanner-button-secondary { border-color: rgba(16,185,129,.3); background: rgba(16,185,129,.08); color: var(--text-primary); }
+    .scanner-status { padding: 13px 15px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-primary); color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
+    .scanner-status.success { border-color: rgba(16,185,129,.4); background: rgba(16,185,129,.1); color: #34d399; }
+    .scanner-status.error { border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08); color: #fca5a5; }
+    .scanner-status.warning { border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.08); color: #fcd34d; }
+    .scanner-result { display: none; gap: 8px; padding: 16px; border: 1px solid rgba(16,185,129,.3); border-radius: 14px; background: rgba(16,185,129,.08); }
+    .scanner-result.visible { display: grid; }
+    .scanner-result strong { color: var(--text-primary); }
+    .scanner-result p { margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
+    .scanner-member-notice { padding: 18px; border: 1px solid var(--border-color); border-radius: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+    .attendance-event-item { padding: 14px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-primary); }
+    .attendance-event-item h4 { margin: 0 0 10px; font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .attendance-event-item p { margin: 6px 0; font-size: 13px; line-height: 1.5; color: var(--text-secondary); }
+
+    #scanner-admin-panel[hidden], #scanner-member-notice[hidden] { display: none !important; }
+
     @media(max-width: 760px) {
-      .attendance-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .attendance-stats {
-        gap: 8px;
-      }
-
-      .attendance-stat {
-        padding: 13px 10px;
-      }
-
-      .attendance-stat strong {
-        font-size: 20px;
-      }
-
-      .attendance-hero {
-        padding: 21px;
-      }
-
-      .attendance-panel {
-        padding: 14px;
-      }
+      .attendance-layout { grid-template-columns: 1fr; }
+      .attendance-stats { gap: 8px; }
+      .attendance-stat { padding: 13px 10px; }
+      .attendance-stat strong { font-size: 20px; }
+      .attendance-hero { padding: 21px; }
+      .attendance-panel { padding: 14px; }
     }
-
+    @media(max-width: 600px) {
+      .scanner-controls { display: grid; grid-template-columns: 1fr 1fr; }
+      .scanner-button { width: 100%; padding: 11px 10px; font-size: 13px; }
+      #qr-reader { min-height: 230px; }
+    }
     @media(max-width: 390px) {
-      .attendance-stat span {
-        font-size: 10px;
-      }
-
-      .attendance-stat strong {
-        font-size: 18px;
-      }
+      .attendance-stat span { font-size: 10px; }
+      .attendance-stat strong { font-size: 18px; }
     }
-
-  
-/* =========================================
-   TARBIYAH QR ATTENDANCE SCANNER
-========================================= */
-
-.attendance-scanner {
-  display: grid;
-  gap: 18px;
-}
-
-.scanner-admin-panel {
-  display: grid;
-  gap: 16px;
-}
-
-.scanner-agenda-select {
-  width: 100%;
-  min-height: 48px;
-  padding: 12px 14px;
-  border: 1px solid var(--border-color, rgba(255,255,255,.14));
-  border-radius: 12px;
-  background: var(--surface, #142b24);
-  color: var(--text-primary, #fff);
-  font: inherit;
-}
-
-.scanner-agenda-info {
-  display: grid;
-  gap: 7px;
-  padding: 14px;
-  border: 1px solid rgba(16,185,129,.24);
-  border-radius: 14px;
-  background: rgba(16,185,129,.07);
-}
-
-.scanner-agenda-info strong {
-  color: var(--text-primary, #fff);
-  font-size: 15px;
-}
-
-.scanner-agenda-info span {
-  color: var(--text-secondary, #a9b8b0);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.scanner-camera-box {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  overflow: hidden;
-  border: 1px solid rgba(16,185,129,.3);
-  border-radius: 18px;
-  background: #07130f;
-}
-
-#qr-reader {
-  width: 100%;
-  min-height: 260px;
-  color: #fff;
-}
-
-#qr-reader video {
-  width: 100% !important;
-  border-radius: 12px;
-  object-fit: cover;
-}
-
-#qr-reader__dashboard {
-  display: none !important;
-}
-
-#qr-reader__scan_region {
-  min-height: 240px;
-}
-
-#qr-reader__scan_region img {
-  display: none !important;
-}
-
-.scanner-camera-placeholder {
-  display: grid;
-  min-height: 260px;
-  place-items: center;
-  padding: 24px;
-  color: #a9b8b0;
-  text-align: center;
-}
-
-.scanner-camera-placeholder .camera-icon {
-  display: grid;
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 12px;
-  place-items: center;
-  border: 1px solid rgba(16,185,129,.35);
-  border-radius: 20px;
-  background: rgba(16,185,129,.12);
-  color: #34d399;
-  font-size: 28px;
-}
-
-.scanner-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.scanner-button {
-  display: inline-flex;
-  min-height: 46px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 11px 18px;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  transition: .2s ease;
-}
-
-.scanner-button:disabled {
-  cursor: not-allowed;
-  opacity: .45;
-}
-
-.scanner-button-primary {
-  background: #059669;
-  color: #fff;
-}
-
-.scanner-button-primary:not(:disabled):hover {
-  background: #047857;
-  box-shadow: 0 0 18px rgba(16,185,129,.25);
-}
-
-.scanner-button-secondary {
-  border-color: rgba(16,185,129,.3);
-  background: rgba(16,185,129,.08);
-  color: var(--text-primary, #fff);
-}
-
-.scanner-status {
-  padding: 13px 15px;
-  border: 1px solid var(--border-color, rgba(255,255,255,.12));
-  border-radius: 12px;
-  background: var(--surface, #142b24);
-  color: var(--text-secondary, #a9b8b0);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.scanner-status.success {
-  border-color: rgba(16,185,129,.4);
-  background: rgba(16,185,129,.1);
-  color: #34d399;
-}
-
-.scanner-status.error {
-  border-color: rgba(239,68,68,.35);
-  background: rgba(239,68,68,.08);
-  color: #fca5a5;
-}
-
-.scanner-status.warning {
-  border-color: rgba(245,158,11,.35);
-  background: rgba(245,158,11,.08);
-  color: #fcd34d;
-}
-
-.scanner-result {
-  display: none;
-  gap: 8px;
-  padding: 16px;
-  border: 1px solid rgba(16,185,129,.3);
-  border-radius: 14px;
-  background: rgba(16,185,129,.08);
-}
-
-.scanner-result.visible {
-  display: grid;
-}
-
-.scanner-result strong {
-  color: var(--text-primary, #fff);
-}
-
-.scanner-result p {
-  margin: 0;
-  color: var(--text-secondary, #a9b8b0);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.scanner-member-notice {
-  padding: 18px;
-  border: 1px solid var(--border-color, rgba(255,255,255,.12));
-  border-radius: 14px;
-  color: var(--text-secondary, #a9b8b0);
-  line-height: 1.7;
-}
-
-@media (max-width: 600px) {
-  .scanner-controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .scanner-button {
-    width: 100%;
-    padding: 11px 10px;
-    font-size: 13px;
-  }
-
-  #qr-reader {
-    min-height: 230px;
-  }
-}
-
- 
-/* Pastikan panel yang beratribut hidden tidak tampil */
-#scanner-admin-panel[hidden],
-#scanner-member-notice[hidden] {
-  display: none !important;
-}
-
-
-/* =========================================================
-   TARBIYAH — PRESENSI HEADER
-   Design mengikuti profil-anggota.html
-   Scope: khusus halaman presensi
-========================================================= */
-
-.presensi-header {
-  position: sticky;
-  top: 0;
-  z-index: 500;
-
-  width: 100%;
-  min-height: 72px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 12px;
-  padding: 10px 5%;
-
-  background: var(--profile-surface, var(--surface-primary));
-  border-bottom: 1px solid var(--profile-border, var(--border-default));
-
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-.presensi-header-left,
-.presensi-header-actions {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  gap: 12px;
-}
-
-.presensi-header-left {
-  flex: 1 1 auto;
-}
-
-.presensi-header-actions {
-  flex: 0 0 auto;
-}
-
-/* Logo dan identitas */
-
-.presensi-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  min-width: 0;
-  color: var(--profile-text, var(--text-primary));
-  text-decoration: none;
-}
-
-.presensi-brand img {
-  display: block;
-
-  width: 42px !important;
-  height: 42px !important;
-  min-width: 42px;
-  max-width: 42px;
-
-  object-fit: contain;
-  flex: 0 0 42px;
-}
-
-.presensi-brand-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  gap: 3px;
-}
-
-.presensi-brand-text strong {
-  color: var(--profile-primary-light, var(--green-500));
-
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  line-height: 1.2;
-}
-
-.presensi-brand-text span {
-  color: var(--profile-muted, var(--text-muted));
-
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  line-height: 1.3;
-}
-
-/* Tombol ikon */
-
-.presensi-icon-button,
-.presensi-back-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  flex: 0 0 42px;
-
-  padding: 0;
-
-  border: 1px solid var(--profile-border, var(--border-default));
-  border-radius: 12px;
-
-  background: var(--profile-surface-2, var(--surface-secondary));
-  color: var(--profile-text, var(--text-primary));
-
-  font-size: 19px;
-  line-height: 1;
-
-  text-decoration: none;
-  transition: all .25s ease;
-}
-
-.presensi-icon-button:hover,
-.presensi-back-button:hover {
-  color: #ffffff;
-  background: var(--profile-primary-dark, var(--green-700));
-  border-color: var(--profile-primary-dark, var(--green-700));
-  transform: translateY(-2px);
-}
-
-.presensi-icon-button:active,
-.presensi-back-button:active {
-  transform: translateY(0);
-}
-
-/* Responsif tablet */
-
-@media (max-width: 768px) {
-  .presensi-header {
-    min-height: 65px;
-    padding: 9px 3%;
-    gap: 8px;
-  }
-
-  .presensi-header-left,
-  .presensi-header-actions {
-    gap: 8px;
-  }
-
-  .presensi-brand img {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px;
-    max-width: 36px;
-    flex-basis: 36px;
-  }
-
-  .presensi-brand-text strong {
-    font-size: 14px;
-  }
-
-  .presensi-brand-text span {
-    font-size: 10px;
-  }
-
-  .presensi-icon-button,
-  .presensi-back-button {
-    width: 37px;
-    height: 37px;
-    min-width: 37px;
-    flex-basis: 37px;
-    border-radius: 10px;
-  }
-}
-
-/* Responsif HP kecil */
-
-@media (max-width: 380px) {
-  .presensi-header {
-    padding-inline: 8px;
-    gap: 5px;
-  }
-
-  .presensi-header-left,
-  .presensi-header-actions {
-    gap: 5px;
-  }
-
-  .presensi-brand {
-    gap: 6px;
-  }
-
-  .presensi-brand img {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px;
-    max-width: 32px;
-    flex-basis: 32px;
-  }
-
-  .presensi-brand-text strong {
-    font-size: 12px;
-    letter-spacing: .5px;
-  }
-
-  .presensi-brand-text span {
-    font-size: 9px;
-  }
-
-  .presensi-icon-button,
-  .presensi-back-button {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    flex-basis: 34px;
-    font-size: 17px;
-  }
-}
-
-
-/* =========================================
-   PERBAIKAN SIDEBAR DAN LOGO PRESENSI
-========================================= */
-
-/* Pastikan sidebar mengikuti sistem module-shell */
-.app-shell {
-  position: relative;
-  min-height: 100vh;
-}
-
-.app-sidebar {
-  box-sizing: border-box;
-  z-index: 1000;
-}
-
-.app-sidebar .brand-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  text-decoration: none;
-}
-
-.app-sidebar .brand-logo img {
-  display: block;
-  width: 40px !important;
-  height: 40px !important;
-  min-width: 40px;
-  max-width: 40px;
-  flex: 0 0 40px;
-  object-fit: contain;
-}
-
-/* Logo Header */
-.presensi-brand img {
-  display: block;
-  width: 42px !important;
-  height: 42px !important;
-  min-width: 42px;
-  max-width: 42px;
-  flex: 0 0 42px;
-  object-fit: contain;
-}
-
-/* Konten utama tidak melebar */
-.app-main {
-  min-width: 0;
-  width: 100%;
-}
-
-/* Cegah elemen Sidebar tampil sebagai konten biasa
-   ketika belum dibuka */
-.app-sidebar:not(.is-open):not(.open):not(.active) {
-  box-sizing: border-box;
-}
-
-
-
-/* =========================================================
-   TARBIYAH — MASTER TOGGLE SWITCH MODE
-   Mengikuti profil-anggota.css
-   ========================================================= */
-
-/* Variabel yang dibutuhkan Toggle Switch */
-
-:root {
-  --profile-primary: #10b981;
-  --profile-primary-dark: #047857;
-  --profile-primary-light: #34d399;
-  --profile-bg: #0b1713;
-  --profile-surface: #12231c;
-  --profile-surface-2: #192e25;
-  --profile-border: rgba(255,255,255,.09);
-  --profile-text: #f1f5f3;
-  --profile-muted: #9aada3;
-  --profile-transition: .25s ease;
-}
-
-html[data-theme="light"] {
-  --profile-bg: #f2f7f4;
-  --profile-surface: #ffffff;
-  --profile-surface-2: #eaf3ed;
-  --profile-border: rgba(15,75,48,.12);
-  --profile-text: #183329;
-  --profile-muted: #71877b;
-}
-
-/* MASTER BUTTON — SAMA DENGAN profil-anggota.css */
-
-.icon-button {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--profile-border);
-  border-radius: 12px;
-  background: var(--profile-surface-2);
-  color: var(--profile-text);
-  font-size: 20px;
-  cursor: pointer;
-  transition: var(--profile-transition);
-}
-
-.icon-button:hover {
-  color: white;
-  background: var(--profile-primary-dark);
-  transform: translateY(-2px);
-}
-
-@media (max-width: 600px) {
-  .icon-button {
-    width: 37px;
-    height: 37px;
-    border-radius: 10px;
-  }
-}
-
-@media (max-width: 360px) {
-  .icon-button {
-    width: 33px;
-    height: 33px;
-  }
-}
-
-
-/* =========================================
-   TARBIYAH — DASHBOARD AGENDA PRESENSI
-   ========================================= */
-
-.attendance-event-item {
-  padding: 14px;
-  margin-bottom: 12px;
-  border: 1px solid var(--border-color, rgba(128,128,128,.2));
-  border-radius: 14px;
-  background: var(--surface-secondary, rgba(128,128,128,.06));
-}
-
-.attendance-event-item h4 {
-  margin: 0 0 10px;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary, inherit);
-}
-
-.attendance-event-item p {
-  margin: 6px 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text-secondary, inherit);
-}
-
-.attendance-event-item p:first-of-type {
-  font-weight: 600;
-}
-
-.attendance-empty {
-  padding: 18px;
-  text-align: center;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--text-secondary, inherit);
-}
-
-    
   </style>
 
-  
-<!-- ERUDA CONSOLE — DEBUG TARBIYAH -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  eruda.init();
-
-  console.log("================================");
-  console.log("TARBIYAH — ERUDA CONSOLE AKTIF");
-  console.log("================================");
-</script>
-
+  <!-- ERUDA CONSOLE — DEBUG TARBIYAH -->
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+    console.log("================================");
+    console.log("TARBIYAH — ERUDA CONSOLE AKTIF");
+    console.log("================================");
+  </script>
 </head>
 
-<body>
+<body class="auth-pending">
 
-<div class="app-shell" data-module-shell>
+  <div class="app-shell">
 
-  <!-- SIDEBAR NAVIGASI -->
-  <aside class="app-sidebar" data-sidebar>
-
-    <div class="sidebar-header">
-
-      <a href="./tarbiyah.html" class="brand-logo">
-        <img
-          src="./assets/icons/icon-192.png"
-          alt="Logo TARBIYAH">
-        <span>TARBIYAH</span>
-      </a>
-
-      <button
-        type="button"
-        data-sidebar-close
-        aria-label="Tutup menu">
-        ×
-      </button>
-
-    </div>
-
-    <nav class="sidebar-navigation" aria-label="Navigasi utama">
-
-      <a href="./tarbiyah.html" class="sidebar-link">
-        Dashboard
-      </a>
-
-      <a href="./profil-anggota.html" class="sidebar-link">
-        Profil Anggota
-      </a>
-
-      <a href="./agenda-tarbiyah.html" class="sidebar-link">
-        Agenda Tarbiyah
-      </a>
-
-      <a href="./pembelajaran.html" class="sidebar-link">
-        Pembelajaran
-      </a>
-
-      <a href="./berita-pengumuman.html" class="sidebar-link">
-        Berita &amp; Pengumuman
-      </a>
-
-      <a href="./presensi-tarbiyah.html" class="sidebar-link active">
-        Presensi
-      </a>
-
-      <a href="./galeri-foto-video.html" class="sidebar-link">
-        Galeri
-      </a>
-
-      <a href="./diskusi-tarbiyah.html" class="sidebar-link">
-        Diskusi
-      </a>
-
-      <a href="./notifikasi.html" class="sidebar-link">
-        Notifikasi
-      </a>
-
-    </nav>
-
-  </aside>
-
-  <!-- OVERLAY SIDEBAR -->
-  <div class="sidebar-overlay" data-sidebar-overlay></div>
-
-  <!-- KONTEN UTAMA -->
-  <main class="app-main">
-    
-<header class="topbar presensi-header">
-
-  <div class="presensi-header-left">
-
-    <!-- Tombol Sidebar -->
-    <button
-      type="button"
-      class="presensi-icon-button"
-      data-sidebar-toggle
-      aria-label="Buka menu">
-      ☰
-    </button>
-
-    <!-- Identitas TARBIYAH -->
-    <a href="./tarbiyah.html" class="presensi-brand">
-      <img
-        src="./assets/icons/icon-192.png"
-        alt="Logo TARBIYAH">
-
-      <div class="presensi-brand-text">
-        <strong>TARBIYAH</strong>
-        <span>Presensi Anggota</span>
-      </div>
-    </a>
-
-    <!-- Kembali ke Dashboard -->
-    <a
-      href="./tarbiyah.html"
-      class="presensi-back-button"
-      aria-label="Kembali ke Dashboard"
-      title="Kembali ke Dashboard">
-      ←
-    </a>
-
-  </div>
-
-  <div class="presensi-header-actions">
-
-  <!-- Toggle Switch Mode: MASTER TARBIYAH -->
-
- <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
-  ☀
- </button>   
-    
-    <!-- Notifikasi -->
-    <a
-      href="./notifikasi.html"
-      class="presensi-icon-button"
-      aria-label="Notifikasi"
-      title="Notifikasi">
-      ♧
-    </a>
-
-  </div>
-
-</header>
-
-      <section class="page-content">
-        <section class="attendance-hero">
-          <h1>Presensi Anggota</h1>
-          <p>
-            Catat kehadiran dalam kegiatan dan kajian TARBIYAH.
-            Riwayat presensi membantu anggota dan pengurus memantau
-            partisipasi kegiatan secara tertib.
-          </p>
-        </section>
-
-        <section class="attendance-stats" aria-label="Ringkasan kehadiran">
-          <article class="attendance-stat">
-            <span>Total Kehadiran</span>
-            <strong data-attendance-total>—</strong>
-          </article>
-
-          <article class="attendance-stat">
-            <span>Hadir Bulan Ini</span>
-            <strong data-attendance-month>—</strong>
-          </article>
-
-          <article class="attendance-stat">
-            <span>Persentase Kehadiran</span>
-            <strong data-attendance-rate>—</strong>
-          </article>
-        </section>
-
-        <div class="attendance-layout">
-          <section class="attendance-panel">
-            <h2>Formulir Presensi</h2>
-
-            
-<div class="attendance-scanner" id="attendance-scanner">
-
-  <!-- PANEL KHUSUS ADMIN -->
-  <section class="scanner-admin-panel" id="scanner-admin-panel">
-
-    <div>
-      <label for="presensi-agenda-select">
-        <strong>Pilih Agenda Kajian</strong>
-      </label>
-
-      <select
-        id="presensi-agenda-select"
-        class="scanner-agenda-select"
-        required
-      >
-        <option value="">Memuat agenda kajian...</option>
-      </select>
-    </div>
-
-    <div
-      class="scanner-agenda-info"
-      id="scanner-agenda-info"
-    >
-      <strong id="scanner-agenda-title">
-        Belum ada agenda dipilih
-      </strong>
-
-      <span id="scanner-agenda-time">
-        Silakan pilih agenda kajian terlebih dahulu.
-      </span>
-
-      <span id="scanner-agenda-location">
-        Lokasi: -
-      </span>
-    </div>
-
-    <div>
-      <strong>QR Code Anggota</strong>
-      <p class="scanner-member-notice">
-        Arahkan kamera belakang HP ke QR Code anggota.
-        Pastikan QR terlihat jelas dan pencahayaan cukup.
-      </p>
-    </div>
-
-    <!-- AREA KAMERA -->
-    <div class="scanner-camera-box">
-
-      <div id="qr-reader">
-
-        <div class="scanner-camera-placeholder">
-          <div>
-            <div class="camera-icon">▣</div>
-            <strong>Kamera belum diaktifkan</strong>
-            <p>Tekan tombol Mulai Scanner untuk membuka kamera.</p>
+    <!-- =========================================
+         HEADER UNIVERSAL
+    ========================================== -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-logo-wrap">
+            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+          </div>
+          <div class="header-brand-text">
+            <h1>TARBIYAH</h1>
+            <span>Presensi Anggota</span>
           </div>
         </div>
-
       </div>
 
-    </div>
+      <div class="header-right">
+        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
+          ☀
+        </button>
+        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
+          ♧
+        </a>
+      </div>
+    </header>
 
-    <!-- TOMBOL KAMERA -->
-    <div class="scanner-controls">
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+    <main class="app-main">
 
-      <button
-        type="button"
-        class="scanner-button scanner-button-primary"
-        id="btn-start-scanner"
-      >
-        <span>▣</span>
-        Mulai Scanner
-      </button>
+      <!-- 1. TOMBOL BACK UNIVERSAL -->
+      <div class="page-header-nav">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+          <span class="tarbiyah-page-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+        </a>
+      </div>
 
-      <button
-        type="button"
-        class="scanner-button scanner-button-secondary"
-        id="btn-stop-scanner"
-        disabled
-      >
-        Hentikan Kamera
-      </button>
-
-      <button
-        type="button"
-        class="scanner-button scanner-button-secondary"
-        id="btn-resume-scanner"
-        disabled
-      >
-        Scan Berikutnya
-      </button>
-
-    </div>
-
-    <!-- STATUS -->
-    <div
-      class="scanner-status"
-      id="scanner-status"
-      role="status"
-      aria-live="polite"
-    >
-      Sistem siap. Pilih agenda sebelum memulai pemindaian.
-    </div>
-
-    <!-- HASIL PEMINDAIAN -->
-    <div
-      class="scanner-result"
-      id="scanner-result"
-      aria-live="polite"
-    >
-      <strong id="scanner-result-title">
-        Hasil Presensi
-      </strong>
-
-      <p id="scanner-result-message"></p>
-    </div>
-
-  </section>
-
-  <!-- TAMPILAN JIKA PENGGUNA BUKAN ADMIN -->
-  <div
-    class="scanner-member-notice"
-    id="scanner-member-notice"
-    hidden
-  >
-    Fitur pemindaian QR hanya dapat digunakan oleh Admin
-    dan Super Admin. Riwayat kehadiran pribadi tetap dapat
-    dilihat melalui bagian riwayat presensi.
-  </div>
-
-</div>
-
-          </section>
-
-          <section class="attendance-panel">
-            <h2>Jadwal Kegiatan</h2>
-
-            <div class="attendance-empty" data-attendance-events>
-              Belum ada jadwal kegiatan yang ditampilkan.
-              Jadwal akan dimuat dari data agenda TARBIYAH.
-            </div>
-          </section>
-        </div>
-
-        <section class="attendance-panel" style="margin-top:18px;">
-          <h2>Riwayat Kehadiran</h2>
-
-          <div class="attendance-history-toolbar">
-            <input
-              type="search"
-              placeholder="Cari nama kegiatan..."
-              aria-label="Cari riwayat kegiatan"
-              data-attendance-history-search
-            >
-
-            <select aria-label="Filter status kehadiran" data-attendance-history-filter>
-              <option value="">Semua status</option>
-              <option value="hadir">Hadir</option>
-              <option value="izin">Izin</option>
-              <option value="sakit">Sakit</option>
-            </select>
-          </div>
-
-          <div class="attendance-table-wrap">
-            <table class="attendance-table">
-              <thead>
-                <tr>
-                  <th>Tanggal</th>
-                  <th>Kegiatan</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-
-              <tbody data-attendance-history>
-                <tr>
-                  <td colspan="3">
-                    <div class="attendance-empty">
-                      Riwayat kehadiran belum tersedia.
-                      Data akan muncul setelah integrasi presensi selesai.
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+      <!-- 2. HERO SECTION -->
+      <section class="attendance-hero">
+        <h2>Presensi Anggota</h2>
+        <p>
+          Catat kehadiran dalam kegiatan dan kajian TARBIYAH.
+          Riwayat presensi membantu anggota dan pengurus memantau
+          partisipasi kegiatan secara tertib.
+        </p>
       </section>
 
-      <footer class="app-footer">
+      <!-- 3. STATISTIK -->
+      <section class="attendance-stats" aria-label="Ringkasan kehadiran">
+        <article class="attendance-stat">
+          <span>Total Kehadiran</span>
+          <strong data-attendance-total>—</strong>
+        </article>
+        <article class="attendance-stat">
+          <span>Hadir Bulan Ini</span>
+          <strong data-attendance-month>—</strong>
+        </article>
+        <article class="attendance-stat">
+          <span>Persentase Kehadiran</span>
+          <strong data-attendance-rate>—</strong>
+        </article>
+      </section>
+
+      <!-- 4. KONTEN SCANNER & JADWAL -->
+      <div class="attendance-layout">
+        <section class="attendance-panel">
+          <h3>Formulir Presensi</h3>
+
+          <div class="attendance-scanner" id="attendance-scanner">
+            <!-- PANEL KHUSUS ADMIN -->
+            <section class="scanner-admin-panel" id="scanner-admin-panel">
+              <div>
+                <label for="presensi-agenda-select"><strong>Pilih Agenda Kajian</strong></label>
+                <select id="presensi-agenda-select" class="scanner-agenda-select" required>
+                  <option value="">Memuat agenda kajian...</option>
+                </select>
+              </div>
+
+              <div class="scanner-agenda-info" id="scanner-agenda-info">
+                <strong id="scanner-agenda-title">Belum ada agenda dipilih</strong>
+                <span id="scanner-agenda-time">Silakan pilih agenda kajian terlebih dahulu.</span>
+                <span id="scanner-agenda-location">Lokasi: -</span>
+              </div>
+
+              <div>
+                <strong>QR Code Anggota</strong>
+                <p class="scanner-member-notice">Arahkan kamera belakang HP ke QR Code anggota. Pastikan QR terlihat jelas dan pencahayaan cukup.</p>
+              </div>
+
+              <div class="scanner-camera-box">
+                <div id="qr-reader">
+                  <div class="scanner-camera-placeholder">
+                    <div>
+                      <div class="camera-icon">▣</div>
+                      <strong>Kamera belum diaktifkan</strong>
+                      <p>Tekan tombol Mulai Scanner untuk membuka kamera.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="scanner-controls">
+                <button type="button" class="scanner-button scanner-button-primary" id="btn-start-scanner">
+                  <span>▣</span> Mulai Scanner
+                </button>
+                <button type="button" class="scanner-button scanner-button-secondary" id="btn-stop-scanner" disabled>Hentikan Kamera</button>
+                <button type="button" class="scanner-button scanner-button-secondary" id="btn-resume-scanner" disabled>Scan Berikutnya</button>
+              </div>
+
+              <div class="scanner-status" id="scanner-status" role="status" aria-live="polite">
+                Sistem siap. Pilih agenda sebelum memulai pemindaian.
+              </div>
+
+              <div class="scanner-result" id="scanner-result" aria-live="polite">
+                <strong id="scanner-result-title">Hasil Presensi</strong>
+                <p id="scanner-result-message"></p>
+              </div>
+            </section>
+
+            <!-- TAMPILAN JIKA PENGGUNA BUKAN ADMIN -->
+            <div class="scanner-member-notice" id="scanner-member-notice" hidden>
+              Fitur pemindaian QR hanya dapat digunakan oleh Admin dan Super Admin. Riwayat kehadiran pribadi tetap dapat dilihat melalui bagian riwayat presensi.
+            </div>
+          </div>
+        </section>
+
+        <section class="attendance-panel">
+          <h3>Jadwal Kegiatan</h3>
+          <div class="attendance-empty" data-attendance-events>
+            Belum ada jadwal kegiatan yang ditampilkan. Jadwal akan dimuat dari data agenda TARBIYAH.
+          </div>
+        </section>
+      </div>
+
+      <!-- 5. RIWAYAT KEHADIRAN -->
+      <section class="attendance-panel" style="margin-top:18px;">
+        <h3>Riwayat Kehadiran</h3>
+
+        <div class="attendance-history-toolbar">
+          <input type="search" placeholder="Cari nama kegiatan..." aria-label="Cari riwayat kegiatan" data-attendance-history-search>
+          <select aria-label="Filter status kehadiran" data-attendance-history-filter>
+            <option value="">Semua status</option>
+            <option value="hadir">Hadir</option>
+            <option value="izin">Izin</option>
+            <option value="sakit">Sakit</option>
+          </select>
+        </div>
+
+        <div class="attendance-table-wrap">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Kegiatan</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody data-attendance-history>
+              <tr>
+                <td colspan="3">
+                  <div class="attendance-empty">
+                    Riwayat kehadiran belum tersedia. Data akan muncul setelah integrasi presensi selesai.
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="app-footer" style="padding: 24px 0 12px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary); text-align: center; font-size: .78rem;">
         <p>© <span data-current-year></span> TARBIYAH — Pembelajaran Muslim</p>
       </footer>
+
     </main>
   </div>
+
+  <!-- SUPABASE & SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  
+  <!-- SCRIPT TEMA -->
+  <script src="./js/tarbiyah-theme.js"></script>
+  
+  <script src="./js/presensi-api.js"></script>
+  <script src="./js/presensi-dashboard.js"></script>
+  <script src="./js/module.js"></script>
+  <script src="./js/module-shell.js"></script>
+  <script src="./js/pwa.js"></script>
+
+  <!-- QR SCANNER LIBRARY -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="./js/presensi-scanner.js"></script>
 
   <script>
     (() => {
@@ -1266,7 +579,6 @@ html[data-theme="light"] {
         const localDate = new Date(
           now.getTime() - now.getTimezoneOffset() * 60000
         ).toISOString().slice(0, 10);
-
         dateInput.value = localDate;
       }
 
@@ -1276,41 +588,12 @@ html[data-theme="light"] {
       if (form) {
         form.addEventListener("submit", event => {
           event.preventDefault();
-
           if (message) {
-            message.textContent =
-              "Presensi belum dikirim. Integrasi backend dan validasi kegiatan perlu diaktifkan terlebih dahulu.";
+            message.textContent = "Presensi belum dikirim. Integrasi backend dan validasi kegiatan perlu diaktifkan terlebih dahulu.";
           }
         });
       }
     })();
   </script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./js/config.js"></script>
-<script src="./js/supabase-client.js"></script>
-<script src="./js/auth.js"></script>
-<script src="./js/auth-guard.js"></script>
-<script src="./js/presensi-api.js"></script>
-<script src="./js/presensi-dashboard.js"></script>
-
-<!-- LEGACY THEME COMPATIBILITY BRIDGE -->
-<script src="./js/tarbiyah-theme.js"></script>
-<script src="./js/module.js"></script>
-<script src="./js/module-shell.js"></script>
-<script src="./js/pwa.js"></script>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="./js/presensi-scanner.js"></script>
-  
-  
-  
-  
-  
-<!-- QR SCANNER LIBRARY -->
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-
-<!-- TARBIYAH QR SCANNER -->
-<script src="./js/presensi-scanner.js"></script>
-
 </body>
 </html>
