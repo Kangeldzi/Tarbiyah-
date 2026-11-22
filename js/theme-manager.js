@@ -1,4 +1,3 @@
-
 /**
  * ============================================================
  * TARBIYAH — UNIVERSAL THEME MANAGER
@@ -134,50 +133,60 @@
      SINKRONISASI TOMBOL MASTER
      Jangan mengubah isi ikon ◐ atau struktur HTML tombol.
   ========================================================== */
-function updateThemeControls() {
-  const buttons = document.querySelectorAll(TOGGLE_SELECTOR);
-  const isDark = state.activeTheme === "dark";
 
-  buttons.forEach(button => {
-    // Simbol untuk tema berikutnya
-    button.textContent = isDark ? "☀" : "☾";
-
-    // Warna ikon ditentukan secara eksplisit
-    button.style.color = isDark
-      ? "#fbbf24"
-      : "#047857";
-
-    button.style.fontFamily =
-      "Arial, sans-serif";
-
-    button.style.fontSize = "21px";
-    button.style.fontWeight = "700";
-    button.style.lineHeight = "1";
-
-    button.style.display = "inline-flex";
-    button.style.alignItems = "center";
-    button.style.justifyContent = "center";
-
-    button.setAttribute(
-      "aria-label",
-      isDark
-        ? "Ganti ke mode terang"
-        : "Ganti ke mode gelap"
+  function updateThemeControls() {
+    const buttons = document.querySelectorAll(
+      TOGGLE_SELECTOR
     );
 
-    button.setAttribute(
-      "title",
-      isDark
-        ? "Ganti ke mode terang"
-        : "Ganti ke mode gelap"
-    );
+    buttons.forEach(button => {
+      const label = state.preference === "system"
+        ? `Tema sistem (${state.activeTheme})`
+        : state.activeTheme === "light"
+          ? "Tema terang"
+          : "Tema gelap";
 
-    button.setAttribute(
-      "aria-pressed",
-      String(isDark)
-    );
-  });
-}
+      button.setAttribute(
+        "aria-label",
+        `Mode tampilan: ${label}. Tekan untuk mengganti tema.`
+      );
+
+      button.setAttribute(
+        "aria-pressed",
+        state.activeTheme === "dark" ? "true" : "false"
+      );
+
+      button.setAttribute(
+        "title",
+        label
+      );
+
+      // PENTING:
+      // Tidak mengubah textContent, innerHTML,
+      // ikon, class, atau struktur tombol master.
+    });
+
+    document.querySelectorAll(OPTION_SELECTOR).forEach(option => {
+      const value = normalizeTheme(
+        option.dataset.themeOption
+      );
+
+      const active = value === state.preference;
+
+      option.classList.toggle("is-active", active);
+
+      if (active) {
+        option.setAttribute("aria-current", "true");
+      } else {
+        option.removeAttribute("aria-current");
+      }
+    });
+
+    emit("tarbiyah:theme-controls-updated", {
+      preference: state.preference,
+      activeTheme: state.activeTheme
+    });
+  }
 
   /* ==========================================================
      MENERAPKAN TEMA
