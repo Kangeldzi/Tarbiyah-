@@ -1,44 +1,19 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#102a22">
   <meta name="color-scheme" content="dark light">
-
-  <meta
-    name="description"
-    content="Masuk atau daftar akun TARBIYAH — Pembelajaran Muslim."
-  >
-
+  <meta name="description" content="Masuk atau daftar akun TARBIYAH — Pembelajaran Muslim.">
   <title>Masuk / Daftar — TARBIYAH</title>
 
   <link rel="manifest" href="./manifest.json">
-
-  <link
-    rel="icon"
-    type="image/png"
-    href="./assets/icons/icon-192.png"
-  >
-
-  <link
-    rel="apple-touch-icon"
-    href="./assets/icons/icon-192.png"
-  >
-
+  <link rel="icon" type="image/png" href="./assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- CSS -->
   <link rel="stylesheet" href="./css/variables.css">
@@ -46,33 +21,18 @@
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/authentication.css">
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      min-height: 100%;
-      margin: 0;
-    }
-
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
     body {
       min-height: 100vh;
       min-height: 100dvh;
       font-family: 'Inter', sans-serif;
       background:
-        radial-gradient(
-          circle at 15% 10%,
-          rgba(16, 185, 129, 0.13),
-          transparent 32%
-        ),
-        radial-gradient(
-          circle at 90% 90%,
-          rgba(52, 211, 153, 0.08),
-          transparent 30%
-        ),
+        radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.13), transparent 32%),
+        radial-gradient(circle at 90% 90%, rgba(52, 211, 153, 0.08), transparent 30%),
         var(--bg-primary, #081c17);
       color: var(--text-primary, #f0fdf4);
     }
@@ -84,10 +44,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding:
-        max(22px, env(safe-area-inset-top))
-        18px
-        max(22px, env(safe-area-inset-bottom));
+      padding: max(22px, env(safe-area-inset-top)) 18px max(22px, env(safe-area-inset-bottom));
     }
 
     .auth-topbar {
@@ -99,6 +56,7 @@
       margin: 0 auto 24px;
     }
 
+    /* PERBAIKAN TOMBOL BACK MENGGUNAKAN SVG UNIVERSAL */
     .auth-back-link {
       display: inline-flex;
       align-items: center;
@@ -111,18 +69,36 @@
     }
 
     .auth-back-link:hover {
-      color: #34d399;
+      color: var(--color-primary, #34d399);
     }
 
+    .auth-back-link svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    /* PERBAIKAN TOMBOL TEMA */
     .auth-theme-button {
-      width: 40px;
-      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
       border: 1px solid var(--border-color, rgba(110,231,183,.18));
       border-radius: 12px;
       background: var(--bg-card, #102a22);
       color: var(--text-primary, #f0fdf4);
       cursor: pointer;
-      font-size: 17px;
+      font-size: 1.25rem;
+      transition: all .2s ease;
+    }
+
+    .auth-theme-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
     }
 
     .auth-container {
@@ -147,16 +123,11 @@
       position: relative;
       overflow: hidden;
       background:
-        radial-gradient(
-          circle at 50% 35%,
-          rgba(52, 211, 153, 0.2),
-          transparent 45%
-        ),
+        radial-gradient(circle at 50% 35%, rgba(52, 211, 153, 0.2), transparent 45%),
         linear-gradient(145deg, #0b382a, #102a22 70%);
     }
 
-    .auth-visual::before,
-    .auth-visual::after {
+    .auth-visual::before, .auth-visual::after {
       content: "";
       position: absolute;
       border: 1px solid rgba(110, 231, 183, 0.12);
@@ -164,24 +135,10 @@
       pointer-events: none;
     }
 
-    .auth-visual::before {
-      width: 390px;
-      height: 390px;
-      top: -100px;
-      right: -180px;
-    }
+    .auth-visual::before { width: 390px; height: 390px; top: -100px; right: -180px; }
+    .auth-visual::after { width: 280px; height: 280px; bottom: -120px; left: -100px; }
 
-    .auth-visual::after {
-      width: 280px;
-      height: 280px;
-      bottom: -120px;
-      left: -100px;
-    }
-
-    .auth-visual-content {
-      position: relative;
-      z-index: 1;
-    }
+    .auth-visual-content { position: relative; z-index: 1; }
 
     .auth-logo-frame {
       width: 88px;
@@ -195,11 +152,7 @@
       box-shadow: 0 0 35px rgba(16, 185, 129, 0.16);
     }
 
-    .auth-logo-frame img {
-      width: 62px;
-      height: 62px;
-      object-fit: contain;
-    }
+    .auth-logo-frame img { width: 62px; height: 62px; object-fit: contain; }
 
     .auth-visual h1 {
       font-family: 'Poppins', sans-serif;
@@ -217,11 +170,7 @@
       margin: 0;
     }
 
-    .auth-feature-list {
-      display: grid;
-      gap: 17px;
-      margin-top: 38px;
-    }
+    .auth-feature-list { display: grid; gap: 17px; margin-top: 38px; }
 
     .auth-feature {
       display: flex;
@@ -250,23 +199,9 @@
       min-width: 0;
     }
 
-    .auth-heading {
-      margin-bottom: 26px;
-    }
-
-    .auth-heading h2 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 25px;
-      font-weight: 700;
-      margin: 0 0 9px;
-    }
-
-    .auth-heading p {
-      color: var(--text-secondary, #a7c8ba);
-      font-size: 13px;
-      line-height: 1.7;
-      margin: 0;
-    }
+    .auth-heading { margin-bottom: 26px; }
+    .auth-heading h2 { font-family: 'Poppins', sans-serif; font-size: 25px; font-weight: 700; margin: 0 0 9px; }
+    .auth-heading p { color: var(--text-secondary, #a7c8ba); font-size: 13px; line-height: 1.7; margin: 0; }
 
     .auth-tabs {
       display: grid;
@@ -291,33 +226,17 @@
       transition: 0.2s ease;
     }
 
-    .auth-tab.active,
-    .auth-tab[aria-selected="true"] {
+    .auth-tab.active, .auth-tab[aria-selected="true"] {
       color: #ffffff;
       background: #059669;
       box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);
     }
 
-    .auth-form {
-      width: 100%;
-    }
+    .auth-form { width: 100%; }
+    .auth-form[hidden] { display: none !important; }
 
-    .auth-form[hidden] {
-      display: none !important;
-    }
-
-    .auth-field {
-      margin-bottom: 17px;
-    }
-
-    .auth-field label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text-primary, #ecfdf5);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
+    .auth-field { margin-bottom: 17px; }
+    .auth-field label { display: block; margin-bottom: 8px; color: var(--text-primary, #ecfdf5); font-size: 12px; font-weight: 700; }
     .auth-field input {
       width: 100%;
       min-height: 47px;
@@ -332,23 +251,11 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .auth-field input:focus {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
-    }
+    .auth-field input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12); }
+    .auth-field input::placeholder { color: var(--text-muted, #78998a); }
 
-    .auth-field input::placeholder {
-      color: var(--text-muted, #78998a);
-    }
-
-    .auth-password-wrap {
-      position: relative;
-    }
-
-    .auth-password-wrap input {
-      padding-right: 48px;
-    }
-
+    .auth-password-wrap { position: relative; }
+    .auth-password-wrap input { padding-right: 48px; }
     .auth-password-toggle {
       position: absolute;
       top: 50%;
@@ -363,38 +270,13 @@
       cursor: pointer;
     }
 
-    .auth-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 5px 0 20px;
-      font-size: 12px;
-    }
+    .auth-options { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 5px 0 20px; font-size: 12px; }
+    .auth-remember { display: inline-flex; align-items: center; gap: 7px; color: var(--text-secondary, #a7c8ba); }
+    .auth-remember input, .auth-terms input { accent-color: #10b981; }
+    .auth-link { color: #34d399; text-decoration: none; font-weight: 700; cursor: pointer; }
+    .auth-link:hover { text-decoration: underline; }
 
-    .auth-remember {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: var(--text-secondary, #a7c8ba);
-    }
-
-    .auth-remember input,
-    .auth-terms input {
-      accent-color: #10b981;
-    }
-
-    .auth-link {
-      color: #34d399;
-      text-decoration: none;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-link:hover {
-      text-decoration: underline;
-    }
-
+    /* PERBAIKAN TOMBOL SUBMIT MENGGUNAKAN SVG UNIVERSAL */
     .auth-submit {
       width: 100%;
       min-height: 49px;
@@ -414,1378 +296,384 @@
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .auth-submit:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 26px rgba(16, 185, 129, 0.3);
+    .auth-submit:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(16, 185, 129, 0.3); }
+    .auth-submit:disabled { opacity: 0.65; cursor: wait; transform: none; }
+
+    .auth-submit svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      fill: none;
     }
 
-    .auth-submit:disabled {
-      opacity: 0.65;
-      cursor: wait;
-      transform: none;
-    }
+    .auth-terms { display: flex; align-items: flex-start; gap: 9px; margin: 4px 0 20px; color: var(--text-secondary, #a7c8ba); font-size: 11px; line-height: 1.7; }
+    .auth-alert { display: none; padding: 12px 14px; margin-bottom: 18px; border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 11px; background: rgba(16, 185, 129, 0.08); color: var(--text-primary, #ecfdf5); font-size: 12px; line-height: 1.7; }
+    .auth-alert:not(:empty) { display: block; }
+    .auth-alert[data-type="error"] { border-color: rgba(248, 113, 113, 0.35); background: rgba(248, 113, 113, 0.08); }
+    .auth-alert[data-type="success"] { border-color: rgba(52, 211, 153, 0.35); background: rgba(52, 211, 153, 0.08); }
 
-    .auth-terms {
-      display: flex;
-      align-items: flex-start;
-      gap: 9px;
-      margin: 4px 0 20px;
-      color: var(--text-secondary, #a7c8ba);
-      font-size: 11px;
-      line-height: 1.7;
-    }
-
-    .auth-alert {
-      display: none;
-      padding: 12px 14px;
-      margin-bottom: 18px;
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      border-radius: 11px;
-      background: rgba(16, 185, 129, 0.08);
-      color: var(--text-primary, #ecfdf5);
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .auth-alert:not(:empty) {
-      display: block;
-    }
-
-    .auth-alert[data-type="error"] {
-      border-color: rgba(248, 113, 113, 0.35);
-      background: rgba(248, 113, 113, 0.08);
-    }
-
-    .auth-alert[data-type="success"] {
-      border-color: rgba(52, 211, 153, 0.35);
-      background: rgba(52, 211, 153, 0.08);
-    }
-
-    .auth-bottom {
-      margin-top: 23px;
-      text-align: center;
-      color: var(--text-secondary, #a7c8ba);
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .auth-bottom button {
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: #34d399;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-footer {
-      margin-top: 24px;
-      text-align: center;
-      color: var(--text-muted, #78998a);
-      font-size: 10px;
-    }
-
-    .auth-pending {
-      visibility: hidden;
-    }
+    .auth-bottom { margin-top: 23px; text-align: center; color: var(--text-secondary, #a7c8ba); font-size: 12px; line-height: 1.7; }
+    .auth-bottom button { padding: 0; border: 0; background: transparent; color: #34d399; font: inherit; font-weight: 700; cursor: pointer; }
+    .auth-footer { margin-top: 24px; text-align: center; color: var(--text-muted, #78998a); font-size: 10px; }
+    .auth-pending { visibility: hidden; }
 
     @media (max-width: 760px) {
-      .auth-page {
-        justify-content: flex-start;
-        padding-top: max(18px, env(safe-area-inset-top));
-      }
-
-      .auth-topbar {
-        margin-bottom: 15px;
-      }
-
-      .auth-container {
-        max-width: 480px;
-        grid-template-columns: 1fr;
-        border-radius: 21px;
-      }
-
-      .auth-visual {
-        min-height: auto;
-        padding: 25px 24px;
-      }
-
-      .auth-logo-frame {
-        width: 58px;
-        height: 58px;
-        border-radius: 17px;
-        margin-bottom: 15px;
-      }
-
-      .auth-logo-frame img {
-        width: 42px;
-        height: 42px;
-      }
-
-      .auth-visual h1 {
-        font-size: 23px;
-        margin-bottom: 8px;
-      }
-
-      .auth-visual p {
-        font-size: 12px;
-        line-height: 1.6;
-      }
-
-      .auth-feature-list {
-        display: none;
-      }
-
-      .auth-wrapper {
-        padding: 29px 23px 30px;
-      }
-
-      .auth-heading {
-        margin-bottom: 21px;
-      }
-
-      .auth-heading h2 {
-        font-size: 22px;
-      }
+      .auth-page { justify-content: flex-start; padding-top: max(18px, env(safe-area-inset-top)); }
+      .auth-topbar { margin-bottom: 15px; }
+      .auth-container { max-width: 480px; grid-template-columns: 1fr; border-radius: 21px; }
+      .auth-visual { min-height: auto; padding: 25px 24px; }
+      .auth-logo-frame { width: 58px; height: 58px; border-radius: 17px; margin-bottom: 15px; }
+      .auth-logo-frame img { width: 42px; height: 42px; }
+      .auth-visual h1 { font-size: 23px; margin-bottom: 8px; }
+      .auth-visual p { font-size: 12px; line-height: 1.6; }
+      .auth-feature-list { display: none; }
+      .auth-wrapper { padding: 29px 23px 30px; }
+      .auth-heading { margin-bottom: 21px; }
+      .auth-heading h2 { font-size: 22px; }
     }
 
     @media (max-width: 360px) {
-      .auth-wrapper {
-        padding-left: 17px;
-        padding-right: 17px;
-      }
-
-      .auth-options {
-        font-size: 11px;
-      }
+      .auth-wrapper { padding-left: 17px; padding-right: 17px; }
+      .auth-options { font-size: 11px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-      }
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
     }
 
-
-/* =========================================================
-   TARBIYAH — AUTH UI REFINEMENT
-   Perbaikan identitas, checkbox, tab, dan tombol tema
-   ========================================================= */
-
-/* 1. Susunan utama: identitas di atas formulir */
-.auth-container {
-  display: flex !important;
-  flex-direction: column;
-  width: 100%;
-  max-width: 540px;
-  min-height: auto;
-  margin-inline: auto;
-  border-radius: 24px;
-}
-
-.auth-visual {
-  min-height: auto;
-  padding: 30px 28px 16px;
-  text-align: center;
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(52, 211, 153, .19),
-      transparent 70%
-    ),
-    linear-gradient(145deg, #0b382a, #102a22 75%);
-}
-
-.auth-visual-content {
-  width: 100%;
-  max-width: 440px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-/* 2. Logo dan nama TARBIYAH */
-.auth-logo-frame {
-  width: 76px;
-  height: 76px;
-  margin: 0 auto 13px;
-  border-radius: 21px;
-}
-
-.auth-logo-frame img {
-  width: 54px;
-  height: 54px;
-}
-
-.auth-visual h1 {
-  margin: 0 0 8px;
-  font-size: clamp(25px, 5vw, 31px);
-  font-weight: 800;
-  letter-spacing: .07em;
-  text-align: center;
-}
-
-.auth-visual p {
-  max-width: 390px;
-  margin: 0 auto;
-  font-size: 12.5px;
-  line-height: 1.75;
-  text-align: center;
-}
-
-.auth-feature-list {
-  display: none;
-}
-
-/* 3. Formulir */
-.auth-wrapper {
-  width: 100%;
-  min-height: auto;
-  padding: 20px 34px 30px;
-}
-
-.auth-heading {
-  margin-bottom: 22px;
-  text-align: center;
-}
-
-.auth-heading h2,
-.auth-heading p {
-  text-align: center;
-}
-
-/* 4. Tab Masuk dan Daftar */
-.auth-tabs {
-  width: 100%;
-  padding: 5px;
-  gap: 6px;
-  border: 1px solid var(--border-color, rgba(110,231,183,.18));
-  border-radius: 14px;
-}
-
-.auth-tab {
-  min-height: 43px;
-  border-radius: 10px;
-  color: var(--text-secondary, #a7c8ba);
-  background: transparent;
-  transition:
-    color .22s ease,
-    background .22s ease,
-    box-shadow .22s ease,
-    transform .22s ease;
-}
-
-.auth-tab.active,
-.auth-tab[aria-selected="true"] {
-  color: #fff !important;
-  background: linear-gradient(135deg, #059669, #10b981) !important;
-  box-shadow: 0 4px 13px rgba(16,185,129,.22);
-}
-
-.auth-tab:not(.active):not([aria-selected="true"]) {
-  color: var(--text-secondary, #a7c8ba);
-  background: transparent;
-  box-shadow: none;
-}
-
-/* 5. Checkbox persetujuan */
-.auth-terms {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  width: 100%;
-  margin: 5px 0 18px;
-  font-size: 11.5px;
-  line-height: 1.65;
-  cursor: pointer;
-}
-
-.auth-terms input[type="checkbox"] {
-  appearance: auto;
-  -webkit-appearance: checkbox;
-  display: block;
-  flex: 0 0 17px;
-  width: 17px !important;
-  min-width: 17px;
-  max-width: 17px;
-  height: 17px;
-  min-height: 17px !important;
-  margin: 2px 0 0;
-  padding: 0;
-  accent-color: #10b981;
-  cursor: pointer;
-}
-
-.auth-terms span {
-  flex: 1;
-  min-width: 0;
-  display: block;
-  overflow-wrap: anywhere;
-}
-
-/* 6. Tombol tema */
-.auth-theme-button {
-  position: relative;
-  display: inline-grid;
-  place-items: center;
-  flex: 0 0 42px;
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--border-color, rgba(110,231,183,.22));
-  border-radius: 14px;
-  background: var(--bg-card, #102a22);
-  color: var(--text-primary, #f0fdf4);
-  font-size: 19px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0,0,0,.12);
-  transition:
-    transform .2s ease,
-    background .2s ease,
-    border-color .2s ease,
-    box-shadow .2s ease;
-}
-
-.auth-theme-button:hover {
-  transform: translateY(-2px);
-  border-color: #10b981;
-  box-shadow: 0 5px 17px rgba(16,185,129,.2);
-}
-
-.auth-theme-button:active {
-  transform: scale(.95);
-}
-
-.auth-theme-button:focus-visible,
-.auth-tab:focus-visible {
-  outline: 3px solid rgba(16,185,129,.35);
-  outline-offset: 3px;
-}
-
-/* 7. Tema terang */
-[data-theme="light"] .auth-visual {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(16,185,129,.13), transparent 70%),
-    linear-gradient(145deg, #e6f8ef, #f2fbf5 75%);
-}
-
-[data-theme="light"] .auth-visual h1 {
-  color: #075c42;
-}
-
-[data-theme="light"] .auth-visual p {
-  color: #376b57;
-}
-
-[data-theme="light"] .auth-theme-button {
-  background: #ffffff;
-  color: #075c42;
-  border-color: rgba(5,150,105,.2);
-}
-
-/* 8. Mobile */
-@media (max-width: 760px) {
-  .auth-page {
-    justify-content: flex-start;
-    padding: max(15px, env(safe-area-inset-top)) 14px
-             max(20px, env(safe-area-inset-bottom));
-  }
-
-  .auth-topbar {
-    max-width: 540px;
-    margin-bottom: 14px;
-  }
-
-  .auth-container {
-    max-width: 480px;
-    border-radius: 21px;
-  }
-
-  .auth-visual {
-    display: block;
-    padding: 24px 20px 12px;
-  }
-
-  .auth-logo-frame {
-    width: 65px;
-    height: 65px;
-    margin-bottom: 11px;
-    border-radius: 18px;
-  }
-
-  .auth-logo-frame img {
-    width: 47px;
-    height: 47px;
-  }
-
-  .auth-visual h1 {
-    font-size: 25px;
-  }
-
-  .auth-visual p {
-    max-width: 350px;
-    font-size: 11.5px;
-  }
-
-  .auth-wrapper {
-    padding: 19px 22px 25px;
-  }
-
-  .auth-heading {
-    margin-bottom: 19px;
-  }
-}
-
-@media (max-width: 360px) {
-  .auth-page {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .auth-visual {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .auth-wrapper {
-    padding-left: 17px;
-    padding-right: 17px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .auth-container,
-  .auth-tab,
-  .auth-theme-button {
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-/* ==========================================
-   TARBIYAH — PREMIUM LOGO LIGHT ANIMATION
-   Kilatan acak empat arah, durasi 3 detik
-   ========================================== */
-
-/* Logo: denyut cahaya */
-.brand-mark,
-.auth-logo-frame {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  animation: tarbiyahLogoPulse 3s ease-in-out infinite;
-}
-
-/* Lapisan kilatan cahaya */
-.brand-mark::before,
-.auth-logo-frame::before {
-  content: "";
-  position: absolute;
-  z-index: 5;
-  inset: -65% -45%;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(
-    112deg,
-    transparent 39%,
-    rgba(255,255,255,0) 43%,
-    rgba(255,248,218,.20) 47%,
-    rgba(255,255,255,.95) 50%,
-    rgba(255,226,151,.55) 53%,
-    rgba(255,255,255,0) 58%,
-    transparent 62%
-  );
-  mix-blend-mode: screen;
-  transform: translate3d(-90%, 0, 0) rotate(-14deg);
-}
-
-/* Empat arah kilatan */
-.brand-mark.shine-left::before,
-.auth-logo-frame.shine-left::before {
-  animation: tarbiyahShineLeft 3s ease-in-out both;
-}
-
-.brand-mark.shine-right::before,
-.auth-logo-frame.shine-right::before {
-  animation: tarbiyahShineRight 3s ease-in-out both;
-}
-
-.brand-mark.shine-up::before,
-.auth-logo-frame.shine-up::before {
-  animation: tarbiyahShineUp 3s ease-in-out both;
-}
-
-.brand-mark.shine-down::before,
-.auth-logo-frame.shine-down::before {
-  animation: tarbiyahShineDown 3s ease-in-out both;
-}
-
-/* Cahaya pada gambar logo */
-.brand-mark img,
-.auth-logo-frame img {
-  position: relative;
-  z-index: 2;
-  animation: tarbiyahLogoBlink 3s ease-in-out infinite;
-}
-
-/* Kilauan bergerak pada tulisan TARBIYAH */
-.brand-title,
-.auth-visual h1,
-.auth-heading h2 {
-  background: linear-gradient(
-    100deg,
-    #fff3cc 0%,
-    #d6b56d 30%,
-    #ffffff 50%,
-    #d6b56d 70%,
-    #fff3cc 100%
-  );
-  background-size: 220% auto;
-  color: transparent !important;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: tarbiyahTextShimmer 3s linear infinite;
-  filter: drop-shadow(0 0 9px rgba(214,181,109,.18));
-}
-
-/* Denyut cahaya bingkai logo */
-@keyframes tarbiyahLogoPulse {
-  0%, 100% {
-    box-shadow:
-      0 0 20px rgba(214,181,109,.18),
-      inset 0 0 20px rgba(255,255,255,.04);
-  }
-  50% {
-    box-shadow:
-      0 0 38px rgba(214,181,109,.48),
-      inset 0 0 30px rgba(255,255,255,.12);
-  }
-}
-
-/* Efek blink gambar logo */
-@keyframes tarbiyahLogoBlink {
-  0%, 100% {
-    filter: drop-shadow(0 0 7px rgba(240,220,167,.38)) brightness(1);
-  }
-  48% {
-    filter: drop-shadow(0 0 15px rgba(255,225,151,.75)) brightness(1.12);
-  }
-  53% {
-    filter: drop-shadow(0 0 23px rgba(255,255,225,.95)) brightness(1.2);
-  }
-  58% {
-    filter: drop-shadow(0 0 10px rgba(240,220,167,.55)) brightness(1.04);
-  }
-}
-
-/* Kilatan kiri ke kanan */
-@keyframes tarbiyahShineLeft {
-  0%, 10% {
-    opacity: 0;
-    transform: translate3d(-90%,0,0) rotate(-14deg);
-  }
-  25% { opacity: .95; }
-  90%, 100% {
-    opacity: 0;
-    transform: translate3d(90%,0,0) rotate(-14deg);
-  }
-}
-
-/* Kilatan kanan ke kiri */
-@keyframes tarbiyahShineRight {
-  0%, 10% {
-    opacity: 0;
-    transform: translate3d(90%,0,0) rotate(166deg);
-  }
-  25% { opacity: .95; }
-  90%, 100% {
-    opacity: 0;
-    transform: translate3d(-90%,0,0) rotate(166deg);
-  }
-}
-
-/* Kilatan bawah ke atas */
-@keyframes tarbiyahShineUp {
-  0%, 10% {
-    opacity: 0;
-    transform: translate3d(0,90%,0) rotate(76deg);
-  }
-  25% { opacity: .95; }
-  90%, 100% {
-    opacity: 0;
-    transform: translate3d(0,-90%,0) rotate(76deg);
-  }
-}
-
-/* Kilatan atas ke bawah */
-@keyframes tarbiyahShineDown {
-  0%, 10% {
-    opacity: 0;
-    transform: translate3d(0,-90%,0) rotate(-104deg);
-  }
-  25% { opacity: .95; }
-  90%, 100% {
-    opacity: 0;
-    transform: translate3d(0,90%,0) rotate(-104deg);
-  }
-}
-
-/* Shimmer tulisan */
-@keyframes tarbiyahTextShimmer {
-  to { background-position: 220% center; }
-}
-
-/* Hormati pengaturan pengurangan animasi perangkat */
-@media (prefers-reduced-motion: reduce) {
-  .brand-mark,
-  .auth-logo-frame,
-  .brand-mark img,
-  .auth-logo-frame img,
-  .brand-title,
-  .auth-visual h1,
-  .auth-heading h2 {
-    animation: none !important;
-  }
-}
-
-
-/* TARBIYAH — TAB AKTIF MASUK / DAFTAR */
-.auth-tabs {
-  display: flex !important;
-  gap: 8px !important;
-  padding: 5px !important;
-  border-radius: 14px !important;
-  background: rgba(120, 140, 130, .12) !important;
-}
-
-.auth-tabs #loginTab,
-.auth-tabs #registerTab {
-  flex: 1 1 50% !important;
-  min-height: 43px !important;
-  border: 1px solid transparent !important;
-  border-radius: 10px !important;
-  background: transparent !important;
-  color: var(--text-secondary, #94a3a0) !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  transition: all .25s ease !important;
-}
-
-/* Status aktif */
-.auth-tabs #loginTab.active,
-.auth-tabs #registerTab.active,
-.auth-tabs #loginTab[aria-selected="true"],
-.auth-tabs #registerTab[aria-selected="true"] {
-  color: #fff !important;
-  background: linear-gradient(135deg, #159b68, #08764e) !important;
-  border-color: rgba(110, 231, 183, .45) !important;
-  box-shadow: 0 5px 16px rgba(13, 148, 89, .28) !important;
-}
-
-/* Status tidak aktif */
-.auth-tabs #loginTab:not(.active):not([aria-selected="true"]),
-.auth-tabs #registerTab:not(.active):not([aria-selected="true"]) {
-  color: var(--text-secondary, #94a3a0) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-color: transparent !important;
-}
-
+    /* TARBIYAH — AUTH UI REFINEMENT */
+    .auth-container { display: flex !important; flex-direction: column; width: 100%; max-width: 540px; min-height: auto; margin-inline: auto; border-radius: 24px; }
+    .auth-visual { min-height: auto; padding: 30px 28px 16px; text-align: center; background: radial-gradient(circle at 50% 0%, rgba(52, 211, 153, .19), transparent 70%), linear-gradient(145deg, #0b382a, #102a22 75%); }
+    .auth-visual-content { width: 100%; max-width: 440px; margin: 0 auto; text-align: center; }
+    .auth-logo-frame { width: 76px; height: 76px; margin: 0 auto 13px; border-radius: 21px; }
+    .auth-logo-frame img { width: 54px; height: 54px; }
+    .auth-visual h1 { margin: 0 0 8px; font-size: clamp(25px, 5vw, 31px); font-weight: 800; letter-spacing: .07em; text-align: center; }
+    .auth-visual p { max-width: 390px; margin: 0 auto; font-size: 12.5px; line-height: 1.75; text-align: center; }
+    .auth-feature-list { display: none; }
+    .auth-wrapper { width: 100%; min-height: auto; padding: 20px 34px 30px; }
+    .auth-heading { margin-bottom: 22px; text-align: center; }
+    .auth-heading h2, .auth-heading p { text-align: center; }
+    .auth-tabs { width: 100%; padding: 5px; gap: 6px; border: 1px solid var(--border-color, rgba(110,231,183,.18)); border-radius: 14px; }
+    .auth-tab { min-height: 43px; border-radius: 10px; color: var(--text-secondary, #a7c8ba); background: transparent; transition: color .22s ease, background .22s ease, box-shadow .22s ease, transform .22s ease; }
+    .auth-tab.active, .auth-tab[aria-selected="true"] { color: #fff !important; background: linear-gradient(135deg, #059669, #10b981) !important; box-shadow: 0 4px 13px rgba(16,185,129,.22); }
+    .auth-tab:not(.active):not([aria-selected="true"]) { color: var(--text-secondary, #a7c8ba); background: transparent; box-shadow: none; }
+    .auth-terms { display: flex; align-items: flex-start; gap: 10px; width: 100%; margin: 5px 0 18px; font-size: 11.5px; line-height: 1.65; cursor: pointer; }
+    .auth-terms input[type="checkbox"] { appearance: auto; -webkit-appearance: checkbox; display: block; flex: 0 0 17px; width: 17px !important; min-width: 17px; max-width: 17px; height: 17px; min-height: 17px !important; margin: 2px 0 0; padding: 0; accent-color: #10b981; cursor: pointer; }
+    .auth-terms span { flex: 1; min-width: 0; display: block; overflow-wrap: anywhere; }
+    
+    [data-theme="light"] .auth-visual { background: radial-gradient(circle at 50% 0%, rgba(16,185,129,.13), transparent 70%), linear-gradient(145deg, #e6f8ef, #f2fbf5 75%); }
+    [data-theme="light"] .auth-visual h1 { color: #075c42; }
+    [data-theme="light"] .auth-visual p { color: #376b57; }
+    [data-theme="light"] .auth-theme-button { background: #ffffff; color: #075c42; border-color: rgba(5,150,105,.2); }
+
+    @media (max-width: 760px) {
+      .auth-page { justify-content: flex-start; padding: max(15px, env(safe-area-inset-top)) 14px max(20px, env(safe-area-inset-bottom)); }
+      .auth-topbar { max-width: 540px; margin-bottom: 14px; }
+      .auth-container { max-width: 480px; border-radius: 21px; }
+      .auth-visual { display: block; padding: 24px 20px 12px; }
+      .auth-logo-frame { width: 65px; height: 65px; margin-bottom: 11px; border-radius: 18px; }
+      .auth-logo-frame img { width: 47px; height: 47px; }
+      .auth-visual h1 { font-size: 25px; }
+      .auth-visual p { max-width: 350px; font-size: 11.5px; }
+      .auth-wrapper { padding: 19px 22px 25px; }
+      .auth-heading { margin-bottom: 19px; }
+    }
+
+    @media (max-width: 360px) {
+      .auth-page { padding-left: 10px; padding-right: 10px; }
+      .auth-visual { padding-left: 16px; padding-right: 16px; }
+      .auth-wrapper { padding-left: 17px; padding-right: 17px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .auth-container, .auth-tab, .auth-theme-button { transition: none !important; animation: none !important; }
+    }
+
+    /* ANIMASI KILAUAN LOGO */
+    .brand-mark, .auth-logo-frame { position: relative; isolation: isolate; overflow: hidden; animation: tarbiyahLogoPulse 3s ease-in-out infinite; }
+    .brand-mark::before, .auth-logo-frame::before {
+      content: ""; position: absolute; z-index: 5; inset: -65% -45%; pointer-events: none; opacity: 0;
+      background: linear-gradient(112deg, transparent 39%, rgba(255,255,255,0) 43%, rgba(255,248,218,.20) 47%, rgba(255,255,255,.95) 50%, rgba(255,226,151,.55) 53%, rgba(255,255,255,0) 58%, transparent 62%);
+      mix-blend-mode: screen; transform: translate3d(-90%, 0, 0) rotate(-14deg);
+    }
+    .brand-mark.shine-left::before, .auth-logo-frame.shine-left::before { animation: tarbiyahShineLeft 3s ease-in-out both; }
+    .brand-mark.shine-right::before, .auth-logo-frame.shine-right::before { animation: tarbiyahShineRight 3s ease-in-out both; }
+    .brand-mark.shine-up::before, .auth-logo-frame.shine-up::before { animation: tarbiyahShineUp 3s ease-in-out both; }
+    .brand-mark.shine-down::before, .auth-logo-frame.shine-down::before { animation: tarbiyahShineDown 3s ease-in-out both; }
+    .brand-mark img, .auth-logo-frame img { position: relative; z-index: 2; animation: tarbiyahLogoBlink 3s ease-in-out infinite; }
+    .brand-title, .auth-visual h1, .auth-heading h2 {
+      background: linear-gradient(100deg, #fff3cc 0%, #d6b56d 30%, #ffffff 50%, #d6b56d 70%, #fff3cc 100%);
+      background-size: 220% auto; color: transparent !important; -webkit-background-clip: text; background-clip: text;
+      animation: tarbiyahTextShimmer 3s linear infinite; filter: drop-shadow(0 0 9px rgba(214,181,109,.18));
+    }
+
+    @keyframes tarbiyahLogoPulse { 0%, 100% { box-shadow: 0 0 20px rgba(214,181,109,.18), inset 0 0 20px rgba(255,255,255,.04); } 50% { box-shadow: 0 0 38px rgba(214,181,109,.48), inset 0 0 30px rgba(255,255,255,.12); } }
+    @keyframes tarbiyahLogoBlink { 0%, 100% { filter: drop-shadow(0 0 7px rgba(240,220,167,.38)) brightness(1); } 48% { filter: drop-shadow(0 0 15px rgba(255,225,151,.75)) brightness(1.12); } 53% { filter: drop-shadow(0 0 23px rgba(255,255,225,.95)) brightness(1.2); } 58% { filter: drop-shadow(0 0 10px rgba(240,220,167,.55)) brightness(1.04); } }
+    @keyframes tarbiyahShineLeft { 0%, 10% { opacity: 0; transform: translate3d(-90%,0,0) rotate(-14deg); } 25% { opacity: .95; } 90%, 100% { opacity: 0; transform: translate3d(90%,0,0) rotate(-14deg); } }
+    @keyframes tarbiyahShineRight { 0%, 10% { opacity: 0; transform: translate3d(90%,0,0) rotate(166deg); } 25% { opacity: .95; } 90%, 100% { opacity: 0; transform: translate3d(-90%,0,0) rotate(166deg); } }
+    @keyframes tarbiyahShineUp { 0%, 10% { opacity: 0; transform: translate3d(0,90%,0) rotate(76deg); } 25% { opacity: .95; } 90%, 100% { opacity: 0; transform: translate3d(0,-90%,0) rotate(76deg); } }
+    @keyframes tarbiyahShineDown { 0%, 10% { opacity: 0; transform: translate3d(0,-90%,0) rotate(-104deg); } 25% { opacity: .95; } 90%, 100% { opacity: 0; transform: translate3d(0,90%,0) rotate(-104deg); } }
+    @keyframes tarbiyahTextShimmer { to { background-position: 220% center; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .brand-mark, .auth-logo-frame, .brand-mark img, .auth-logo-frame img, .brand-title, .auth-visual h1, .auth-heading h2 { animation: none !important; }
+    }
+
+    /* SINKRONISASI TAB */
+    .auth-tabs { display: flex !important; gap: 8px !important; padding: 5px !important; border-radius: 14px !important; background: rgba(120, 140, 130, .12) !important; }
+    .auth-tabs #loginTab, .auth-tabs #registerTab { flex: 1 1 50% !important; min-height: 43px !important; border: 1px solid transparent !important; border-radius: 10px !important; background: transparent !important; color: var(--text-secondary, #94a3a0) !important; font-weight: 700 !important; cursor: pointer !important; transition: all .25s ease !important; }
+    .auth-tabs #loginTab.active, .auth-tabs #registerTab.active, .auth-tabs #loginTab[aria-selected="true"], .auth-tabs #registerTab[aria-selected="true"] { color: #fff !important; background: linear-gradient(135deg, #159b68, #08764e) !important; border-color: rgba(110, 231, 183, .45) !important; box-shadow: 0 5px 16px rgba(13, 148, 89, .28) !important; }
+    .auth-tabs #loginTab:not(.active):not([aria-selected="true"]), .auth-tabs #registerTab:not(.active):not([aria-selected="true"]) { color: var(--text-secondary, #94a3a0) !important; background: transparent !important; box-shadow: none !important; border-color: transparent !important; }
   </style>
 </head>
 
-<body>
+<body class="auth-pending">
 
   <main class="auth-page">
 
     <!-- TOP BAR -->
     <div class="auth-topbar">
-
       <a href="./index.html" class="auth-back-link">
-        <span aria-hidden="true">←</span>
+        <!-- IKON SVG PANAH KIRI -->
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
         <span>Kembali ke Beranda</span>
       </a>
 
-      <button
-        type="button"
-        class="auth-theme-button"
-        data-theme-toggle
-        aria-label="Ganti tema"
-        title="Ganti tema"
-      >
-        ◐
+      <!-- TOMBOL TEMA -->
+      <button type="button" id="btnTheme" class="auth-theme-button" aria-label="Ubah tema">
+        ☀
       </button>
-
     </div>
-
 
     <!-- AUTH CONTAINER -->
     <section class="auth-container">
-
       <!-- VISUAL PANEL -->
       <aside class="auth-visual">
-
         <div class="auth-visual-content">
-
           <div class="auth-logo-frame">
-            <img
-              src="./assets/icons/icon-192.png"
-              alt="Logo TARBIYAH"
-              width="62"
-              height="62"
-            >
+            <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH" width="62" height="62">
           </div>
-
-          <h1>
-            TARBIYAH
-          </h1>
-
-          <p>
-            Ruang belajar, kajian, dan ukhuwah untuk
-            membangun ilmu, memperkuat iman, serta
-            menumbuhkan kebaikan bersama.
-          </p>
-
+          <h1>TARBIYAH</h1>
+          <p>Ruang belajar, kajian, dan ukhuwah untuk membangun ilmu, memperkuat iman, serta menumbuhkan kebaikan bersama.</p>
           <div class="auth-feature-list">
-
-            <div class="auth-feature">
-              <span class="auth-feature-icon">✦</span>
-              <span>Pembelajaran dan materi keislaman</span>
-            </div>
-
-            <div class="auth-feature">
-              <span class="auth-feature-icon">◷</span>
-              <span>Agenda kajian dan kegiatan</span>
-            </div>
-
-            <div class="auth-feature">
-              <span class="auth-feature-icon">♧</span>
-              <span>Komunitas dan ukhuwah Muslim</span>
-            </div>
-
+            <div class="auth-feature"><span class="auth-feature-icon">✦</span><span>Pembelajaran dan materi keislaman</span></div>
+            <div class="auth-feature"><span class="auth-feature-icon">◷</span><span>Agenda kajian dan kegiatan</span></div>
+            <div class="auth-feature"><span class="auth-feature-icon">♧</span><span>Komunitas dan ukhuwah Muslim</span></div>
           </div>
-
         </div>
-
       </aside>
-
 
       <!-- FORM PANEL -->
       <div class="auth-wrapper">
-
         <header class="auth-heading">
-
-          <h2 id="formTitle">
-            Selamat Datang
-          </h2>
-
-          <p id="formSubtitle">
-            Masuk ke akun TARBIYAH untuk melanjutkan
-            perjalanan belajar dan bertumbuh.
-          </p>
-
+          <h2 id="formTitle">Selamat Datang</h2>
+          <p id="formSubtitle">Masuk ke akun TARBIYAH untuk melanjutkan perjalanan belajar dan bertumbuh.</p>
         </header>
 
-
         <!-- TAB LOGIN / REGISTER -->
-        <div
-          class="auth-tabs"
-          role="tablist"
-          aria-label="Pilihan autentikasi"
-        >
-
-          <button
-            type="button"
-            class="auth-tab active"
-            id="loginTab"
-            role="tab"
-            aria-selected="true"
-            aria-controls="loginForm"
-          >
-            Masuk
-          </button>
-
-          <button
-            type="button"
-            class="auth-tab"
-            id="registerTab"
-            role="tab"
-            aria-selected="false"
-            aria-controls="registerForm"
-          >
-            Daftar
-          </button>
-
+        <div class="auth-tabs" role="tablist" aria-label="Pilihan autentikasi">
+          <button type="button" class="auth-tab active" id="loginTab" role="tab" aria-selected="true" aria-controls="loginForm">Masuk</button>
+          <button type="button" class="auth-tab" id="registerTab" role="tab" aria-selected="false" aria-controls="registerForm">Daftar</button>
         </div>
 
-
         <!-- NOTIFIKASI AUTH -->
-        <div
-          class="auth-alert"
-          id="authAlert"
-          role="status"
-          aria-live="polite"
-        ></div>
+        <div class="auth-alert" id="authAlert" role="status" aria-live="polite"></div>
 
-
-        <!-- ==========================================
-             FORM LOGIN
-        =========================================== -->
-
-        <form
-          id="loginForm"
-          class="auth-form"
-          autocomplete="on"
-          novalidate
-        >
-
+        <!-- FORM LOGIN -->
+        <form id="loginForm" class="auth-form" autocomplete="on" novalidate>
           <div class="auth-field">
-
-            <label for="loginEmail">
-              Alamat Email
-            </label>
-
-            <input
-              type="email"
-              id="loginEmail"
-              name="email"
-              placeholder="nama@email.com"
-              autocomplete="username"
-              inputmode="email"
-              required
-            >
-
+            <label for="loginEmail">Alamat Email</label>
+            <input type="email" id="loginEmail" name="email" placeholder="nama@email.com" autocomplete="username" inputmode="email" required>
           </div>
-
-
           <div class="auth-field">
-
-            <label for="loginPassword">
-              Kata Sandi
-            </label>
-
+            <label for="loginPassword">Kata Sandi</label>
             <div class="auth-password-wrap">
-
-              <input
-                type="password"
-                id="loginPassword"
-                name="password"
-                placeholder="Masukkan kata sandi"
-                autocomplete="current-password"
-                required
-              >
-
-              <button
-                type="button"
-                class="auth-password-toggle"
-                data-toggle="loginPassword"
-                aria-label="Tampilkan kata sandi"
-              >
-                ◉
-              </button>
-
+              <input type="password" id="loginPassword" name="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required>
+              <button type="button" class="auth-password-toggle" data-toggle="loginPassword" aria-label="Tampilkan kata sandi">◉</button>
             </div>
-
           </div>
-
-
           <div class="auth-options">
-
             <label class="auth-remember">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                name="remember"
-              >
+              <input type="checkbox" id="rememberMe" name="remember">
               <span>Ingat saya</span>
             </label>
-
-            <a
-              href="#forgot"
-              class="auth-link"
-              data-forgot
-            >
-              Lupa kata sandi?
-            </a>
-
+            <a href="#forgot" class="auth-link" data-forgot>Lupa kata sandi?</a>
           </div>
-
-
-          <button
-            type="submit"
-            class="auth-submit"
-            id="loginSubmit"
-          >
+          
+          <button type="submit" class="auth-submit" id="loginSubmit">
             Masuk ke TARBIYAH
-            <span aria-hidden="true">→</span>
+            <!-- IKON SVG PANAH KANAN -->
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </button>
-
         </form>
 
-
-        <!-- ==========================================
-             FORM REGISTER
-        =========================================== -->
-
-        <form
-          id="registerForm"
-          class="auth-form"
-          autocomplete="on"
-          novalidate
-          hidden
-        >
-
+        <!-- FORM REGISTER -->
+        <form id="registerForm" class="auth-form" autocomplete="on" novalidate hidden>
           <div class="auth-field">
-
-            <label for="registerName">
-              Nama Lengkap
-            </label>
-
-            <input
-              type="text"
-              id="registerName"
-              name="fullName"
-              placeholder="Masukkan nama lengkap"
-              autocomplete="name"
-              maxlength="100"
-              required
-            >
-
+            <label for="registerName">Nama Lengkap</label>
+            <input type="text" id="registerName" name="fullName" placeholder="Masukkan nama lengkap" autocomplete="name" maxlength="100" required>
           </div>
-
-
           <div class="auth-field">
-
-            <label for="registerEmail">
-              Alamat Email
-            </label>
-
-            <input
-              type="email"
-              id="registerEmail"
-              name="email"
-              placeholder="nama@email.com"
-              autocomplete="email"
-              inputmode="email"
-              required
-            >
-
+            <label for="registerEmail">Alamat Email</label>
+            <input type="email" id="registerEmail" name="email" placeholder="nama@email.com" autocomplete="email" inputmode="email" required>
           </div>
-
-
           <div class="auth-field">
-
-            <label for="registerPassword">
-              Buat Kata Sandi
-            </label>
-
+            <label for="registerPassword">Buat Kata Sandi</label>
             <div class="auth-password-wrap">
-
-              <input
-                type="password"
-                id="registerPassword"
-                name="password"
-                placeholder="Minimal 8 karakter"
-                autocomplete="new-password"
-                minlength="8"
-                required
-              >
-
-              <button
-                type="button"
-                class="auth-password-toggle"
-                data-toggle="registerPassword"
-                aria-label="Tampilkan kata sandi"
-              >
-                ◉
-              </button>
-
+              <input type="password" id="registerPassword" name="password" placeholder="Minimal 8 karakter" autocomplete="new-password" minlength="8" required>
+              <button type="button" class="auth-password-toggle" data-toggle="registerPassword" aria-label="Tampilkan kata sandi">◉</button>
             </div>
-
           </div>
-
-
           <div class="auth-field">
-
-            <label for="registerConfirm">
-              Konfirmasi Kata Sandi
-            </label>
-
+            <label for="registerConfirm">Konfirmasi Kata Sandi</label>
             <div class="auth-password-wrap">
-
-              <input
-                type="password"
-                id="registerConfirm"
-                name="confirmPassword"
-                placeholder="Ulangi kata sandi"
-                autocomplete="new-password"
-                minlength="8"
-                required
-              >
-
-              <button
-                type="button"
-                class="auth-password-toggle"
-                data-toggle="registerConfirm"
-                aria-label="Tampilkan kata sandi"
-              >
-                ◉
-              </button>
-
+              <input type="password" id="registerConfirm" name="confirmPassword" placeholder="Ulangi kata sandi" autocomplete="new-password" minlength="8" required>
+              <button type="button" class="auth-password-toggle" data-toggle="registerConfirm" aria-label="Tampilkan kata sandi">◉</button>
             </div>
-
           </div>
-
-
           <label class="auth-terms">
-
-            <input
-              type="checkbox"
-              id="acceptTerms"
-              name="acceptTerms"
-              required
-            >
-
-            <span>
-              Saya menyetujui ketentuan penggunaan dan
-              kebijakan privasi aplikasi TARBIYAH.
-            </span>
-
+            <input type="checkbox" id="acceptTerms" name="acceptTerms" required>
+            <span>Saya menyetujui ketentuan penggunaan dan kebijakan privasi aplikasi TARBIYAH.</span>
           </label>
-
-
-          <button
-            type="submit"
-            class="auth-submit"
-            id="registerSubmit"
-          >
+          
+          <button type="submit" class="auth-submit" id="registerSubmit">
             Buat Akun TARBIYAH
-            <span aria-hidden="true">→</span>
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </button>
-
         </form>
 
-
-        <!-- ==========================================
-             FORM LUPA PASSWORD
-        =========================================== -->
-
-        <form
-          id="forgotForm"
-          class="auth-form"
-          autocomplete="on"
-          novalidate
-          hidden
-        >
-
+        <!-- FORM LUPA PASSWORD -->
+        <form id="forgotForm" class="auth-form" autocomplete="on" novalidate hidden>
           <div class="auth-field">
-
-            <label for="forgotEmail">
-              Alamat Email Terdaftar
-            </label>
-
-            <input
-              type="email"
-              id="forgotEmail"
-              name="email"
-              placeholder="nama@email.com"
-              autocomplete="email"
-              inputmode="email"
-              required
-            >
-
+            <label for="forgotEmail">Alamat Email Terdaftar</label>
+            <input type="email" id="forgotEmail" name="email" placeholder="nama@email.com" autocomplete="email" inputmode="email" required>
           </div>
-
-
-          <button
-            type="submit"
-            class="auth-submit"
-            id="forgotSubmit"
-          >
+          
+          <button type="submit" class="auth-submit" id="forgotSubmit">
             Kirim Link Pemulihan
-            <span aria-hidden="true">→</span>
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </button>
-
-
+          
           <div class="auth-bottom">
-
-            <a
-              href="#login"
-              class="auth-link"
-              data-back-login
-            >
-              ← Kembali ke halaman masuk
-            </a>
-
+            <a href="#login" class="auth-link" data-back-login>← Kembali ke halaman masuk</a>
           </div>
-
         </form>
 
-
-        <!-- ==========================================
-             FORM PASSWORD BARU
-        =========================================== -->
-
-        <form
-          id="recoveryForm"
-          class="auth-form"
-          autocomplete="on"
-          novalidate
-          hidden
-        >
-
+        <!-- FORM PASSWORD BARU -->
+        <form id="recoveryForm" class="auth-form" autocomplete="on" novalidate hidden>
           <div class="auth-field">
-
-            <label for="newPassword">
-              Kata Sandi Baru
-            </label>
-
+            <label for="newPassword">Kata Sandi Baru</label>
             <div class="auth-password-wrap">
-
-              <input
-                type="password"
-                id="newPassword"
-                name="newPassword"
-                placeholder="Masukkan kata sandi baru"
-                autocomplete="new-password"
-                minlength="8"
-                required
-              >
-
-              <button
-                type="button"
-                class="auth-password-toggle"
-                data-toggle="newPassword"
-                aria-label="Tampilkan kata sandi"
-              >
-                ◉
-              </button>
-
+              <input type="password" id="newPassword" name="newPassword" placeholder="Masukkan kata sandi baru" autocomplete="new-password" minlength="8" required>
+              <button type="button" class="auth-password-toggle" data-toggle="newPassword" aria-label="Tampilkan kata sandi">◉</button>
             </div>
-
           </div>
-
-
           <div class="auth-field">
-
-            <label for="newPasswordConfirm">
-              Konfirmasi Kata Sandi Baru
-            </label>
-
+            <label for="newPasswordConfirm">Konfirmasi Kata Sandi Baru</label>
             <div class="auth-password-wrap">
-
-              <input
-                type="password"
-                id="newPasswordConfirm"
-                name="confirmNewPassword"
-                placeholder="Ulangi kata sandi baru"
-                autocomplete="new-password"
-                minlength="8"
-                required
-              >
-
-              <button
-                type="button"
-                class="auth-password-toggle"
-                data-toggle="newPasswordConfirm"
-                aria-label="Tampilkan kata sandi"
-              >
-                ◉
-              </button>
-
+              <input type="password" id="newPasswordConfirm" name="confirmNewPassword" placeholder="Ulangi kata sandi baru" autocomplete="new-password" minlength="8" required>
+              <button type="button" class="auth-password-toggle" data-toggle="newPasswordConfirm" aria-label="Tampilkan kata sandi">◉</button>
             </div>
-
           </div>
-
-
-          <button
-            type="submit"
-            class="auth-submit"
-            id="recoverySubmit"
-          >
+          
+          <button type="submit" class="auth-submit" id="recoverySubmit">
             Simpan Kata Sandi Baru
-            <span aria-hidden="true">→</span>
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
           </button>
-
         </form>
-
 
         <!-- BOTTOM SWITCH -->
         <div class="auth-bottom" id="authBottom">
-
           Belum memiliki akun?
-
-          <button
-            type="button"
-            data-switch-register
-          >
-            Daftar sekarang
-          </button>
-
+          <button type="button" data-switch-register>Daftar sekarang</button>
         </div>
 
-
         <footer class="auth-footer">
-          TARBIYAH ©
-          <span id="currentYear">2026</span>
-          · Pembelajaran Muslim
+          TARBIYAH © <span id="currentYear">2026</span> · Pembelajaran Muslim
         </footer>
-
       </div>
-
     </section>
-
   </main>
 
-
-  <!-- ================================================
-       JAVASCRIPT
-  ================================================= -->
-
-  <!-- Supabase SDK -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
-
-  <!-- Konfigurasi dan Supabase Client -->
+  <!-- JAVASCRIPT -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="./js/config.js"></script>
   <script defer src="./js/supabase-client.js"></script>
-
-  <!-- Tema -->
-  <script defer src="./js/theme-manager.js"></script>
-
-  <!-- Autentikasi -->
+  <script defer src="./js/tarbiyah-theme.js"></script>
   <script defer src="./js/auth.js"></script>
-
-  <!-- Pengelola Halaman Autentikasi -->
   <script defer src="./js/auth-page.js"></script>
-
-  <!-- PWA -->
   <script defer src="./js/pwa.js"></script>
 
-
-  <!-- Tahun Otomatis -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const year = document.getElementById('currentYear');
+      if (year) year.textContent = new Date().getFullYear();
+    });
 
-      if (year) {
-        year.textContent = new Date().getFullYear();
+    /* ANIMASI KILAUAN LOGO */
+    (() => {
+      const directions = ["shine-left", "shine-right", "shine-up", "shine-down"];
+      const logoElements = document.querySelectorAll(".brand-mark, .auth-logo-frame");
+      if (!logoElements.length) return;
+
+      let previousDirection = "";
+      function playRandomShine() {
+        let nextDirection;
+        do { nextDirection = directions[Math.floor(Math.random() * directions.length)]; } 
+        while (directions.length > 1 && nextDirection === previousDirection);
+
+        previousDirection = nextDirection;
+        logoElements.forEach((logo) => {
+          logo.classList.remove(...directions);
+          void logo.offsetWidth;
+          logo.classList.add(nextDirection);
+        });
       }
-    });
-
-
-/* ==========================================
-   TARBIYAH — RANDOM LOGO SHINE CONTROLLER
-   ========================================== */
-(() => {
-  "use strict";
-
-  const directions = [
-    "shine-left",
-    "shine-right",
-    "shine-up",
-    "shine-down"
-  ];
-
-  const logoElements = document.querySelectorAll(
-    ".brand-mark, .auth-logo-frame"
-  );
-
-  if (!logoElements.length) return;
-
-  let previousDirection = "";
-
-  function playRandomShine() {
-    let nextDirection;
-
-    do {
-      nextDirection =
-        directions[Math.floor(Math.random() * directions.length)];
-    } while (
-      directions.length > 1 &&
-      nextDirection === previousDirection
-    );
-
-    previousDirection = nextDirection;
-
-    logoElements.forEach((logo) => {
-      logo.classList.remove(...directions);
-      void logo.offsetWidth;
-      logo.classList.add(nextDirection);
-    });
-  }
-
-  let shineTimer;
-
-  function startShine() {
-    clearInterval(shineTimer);
-    playRandomShine();
-    shineTimer = setInterval(playRandomShine, 3000);
-  }
-
-  function stopShine() {
-    clearInterval(shineTimer);
-  }
-
-  startShine();
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      stopShine();
-    } else {
+      let shineTimer;
+      function startShine() { clearInterval(shineTimer); playRandomShine(); shineTimer = setInterval(playRandomShine, 3000); }
+      function stopShine() { clearInterval(shineTimer); }
       startShine();
-    }
-  });
-})();
+      document.addEventListener("visibilitychange", () => { if (document.hidden) stopShine(); else startShine(); });
+    })();
 
+    /* SINKRONISASI TAB */
+    (() => {
+      const loginTab = document.getElementById("loginTab");
+      const registerTab = document.getElementById("registerTab");
+      if (!loginTab || !registerTab) return;
 
-/* TARBIYAH — SINKRONISASI VISUAL TAB */
-(() => {
-  "use strict";
+      function updateActiveTab(selected) {
+        const isLogin = selected === "login";
+        loginTab.classList.toggle("active", isLogin);
+        registerTab.classList.toggle("active", !isLogin);
+        loginTab.setAttribute("aria-selected", String(isLogin));
+        registerTab.setAttribute("aria-selected", String(!isLogin));
+      }
 
-  const loginTab = document.getElementById("loginTab");
-  const registerTab = document.getElementById("registerTab");
+      document.addEventListener("click", (event) => {
+        const clickedTab = event.target.closest("#loginTab, #registerTab");
+        if (!clickedTab) return;
+        updateActiveTab(clickedTab.id === "loginTab" ? "login" : "register");
+      });
 
-  if (!loginTab || !registerTab) {
-    console.warn("[TARBIYAH] Tombol tab tidak ditemukan.");
-    return;
-  }
-
-  function updateActiveTab(selected) {
-    const isLogin = selected === "login";
-
-    loginTab.classList.toggle("active", isLogin);
-    registerTab.classList.toggle("active", !isLogin);
-
-    loginTab.setAttribute("aria-selected", String(isLogin));
-    registerTab.setAttribute("aria-selected", String(!isLogin));
-  }
-
-  document.addEventListener("click", (event) => {
-    const clickedTab = event.target.closest("#loginTab, #registerTab");
-
-    if (!clickedTab) return;
-
-    updateActiveTab(
-      clickedTab.id === "loginTab" ? "login" : "register"
-    );
-  });
-
-  // Sinkronkan tampilan awal
-  updateActiveTab(
-    registerTab.getAttribute("aria-selected") === "true"
-      ? "register"
-      : "login"
-  );
-
-  console.info("[TARBIYAH] Sinkronisasi tab aktif siap.");
-})();
-
-</script>
+      updateActiveTab(registerTab.getAttribute("aria-selected") === "true" ? "register" : "login");
+    })();
+  </script>
 </body>
 </html>
