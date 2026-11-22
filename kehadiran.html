@@ -26,18 +26,22 @@
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  
+  <!-- CSS Navigasi Universal -->
   <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
     :root {
-      --attendance-green: #10b981;
-      --attendance-muted: var(--text-muted, #94a3b8);
-      --attendance-card: var(--surface, #172b25);
-      --attendance-border: var(--border, rgba(255,255,255,.09));
+      --attendance-green: var(--color-primary, #10b981);
+      --attendance-muted: var(--text-secondary, #94a3b8);
+      --attendance-card: var(--bg-secondary, #172b25);
+      --attendance-border: var(--border-color, rgba(255,255,255,.09));
     }
 
     body {
       font-family: Inter, sans-serif;
+      background: var(--bg-primary, #0b1713);
+      color: var(--text-primary, #fff);
     }
 
     .attendance-page {
@@ -58,6 +62,7 @@
     .attendance-header h1 {
       font: 800 clamp(1.4rem, 4vw, 2rem) Poppins, sans-serif;
       margin: 0 0 7px;
+      color: var(--text-primary);
     }
 
     .attendance-header p {
@@ -121,6 +126,7 @@
 
     .summary-card strong {
       font: 800 1.55rem Poppins, sans-serif;
+      color: var(--text-primary);
     }
 
     .attendance-panel {
@@ -140,6 +146,7 @@
     .panel-heading h2 {
       font: 700 1rem Poppins, sans-serif;
       margin: 0;
+      color: var(--text-primary);
     }
 
     .panel-heading p {
@@ -202,6 +209,7 @@
       padding: 10px 14px;
       font: 700 .78rem Inter, sans-serif;
       cursor: pointer;
+      transition: .2s;
     }
 
     .attendance-button:hover {
@@ -321,6 +329,7 @@
       margin: 1px 0 6px;
       line-height: 1.45;
       overflow-wrap: anywhere;
+      color: var(--text-primary);
     }
 
     .attendance-info p {
@@ -380,6 +389,7 @@
       font-size: .76rem;
       font-weight: 700;
       color: var(--attendance-green);
+      user-select: none;
     }
 
     .topic-list {
@@ -491,10 +501,10 @@
   </style>
 </head>
 
-<body>
+<body class="auth-pending">
   <main class="attendance-page" data-module="kehadiran">
 
-    <!-- 1. TOMBOL BACK UNIVERSAL -->
+    <!-- 1. TOMBOL BACK (Diletakkan berdiri sendiri agar pasti bisa diklik) -->
     <div class="page-header-nav" style="margin-bottom: 24px;">
       <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
         <span class="tarbiyah-page-nav__icon">
@@ -507,7 +517,7 @@
       </a>
     </div>
 
-    <!-- 2. HEADER ASLI -->
+    <!-- 2. HEADER ASLI (Hanya ada satu, di luar form) -->
     <header class="attendance-header">
       <div>
         <div class="attendance-badge">REKAM JEJAK KEGIATAN</div>
@@ -571,6 +581,7 @@
 
       <div class="attendance-message" id="attendanceMessage" role="status"></div>
 
+      <!-- TABS NAVIGASI -->
       <div class="attendance-tabs" role="group" aria-label="Kategori riwayat">
         <button class="attendance-tab active" type="button" data-source="all">
           Semua Kajian
@@ -583,6 +594,7 @@
         </button>
       </div>
 
+      <!-- FILTER & SEARCH -->
       <div class="attendance-filters">
         <input
           type="search"
@@ -601,6 +613,7 @@
         </select>
       </div>
 
+      <!-- LIST DATA -->
       <div class="attendance-list" id="attendanceList">
         <div class="attendance-empty">
           <span>⏳</span>
@@ -616,7 +629,10 @@
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
-  <script src="./js/theme-manager.js"></script>
+  
+  <!-- SCRIPT TEMA -->
+  <script src="./js/tarbiyah-theme.js"></script>
+  
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
@@ -650,12 +666,10 @@
 
     function normalizeStatus(value) {
       const status = String(value || "").toLowerCase().trim();
-
       if (["hadir", "present", "attended"].includes(status)) return "hadir";
       if (["izin", "permission"].includes(status)) return "izin";
       if (["sakit", "sick"].includes(status)) return "sakit";
       if (["alpa", "absent"].includes(status)) return "alpa";
-
       return "unknown";
     }
 
@@ -674,30 +688,19 @@
 
     function safeDate(value) {
       if (!value) return null;
-
       const date = new Date(value);
       return Number.isNaN(date.getTime()) ? null : date;
     }
 
     function formatDate(value) {
       const date = safeDate(value);
-
       if (!date) return "Tanggal belum diketahui";
-
-      return date.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      });
+      return date.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
     }
 
     function dateBox(value) {
       const date = safeDate(value);
-
-      if (!date) {
-        return { day: "—", month: "TANPA TANGGAL" };
-      }
-
+      if (!date) return { day: "—", month: "TANPA TANGGAL" };
       return {
         day: date.toLocaleDateString("id-ID", { day: "2-digit" }),
         month: date.toLocaleDateString("id-ID", { month: "short" })
@@ -721,13 +724,10 @@
     function createEmpty(message, icon = "📭") {
       const empty = document.createElement("div");
       empty.className = "attendance-empty";
-
       const symbol = document.createElement("span");
       symbol.textContent = icon;
-
       const text = document.createElement("div");
       text.textContent = message;
-
       empty.append(symbol, text);
       return empty;
     }
@@ -742,247 +742,159 @@
         .select("id, user_id, member_number, membership_status")
         .eq("user_id", userId)
         .maybeSingle();
-
       if (error) throw error;
-
-      if (!data) {
-        throw new Error(
-          "Data keanggotaan tidak ditemukan untuk akun ini. Hubungi Admin TARBIYAH."
-        );
-      }
-
+      if (!data) throw new Error("Data keanggotaan tidak ditemukan untuk akun ini. Hubungi Admin TARBIYAH.");
       return data;
     }
 
-    
-async function loadHistorical(client, memberId) {
-  // 1. Ambil SELURUH pertemuan historis, bukan hanya
-  // pertemuan yang sudah memiliki catatan kehadiran.
-  const { data: meetings, error: meetingsError } = await client
-    .from("historical_meetings")
-    .select("*")
-    .order("meeting_number", { ascending: true });
+    async function loadHistorical(client, memberId) {
+      const { data: meetings, error: meetingsError } = await client
+        .from("historical_meetings")
+        .select("*")
+        .order("meeting_number", { ascending: true });
+      if (meetingsError) throw meetingsError;
+      const meetingRows = meetings || [];
+      if (!meetingRows.length) return [];
 
-  if (meetingsError) throw meetingsError;
+      const meetingIds = uniqueIds(meetingRows.map(item => item.id));
 
-  const meetingRows = meetings || [];
+      const { data: attendance, error: attendanceError } = await client
+        .from("historical_meeting_attendance")
+        .select("*")
+        .eq("member_id", memberId)
+        .in("meeting_id", meetingIds);
+      if (attendanceError) throw attendanceError;
 
-  if (!meetingRows.length) return [];
+      const attendanceMap = new Map();
+      (attendance || []).forEach(row => { attendanceMap.set(row.meeting_id, row); });
 
-  const meetingIds = uniqueIds(meetingRows.map(item => item.id));
+      const { data: topics, error: topicsError } = await client
+        .from("historical_topics")
+        .select("*")
+        .in("meeting_id", meetingIds)
+        .order("sort_order", { ascending: true });
+      if (topicsError) throw topicsError;
 
-  // 2. Ambil catatan kehadiran anggota untuk semua pertemuan.
-  const { data: attendance, error: attendanceError } = await client
-    .from("historical_meeting_attendance")
-    .select("*")
-    .eq("member_id", memberId)
-    .in("meeting_id", meetingIds);
+      const topicRows = topics || [];
+      const topicIds = uniqueIds(topicRows.map(item => item.id));
 
-  if (attendanceError) throw attendanceError;
+      let topicAttendance = [];
+      if (topicIds.length) {
+        const { data, error } = await client
+          .from("historical_topic_attendance")
+          .select("*")
+          .eq("member_id", memberId)
+          .in("topic_id", topicIds);
+        if (error) throw error;
+        topicAttendance = data || [];
+      }
 
-  const attendanceMap = new Map();
+      const topicAttendanceMap = new Map();
+      topicAttendance.forEach(row => { topicAttendanceMap.set(row.topic_id, row); });
 
-  (attendance || []).forEach(row => {
-    attendanceMap.set(row.meeting_id, row);
-  });
+      const topicsByMeeting = new Map();
+      topicRows.forEach(topic => {
+        if (!topicsByMeeting.has(topic.meeting_id)) topicsByMeeting.set(topic.meeting_id, []);
+        const attendanceRow = topicAttendanceMap.get(topic.id);
+        topicsByMeeting.get(topic.meeting_id).push({
+          id: topic.id,
+          title: topic.title || "Topik tanpa judul",
+          status: attendanceRow ? normalizeStatus(attendanceRow.attendance_status) : "unknown",
+          note: attendanceRow?.attendance_note || ""
+        });
+      });
 
-  // 3. Ambil seluruh topik dari pertemuan historis.
-  const { data: topics, error: topicsError } = await client
-    .from("historical_topics")
-    .select("*")
-    .in("meeting_id", meetingIds)
-    .order("sort_order", { ascending: true });
-
-  if (topicsError) throw topicsError;
-
-  const topicRows = topics || [];
-  const topicIds = uniqueIds(topicRows.map(item => item.id));
-
-  // 4. Ambil catatan kehadiran per topik milik anggota.
-  let topicAttendance = [];
-
-  if (topicIds.length) {
-    const { data, error } = await client
-      .from("historical_topic_attendance")
-      .select("*")
-      .eq("member_id", memberId)
-      .in("topic_id", topicIds);
-
-    if (error) throw error;
-
-    topicAttendance = data || [];
-  }
-
-  const topicAttendanceMap = new Map();
-
-  topicAttendance.forEach(row => {
-    topicAttendanceMap.set(row.topic_id, row);
-  });
-
-  // 5. Kelompokkan topik berdasarkan pertemuan.
-  const topicsByMeeting = new Map();
-
-  topicRows.forEach(topic => {
-    if (!topicsByMeeting.has(topic.meeting_id)) {
-      topicsByMeeting.set(topic.meeting_id, []);
+      return meetingRows.map(meeting => {
+        const attendanceRow = attendanceMap.get(meeting.id);
+        return {
+          id: `historical-${meeting.id}`,
+          source: "historical",
+          sourceLabel: "Arsip Historis",
+          title: meeting.title || "Pertemuan Historis",
+          meetingNumber: meeting.meeting_number,
+          date: meeting.meeting_date || null,
+          location: meeting.location_name || "",
+          description: meeting.description || "",
+          status: attendanceRow ? normalizeStatus(attendanceRow.attendance_status) : "unknown",
+          note: attendanceRow?.attendance_note || "",
+          topics: topicsByMeeting.get(meeting.id) || [],
+          createdAt: attendanceRow?.created_at || null
+        };
+      });
     }
 
-    const attendanceRow = topicAttendanceMap.get(topic.id);
+    async function loadLatest(client, memberId) {
+      const { data: agendas, error: agendaError } = await client
+        .from("kajian_agenda")
+        .select("*")
+        .order("starts_at", { ascending: false })
+        .limit(500);
+      if (agendaError) throw agendaError;
 
-    topicsByMeeting.get(topic.meeting_id).push({
-      id: topic.id,
-      title: topic.title || "Topik tanpa judul",
-      status: attendanceRow
-        ? normalizeStatus(attendanceRow.attendance_status)
-        : "unknown",
-      note: attendanceRow?.attendance_note || ""
-    });
-  });
+      const agendaRows = agendas || [];
+      if (!agendaRows.length) return [];
 
-  // 6. Bentuk daftar seluruh pertemuan.
-  // Jika tidak ada catatan kehadiran, status = unknown.
-  return meetingRows.map(meeting => {
-    const attendanceRow = attendanceMap.get(meeting.id);
+      const agendaIds = uniqueIds(agendaRows.map(item => item.id));
 
-    return {
-      id: `historical-${meeting.id}`,
-      source: "historical",
-      sourceLabel: "Arsip Historis",
-      title: meeting.title || "Pertemuan Historis",
-      meetingNumber: meeting.meeting_number,
-      date: meeting.meeting_date || null,
-      location: meeting.location_name || "",
-      description: meeting.description || "",
-      status: attendanceRow
-        ? normalizeStatus(attendanceRow.attendance_status)
-        : "unknown",
-      note: attendanceRow?.attendance_note || "",
-      topics: topicsByMeeting.get(meeting.id) || [],
-      createdAt: attendanceRow?.created_at || null
-    };
-  });
-}
+      const { data: attendance, error: attendanceError } = await client
+        .from("kajian_attendance")
+        .select("*")
+        .eq("member_id", memberId)
+        .in("agenda_id", agendaIds)
+        .order("attended_at", { ascending: false });
+      if (attendanceError) throw attendanceError;
 
-   
-async function loadLatest(client, memberId) {
-  // 1. Ambil agenda langsung dari tabel kajian_agenda.
-  // Agenda tetap ditampilkan walaupun belum ada presensi.
-  const { data: agendas, error: agendaError } = await client
-    .from("kajian_agenda")
-    .select("*")
-    .order("starts_at", { ascending: false })
-    .limit(500);
+      const attendanceMap = new Map();
+      (attendance || []).forEach(row => {
+        if (!attendanceMap.has(row.agenda_id)) attendanceMap.set(row.agenda_id, row);
+      });
 
-  if (agendaError) throw agendaError;
-
-  const agendaRows = agendas || [];
-
-  if (!agendaRows.length) return [];
-
-  const agendaIds = uniqueIds(agendaRows.map(item => item.id));
-
-  // 2. Ambil catatan presensi anggota untuk agenda tersebut.
-  const { data: attendance, error: attendanceError } = await client
-    .from("kajian_attendance")
-    .select("*")
-    .eq("member_id", memberId)
-    .in("agenda_id", agendaIds)
-    .order("attended_at", { ascending: false });
-
-  if (attendanceError) throw attendanceError;
-
-  const attendanceMap = new Map();
-
-  (attendance || []).forEach(row => {
-    // Data sudah diurutkan terbaru lebih dahulu.
-    // Simpan satu catatan pertama untuk setiap agenda.
-    if (!attendanceMap.has(row.agenda_id)) {
-      attendanceMap.set(row.agenda_id, row);
+      return agendaRows.map(agenda => {
+        const attendanceRow = attendanceMap.get(agenda.id);
+        return {
+          id: `latest-${agenda.id}`,
+          source: "latest",
+          sourceLabel: "Kajian Terbaru",
+          title: agenda.title || "Kajian TARBIYAH",
+          date: agenda.starts_at || attendanceRow?.attended_at || null,
+          location: agenda.location_name || agenda.location_address || "",
+          description: agenda.description || "",
+          speaker: agenda.speaker_name || "",
+          status: attendanceRow ? normalizeStatus(attendanceRow.attendance_status) : "unknown",
+          note: attendanceRow?.manual_reason || "",
+          topics: [],
+          attendanceMethod: attendanceRow?.attendance_method || "",
+          createdAt: attendanceRow?.created_at || null
+        };
+      });
     }
-  });
 
-  // 3. Tampilkan semua agenda.
-  return agendaRows.map(agenda => {
-    const attendanceRow = attendanceMap.get(agenda.id);
+    function renderSummary(records) {
+      const historical = records.filter(item => item.source === "historical");
+      const total = historical.length;
+      const present = historical.filter(item => item.status === "hadir").length;
+      const percentage = total ? Math.round((present / total) * 100) : 0;
+      const unknown = historical.filter(item => item.status === "unknown").length;
 
-    return {
-      id: `latest-${agenda.id}`,
-      source: "latest",
-      sourceLabel: "Kajian Terbaru",
-      title: agenda.title || "Kajian TARBIYAH",
-      date: agenda.starts_at || attendanceRow?.attended_at || null,
-      location: agenda.location_name || agenda.location_address || "",
-      description: agenda.description || "",
-      speaker: agenda.speaker_name || "",
-      status: attendanceRow
-        ? normalizeStatus(attendanceRow.attendance_status)
-        : "unknown",
-      note: attendanceRow?.manual_reason || "",
-      topics: [],
-      attendanceMethod: attendanceRow?.attendance_method || "",
-      createdAt: attendanceRow?.created_at || null
-    };
-  });
-}
-    
-function renderSummary(records) {
-  // Statistik ini khusus arsip historis.
-  // Kajian terbaru tidak dimasukkan ke penyebut 12 pertemuan historis.
-  const historical = records.filter(
-    item => item.source === "historical"
-  );
-
-  const total = historical.length;
-
-  const present = historical.filter(
-    item => item.status === "hadir"
-  ).length;
-
-  // Persentase dihitung berdasarkan seluruh pertemuan historis,
-  // termasuk yang statusnya belum memiliki catatan.
-  const percentage = total
-    ? Math.round((present / total) * 100)
-    : 0;
-
-  const unknown = historical.filter(
-    item => item.status === "unknown"
-  ).length;
-
-  $("totalActivities").textContent =
-    total.toLocaleString("id-ID");
-
-  $("totalPresent").textContent =
-    present.toLocaleString("id-ID");
-
-  $("attendancePercentage").textContent =
-    `${percentage}%`;
-
-  $("attendanceProgressBar").style.width =
-    `${percentage}%`;
-
-  $("attendanceProgressText").textContent = total
-    ? `${present} dari ${total} pertemuan historis tercatat hadir. ${unknown} pertemuan belum memiliki catatan kehadiran yang dapat diverifikasi.`
-    : "Belum ada data pertemuan historis.";
-}
+      $("totalActivities").textContent = total.toLocaleString("id-ID");
+      $("totalPresent").textContent = present.toLocaleString("id-ID");
+      $("attendancePercentage").textContent = `${percentage}%`;
+      $("attendanceProgressBar").style.width = `${percentage}%`;
+      $("attendanceProgressText").textContent = total
+        ? `${present} dari ${total} pertemuan historis tercatat hadir. ${unknown} pertemuan belum memiliki catatan kehadiran yang dapat diverifikasi.`
+        : "Belum ada data pertemuan historis.";
+    }
 
     function matchesRecord(record, keyword, filter) {
       const searchable = [
-        record.title,
-        record.location,
-        record.description,
-        record.speaker,
+        record.title, record.location, record.description, record.speaker,
         ...(record.topics || []).map(topic => topic.title)
       ].join(" ").toLowerCase();
-
-      const matchesKeyword = searchable.includes(keyword);
-      const matchesStatus = filter === "all" || record.status === filter;
-
-      return matchesKeyword && matchesStatus;
+      return searchable.includes(keyword) && (filter === "all" || record.status === filter);
     }
 
     function createTopicDetails(record) {
       if (!record.topics || !record.topics.length) return null;
-
       const details = document.createElement("details");
       details.className = "attendance-topics";
 
@@ -995,15 +907,12 @@ function renderSummary(records) {
       record.topics.forEach((topic, index) => {
         const row = document.createElement("div");
         row.className = "topic-row";
-
         const name = document.createElement("div");
         name.className = "topic-name";
         name.textContent = `${index + 1}. ${topic.title}`;
-
         const badge = document.createElement("span");
         badge.className = `topic-state ${topic.status}`;
         badge.textContent = STATUS_LABELS[topic.status] || "Belum ada catatan";
-
         row.append(name, badge);
         list.appendChild(row);
       });
@@ -1015,39 +924,25 @@ function renderSummary(records) {
     function createRecordCard(record) {
       const item = document.createElement("article");
       item.className = "attendance-item";
-
       const top = document.createElement("div");
       top.className = "attendance-item-top";
-
       const date = dateBox(record.date);
-
       const dateElement = document.createElement("div");
       dateElement.className = "attendance-date";
-
       const day = document.createElement("strong");
       day.textContent = date.day;
-
       const month = document.createElement("small");
       month.textContent = date.month;
-
       dateElement.append(day, month);
-
       const info = document.createElement("div");
       info.className = "attendance-info";
-
       const title = document.createElement("h3");
-      title.textContent = record.meetingNumber
-        ? `Pertemuan ${record.meetingNumber} — ${record.title}`
-        : record.title;
-
+      title.textContent = record.meetingNumber ? `Pertemuan ${record.meetingNumber} — ${record.title}` : record.title;
       const details = document.createElement("p");
       const detailParts = [formatDate(record.date)];
-
       if (record.location) detailParts.push(record.location);
       if (record.speaker) detailParts.push(`Pemateri: ${record.speaker}`);
-
       details.textContent = detailParts.join(" · ");
-
       info.append(title, details, createStatusBadge(record.status));
 
       const source = document.createElement("span");
@@ -1058,9 +953,7 @@ function renderSummary(records) {
       if (record.attendanceMethod) {
         const method = document.createElement("span");
         method.className = "attendance-source";
-        method.textContent = record.attendanceMethod === "qr"
-          ? "Presensi QR"
-          : "Presensi Manual";
+        method.textContent = record.attendanceMethod === "qr" ? "Presensi QR" : "Presensi Manual";
         info.appendChild(method);
       }
 
@@ -1076,7 +969,6 @@ function renderSummary(records) {
 
       const topicDetails = createTopicDetails(record);
       if (topicDetails) item.appendChild(topicDetails);
-
       return item;
     }
 
@@ -1086,40 +978,25 @@ function renderSummary(records) {
       const filter = $("attendanceFilter").value;
 
       const filtered = state.records.filter(record => {
-        const sourceMatches =
-          state.source === "all" || record.source === state.source;
-
+        const sourceMatches = state.source === "all" || record.source === state.source;
         return sourceMatches && matchesRecord(record, keyword, filter);
       });
 
       list.replaceChildren();
-
       if (!filtered.length) {
-        list.appendChild(
-          createEmpty(
-            state.records.length
-              ? "Tidak ada riwayat yang sesuai dengan pencarian atau filter."
-              : "Belum ada catatan kehadiran untuk akun ini."
-          )
-        );
+        list.appendChild(createEmpty(
+          state.records.length ? "Tidak ada riwayat yang sesuai dengan pencarian atau filter." : "Belum ada catatan kehadiran untuk akun ini."
+        ));
         return;
       }
-
-      filtered.forEach(record => {
-        list.appendChild(createRecordCard(record));
-      });
+      filtered.forEach(record => list.appendChild(createRecordCard(record)));
     }
 
     async function loadAttendance() {
       if (state.loading) return;
-
       const client = getSupabase();
-
       if (!client) {
-        showMessage(
-          "Koneksi Supabase tidak ditemukan. Periksa js/supabase-client.js.",
-          true
-        );
+        showMessage("Koneksi Supabase tidak ditemukan. Periksa js/supabase-client.js.", true);
         return;
       }
 
@@ -1129,19 +1006,12 @@ function renderSummary(records) {
       clearMessage();
 
       try {
-        const { data: authData, error: authError } =
-          await client.auth.getUser();
-
+        const { data: authData, error: authError } = await client.auth.getUser();
         if (authError) throw authError;
-
         const user = authData?.user;
-
-        if (!user) {
-          throw new Error("Sesi login tidak ditemukan. Silakan login kembali.");
-        }
+        if (!user) throw new Error("Sesi login tidak ditemukan. Silakan login kembali.");
 
         state.user = user;
-
         const member = await getOwnMember(client, user.id);
         state.member = member;
 
@@ -1153,32 +1023,21 @@ function renderSummary(records) {
         state.records = [...historical, ...latest].sort((a, b) => {
           const dateA = safeDate(a.date);
           const dateB = safeDate(b.date);
-
           if (dateA && dateB) return dateB - dateA;
           if (dateA) return -1;
           if (dateB) return 1;
-
           return (b.meetingNumber || 0) - (a.meetingNumber || 0);
         });
 
         renderSummary(state.records);
         renderRecords();
-
-        showMessage(
-          `Riwayat berhasil dimuat: ${historical.length} arsip historis dan ${latest.length} kajian terbaru.`
-        );
-
+        showMessage(`Riwayat berhasil dimuat: ${historical.length} arsip historis dan ${latest.length} kajian terbaru.`);
       } catch (error) {
         console.error("[TARBIYAH KEHADIRAN]", error);
-
         state.records = [];
         renderSummary([]);
         renderRecords();
-
-        showMessage(
-          error?.message || "Terjadi kesalahan saat memuat riwayat.",
-          true
-        );
+        showMessage(error?.message || "Terjadi kesalahan saat memuat riwayat.", true);
       } finally {
         state.loading = false;
         $("refreshAttendance").disabled = false;
@@ -1188,16 +1047,12 @@ function renderSummary(records) {
 
     function init() {
       $("refreshAttendance").addEventListener("click", loadAttendance);
-
       $("attendanceSearch").addEventListener("input", renderRecords);
       $("attendanceFilter").addEventListener("change", renderRecords);
 
       document.querySelectorAll(".attendance-tab").forEach(button => {
         button.addEventListener("click", () => {
-          document.querySelectorAll(".attendance-tab").forEach(tab => {
-            tab.classList.remove("active");
-          });
-
+          document.querySelectorAll(".attendance-tab").forEach(tab => tab.classList.remove("active"));
           button.classList.add("active");
           state.source = button.dataset.source || "all";
           renderRecords();
