@@ -136,21 +136,40 @@
   ========================================================== */
 function updateThemeControls() {
   const buttons = document.querySelectorAll(TOGGLE_SELECTOR);
+  const isDark = state.activeTheme === "dark";
 
   buttons.forEach(button => {
-    const isDark = state.activeTheme === "dark";
-
-    // Ikon menunjukkan tema yang bisa dipilih berikutnya.
+    // Simbol untuk tema berikutnya
     button.textContent = isDark ? "☀" : "☾";
+
+    // Warna ikon ditentukan secara eksplisit
+    button.style.color = isDark
+      ? "#fbbf24"
+      : "#047857";
+
+    button.style.fontFamily =
+      "Arial, sans-serif";
+
+    button.style.fontSize = "21px";
+    button.style.fontWeight = "700";
+    button.style.lineHeight = "1";
+
+    button.style.display = "inline-flex";
+    button.style.alignItems = "center";
+    button.style.justifyContent = "center";
 
     button.setAttribute(
       "aria-label",
-      isDark ? "Ganti ke mode terang" : "Ganti ke mode gelap"
+      isDark
+        ? "Ganti ke mode terang"
+        : "Ganti ke mode gelap"
     );
 
     button.setAttribute(
       "title",
-      isDark ? "Ganti ke mode terang" : "Ganti ke mode gelap"
+      isDark
+        ? "Ganti ke mode terang"
+        : "Ganti ke mode gelap"
     );
 
     button.setAttribute(
