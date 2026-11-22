@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -6,36 +5,138 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#102a22">
   <meta name="description" content="Daftar anggota binaan Mentor TARBIYAH">
-
   <title>Anggota Binaan — TARBIYAH</title>
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CSS Utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  
+  <!-- CSS Navigasi Universal -->
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
-    * { box-sizing: border-box; }
+    /* =========================================
+       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
+    ========================================= */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-    body {
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* KUNCI LOGO AGAR TIDAK PECAH */
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .brand-logo-wrap .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-brand-text h1 {
       margin: 0;
-      font-family: Inter, sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      color: var(--color-primary, #36b58a);
+      line-height: 1.1;
+      font-family: var(--font-heading);
     }
 
-    .mentor-page {
-      width: min(1100px, 100%);
-      margin: auto;
-      padding: 24px 17px 90px;
+    .header-brand-text span {
+      display: block;
+      font-size: .75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1.25rem;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
+    }
+
+    /* =========================================
+       LAYOUT UTAMA
+    ========================================= */
+    .app-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Jarak aman untuk tombol back */
+    .page-header-nav {
+      margin-bottom: 30px;
+    }
+
+    /* =========================================
+       KONTEN ANGGOTA BINAAN (TIDAK DIUBAH)
+    ========================================= */
     .mentor-header {
       display: flex;
       justify-content: space-between;
@@ -45,29 +146,17 @@
       margin-bottom: 24px;
     }
 
-    .mentor-header h1 {
+    .mentor-header h2 {
       margin: 0 0 8px;
       font: 800 clamp(1.45rem, 4vw, 2rem) Poppins, sans-serif;
+      color: var(--text-primary);
     }
 
     .mentor-header p {
       margin: 0;
-      color: var(--text-secondary, #a7c8ba);
+      color: var(--text-secondary);
       font-size: .84rem;
       line-height: 1.7;
-    }
-
-    .mentor-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
-      border-radius: 11px;
-      color: var(--text-primary, #ecfdf5);
-      text-decoration: none;
-      font-size: .78rem;
-      font-weight: 700;
     }
 
     .mentor-summary {
@@ -79,28 +168,28 @@
 
     .mentor-stat {
       padding: 18px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 15px;
-      background: var(--bg-card, #102a22);
+      background: var(--bg-secondary);
     }
 
     .mentor-stat small {
       display: block;
-      color: var(--text-secondary, #a7c8ba);
+      color: var(--text-secondary);
       font-size: .75rem;
       margin-bottom: 8px;
     }
 
     .mentor-stat strong {
       font: 800 1.7rem Poppins, sans-serif;
-      color: #34d399;
+      color: var(--color-primary);
     }
 
     .mentor-panel {
       padding: 18px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 16px;
-      background: var(--bg-card, #102a22);
+      background: var(--bg-secondary);
     }
 
     .mentor-panel-heading {
@@ -112,27 +201,28 @@
       margin-bottom: 17px;
     }
 
-    .mentor-panel-heading h2 {
+    .mentor-panel-heading h3 {
       margin: 0;
       font: 700 1rem Poppins, sans-serif;
+      color: var(--text-primary);
     }
 
     .mentor-search {
       width: 100%;
       min-height: 43px;
       padding: 11px 13px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.12));
+      border: 1px solid var(--border-color);
       border-radius: 10px;
       outline: none;
-      color: var(--text-primary, #ecfdf5);
-      background: var(--bg-secondary, #102a22);
+      color: var(--text-primary);
+      background: var(--bg-primary);
       font: inherit;
       font-size: .82rem;
       margin-bottom: 17px;
     }
 
     .mentor-search:focus {
-      border-color: #10b981;
+      border-color: var(--color-primary);
     }
 
     .mentor-list {
@@ -144,9 +234,9 @@
     .mentor-member-card {
       min-width: 0;
       padding: 16px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 14px;
-      background: var(--bg-secondary, rgba(255,255,255,.025));
+      background: var(--bg-primary);
     }
 
     .mentor-member-top {
@@ -163,8 +253,8 @@
       display: grid;
       place-items: center;
       border-radius: 14px;
-      background: rgba(16,185,129,.15);
-      color: #34d399;
+      background: rgba(54,181,138,.15);
+      color: var(--color-primary);
       font: 800 1rem Poppins, sans-serif;
     }
 
@@ -176,12 +266,13 @@
       display: block;
       overflow-wrap: anywhere;
       font-size: .88rem;
+      color: var(--text-primary);
     }
 
     .mentor-member-name small {
       display: block;
       margin-top: 5px;
-      color: var(--text-secondary, #a7c8ba);
+      color: var(--text-secondary);
       font-size: .7rem;
     }
 
@@ -198,20 +289,21 @@
     }
 
     .mentor-detail-row span:first-child {
-      color: var(--text-secondary, #a7c8ba);
+      color: var(--text-secondary);
     }
 
     .mentor-detail-row span:last-child {
       text-align: right;
       overflow-wrap: anywhere;
+      color: var(--text-primary);
     }
 
     .mentor-status {
       display: inline-block;
       padding: 5px 9px;
       border-radius: 30px;
-      background: rgba(16,185,129,.12);
-      color: #34d399;
+      background: rgba(54,181,138,.12);
+      color: var(--color-primary);
       font-size: .66rem;
       font-weight: 800;
     }
@@ -239,17 +331,17 @@
     }
 
     .mentor-message.success {
-      background: rgba(16,185,129,.1);
-      color: #34d399;
+      background: rgba(54,181,138,.1);
+      color: var(--color-primary);
     }
 
     .mentor-empty {
       grid-column: 1 / -1;
       padding: 35px 15px;
-      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border: 1px dashed var(--border-color);
       border-radius: 13px;
       text-align: center;
-      color: var(--text-secondary, #a7c8ba);
+      color: var(--text-secondary);
       font-size: .82rem;
       line-height: 1.7;
     }
@@ -258,7 +350,7 @@
       display: block;
       margin-bottom: 8px;
       font-size: 1rem;
-      color: var(--text-primary, #ecfdf5);
+      color: var(--text-primary);
     }
 
     .mentor-refresh {
@@ -269,6 +361,11 @@
       color: white;
       font: 700 .75rem Inter, sans-serif;
       cursor: pointer;
+      transition: .2s;
+    }
+
+    .mentor-refresh:hover {
+      background: #059669;
     }
 
     .mentor-refresh:disabled {
@@ -278,139 +375,144 @@
 
     .mentor-footer {
       margin-top: 18px;
-      color: var(--text-secondary, #a7c8ba);
+      color: var(--text-secondary);
       font-size: .7rem;
       line-height: 1.6;
       text-align: center;
     }
 
     @media(max-width: 650px) {
-      .mentor-page {
-        padding: 19px 13px 85px;
-      }
-
-      .mentor-list {
-        grid-template-columns: 1fr;
-      }
-
-      .mentor-panel {
-        padding: 14px;
-      }
+      .app-main { padding: 16px; }
+      .mentor-list { grid-template-columns: 1fr; }
+      .mentor-panel { padding: 14px; }
     }
 
     @media(max-width: 350px) {
-      .mentor-summary {
-        grid-template-columns: 1fr;
-      }
+      .mentor-summary { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body class="auth-pending">
 
-  <main class="mentor-page" data-module="anggota-binaan">
+  <div class="app-shell">
 
-    <header class="mentor-header">
-      <div>
-        <h1>Anggota Binaan</h1>
-        <p>
-          Daftar anggota yang berada dalam pendampingan
-          Mentor TARBIYAH.
-        </p>
-      </div>
-
-  <a
-  id="btnBackDashboard"
-  href="./dashboard.html"
-  onclick="window.location.assign(this.href); return false;"
-  style="
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 18px;
-    border: 0;
-    border-radius: 12px;
-    background: #087f5b;
-    color: #ffffff;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
-    position: relative;
-    z-index: 9999;
-    pointer-events: auto;
-  "
->
-  ← Kembali ke Dashboard
-</a>
-      
-    </header>
-
-    <section class="mentor-summary">
-      <article class="mentor-stat">
-        <small>Total Anggota Binaan Aktif</small>
-        <strong id="totalMentees">—</strong>
-      </article>
-
-      <article class="mentor-stat">
-        <small>Penugasan Aktif</small>
-        <strong id="activeAssignments">—</strong>
-      </article>
-    </section>
-
-    <section class="mentor-panel">
-
-      <div class="mentor-panel-heading">
-        <h2>Daftar Anggota Binaan</h2>
-
-        <button
-          type="button"
-          class="mentor-refresh"
-          id="refreshMentees"
-        >
-          ↻ Perbarui
-        </button>
-      </div>
-
-      <div
-        class="mentor-message"
-        id="mentorMessage"
-        role="status"
-      ></div>
-
-      <input
-        type="search"
-        class="mentor-search"
-        id="menteeSearch"
-        placeholder="Cari nama, nomor anggota, atau kota..."
-        aria-label="Cari anggota binaan"
-      >
-
-      <div class="mentor-list" id="menteeList">
-        <div class="mentor-empty">
-          Memuat data anggota binaan...
+    <!-- =========================================
+         HEADER UNIVERSAL
+    ========================================== -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-logo-wrap">
+            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+          </div>
+          <div class="header-brand-text">
+            <h1>TARBIYAH</h1>
+            <span>Anggota Binaan</span>
+          </div>
         </div>
       </div>
 
-    </section>
+      <div class="header-right">
+        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
+          ☀
+        </button>
+        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
+          ♧
+        </a>
+      </div>
+    </header>
 
-    <p class="mentor-footer">
-      Data ditampilkan berdasarkan penugasan aktif dan
-      hak akses akun yang sedang login.
-    </p>
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+    <main class="app-main">
 
-  </main>
+      <!-- 1. TOMBOL BACK UNIVERSAL -->
+      <div class="page-header-nav">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+          <span class="tarbiyah-page-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+        </a>
+      </div>
 
+      <!-- 2. HEADER HALAMAN -->
+      <header class="mentor-header">
+        <div>
+          <h2>Anggota Binaan</h2>
+          <p>
+            Daftar anggota yang berada dalam pendampingan
+            Mentor TARBIYAH.
+          </p>
+        </div>
+      </header>
+
+      <!-- 3. KONTEN UTAMA -->
+      <section class="mentor-summary">
+        <article class="mentor-stat">
+          <small>Total Anggota Binaan Aktif</small>
+          <strong id="totalMentees">—</strong>
+        </article>
+
+        <article class="mentor-stat">
+          <small>Penugasan Aktif</small>
+          <strong id="activeAssignments">—</strong>
+        </article>
+      </section>
+
+      <section class="mentor-panel">
+        <div class="mentor-panel-heading">
+          <h3>Daftar Anggota Binaan</h3>
+          <button type="button" class="mentor-refresh" id="refreshMentees">
+            ↻ Perbarui
+          </button>
+        </div>
+
+        <div class="mentor-message" id="mentorMessage" role="status"></div>
+
+        <input
+          type="search"
+          class="mentor-search"
+          id="menteeSearch"
+          placeholder="Cari nama, nomor anggota, atau kota..."
+          aria-label="Cari anggota binaan"
+        >
+
+        <div class="mentor-list" id="menteeList">
+          <div class="mentor-empty">
+            Memuat data anggota binaan...
+          </div>
+        </div>
+      </section>
+
+      <p class="mentor-footer">
+        Data ditampilkan berdasarkan penugasan aktif dan
+        hak akses akun yang sedang login.
+      </p>
+
+    </main>
+  </div>
+
+  <!-- SUPABASE & SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
-  <script src="./js/theme-manager.js"></script>
+  
+  <!-- SCRIPT TEMA -->
+  <script src="./js/tarbiyah-theme.js"></script>
+  
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
+  
+  <!-- LOGIC JS ANGGOTA BINAAN -->
   <script src="./js/anggota-binaan.js"></script>
-
 </body>
 </html>
