@@ -1,23 +1,50 @@
+
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
   <meta name="theme-color" content="#102a22">
   <meta name="color-scheme" content="dark light">
-  <meta name="description" content="TARBIYAH — Platform pembelajaran, kajian, dan komunitas Muslim. Belajar, Bertumbuh, dan Berukhuwah.">
+
+  <meta
+    name="description"
+    content="TARBIYAH — Platform pembelajaran, kajian, dan komunitas Muslim. Belajar, Bertumbuh, dan Berukhuwah."
+  >
+
   <meta name="application-name" content="TARBIYAH">
+
   <title>TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah</title>
 
-  <!-- PWA & Icons -->
+  <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
-  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
 
-  <!-- Fonts -->
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    href="./assets/icons/icon-192.png"
+  >
+
+  <!-- Preconnect Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
 
   <!-- CSS -->
   <link rel="stylesheet" href="./css/variables.css">
@@ -25,8 +52,8 @@
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/splash.css">
-  <link rel="stylesheet" href="./css/page-navigation.css">
 
+  <!-- Splash Page Specific Styles -->
   <style>
     :root {
       --splash-bg: #081c17;
@@ -36,7 +63,8 @@
       --splash-muted: #a7c8ba;
     }
 
-    html, body {
+    html,
+    body {
       min-height: 100%;
       margin: 0;
     }
@@ -59,13 +87,29 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+      padding:
+        max(24px, env(safe-area-inset-top))
+        20px
+        max(24px, env(safe-area-inset-bottom));
       box-sizing: border-box;
       isolation: isolate;
       background:
-        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.16), transparent 36%),
-        radial-gradient(circle at 15% 15%, rgba(52, 211, 153, 0.09), transparent 30%),
-        linear-gradient(145deg, #071812, #102a22 55%, #06150f);
+        radial-gradient(
+          circle at 50% 40%,
+          rgba(16, 185, 129, 0.16),
+          transparent 36%
+        ),
+        radial-gradient(
+          circle at 15% 15%,
+          rgba(52, 211, 153, 0.09),
+          transparent 30%
+        ),
+        linear-gradient(
+          145deg,
+          #071812,
+          #102a22 55%,
+          #06150f
+        );
     }
 
     .splash-glow {
@@ -89,7 +133,8 @@
       pointer-events: none;
     }
 
-    .splash-orbit::before, .splash-orbit::after {
+    .splash-orbit::before,
+    .splash-orbit::after {
       content: "";
       position: absolute;
       border: 1px solid rgba(110, 231, 183, 0.08);
@@ -97,7 +142,9 @@
       inset: 12%;
     }
 
-    .splash-orbit::after { inset: 24%; }
+    .splash-orbit::after {
+      inset: 24%;
+    }
 
     .splash-content {
       width: 100%;
@@ -111,7 +158,9 @@
       animation: splashAppear 1s ease both;
     }
 
-    .splash-brand { margin-bottom: 34px; }
+    .splash-brand {
+      margin-bottom: 34px;
+    }
 
     .splash-logo-frame {
       width: 116px;
@@ -122,7 +171,9 @@
       border-radius: 32px;
       border: 1px solid rgba(110, 231, 183, 0.28);
       background: rgba(16, 185, 129, 0.10);
-      box-shadow: 0 0 35px rgba(16, 185, 129, 0.20), inset 0 0 25px rgba(52, 211, 153, 0.08);
+      box-shadow:
+        0 0 35px rgba(16, 185, 129, 0.20),
+        inset 0 0 25px rgba(52, 211, 153, 0.08);
       animation: logoPulse 3s ease-in-out infinite;
     }
 
@@ -158,7 +209,12 @@
       height: 3px;
       border-radius: 10px;
       margin: 0 auto 24px;
-      background: linear-gradient(90deg, transparent, #34d399, transparent);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        #34d399,
+        transparent
+      );
       box-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
     }
 
@@ -204,12 +260,15 @@
       width: 0;
       height: 100%;
       border-radius: inherit;
-      background: linear-gradient(90deg, #059669, #6ee7b7);
+      background: linear-gradient(
+        90deg,
+        #059669,
+        #6ee7b7
+      );
       box-shadow: 0 0 12px rgba(52, 211, 153, 0.7);
       transition: width 0.25s ease;
     }
 
-    /* TOMBOL MASUK SEKARANG */
     .splash-enter-button {
       width: min(100%, 280px);
       min-height: 52px;
@@ -221,17 +280,27 @@
       padding: 14px 24px;
       border: 1px solid rgba(167, 243, 208, 0.4);
       border-radius: 15px;
-      background: linear-gradient(135deg, #059669, #10b981);
+      background: linear-gradient(
+        135deg,
+        #059669,
+        #10b981
+      );
       color: #ffffff;
       font-family: 'Inter', sans-serif;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 8px 28px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      box-shadow:
+        0 8px 28px rgba(16, 185, 129, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
       opacity: 0;
       visibility: hidden;
       transform: translateY(12px);
-      transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease, box-shadow 0.25s ease;
+      transition:
+        opacity 0.35s ease,
+        transform 0.35s ease,
+        visibility 0.35s ease,
+        box-shadow 0.25s ease;
     }
 
     .splash-enter-button.is-visible {
@@ -241,7 +310,9 @@
     }
 
     .splash-enter-button:hover {
-      box-shadow: 0 10px 35px rgba(16, 185, 129, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      box-shadow:
+        0 10px 35px rgba(16, 185, 129, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
     }
 
@@ -276,7 +347,6 @@
       z-index: 2;
     }
 
-    /* OVERLAY */
     .splash-overlay {
       position: fixed;
       inset: 0;
@@ -288,7 +358,9 @@
       z-index: 20;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
+      transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
     }
 
     .splash-overlay.is-visible {
@@ -306,51 +378,9 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
     }
 
-    /* PERBAIKAN IKON OVERLAY: TANPA BORDER, PAKAI EFEK KILAUAN */
     .splash-overlay-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 16px;
-      position: relative;
-      overflow: hidden;
-      border-radius: 20px;
-      background: transparent; /* Menghilangkan background kotak */
-      border: none; /* Menghilangkan border */
-    }
-
-    .splash-overlay-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      filter: drop-shadow(0 0 15px rgba(52, 211, 153, 0.4));
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Efek Kilauan pada Ikon Overlay (Diambil dari animasi splash logo) */
-    .splash-overlay-icon::before {
-      content: "";
-      position: absolute;
-      z-index: 5;
-      inset: -65% -45%;
-      pointer-events: none;
-      opacity: 0;
-      background: linear-gradient(
-        112deg,
-        transparent 39%,
-        rgba(255,255,255,0) 43%,
-        rgba(255,248,218,.22) 47%,
-        rgba(255,255,255,.98) 50%,
-        rgba(255,226,151,.60) 53%,
-        rgba(255,255,255,0) 58%,
-        transparent 62%
-      );
-      mix-blend-mode: screen;
-      transform: translate3d(-90%, 0, 0) rotate(-14deg);
-      animation: tarbiyahShineLeft 3s ease-in-out infinite; /* Animasi berulang */
+      font-size: 32px;
+      margin-bottom: 12px;
     }
 
     .splash-overlay-title {
@@ -379,130 +409,527 @@
       cursor: pointer;
     }
 
-    /* ANIMASI DASAR */
-    @keyframes splashAppear { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes logoPulse {
-      0%, 100% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.16), inset 0 0 20px rgba(52, 211, 153, 0.06); }
-      50% { box-shadow: 0 0 45px rgba(16, 185, 129, 0.34), inset 0 0 28px rgba(52, 211, 153, 0.14); }
-    }
-    @keyframes splashGlow { from { transform: scale(0.85); opacity: 0.55; } to { transform: scale(1.15); opacity: 1; } }
-    @keyframes splashOrbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes splashAppear {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
 
-    /* ANIMASI KILAUAN (Dipindahkan ke sini agar bisa dipakai di overlay) */
-    @keyframes tarbiyahShineLeft {
-      0%, 10% { opacity: 0; transform: translate3d(-90%,0,0) rotate(-14deg); }
-      25% { opacity: .95; }
-      90%, 100% { opacity: 0; transform: translate3d(90%,0,0) rotate(-14deg); }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes logoPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 25px rgba(16, 185, 129, 0.16),
+          inset 0 0 20px rgba(52, 211, 153, 0.06);
+      }
+
+      50% {
+        box-shadow:
+          0 0 45px rgba(16, 185, 129, 0.34),
+          inset 0 0 28px rgba(52, 211, 153, 0.14);
+      }
+    }
+
+    @keyframes splashGlow {
+      from {
+        transform: scale(0.85);
+        opacity: 0.55;
+      }
+
+      to {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+    }
+
+    @keyframes splashOrbit {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     @media (max-width: 480px) {
-      .splash-logo-frame { width: 100px; height: 100px; border-radius: 28px; }
-      .splash-logo-frame img { width: 66px; height: 66px; }
-      .splash-brand { margin-bottom: 26px; }
-      .splash-loading-area { margin-top: 32px; }
+      .splash-logo-frame {
+        width: 100px;
+        height: 100px;
+        border-radius: 28px;
+      }
+
+      .splash-logo-frame img {
+        width: 66px;
+        height: 66px;
+      }
+
+      .splash-brand {
+        margin-bottom: 26px;
+      }
+
+      .splash-loading-area {
+        margin-top: 32px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
+      *,
+      *::before,
+      *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
       }
     }
-  </style>
+
+
+/* ==========================================
+   TARBIYAH — PREMIUM LOGO LIGHT ANIMATION
+   Kilatan acak empat arah, durasi 3 detik
+   ========================================== */
+
+/* Logo: denyut cahaya */
+.brand-mark,
+.auth-logo-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  animation: tarbiyahLogoPulse 3s ease-in-out infinite;
+}
+
+/* Lapisan kilatan cahaya */
+.brand-mark::before,
+.auth-logo-frame::before {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: -65% -45%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    112deg,
+    transparent 39%,
+    rgba(255,255,255,0) 43%,
+    rgba(255,248,218,.20) 47%,
+    rgba(255,255,255,.95) 50%,
+    rgba(255,226,151,.55) 53%,
+    rgba(255,255,255,0) 58%,
+    transparent 62%
+  );
+  mix-blend-mode: screen;
+  transform: translate3d(-90%, 0, 0) rotate(-14deg);
+}
+
+/* Empat arah kilatan */
+.brand-mark.shine-left::before,
+.auth-logo-frame.shine-left::before {
+  animation: tarbiyahShineLeft 3s ease-in-out both;
+}
+
+.brand-mark.shine-right::before,
+.auth-logo-frame.shine-right::before {
+  animation: tarbiyahShineRight 3s ease-in-out both;
+}
+
+.brand-mark.shine-up::before,
+.auth-logo-frame.shine-up::before {
+  animation: tarbiyahShineUp 3s ease-in-out both;
+}
+
+.brand-mark.shine-down::before,
+.auth-logo-frame.shine-down::before {
+  animation: tarbiyahShineDown 3s ease-in-out both;
+}
+
+/* Cahaya pada gambar logo */
+.brand-mark img,
+.auth-logo-frame img {
+  position: relative;
+  z-index: 2;
+  animation: tarbiyahLogoBlink 3s ease-in-out infinite;
+}
+
+/* Kilauan bergerak pada tulisan TARBIYAH */
+.brand-title,
+.auth-visual h1,
+.auth-heading h2 {
+  background: linear-gradient(
+    100deg,
+    #fff3cc 0%,
+    #d6b56d 30%,
+    #ffffff 50%,
+    #d6b56d 70%,
+    #fff3cc 100%
+  );
+  background-size: 220% auto;
+  color: transparent !important;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: tarbiyahTextShimmer 3s linear infinite;
+  filter: drop-shadow(0 0 9px rgba(214,181,109,.18));
+}
+
+/* Denyut cahaya bingkai logo */
+@keyframes tarbiyahLogoPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(214,181,109,.18),
+      inset 0 0 20px rgba(255,255,255,.04);
+  }
+  50% {
+    box-shadow:
+      0 0 38px rgba(214,181,109,.48),
+      inset 0 0 30px rgba(255,255,255,.12);
+  }
+}
+
+/* Efek blink gambar logo */
+@keyframes tarbiyahLogoBlink {
+  0%, 100% {
+    filter: drop-shadow(0 0 7px rgba(240,220,167,.38)) brightness(1);
+  }
+  48% {
+    filter: drop-shadow(0 0 15px rgba(255,225,151,.75)) brightness(1.12);
+  }
+  53% {
+    filter: drop-shadow(0 0 23px rgba(255,255,225,.95)) brightness(1.2);
+  }
+  58% {
+    filter: drop-shadow(0 0 10px rgba(240,220,167,.55)) brightness(1.04);
+  }
+}
+
+/* Kilatan kiri ke kanan */
+@keyframes tarbiyahShineLeft {
+  0%, 10% {
+    opacity: 0;
+    transform: translate3d(-90%,0,0) rotate(-14deg);
+  }
+  25% { opacity: .95; }
+  90%, 100% {
+    opacity: 0;
+    transform: translate3d(90%,0,0) rotate(-14deg);
+  }
+}
+
+/* Kilatan kanan ke kiri */
+@keyframes tarbiyahShineRight {
+  0%, 10% {
+    opacity: 0;
+    transform: translate3d(90%,0,0) rotate(166deg);
+  }
+  25% { opacity: .95; }
+  90%, 100% {
+    opacity: 0;
+    transform: translate3d(-90%,0,0) rotate(166deg);
+  }
+}
+
+/* Kilatan bawah ke atas */
+@keyframes tarbiyahShineUp {
+  0%, 10% {
+    opacity: 0;
+    transform: translate3d(0,90%,0) rotate(76deg);
+  }
+  25% { opacity: .95; }
+  90%, 100% {
+    opacity: 0;
+    transform: translate3d(0,-90%,0) rotate(76deg);
+  }
+}
+
+/* Kilatan atas ke bawah */
+@keyframes tarbiyahShineDown {
+  0%, 10% {
+    opacity: 0;
+    transform: translate3d(0,-90%,0) rotate(-104deg);
+  }
+  25% { opacity: .95; }
+  90%, 100% {
+    opacity: 0;
+    transform: translate3d(0,90%,0) rotate(-104deg);
+  }
+}
+
+/* Shimmer tulisan */
+@keyframes tarbiyahTextShimmer {
+  to { background-position: 220% center; }
+}
+
+/* Hormati pengaturan pengurangan animasi perangkat */
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark,
+  .auth-logo-frame,
+  .brand-mark img,
+  .auth-logo-frame img,
+  .brand-title,
+  .auth-visual h1,
+  .auth-heading h2 {
+    animation: none !important;
+  }
+}
+
+
+/* ==========================================
+   TARBIYAH SPLASH — TARGET CLASS ASLI
+   ========================================== */
+
+.splash-logo-frame {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  animation: logoPulse 3s ease-in-out infinite !important;
+}
+
+.splash-logo-frame::before {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: -65% -45%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    112deg,
+    transparent 39%,
+    rgba(255,255,255,0) 43%,
+    rgba(255,248,218,.22) 47%,
+    rgba(255,255,255,.98) 50%,
+    rgba(255,226,151,.60) 53%,
+    rgba(255,255,255,0) 58%,
+    transparent 62%
+  );
+  mix-blend-mode: screen;
+  transform: translate3d(-90%, 0, 0) rotate(-14deg);
+}
+
+.splash-logo-frame.shine-left::before {
+  animation: tarbiyahShineLeft 3s ease-in-out both;
+}
+
+.splash-logo-frame.shine-right::before {
+  animation: tarbiyahShineRight 3s ease-in-out both;
+}
+
+.splash-logo-frame.shine-up::before {
+  animation: tarbiyahShineUp 3s ease-in-out both;
+}
+
+.splash-logo-frame.shine-down::before {
+  animation: tarbiyahShineDown 3s ease-in-out both;
+}
+
+.splash-logo-frame img {
+  position: relative;
+  z-index: 2;
+  animation: tarbiyahLogoBlink 3s ease-in-out infinite;
+}
+
+/* Judul TARBIYAH */
+.splash-brand-name {
+  background: linear-gradient(
+    100deg,
+    #fff3cc 0%,
+    #d6b56d 30%,
+    #ffffff 50%,
+    #d6b56d 70%,
+    #fff3cc 100%
+  ) !important;
+  background-size: 220% auto !important;
+  color: transparent !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  animation: tarbiyahTextShimmer 3s linear infinite !important;
+  filter: drop-shadow(0 0 12px rgba(214,181,109,.35));
+}
+
+</style>
 </head>
 <body>
 
-  <!-- SPLASH SCREEN -->
+  <!-- ================================================
+       SPLASH SCREEN
+  ================================================= -->
+
   <main class="splash-page" data-splash>
+
     <div class="splash-glow" aria-hidden="true"></div>
     <div class="splash-orbit" aria-hidden="true"></div>
 
     <section class="splash-content">
+
+      <!-- IDENTITAS APLIKASI -->
       <div class="splash-brand">
-        <!-- LOGO PEMBUKA (DENGAN FRAME) -->
+
         <div class="splash-logo-frame">
-          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH" width="76" height="76" data-splash-logo>
+          <img
+            src="./assets/icons/icon-192.png"
+            alt="Logo TARBIYAH"
+            width="76"
+            height="76"
+            data-splash-logo
+          >
         </div>
-        <h1 class="splash-brand-name" data-splash-title>TARBIYAH</h1>
-        <div class="splash-brand-caption">PEMBELAJARAN TAUHID</div>
+
+        <h1
+          class="splash-brand-name"
+          data-splash-title
+        >
+          TARBIYAH
+        </h1>
+
+        <div class="splash-brand-caption">
+          PEMBELAJARAN TAUHID
+
+        </div>
+
       </div>
 
       <div class="splash-divider"></div>
 
-      <h2 class="splash-tagline">Tarbiyah, Berdakwah,<br>dan Beramal.</h2>
+      <!-- TAGLINE -->
+      <h2 class="splash-tagline">
+        Tarbiyah, Berdakwah,<br>
+        dan Beramal.
+      </h2>
+
       <p class="splash-description" data-splash-tagline>
-        Ruang belajar dan ukhuwah untuk membangun ilmu, memperkuat iman, dan menumbuhkan kebaikan bersama.
+        Ruang belajar dan ukhuwah untuk membangun
+        ilmu, memperkuat iman, dan menumbuhkan
+        kebaikan bersama.
       </p>
 
+      <!-- LOADING -->
       <div class="splash-loading-area">
-        <span class="splash-loading-text" data-splash-loading aria-live="polite">
+
+        <span
+          class="splash-loading-text"
+          data-splash-loading
+          aria-live="polite"
+        >
           Menyiapkan ruang Tarbiyah...
         </span>
-        <div class="splash-progress-track" role="progressbar" aria-label="Persiapan aplikasi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-splash-progress-track>
-          <div class="splash-progress-fill" data-splash-progress></div>
+
+        <div
+          class="splash-progress-track"
+          role="progressbar"
+          aria-label="Persiapan aplikasi"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          data-splash-progress-track
+        >
+          <div
+            class="splash-progress-fill"
+            data-splash-progress
+          ></div>
         </div>
+
       </div>
 
-      <!-- TOMBOL MASUK SEKARANG DENGAN SVG UNIVERSAL -->
-      <button type="button" class="splash-enter-button" data-splash-enter>
+      <!-- TOMBOL MASUK -->      
+      <button
+        type="button"
+        class="splash-enter-button"
+        data-splash-enter
+      >
         <span>Masuk Sekarang</span>
-        <span class="tarbiyah-page-nav__icon" style="margin-left:8px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; display:block;">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-          </svg>
+        <span class="splash-enter-arrow" aria-hidden="true">
+          →
         </span>
       </button>
+
     </section>
 
+    <!-- FOOTER -->
     <footer class="splash-footer">
-      TARBIYAH © <span data-current-year>2026</span> · PEMBELAJARAN TAUHID
+      TARBIYAH © <span data-current-year>2026</span>
+      · PEMBELAJARAN TAUHID
     </footer>
+
   </main>
 
-  <!-- OVERLAY -->
-  <div class="splash-overlay" data-splash-overlay role="dialog" aria-modal="true" aria-labelledby="splash-overlay-title" aria-describedby="splash-overlay-message">
+
+  <!-- ================================================
+       NOTIFIKASI / OVERLAY
+  ================================================= -->
+
+  <div
+    class="splash-overlay"
+    data-splash-overlay
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="splash-overlay-title"
+    aria-describedby="splash-overlay-message"
+  >
+
     <div class="splash-overlay-card">
-      
-      <!-- IKON OVERLAY (TRANSPARAN & BERKILAU) -->
+
       <div class="splash-overlay-icon" aria-hidden="true">
-        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
+        ✨
       </div>
 
-      <h2 class="splash-overlay-title" id="splash-overlay-title">Selamat Datang</h2>
-      <p class="splash-overlay-message" id="splash-overlay-message">
+      <h2
+        class="splash-overlay-title"
+        id="splash-overlay-title"
+      >
+        Selamat Datang
+      </h2>
+
+      <p
+        class="splash-overlay-message"
+        id="splash-overlay-message"
+      >
         Selamat datang di ruang TARBIYAH Peningkatan Keimanan dan Amaliyah.
       </p>
 
-      <button type="button" class="splash-overlay-close" data-splash-overlay-close>
+      <button
+        type="button"
+        class="splash-overlay-close"
+        data-splash-overlay-close
+      >
         Lanjut...
       </button>
+
     </div>
+
   </div>
 
-  <!-- SCRIPTS -->
+
+  <!-- ================================================
+       SCRIPT APLIKASI
+  ================================================= -->
+
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/theme-manager.js"></script>
   <script src="./js/splash.js"></script>
   <script src="./js/pwa.js"></script>
 
-  <!-- SCRIPT LOGIKA SPLASH & OVERLAY -->
+  <!-- Tahun otomatis dan penanganan overlay -->
   <script>
     (() => {
       'use strict';
 
-      // 1. Tahun Otomatis
-      const yearElement = document.querySelector('[data-current-year]');
+      const yearElement =
+        document.querySelector('[data-current-year]');
+
       if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
+        yearElement.textContent =
+          new Date().getFullYear();
       }
 
-      // 2. Logika Overlay
-      const overlay = document.querySelector('[data-splash-overlay]');
-      const closeButton = document.querySelector('[data-splash-overlay-close]');
+      const overlay =
+        document.querySelector('[data-splash-overlay]');
+
+      const closeButton =
+        document.querySelector('[data-splash-overlay-close]');
 
       if (overlay && closeButton) {
         closeButton.addEventListener('click', () => {
@@ -515,76 +942,84 @@
           }
         });
       }
-
-      // 3. Animasi Loading Bar
-      const progressFill = document.querySelector('[data-splash-progress]');
-      const progressTrack = document.querySelector('[data-splash-progress-track]');
-      const loadingText = document.querySelector('[data-splash-loading]');
-      
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 15) + 5; 
-        if (progress > 100) progress = 100;
-        
-        if (progressFill) progressFill.style.width = `${progress}%`;
-        if (progressTrack) progressTrack.setAttribute('aria-valuenow', progress);
-
-        if (progress === 100) {
-          clearInterval(interval);
-          if (loadingText) loadingText.textContent = "Siap digunakan!";
-          
-          // Tampilkan tombol masuk
-          const enterButton = document.querySelector('[data-splash-enter]');
-          if (enterButton) {
-            enterButton.classList.add('is-visible');
-            enterButton.addEventListener('click', () => {
-            enterButton.addEventListener('click', () => {
-            window.location.href = './login-register.html';
-            });
-          }
-        }
-      }, 200);
-
-      // 4. Animasi Kilauan Acak pada Logo Pembuka
-      const logo = document.querySelector(".splash-logo-frame");
-      if (logo) {
-        const directions = ["shine-left", "shine-right", "shine-up", "shine-down"];
-        let previousDirection = "";
-        let shineTimer = null;
-
-        function playRandomShine() {
-          let nextDirection;
-          do {
-            nextDirection = directions[Math.floor(Math.random() * directions.length)];
-          } while (directions.length > 1 && nextDirection === previousDirection);
-
-          previousDirection = nextDirection;
-          logo.classList.remove(...directions);
-          void logo.offsetWidth;
-          logo.classList.add(nextDirection);
-        }
-
-        function startShine() {
-          stopShine();
-          playRandomShine();
-          shineTimer = window.setInterval(playRandomShine, 3000);
-        }
-
-        function stopShine() {
-          if (shineTimer !== null) {
-            window.clearInterval(shineTimer);
-            shineTimer = null;
-          }
-        }
-
-        startShine();
-
-        document.addEventListener("visibilitychange", () => {
-          if (document.hidden) stopShine();
-          else startShine();
-        });
-      }
     })();
-  </script>
+
+
+/* ==========================================
+   TARBIYAH — SPLASH RANDOM SHINE CONTROLLER
+   Target: .splash-logo-frame
+   ========================================== */
+(() => {
+  "use strict";
+
+  const logo = document.querySelector(".splash-logo-frame");
+
+  if (!logo) {
+    console.warn("[TARBIYAH] Elemen splash logo tidak ditemukan.");
+    return;
+  }
+
+  const directions = [
+    "shine-left",
+    "shine-right",
+    "shine-up",
+    "shine-down"
+  ];
+
+  let previousDirection = "";
+  let shineTimer = null;
+
+  function playRandomShine() {
+    let nextDirection;
+
+    do {
+      nextDirection =
+        directions[Math.floor(Math.random() * directions.length)];
+    } while (
+      directions.length > 1 &&
+      nextDirection === previousDirection
+    );
+
+    previousDirection = nextDirection;
+
+    logo.classList.remove(...directions);
+
+    // Memulai ulang animasi CSS
+    void logo.offsetWidth;
+
+    logo.classList.add(nextDirection);
+  }
+
+  function startShine() {
+    stopShine();
+
+    playRandomShine();
+
+    // Satu arah baru setiap 3 detik
+    shineTimer = window.setInterval(playRandomShine, 3000);
+  }
+
+  function stopShine() {
+    if (shineTimer !== null) {
+      window.clearInterval(shineTimer);
+      shineTimer = null;
+    }
+  }
+
+  startShine();
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopShine();
+    } else {
+      startShine();
+    }
+  });
+
+  console.info("[TARBIYAH] Animasi kilatan logo splash aktif.");
+})();
+
+
+</script>
 </body>
 </html>
