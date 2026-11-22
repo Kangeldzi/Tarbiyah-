@@ -23,9 +23,28 @@
   <script src="./js/tarbiyah-theme.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
+  
+  <style>
+    /* Memastikan avatar seragam dan tidak pecah */
+    .profile-avatar, .identity-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 50%;
+      border: 2px solid var(--border-color, rgba(255,255,255,0.1));
+      background: var(--bg-secondary);
+    }
+    .profile-avatar img, .identity-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  </style>
 </head>
 
-<body class="admin-page">
+<body class="admin-page auth-pending">
 
   <div class="admin-scrim" id="adminScrim"></div>
 
@@ -40,7 +59,10 @@
     </div>
 
     <div class="admin-profile">
-      <div class="profile-avatar" id="adminAvatar">A</div>
+      <!-- FOTO PROFIL (KLIK KE PROFIL-ANGGOTA.HTML) -->
+      <a href="./profil-anggota.html" class="profile-avatar" id="adminAvatar" title="Buka Profil Anggota">
+        <img src="./assets/icons/icon-192.png" alt="Foto Profil" id="sidebarAvatarImg">
+      </a>
       <div class="profile-copy">
         <strong id="adminName">Memuat pengguna...</strong>
         <span id="adminRole">Memverifikasi akses...</span>
@@ -117,15 +139,19 @@
 
       <div class="topbar-actions">
         <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
-        ☀
+          ☀
         </button>
-        <div class="topbar-identity">
-          <div class="identity-avatar" id="topAvatar">A</div>
+        
+        <!-- FOTO PROFIL TOPBAR (KLIK KE PROFIL-ANGGOTA.HTML) -->
+        <a href="./profil-anggota.html" class="topbar-identity" style="text-decoration: none; color: inherit;" title="Buka Profil Anggota">
+          <div class="identity-avatar" id="topAvatar">
+            <img src="./assets/icons/icon-192.png" alt="Foto Profil" id="topbarAvatarImg">
+          </div>
           <div class="identity-copy">
             <strong id="topName">Administrator</strong>
             <span>Super Admin</span>
           </div>
-        </div>
+        </a>
       </div>
     </header>
 
@@ -195,68 +221,67 @@
 
       <div class="content-grid">
         
-<section class="content-card member-management-card" id="users">
-  <div class="member-heading">
-    <div>
-      <span class="section-kicker">MANAJEMEN PENGGUNA</span>
-      <h3>Pengguna & Anggota TARBIYAH</h3>
-      <p>Periksa profil, tinjau permohonan, dan kelola status keanggotaan.</p>
-    </div>
-    <button class="refresh-button" id="refreshMembers">↻ Perbarui</button>
-  </div>
+        <section class="content-card member-management-card" id="users">
+          <div class="member-heading">
+            <div>
+              <span class="section-kicker">MANAJEMEN PENGGUNA</span>
+              <h3>Pengguna & Anggota TARBIYAH</h3>
+              <p>Periksa profil, tinjau permohonan, dan kelola status keanggotaan.</p>
+            </div>
+            <button class="refresh-button" id="refreshMembers">↻ Perbarui</button>
+          </div>
 
-  <div class="member-toolbar">
-    <input
-      type="search"
-      id="memberSearch"
-      placeholder="Cari nama, username, nomor anggota..."
-      aria-label="Cari pengguna"
-    >
+          <div class="member-toolbar">
+            <input
+              type="search"
+              id="memberSearch"
+              placeholder="Cari nama, username, nomor anggota..."
+              aria-label="Cari pengguna"
+            >
 
-    <select id="memberFilter" aria-label="Filter status anggota">
-      <option value="all">Semua status</option>
-      <option value="pending">Menunggu persetujuan</option>
-      <option value="active">Anggota aktif</option>
-      <option value="rejected">Ditolak</option>
-      <option value="suspended">Ditangguhkan</option>
-      <option value="inactive">Tidak aktif</option>
-      <option value="no_member">Belum memiliki data anggota</option>
-    </select>
-  </div>
+            <select id="memberFilter" aria-label="Filter status anggota">
+              <option value="all">Semua status</option>
+              <option value="pending">Menunggu persetujuan</option>
+              <option value="active">Anggota aktif</option>
+              <option value="rejected">Ditolak</option>
+              <option value="suspended">Ditangguhkan</option>
+              <option value="inactive">Tidak aktif</option>
+              <option value="no_member">Belum memiliki data anggota</option>
+            </select>
+          </div>
 
-  <div class="member-summary" id="memberSummary">
-    Menyiapkan data pengguna...
-  </div>
+          <div class="member-summary" id="memberSummary">
+            Menyiapkan data pengguna...
+          </div>
 
-  <div class="member-table-wrap">
-    <table class="member-table">
-      <thead>
-        <tr>
-          <th>Pengguna</th>
-          <th>Nomor Anggota</th>
-          <th>Status</th>
-          <th>Tanggal Pengajuan</th>
-          <th>Tindakan</th>
-        </tr>
-      </thead>
-      <tbody id="memberTableBody">
-        <tr>
-          <td colspan="5" class="member-empty">Memuat data...</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+          <div class="member-table-wrap">
+            <table class="member-table">
+              <thead>
+                <tr>
+                  <th>Pengguna</th>
+                  <th>Nomor Anggota</th>
+                  <th>Status</th>
+                  <th>Tanggal Pengajuan</th>
+                  <th>Tindakan</th>
+                </tr>
+              </thead>
+              <tbody id="memberTableBody">
+                <tr>
+                  <td colspan="5" class="member-empty">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-  <div class="member-mobile-list" id="memberMobileList">
-    <div class="member-empty">Memuat data...</div>
-  </div>
+          <div class="member-mobile-list" id="memberMobileList">
+            <div class="member-empty">Memuat data...</div>
+          </div>
 
-  <p class="member-footnote">
-    Informasi yang ditampilkan mengikuti izin baca akun administrator.
-    Keputusan keanggotaan diproses melalui fungsi database Supabase.
-  </p>
-</section>
-
+          <p class="member-footnote">
+            Informasi yang ditampilkan mengikuti izin baca akun administrator.
+            Keputusan keanggotaan diproses melalui fungsi database Supabase.
+          </p>
+        </section>
 
         <section class="content-card" id="roles">
           <div class="card-heading">
@@ -264,7 +289,7 @@
               <span class="section-kicker">OTORISASI</span>
               <h3>Manajemen Role</h3>
             </div>
-            <span class="coming-badge">Dalam pengembangan</span>
+            <span class="coming-badge" id="roleBadge">Dalam pengembangan</span>
           </div>
           <p>Pengaturan hak akses berdasarkan role yang sudah tersedia di Supabase.</p>
           <div class="role-chips">
@@ -287,8 +312,9 @@
           <div class="feature-preview">
             <span>▣</span>
             <div>
-              <strong>Kalender Kegiatan</strong>
-              <small>Jadwal, lokasi, dan informasi kajian</small>
+              <!-- WADAH DATA AGENDA DARI SUPABASE -->
+              <strong id="agendaPreviewTitle">Kalender Kegiatan</strong>
+              <small id="agendaPreviewDesc">Menunggu data dari database...</small>
             </div>
           </div>
         </section>
@@ -305,8 +331,9 @@
           <div class="feature-preview">
             <span>▤</span>
             <div>
-              <strong>Pusat Materi</strong>
-              <small>Daftar tema dan bahan pembelajaran</small>
+              <!-- WADAH DATA MATERI DARI SUPABASE -->
+              <strong id="materiPreviewTitle">Pusat Materi</strong>
+              <small id="materiPreviewDesc">Menunggu data dari database...</small>
             </div>
           </div>
         </section>
@@ -323,8 +350,9 @@
           <div class="feature-preview">
             <span>▧</span>
             <div>
-              <strong>Galeri Dokumentasi</strong>
-              <small>Foto dan video kegiatan</small>
+              <!-- WADAH DATA GALERI DARI SUPABASE -->
+              <strong id="galeriPreviewTitle">Galeri Dokumentasi</strong>
+              <small id="galeriPreviewDesc">Menunggu data dari database...</small>
             </div>
           </div>
         </section>
@@ -374,23 +402,23 @@
 
   <div class="admin-toast" id="adminToast" role="status" aria-live="polite"></div>
  
-<div class="member-dialog-backdrop" id="memberDialog" hidden>
-  <section class="member-dialog" role="dialog" aria-modal="true" aria-labelledby="memberDialogTitle">
-    <button type="button" class="member-dialog-close" id="memberDialogClose" aria-label="Tutup">×</button>
+  <div class="member-dialog-backdrop" id="memberDialog" hidden>
+    <section class="member-dialog" role="dialog" aria-modal="true" aria-labelledby="memberDialogTitle">
+      <button type="button" class="member-dialog-close" id="memberDialogClose" aria-label="Tutup">×</button>
 
-    <span class="section-kicker">TINDAKAN ADMINISTRASI</span>
-    <h3 id="memberDialogTitle">Tinjau Permohonan</h3>
-    <p id="memberDialogDescription">Periksa kembali keputusan sebelum melanjutkan.</p>
+      <span class="section-kicker">TINDAKAN ADMINISTRASI</span>
+      <h3 id="memberDialogTitle">Tinjau Permohonan</h3>
+      <p id="memberDialogDescription">Periksa kembali keputusan sebelum melanjutkan.</p>
 
-    <label for="memberDecisionNote">Catatan administrator (opsional)</label>
-    <textarea id="memberDecisionNote" rows="3" maxlength="1000" placeholder="Tuliskan catatan untuk pengguna..."></textarea>
+      <label for="memberDecisionNote">Catatan administrator (opsional)</label>
+      <textarea id="memberDecisionNote" rows="3" maxlength="1000" placeholder="Tuliskan catatan untuk pengguna..."></textarea>
 
-    <div class="member-dialog-actions">
-      <button type="button" class="member-cancel" id="memberDialogCancel">Batal</button>
-      <button type="button" class="member-confirm" id="memberDialogConfirm">Konfirmasi</button>
-    </div>
-  </section>
-</div>
+      <div class="member-dialog-actions">
+        <button type="button" class="member-cancel" id="memberDialogCancel">Batal</button>
+        <button type="button" class="member-confirm" id="memberDialogConfirm">Konfirmasi</button>
+      </div>
+    </section>
+  </div>
 
   <script src="./js/dashboard-admin.js" defer></script>
   <script src="./js/member-management.js" defer></script>
