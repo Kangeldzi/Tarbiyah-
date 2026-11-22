@@ -166,16 +166,16 @@
       access: "member"
     },
 
-    administrasi: {
+        administrasi: {
       id: "administrasi",
       title: "Administrasi dan Pengaturan",
       description: "Pengaturan dan pengelolaan aplikasi.",
       icon: "settings",
       url: "./administrasi-pengaturan.html",
       access: "admin"
-    }
+    },
 
-      "agenda-kajian-manage": {
+    "agenda-kajian-manage": {
       id: "agenda-kajian-manage",
       title: "Kelola Agenda Kajian",
       description: "Membuat, mengubah, mengarsipkan, dan memulihkan agenda kajian.",
@@ -254,7 +254,7 @@
     "riwayat-aktivitas": "riwayat",
 
     "administrasi-pengaturan": "administrasi",
-    pengaturan: "administrasi"
+    pengaturan: "administrasi",
 
     "agenda-kajian": "agenda-kajian-manage",
     "kelola-agenda-kajian": "agenda-kajian-manage",
