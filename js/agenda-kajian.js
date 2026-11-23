@@ -5,7 +5,7 @@
    Database   : kajian_agenda
    Role       : super_admin, admin, mentor
    Timezone   : Asia/Jakarta (WIB)
-   Version    : 3.0 — Unified & Archive
+   Version    : 3.1 — Unified, Archive & Super Admin Delete
    ============================================================ */
 
 (() => {
@@ -16,7 +16,7 @@
   ============================================================ */
 
   if (window.__TARBIYAH_AGENDA_KAJIAN_V3__) {
-    console.info("[TARBIYAH AGENDA] Versi 3 sudah aktif.");
+    console.info("[TARBIYAH AGENDA] Modul sudah aktif.");
     return;
   }
 
@@ -27,9 +27,14 @@
   ============================================================ */
 
   const TABLE = "kajian_agenda";
+  const ATTENDANCE_TABLE = "kajian_attendance";
   const ROLE_TABLE = "user_roles";
   const TIMEZONE = "Asia/Jakarta";
-  const ALLOWED_ROLES = ["super_admin", "admin", "mentor"];
+  const ALLOWED_ROLES = [
+    "super_admin",
+    "admin",
+    "mentor"
+  ];
   const CLIENT_WAIT_MS = 15000;
 
   const $ = (id) => document.getElementById(id);
@@ -60,6 +65,7 @@
 
   function showNotice(message, type = "success") {
     const box = $("agendaNotice");
+
     if (!box) {
       console.warn("[TARBIYAH AGENDA]", message);
       return;
@@ -72,6 +78,7 @@
 
   function hideNotice() {
     const box = $("agendaNotice");
+
     if (box) {
       box.hidden = true;
       box.textContent = "";
@@ -162,9 +169,7 @@
 
       if (client) {
         state.supabase = client;
-
         log("Supabase client berhasil ditemukan.");
-
         return client;
       }
 
@@ -184,12 +189,9 @@
 
   async function getAuthenticatedUser() {
     if (!state.supabase) {
-      throw new Error(
-        "Koneksi Supabase belum tersedia."
-      );
+      throw new Error("Koneksi Supabase belum tersedia.");
     }
 
-    // Gunakan sesi yang sudah disediakan aplikasi jika tersedia.
     const guardedUser =
       window.TARBIYAH_SESSION?.user ||
       window.TARBIYAH_AUTH?.user ||
@@ -200,7 +202,6 @@
       return guardedUser;
     }
 
-    // Jika tidak tersedia, periksa langsung melalui Supabase Auth.
     const { data, error } =
       await state.supabase.auth.getUser();
 
@@ -218,7 +219,6 @@
     }
 
     log("Sesi pengguna berhasil diverifikasi.");
-
     return data.user;
   }
 
@@ -249,6 +249,7 @@
       })
       .filter(Boolean);
 
+    // Prioritas Super Admin, kemudian Admin, lalu Mentor.
     const permittedRole = ALLOWED_ROLES.find((role) =>
       roles.includes(role)
     );
@@ -385,21 +386,18 @@
 
     if (!value) return "";
 
-    // Tautan pendek Google Maps.
     if (
       /^https?:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps)\//i.test(value)
     ) {
       return value;
     }
 
-    // Tautan Google Maps lengkap.
     if (
       /^https?:\/\/(www\.)?google\.[^/]+\/maps/i.test(value)
     ) {
       return value;
     }
 
-    // Koordinat GPS.
     const coordinateMatch = value.match(
       /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/
     );
@@ -421,7 +419,6 @@
       }
     }
 
-    // Nama tempat atau alamat biasa.
     return (
       "https://www.google.com/maps/search/?api=1&query=" +
       encodeURIComponent(value)
@@ -608,7 +605,7 @@
         `
         : "";
 
-      const actionButtons =
+      const regularActionButtons =
         state.view === "published"
           ? `
             <button
@@ -630,6 +627,22 @@
               Pulihkan Agenda
             </button>
           `;
+
+      // Tombol hapus hanya ditampilkan kepada Super Admin.
+      const deleteActionButton =
+        state.role === "super_admin"
+          ? `
+            <button
+              type="button"
+              data-delete-id="${escapeHTML(item.id)}"
+              class="agenda-delete-button">
+              Hapus Permanen
+            </button>
+          `
+          : "";
+
+      const actionButtons =
+        regularActionButtons + deleteActionButton;
 
       const statusLabel =
         state.view === "archived"
@@ -730,10 +743,127 @@
         );
       });
     });
+
+    list.querySelectorAll("[data-delete-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        deleteAgendaPermanently(button.dataset.deleteId);
+      });
+    });
   }
 
   /* ============================================================
-     12. ARSIP DAN PEMULIHAN AGENDA
+     12. HAPUS PERMANEN — KHUSUS SUPER ADMIN
+  ============================================================ */
+
+  async function deleteAgendaPermanently(id) {
+    if (state.busy) return;
+
+    // Pemeriksaan hak akses tambahan di sisi klien.
+    // Pengamanan utama tetap RLS Supabase.
+    if (state.role !== "super_admin") {
+      showNotice(
+        "Akses ditolak. Hanya Super Admin yang dapat menghapus agenda permanen.",
+        "error"
+      );
+      return;
+    }
+
+    const item = state.agendas.find(
+      (agenda) => String(agenda.id) === String(id)
+    );
+
+    if (!item) {
+      showNotice("Agenda tidak ditemukan.", "error");
+      return;
+    }
+
+    const confirmation = window.confirm(
+      `PERINGATAN: Hapus permanen agenda "${item.title}"?\n\n` +
+      "Tindakan ini tidak dapat dibatalkan.\n" +
+      "Riwayat kehadiran anggota tidak akan dihapus.\n" +
+      "Agenda yang memiliki riwayat kehadiran tidak dapat dihapus."
+    );
+
+    if (!confirmation) return;
+
+    try {
+      setBusy(true);
+      hideNotice();
+
+      // Periksa riwayat kehadiran sebelum menghapus agenda.
+      const attendanceResult = await state.supabase
+        .from(ATTENDANCE_TABLE)
+        .select("id", {
+          count: "exact",
+          head: true
+        })
+        .eq("agenda_id", id);
+
+      if (attendanceResult.error) {
+        throw new Error(
+          "Gagal memeriksa riwayat kehadiran. Agenda tidak dihapus. " +
+          getErrorMessage(attendanceResult.error)
+        );
+      }
+
+      const attendanceCount = Number(
+        attendanceResult.count || 0
+      );
+
+      if (attendanceCount > 0) {
+        throw new Error(
+          `Agenda tidak dapat dihapus karena memiliki ${attendanceCount} ` +
+          "catatan kehadiran. Silakan arsipkan agenda agar riwayat anggota tetap tersimpan."
+        );
+      }
+
+      // Penghapusan hanya berdasarkan ID agenda.
+      // RLS database membatasi DELETE untuk Super Admin.
+      const { data, error } = await state.supabase
+        .from(TABLE)
+        .delete()
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(
+          "Penghapusan gagal: " + getErrorMessage(error)
+        );
+      }
+
+      if (!data) {
+        throw new Error(
+          "Agenda tidak terhapus. Periksa kebijakan DELETE dan SELECT RLS."
+        );
+      }
+
+      await loadAgendas();
+
+      showNotice(
+        `Agenda "${item.title}" berhasil dihapus secara permanen.`
+      );
+
+      log("Agenda berhasil dihapus permanen.", { id });
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH AGENDA] Hapus permanen gagal:",
+        error
+      );
+
+      showNotice(
+        getErrorMessage(error),
+        "error"
+      );
+
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /* ============================================================
+     13. ARSIP DAN PEMULIHAN AGENDA
   ============================================================ */
 
   async function changeAgendaStatus(id, newStatus) {
@@ -816,7 +946,7 @@
   }
 
   /* ============================================================
-     13. FORMULIR UBAH AGENDA
+     14. FORMULIR UBAH AGENDA
   ============================================================ */
 
   function startEdit(item) {
@@ -872,7 +1002,7 @@
   }
 
   /* ============================================================
-     14. PENGENDALIAN PROSES
+     15. PENGENDALIAN PROSES
   ============================================================ */
 
   function setBusy(value) {
@@ -904,7 +1034,8 @@
       .querySelectorAll(
         "#agendaList button[data-edit-id], " +
         "#agendaList button[data-archive-id], " +
-        "#agendaList button[data-restore-id]"
+        "#agendaList button[data-restore-id], " +
+        "#agendaList button[data-delete-id]"
       )
       .forEach((button) => {
         button.disabled = state.busy;
@@ -918,7 +1049,7 @@
   }
 
   /* ============================================================
-     15. SIMPAN AGENDA BARU DAN PERUBAHAN
+     16. SIMPAN AGENDA BARU DAN PERUBAHAN
   ============================================================ */
 
   async function saveAgenda(event) {
@@ -928,7 +1059,6 @@
 
     hideNotice();
 
-    // Simpan status edit sebelum resetForm mengosongkannya.
     const editingAtStart = state.editingId;
 
     try {
@@ -975,7 +1105,6 @@
       let result;
 
       if (editingAtStart) {
-        // Perbarui agenda yang sudah ada.
         result = await state.supabase
           .from(TABLE)
           .update(payload)
@@ -984,7 +1113,6 @@
           .maybeSingle();
 
       } else {
-        // Buat agenda baru.
         result = await state.supabase
           .from(TABLE)
           .insert({
@@ -1011,7 +1139,6 @@
 
       resetForm();
 
-      // Setelah simpan, tampilkan daftar agenda aktif.
       state.view = "published";
       updateViewTabs();
 
@@ -1047,7 +1174,7 @@
   }
 
   /* ============================================================
-     16. EVENT LISTENER HALAMAN
+     17. EVENT LISTENER HALAMAN
   ============================================================ */
 
   function bindEvents() {
@@ -1101,7 +1228,6 @@
       }
     });
 
-    // Event tab aktif dan arsip.
     document
       .querySelectorAll("[data-agenda-view]")
       .forEach((button) => {
@@ -1116,7 +1242,7 @@
   }
 
   /* ============================================================
-     17. AKTIFKAN / NONAKTIFKAN FORMULIR
+     18. AKTIFKAN / NONAKTIFKAN FORMULIR
   ============================================================ */
 
   function enableForm() {
@@ -1160,7 +1286,7 @@
   }
 
   /* ============================================================
-     18. INISIALISASI HALAMAN
+     19. INISIALISASI HALAMAN
   ============================================================ */
 
   async function initialize() {
@@ -1255,7 +1381,7 @@
   }
 
   /* ============================================================
-     19. JALANKAN MODUL
+     20. JALANKAN MODUL
   ============================================================ */
 
   if (document.readyState === "loading") {
