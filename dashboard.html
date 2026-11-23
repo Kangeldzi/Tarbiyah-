@@ -13,44 +13,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CSS Utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module-shell.css">
   <link rel="stylesheet" href="./css/dashboard.css">
-  
-  <!-- CSS Navigasi Universal (Untuk berjaga-jaga jika dibutuhkan nanti) -->
   <link rel="stylesheet" href="./css/page-navigation.css">
-  <link rel="stylesheet" href="./css/brand-logo.css">
-  <link rel="stylesheet" href="./css/module-shell.css">
+
   <style>
     /* =========================================
-       HEADER FIX (MENGUNCI LOGO & TOMBOL IKON)
+       HEADER FIX
     ========================================= */
-    /* Kunci agar sidebar tidak terpotong */
-.app-sidebar {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden; /* Mencegah seluruh sidebar ter-scroll */
-}
-
-/* Area menu dibuat scrollable */
-.sidebar-navigation, .admin-nav {
-  flex: 1;
-  overflow-y: auto;
-  padding-bottom: 20px;
-}
-
-/* Area profil dan logout terkunci di bawah */
-.sidebar-footer-wrapper, .sidebar-bottom {
-  flex-shrink: 0;
-  background: var(--bg-secondary);
-  padding-bottom: max(16px, env(safe-area-inset-bottom)); /* Jarak aman untuk HP berponi */
-  border-top: 1px solid var(--border-color);
-}
     .app-header {
       display: flex;
       align-items: center;
@@ -113,7 +88,6 @@
       gap: 10px;
     }
 
-    /* TOMBOL IKON UNIVERSAL */
     .header-icon-button,
     .icon-button {
       display: inline-flex;
@@ -137,30 +111,6 @@
       background: var(--bg-tertiary);
     }
 
-    /* Mengunci layout sidebar */
-.app-sidebar {
-  display: flex !important;
-  flex-direction: column !important;
-  height: 100vh !important;
-  height: 100dvh !important;
-  overflow: hidden !important;
-}
-
-/* Area menu bisa di scroll */
-.app-sidebar .admin-nav {
-  flex: 1 1 auto !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Area bawah (profil & logout) terkunci */
-.app-sidebar .sidebar-bottom {
-  flex: 0 0 auto !important;
-  position: relative;
-  z-index: 10;
-}
-
-    <style>
     /* =========================================
        KUNCI LAYOUT SIDEBAR (FIXED FOOTER)
     ========================================= */
@@ -169,8 +119,23 @@
       flex-direction: column !important;
       height: 100vh !important;
       height: 100dvh !important;
-      overflow: hidden !important; /* Mencegah seluruh sidebar ter-scroll */
-      padding: 0 !important; /* Menghapus padding bawaan yang bikin bocor */
+      overflow: hidden !important;
+      padding: 0 !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 280px !important;
+      z-index: 9999 !important;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out !important;
+      background: var(--bg-secondary) !important;
+      border-right: 1px solid var(--border-color) !important;
+    }
+
+    .app-sidebar.is-open, 
+    .app-sidebar.open,
+    .app-sidebar.active {
+      transform: translateX(0) !important;
     }
 
     /* Area Menu (Dinamis, bisa di-scroll) */
@@ -179,23 +144,36 @@
     .app-sidebar > nav {
       flex: 1 1 auto !important;
       overflow-y: auto !important;
-      padding-bottom: 20px !important;
-      -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+      padding: 16px 12px !important;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* Area Bawah (Foto & Logout) Fixed di dasar */
     .app-sidebar > .sidebar-bottom,
     .app-sidebar > .sidebar-footer-wrapper {
       flex: 0 0 auto !important;
-      position: relative !important;
-      z-index: 100 !important;
       background: var(--bg-secondary) !important;
       border-top: 1px solid var(--border-color) !important;
-      padding: 12px 16px !important;
-      /* Memberikan ruang aman untuk HP yang memiliki Home Bar (seperti iPhone) */
-      padding-bottom: max(16px, env(safe-area-inset-bottom)) !important; 
+      padding: 16px !important;
+      padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
     }
-  
+
+    /* Overlay Gelap */
+    .sidebar-scrim {
+      position: fixed !important;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6) !important;
+      backdrop-filter: blur(4px) !important;
+      z-index: 9998 !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      transition: opacity 0.3s ease !important;
+    }
+
+    .sidebar-scrim.is-visible {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
   </style>
 
   <script>
@@ -232,30 +210,22 @@
        HEADER UNIVERSAL
   ====================================== -->
   <header class="app-header">
-
     <div style="display:flex; align-items:center; gap:16px;">
-      <button
-        class="icon-button mobile-menu-button"
-        id="menuOpen"
-        type="button"
-        aria-label="Buka menu navigasi"
-        aria-controls="appSidebar"
-        aria-expanded="false"
-      >
+      <button class="icon-button mobile-menu-button" id="menuOpen" type="button" aria-label="Buka menu navigasi" aria-controls="appSidebar" aria-expanded="false">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
           <path d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
 
-      <a class="brand" href="./dashboard.html" aria-label="TARBIYAH Beranda" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
-      <span class="brand-logo-wrap" style="width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px; overflow:hidden;">
-        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH" style="width:100%; height:100%; object-fit:contain; display:block;">
-      </span>
-      <span class="brand-copy" style="display:flex; flex-direction:column; justify-content:center;">
-        <strong style="color:var(--color-primary, #36b58a); font-family:var(--font-heading); font-size:1.1rem; font-weight:800; letter-spacing:.05em; line-height:1.1;">TARBIYAH</strong>
-        <small style="color:var(--text-secondary); font-size:.75rem; font-weight:500; margin-top:2px;">Pembelajaran Iman</small>
-      </span>
-    </a>
+      <a class="brand" href="./dashboard.html" aria-label="TARBIYAH Beranda">
+        <span class="brand-logo-wrap" style="width:40px; height:40px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px; overflow:hidden;">
+          <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH" style="width:100%; height:100%; object-fit:contain; display:block;">
+        </span>
+        <span class="brand-copy" style="display:flex; flex-direction:column; justify-content:center;">
+          <strong style="color:var(--color-primary, #36b58a); font-family:var(--font-heading); font-size:1.1rem; font-weight:800; letter-spacing:.05em; line-height:1.1;">TARBIYAH</strong>
+          <small style="color:var(--text-secondary); font-size:.75rem; font-weight:500; margin-top:2px;">Pembelajaran Iman</small>
+        </span>
+      </a>
     </div>
 
     <form class="header-search" id="searchForm" role="search" style="flex:1; max-width:400px; margin:0 20px;">
@@ -263,26 +233,16 @@
         <circle cx="11" cy="11" r="7"/>
         <path d="m20 20-4-4"/>
       </svg>
-      <input
-        id="globalSearch"
-        type="search"
-        placeholder="Cari agenda, materi, anggota..."
-        aria-label="Cari di TARBIYAH"
-        style="flex:1; background:transparent; border:none; outline:none; color:var(--text-primary); font-family:inherit;"
-      >
+      <input id="globalSearch" type="search" placeholder="Cari agenda, materi, anggota..." aria-label="Cari di TARBIYAH" style="flex:1; background:transparent; border:none; outline:none; color:var(--text-primary); font-family:inherit;">
     </form>
 
     <div class="header-actions">
-    <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
-     ☀
-    </button>
-
+      <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">☀</button>
       <a class="icon-button notification-button" href="./notifikasi.html" aria-label="Notifikasi">
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
           <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>
         </svg>
       </a>
-
       <a class="profile-chip" href="./profil-anggota.html" aria-label="Buka profil" style="text-decoration:none;">
         <span class="header-user-avatar" data-user-avatar style="display:flex; width:42px; height:42px; border-radius:50%; border:1px solid var(--border-color); overflow:hidden;">
           <img src="./assets/icons/icon-192.png" alt="Foto profil" style="width:100%; height:100%; object-fit:cover;">
@@ -290,10 +250,6 @@
       </a>
     </div>
   </header>
-<body>
-
-  <a class="skip-link" href="#mainContent">Lewati ke konten</a>
-  <div class="app-backdrop" aria-hidden="true"></div>
 
   <!-- =====================================
        LAYOUT DAN SIDEBAR
@@ -302,10 +258,9 @@
 
     <div class="sidebar-scrim" id="sidebarScrim"></div>
 
-        <aside class="app-sidebar" id="appSidebar" aria-label="Navigasi utama">
-      
+    <aside class="app-sidebar" id="appSidebar" aria-label="Navigasi utama">
       <!-- HEADER SIDEBAR -->
-      <div class="sidebar-topline" style="flex-shrink: 0; padding: 16px;">
+      <div class="sidebar-topline" style="flex-shrink: 0; padding: 16px; border-bottom: 1px solid var(--border-color);">
         <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--text-muted);">NAVIGASI</span>
         <button class="icon-button sidebar-close" id="menuClose" type="button" aria-label="Tutup menu">×</button>
       </div>
@@ -379,8 +334,6 @@
       <!-- AREA PROFIL & LOGOUT (FIXED DI BAWAH) -->
       <div class="sidebar-bottom">
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-          
-          <!-- Info Profil -->
           <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
             <img src="./assets/icons/icon-192.png" alt="Foto profil" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
             <div style="display: flex; flex-direction: column; min-width: 0;">
@@ -388,8 +341,6 @@
               <span style="font-size: 11px; color: var(--text-secondary);">Aktif</span>
             </div>
           </div>
-
-          <!-- Tombol Logout -->
           <button class="icon-button logout-mini" id="logoutMini" type="button" aria-label="Keluar" title="Keluar dari akun" style="flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid var(--border-color); border-radius: 10px; background: transparent; color: var(--text-secondary); cursor: pointer;">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
               <path d="M10 17l5-5-5-5"/>
@@ -397,7 +348,6 @@
               <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>
             </svg>
           </button>
-
         </div>
       </div>
     </aside>
@@ -405,7 +355,7 @@
     <!-- =====================================
          KONTEN UTAMA
     ====================================== -->
-    <main class="main-content profile-container" id="mainContent">
+    <main class="main-content" id="mainContent">
       <!-- WELCOME -->
       <section class="welcome-row">
         <div>
@@ -456,7 +406,7 @@
           <span id="slideCounter" style="font-size:.8rem; font-weight:700; color:var(--text-secondary);">01 / 03</span>
         </div>
 
-                <!-- ⬇️ SLIDE 2: TAMBAHKAN DI SINI ⬇️ -->
+        <!-- SLIDE 2 -->
         <div class="hero-slide">
           <div class="hero-copy">
             <span class="hero-kicker">TARBIYAH • PENGUATAN UKHUWAH</span>
@@ -483,7 +433,7 @@
           </div>
         </div>
 
-        <!-- ⬇️ SLIDE 3: TAMBAHKAN DI SINI ⬇️ -->
+        <!-- SLIDE 3 -->
         <div class="hero-slide">
           <div class="hero-copy">
             <span class="hero-kicker">TARBIYAH • BERBAGI KEBAIKAN</span>
@@ -509,8 +459,6 @@
             <span class="hero-star star-b">✧</span>
           </div>
         </div>
-        <!-- ⬆️ BATAS AKHIR SLIDE BARU ⬆️ -->
-        
       </section>
 
       <!-- MENU TARBIYAH -->
@@ -689,9 +637,7 @@
     </main>
   </div>
 
-  <!-- =====================================
-       BOTTOM NAVIGATION
-  ====================================== -->
+  <!-- BOTTOM NAVIGATION -->
   <nav class="bottom-nav" aria-label="Navigasi bawah">
     <a class="bottom-link active" href="./dashboard.html" data-nav-link>
       <span>⌂</span>
@@ -715,10 +661,9 @@
     </a>
   </nav>
 
-  <!-- TOAST NOTIFICATION -->
   <div class="toast-region" id="toastRegion" aria-live="polite"></div>
 
-  <!-- ERUDA CONSOLE (Hanya Dipanggil Sekali) -->
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
   <script>
     if (window.eruda && !window.__TARBIYAH_ERUDA_READY__) {
@@ -728,9 +673,6 @@
     }
   </script>
 
-  <!-- =====================================
-       DASHBOARD SCRIPTS
-  ====================================== -->
   <script src="./js/tarbiyah-theme.js"></script>
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
@@ -738,7 +680,7 @@
   <script src="./js/dashboard-profile-avatar.js"></script>
   <script src="./js/pwa.js"></script>
 
-    <!-- ⬇️ TAMBAHKAN SCRIPT CAROUSEL DI SINI ⬇️ -->
+  <!-- CAROUSEL SCRIPT -->
   <script>
     (() => {
       const slides = document.querySelectorAll(".hero-slide");
@@ -751,15 +693,12 @@
       let slideInterval;
 
       function goToSlide(index) {
-        // Reset semua class active
         slides.forEach(slide => slide.classList.remove("active"));
         dots.forEach(dot => dot.classList.remove("active"));
 
-        // Set slide dan dot yang aktif
         slides[index].classList.add("active");
         dots[index].classList.add("active");
 
-        // Update teks counter (contoh: 01 / 03)
         if (counter) {
           const currentStr = String(index + 1).padStart(2, "0");
           const totalStr = String(slides.length).padStart(2, "0");
@@ -776,22 +715,44 @@
 
       function startAutoplay() {
         clearInterval(slideInterval);
-        slideInterval = setInterval(nextSlide, 5000); // Ganti slide tiap 5 detik
+        slideInterval = setInterval(nextSlide, 5000);
       }
 
-      // Event listener untuk tombol titik (dots)
       dots.forEach((dot, index) => {
         dot.addEventListener("click", () => {
           goToSlide(index);
-          startAutoplay(); // Reset timer saat diklik manual
+          startAutoplay();
         });
       });
 
-      // Mulai animasi otomatis saat halaman dimuat
       startAutoplay();
     })();
   </script>
-  <!-- ⬆️ BATAS AKHIR SCRIPT CAROUSEL ⬆️ -->
 
+  <!-- SIDEBAR CONTROL SCRIPT (FALLBACK) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const menuOpen = document.getElementById("menuOpen");
+      const menuClose = document.getElementById("menuClose");
+      const sidebar = document.getElementById("appSidebar");
+      const scrim = document.getElementById("sidebarScrim");
+
+      function openSidebar() {
+        if (sidebar) sidebar.classList.add("is-open");
+        if (scrim) scrim.classList.add("is-visible");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeSidebar() {
+        if (sidebar) sidebar.classList.remove("is-open");
+        if (scrim) scrim.classList.remove("is-visible");
+        document.body.style.overflow = "";
+      }
+
+      if (menuOpen) menuOpen.addEventListener("click", openSidebar);
+      if (menuClose) menuClose.addEventListener("click", closeSidebar);
+      if (scrim) scrim.addEventListener("click", closeSidebar);
+    });
+  </script>
 </body>
 </html>
