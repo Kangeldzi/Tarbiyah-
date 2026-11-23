@@ -2,43 +2,58 @@
 /* ============================================================
    TARBIYAH — MODULE SHELL
    File    : js/module-shell.js
-   Versi   : 2.1.0
+   Versi   : 2.2.0
 
    Tanggung jawab:
    - Sidebar desktop dan mobile
    - Overlay sidebar
    - Navigasi aktif
+   - Tombol kembali ke Dashboard
    - Menu pengguna
    - Keyboard Escape
-   - Kompatibilitas beberapa selector versi sebelumnya
    - Responsive layout
+   - Sinkronisasi navigasi
 
-   PENTING:
-   Pengaturan tema sepenuhnya dikelola oleh:
+   PENGELOLAAN TEMA:
+   Sepenuhnya dikelola oleh:
    js/tarbiyah-theme.js
 
    File ini TIDAK mengelola:
-   - Tombol tema
-   - Pergantian Dark / Light Mode
+   - Dark / Light Mode
    - Penyimpanan tema
    - MutationObserver tema
    - Autentikasi Supabase
    - Pembacaan role
    - Data anggota
    - Carousel dashboard
+   - Logika Agenda Kajian
+
+   KOMPATIBILITAS:
+   - agenda-kajian.js versi 3.1
+   - TARBIYAH_THEME_CONTROLLER
 ============================================================ */
 
 (() => {
   "use strict";
 
-  if (window.__TARBIYAH_MODULE_SHELL_V21__) {
-    console.info("[TARBIYAH SHELL] Sudah diinisialisasi.");
+  /* ==========================================================
+     00. PROTECTION
+  ========================================================== */
+
+  const VERSION = "2.2.0";
+
+  if (window.__TARBIYAH_MODULE_SHELL_V22__) {
+    console.info(
+      "[TARBIYAH SHELL] Versi 2.2.0 sudah aktif."
+    );
     return;
   }
 
-  window.__TARBIYAH_MODULE_SHELL_V21__ = true;
+  window.__TARBIYAH_MODULE_SHELL_V22__ = true;
 
-  const VERSION = "2.1.0";
+  /* ==========================================================
+     01. SELECTOR HELPERS
+  ========================================================== */
 
   const $ = (selector, root = document) =>
     root.querySelector(selector);
@@ -48,6 +63,8 @@
 
   const CONFIG = {
     mobileBreakpoint: 900,
+
+    dashboardURL: "dashboard.html",
 
     selectors: {
       sidebar: [
@@ -79,6 +96,14 @@
         ".sidebar-close"
       ],
 
+      backButton: [
+        "#backButton",
+        "#btnBack",
+        "#moduleBack",
+        "[data-shell-back]",
+        "[data-back-to-dashboard]"
+      ],
+
       userMenuButton: [
         "#userMenuToggle",
         "[data-user-menu-toggle]"
@@ -102,16 +127,18 @@
     initialized: false,
     sidebarOpen: false,
     userMenuOpen: false,
-    desktopCollapsed: false
+    desktopCollapsed: false,
+    previousMobileState: null
   };
 
   /* ==========================================================
-     00. SELECTOR HELPERS
+     02. GENERAL HELPERS
   ========================================================== */
 
   function first(selectors) {
     for (const selector of selectors) {
       const element = $(selector);
+
       if (element) return element;
     }
 
@@ -152,6 +179,14 @@
     return first(CONFIG.selectors.shell);
   }
 
+  function getUserMenuButton() {
+    return first(CONFIG.selectors.userMenuButton);
+  }
+
+  function getUserMenuPanel() {
+    return first(CONFIG.selectors.userMenuPanel);
+  }
+
   function setExpanded(buttons, expanded) {
     buttons.forEach(button => {
       button.setAttribute(
@@ -161,8 +196,16 @@
     });
   }
 
+  function isBound(element, property) {
+    return element.dataset[property] === "true";
+  }
+
+  function setBound(element, property) {
+    element.dataset[property] = "true";
+  }
+
   /* ==========================================================
-     01. SIDEBAR MOBILE
+     03. SIDEBAR MOBILE
   ========================================================== */
 
   function openSidebar() {
@@ -171,15 +214,25 @@
 
     if (!sidebar) {
       console.warn(
-        "[TARBIYAH SHELL] Elemen sidebar tidak ditemukan."
+        "[TARBIYAH SHELL] Sidebar tidak ditemukan."
       );
+
       return;
     }
 
+    if (!isMobile()) return;
+
     state.sidebarOpen = true;
 
-    sidebar.classList.add("open", "is-open");
-    sidebar.setAttribute("aria-hidden", "false");
+    sidebar.classList.add(
+      "open",
+      "is-open"
+    );
+
+    sidebar.setAttribute(
+      "aria-hidden",
+      "false"
+    );
 
     if (overlay) {
       overlay.hidden = false;
@@ -190,7 +243,10 @@
         "is-visible"
       );
 
-      overlay.setAttribute("aria-hidden", "false");
+      overlay.setAttribute(
+        "aria-hidden",
+        "false"
+      );
     }
 
     setExpanded(
@@ -199,7 +255,10 @@
     );
 
     document.body.classList.add("menu-open");
-    document.documentElement.classList.add("sidebar-open");
+
+    document.documentElement.classList.add(
+      "sidebar-open"
+    );
   }
 
   function closeSidebar() {
@@ -209,8 +268,15 @@
     state.sidebarOpen = false;
 
     if (sidebar) {
-      sidebar.classList.remove("open", "is-open");
-      sidebar.setAttribute("aria-hidden", "true");
+      sidebar.classList.remove(
+        "open",
+        "is-open"
+      );
+
+      sidebar.setAttribute(
+        "aria-hidden",
+        isMobile() ? "true" : "false"
+      );
     }
 
     if (overlay) {
@@ -220,7 +286,11 @@
         "is-visible"
       );
 
-      overlay.setAttribute("aria-hidden", "true");
+      overlay.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
       overlay.hidden = true;
     }
 
@@ -230,7 +300,10 @@
     );
 
     document.body.classList.remove("menu-open");
-    document.documentElement.classList.remove("sidebar-open");
+
+    document.documentElement.classList.remove(
+      "sidebar-open"
+    );
   }
 
   function toggleSidebar() {
@@ -243,11 +316,11 @@
 
   function bindSidebar() {
     all(CONFIG.selectors.openButton).forEach(button => {
-      if (button.dataset.shellSidebarBound === "true") {
+      if (isBound(button, "shellSidebarBound")) {
         return;
       }
 
-      button.dataset.shellSidebarBound = "true";
+      setBound(button, "shellSidebarBound");
 
       button.addEventListener("click", event => {
         event.preventDefault();
@@ -256,11 +329,11 @@
     });
 
     all(CONFIG.selectors.closeButton).forEach(button => {
-      if (button.dataset.shellSidebarBound === "true") {
+      if (isBound(button, "shellSidebarBound")) {
         return;
       }
 
-      button.dataset.shellSidebarBound = "true";
+      setBound(button, "shellSidebarBound");
 
       button.addEventListener("click", event => {
         event.preventDefault();
@@ -272,19 +345,23 @@
 
     if (
       overlay &&
-      overlay.dataset.shellSidebarBound !== "true"
+      !isBound(overlay, "shellSidebarBound")
     ) {
-      overlay.dataset.shellSidebarBound = "true";
-      overlay.addEventListener("click", closeSidebar);
+      setBound(overlay, "shellSidebarBound");
+
+      overlay.addEventListener(
+        "click",
+        closeSidebar
+      );
     }
 
     const sidebar = getSidebar();
 
     if (
       sidebar &&
-      sidebar.dataset.shellSidebarBound !== "true"
+      !isBound(sidebar, "shellSidebarBound")
     ) {
-      sidebar.dataset.shellSidebarBound = "true";
+      setBound(sidebar, "shellSidebarBound");
 
       sidebar.addEventListener("click", event => {
         const link = event.target.closest("a");
@@ -297,7 +374,7 @@
   }
 
   /* ==========================================================
-     02. SIDEBAR DESKTOP COLLAPSE
+     04. SIDEBAR DESKTOP COLLAPSE
   ========================================================== */
 
   function toggleDesktopSidebar() {
@@ -308,9 +385,16 @@
 
     const shell = getShell();
 
-    if (!shell) return;
+    if (!shell) {
+      console.warn(
+        "[TARBIYAH SHELL] App shell tidak ditemukan."
+      );
 
-    state.desktopCollapsed = !state.desktopCollapsed;
+      return;
+    }
+
+    state.desktopCollapsed =
+      !state.desktopCollapsed;
 
     shell.classList.toggle(
       "sidebar-collapsed",
@@ -329,30 +413,23 @@
     );
 
     buttons.forEach(button => {
-      if (button.dataset.shellCollapseBound === "true") {
+      if (isBound(button, "shellCollapseBound")) {
         return;
       }
 
-      button.dataset.shellCollapseBound = "true";
+      setBound(button, "shellCollapseBound");
 
       button.addEventListener("click", event => {
         event.preventDefault();
+
         toggleDesktopSidebar();
       });
     });
   }
 
   /* ==========================================================
-     03. USER MENU
+     05. USER MENU
   ========================================================== */
-
-  function getUserMenuButton() {
-    return first(CONFIG.selectors.userMenuButton);
-  }
-
-  function getUserMenuPanel() {
-    return first(CONFIG.selectors.userMenuPanel);
-  }
 
   function closeUserMenu() {
     const button = getUserMenuButton();
@@ -361,12 +438,19 @@
     state.userMenuOpen = false;
 
     if (button) {
-      button.setAttribute("aria-expanded", "false");
+      button.setAttribute(
+        "aria-expanded",
+        "false"
+      );
     }
 
     if (panel) {
       panel.hidden = true;
-      panel.classList.remove("show", "open");
+
+      panel.classList.remove(
+        "show",
+        "open"
+      );
     }
   }
 
@@ -401,25 +485,29 @@
 
     if (
       button &&
-      button.dataset.shellUserMenuBound !== "true"
+      !isBound(button, "shellUserMenuBound")
     ) {
-      button.dataset.shellUserMenuBound = "true";
+      setBound(button, "shellUserMenuBound");
 
       button.addEventListener("click", event => {
         event.preventDefault();
         event.stopPropagation();
+
         toggleUserMenu();
       });
     }
 
-    if (!document.body.dataset.shellUserMenuDocumentBound) {
-      document.body.dataset.shellUserMenuDocumentBound = "true";
+    if (
+      !document.body.dataset.shellUserMenuDocumentBound
+    ) {
+      document.body.dataset.shellUserMenuDocumentBound =
+        "true";
 
       document.addEventListener("click", event => {
+        if (!state.userMenuOpen) return;
+
         const panel = getUserMenuPanel();
         const trigger = getUserMenuButton();
-
-        if (!state.userMenuOpen) return;
 
         if (
           panel?.contains(event.target) ||
@@ -432,23 +520,74 @@
       });
     }
 
-    getUserMenuPanel()?.querySelectorAll("a").forEach(link => {
-      if (link.dataset.shellUserMenuLinkBound === "true") {
+    const panel = getUserMenuPanel();
+
+    panel?.querySelectorAll("a").forEach(link => {
+      if (isBound(link, "shellUserMenuLinkBound")) {
         return;
       }
 
-      link.dataset.shellUserMenuLinkBound = "true";
-      link.addEventListener("click", closeUserMenu);
+      setBound(link, "shellUserMenuLinkBound");
+
+      link.addEventListener(
+        "click",
+        closeUserMenu
+      );
     });
   }
 
   /* ==========================================================
-     04. NAVIGASI AKTIF
+     06. NAVIGASI KEMBALI KE DASHBOARD
+  ========================================================== */
+
+  function navigateToDashboard() {
+    closeSidebar();
+    closeUserMenu();
+
+    const destination = new URL(
+      CONFIG.dashboardURL,
+      window.location.href
+    );
+
+    if (
+      destination.origin !== window.location.origin
+    ) {
+      console.error(
+        "[TARBIYAH SHELL] Tujuan navigasi tidak valid."
+      );
+
+      return;
+    }
+
+    window.location.assign(destination.href);
+  }
+
+  function bindBackNavigation() {
+    all(CONFIG.selectors.backButton).forEach(button => {
+      if (isBound(button, "shellBackBound")) {
+        return;
+      }
+
+      setBound(button, "shellBackBound");
+
+      button.addEventListener("click", event => {
+        event.preventDefault();
+
+        navigateToDashboard();
+      });
+    });
+  }
+
+  /* ==========================================================
+     07. NAVIGASI AKTIF
   ========================================================== */
 
   function getCurrentFileName() {
     const path = window.location.pathname || "";
-    const parts = path.split("/").filter(Boolean);
+
+    const parts = path
+      .split("/")
+      .filter(Boolean);
 
     return (
       parts[parts.length - 1] ||
@@ -460,8 +599,14 @@
     if (!value) return "";
 
     try {
-      const url = new URL(value, window.location.href);
-      const parts = url.pathname.split("/").filter(Boolean);
+      const url = new URL(
+        value,
+        window.location.href
+      );
+
+      const parts = url.pathname
+        .split("/")
+        .filter(Boolean);
 
       return (
         parts[parts.length - 1] || ""
@@ -470,6 +615,7 @@
     } catch {
       return String(value)
         .split("?")[0]
+        .split("#")[0]
         .split("/")
         .pop()
         .toLowerCase();
@@ -480,8 +626,7 @@
     return [
       "dashboard.html",
       "tarbiyah.html",
-      "",
-      "index.html"
+      ""
     ].includes(fileName);
   }
 
@@ -489,36 +634,60 @@
     const currentFile = getCurrentFileName();
 
     const links = $$(
-      "[data-nav-link], [data-module], .sidebar-link, .bottom-nav a, .mobile-bottom-nav a"
+      [
+        "[data-nav-link]",
+        "[data-module]",
+        ".sidebar-link",
+        ".bottom-nav a",
+        ".mobile-bottom-nav a"
+      ].join(",")
     );
 
     links.forEach(link => {
       const href = link.getAttribute("href") || "";
+
       const linkFile = normalizeFileName(href);
 
       let active = false;
 
-      if (
-        isDashboardFile(currentFile) &&
-        (
-          link.dataset.module === "dashboard" ||
-          link.dataset.navLink === "dashboard" ||
-          isDashboardFile(linkFile)
-        )
-      ) {
-        active = true;
+      const isDashboardLink =
+        link.dataset.module === "dashboard" ||
+        link.dataset.navLink === "dashboard" ||
+        linkFile === "dashboard.html";
+
+      if (isDashboardFile(currentFile)) {
+        active = isDashboardLink ||
+          (
+            currentFile === "tarbiyah.html" &&
+            linkFile === "tarbiyah.html"
+          );
 
       } else if (
         linkFile &&
         linkFile === currentFile
       ) {
         active = true;
+
+      } else if (
+        link.dataset.module &&
+        link.dataset.module === currentFile.replace(
+          ".html",
+          ""
+        )
+      ) {
+        active = true;
       }
 
-      link.classList.toggle("active", active);
+      link.classList.toggle(
+        "active",
+        active
+      );
 
       if (active) {
-        link.setAttribute("aria-current", "page");
+        link.setAttribute(
+          "aria-current",
+          "page"
+        );
       } else {
         link.removeAttribute("aria-current");
       }
@@ -526,18 +695,27 @@
   }
 
   /* ==========================================================
-     05. NAVIGASI MODUL
+     08. NAVIGASI MODUL
   ========================================================== */
 
   function bindModuleNavigation() {
-    if (document.body.dataset.shellModuleNavigationBound) {
+    if (
+      document.body.dataset.shellModuleNavigationBound
+    ) {
       return;
     }
 
-    document.body.dataset.shellModuleNavigationBound = "true";
+    document.body.dataset.shellModuleNavigationBound =
+      "true";
 
     document.addEventListener("click", event => {
-      const link = event.target.closest(
+      const target = event.target;
+
+      if (!target || typeof target.closest !== "function") {
+        return;
+      }
+
+      const link = target.closest(
         "[data-module], [data-nav-link]"
       );
 
@@ -545,7 +723,7 @@
 
       const href = link.getAttribute("href") || "";
 
-      // Link dengan alamat nyata dibiarkan ditangani browser.
+      // Biarkan browser menangani alamat halaman nyata.
       if (
         href &&
         href !== "#" &&
@@ -568,7 +746,10 @@
         typeof moduleAPI.navigate === "function"
       ) {
         event.preventDefault();
+
         moduleAPI.navigate(moduleName);
+
+        closeSidebar();
 
       } else {
         console.error(
@@ -579,7 +760,7 @@
   }
 
   /* ==========================================================
-     06. KEYBOARD
+     09. KEYBOARD
   ========================================================== */
 
   function bindKeyboard() {
@@ -587,7 +768,8 @@
       return;
     }
 
-    document.body.dataset.shellKeyboardBound = "true";
+    document.body.dataset.shellKeyboardBound =
+      "true";
 
     document.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
@@ -598,43 +780,126 @@
   }
 
   /* ==========================================================
-     07. RESPONSIVE
+     10. RESPONSIVE
   ========================================================== */
 
   function bindResponsive() {
-    if (window.__TARBIYAH_SHELL_RESPONSIVE_BOUND__) {
+    if (
+      window.__TARBIYAH_SHELL_RESPONSIVE_V22__
+    ) {
       return;
     }
 
-    window.__TARBIYAH_SHELL_RESPONSIVE_BOUND__ = true;
+    window.__TARBIYAH_SHELL_RESPONSIVE_V22__ =
+      true;
 
-    let previousMobileState = isMobile();
+    state.previousMobileState = isMobile();
 
-    window.addEventListener("resize", () => {
+    function handleBreakpointChange() {
       const currentMobileState = isMobile();
 
-      if (currentMobileState !== previousMobileState) {
+      if (
+        currentMobileState !==
+        state.previousMobileState
+      ) {
         closeSidebar();
-        previousMobileState = currentMobileState;
+
+        state.previousMobileState =
+          currentMobileState;
       }
-    });
+
+      const sidebar = getSidebar();
+
+      if (sidebar && !state.sidebarOpen) {
+        sidebar.setAttribute(
+          "aria-hidden",
+          currentMobileState ? "true" : "false"
+        );
+      }
+    }
+
+    if (window.matchMedia) {
+      const media = window.matchMedia(
+        `(max-width: ${CONFIG.mobileBreakpoint}px)`
+      );
+
+      if (media.addEventListener) {
+        media.addEventListener(
+          "change",
+          handleBreakpointChange
+        );
+      } else {
+        media.addListener(
+          handleBreakpointChange
+        );
+      }
+    }
+
+    window.addEventListener(
+      "resize",
+      handleBreakpointChange,
+      { passive: true }
+    );
   }
 
   /* ==========================================================
-     08. INITIALIZATION
+     11. THEME INTEGRATION
+  ========================================================== */
+
+  function checkThemeController() {
+    if (window.TARBIYAH_THEME_CONTROLLER) {
+      console.info(
+        "[TARBIYAH SHELL] Theme controller terdeteksi."
+      );
+    } else {
+      console.info(
+        "[TARBIYAH SHELL] Menunggu pengelola tema eksternal."
+      );
+    }
+
+    // PENTING:
+    // Tidak mengubah tema.
+    // Tidak membuat event tema.
+    // Tidak mengakses localStorage tema.
+    // Tidak membuat MutationObserver.
+    // Seluruh pengelolaan tema tetap menjadi
+    // tanggung jawab tarbiyah-theme.js.
+  }
+
+  /* ==========================================================
+     12. REFRESH COMPONENTS
+  ========================================================== */
+
+  function refresh() {
+    bindSidebar();
+    bindDesktopCollapse();
+    bindBackNavigation();
+    bindUserMenu();
+
+    markActiveNavigation();
+
+    console.info(
+      "[TARBIYAH SHELL] Komponen berhasil disinkronkan."
+    );
+  }
+
+  /* ==========================================================
+     13. INITIALIZATION
   ========================================================== */
 
   function initialize() {
-    if (state.initialized) return;
+    if (state.initialized) {
+      refresh();
+      return;
+    }
+
+    if (!document.body) return;
 
     state.initialized = true;
 
     bindSidebar();
     bindDesktopCollapse();
-
-    // Tidak ada bindTheme() di sini.
-    // Tema hanya dikendalikan tarbiyah-theme.js.
-
+    bindBackNavigation();
     bindUserMenu();
     bindModuleNavigation();
     bindKeyboard();
@@ -642,12 +907,10 @@
 
     markActiveNavigation();
 
-    console.info(
-      `[TARBIYAH SHELL] Versi ${VERSION} aktif.`
-    );
+    checkThemeController();
 
     console.info(
-      "[TARBIYAH SHELL] Pengaturan tema diserahkan kepada TARBIYAH_THEME_CONTROLLER."
+      `[TARBIYAH SHELL] Versi ${VERSION} aktif.`
     );
   }
 
@@ -662,17 +925,28 @@
   }
 
   /* ==========================================================
-     09. PUBLIC API
+     14. PUBLIC API
   ========================================================== */
 
   window.TARBIYAH_SHELL = Object.freeze({
     version: VERSION,
+
     initialize,
+
+    refresh,
+
     openSidebar,
+
     closeSidebar,
+
     toggleSidebar,
+
     closeUserMenu,
+
     markActiveNavigation,
+
+    navigateToDashboard,
+
     isMobile
   });
 
