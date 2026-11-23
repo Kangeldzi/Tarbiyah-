@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -10,33 +9,143 @@
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./assets/icons/icon-192.png">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CSS Utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  
+  <!-- CSS Navigasi Tombol Back Universal -->
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
-    .settings-page {
-      width: min(100%, 1100px);
-      margin: 0 auto;
-      padding: 24px 18px 100px;
+    /* =========================================
+       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
+    ========================================= */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* KUNCI LOGO AGAR TIDAK PECAH */
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .brand-logo-wrap .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-brand-text h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      color: var(--color-primary, #36b58a);
+      line-height: 1.1;
+      font-family: var(--font-heading);
+    }
+
+    .header-brand-text span {
+      display: block;
+      font-size: .75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1.25rem;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
+    }
+
+    /* =========================================
+       LAYOUT UTAMA
+    ========================================= */
+    .app-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Jarak aman untuk tombol back */
+    .page-header-nav {
+      margin-bottom: 30px;
+    }
+
+    /* =========================================
+       KONTEN PENGATURAN (TEMA UNIVERSAL)
+    ========================================= */
     .settings-hero {
       position: relative;
       overflow: hidden;
       padding: 25px;
       margin-bottom: 21px;
-      border-radius: 22px;
+      border-radius: 20px;
       color: #fff;
-      background: linear-gradient(135deg, #075c43, #103b30 65%, #102a22);
-      box-shadow: 0 12px 35px rgba(0,0,0,.15);
+      background: linear-gradient(130deg, #075b43, #123c31 60%, #102a22);
+      border: 1px solid var(--border-color);
     }
 
     .settings-hero::after {
@@ -61,11 +170,12 @@
       letter-spacing: 1.5px;
     }
 
-    .settings-hero h1 {
+    .settings-hero h2 {
       position: relative;
       z-index: 1;
       margin: 0 0 8px;
       font: 700 clamp(22px, 5vw, 30px) Poppins, sans-serif;
+      color: #fff;
     }
 
     .settings-hero p {
@@ -91,9 +201,9 @@
       display: grid;
       gap: 7px;
       padding: 12px;
-      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border: 1px solid var(--border-color);
       border-radius: 17px;
-      background: var(--card-bg, rgba(255,255,255,.04));
+      background: var(--bg-secondary);
     }
 
     .settings-nav-button {
@@ -106,17 +216,23 @@
       border: 0;
       border-radius: 10px;
       background: transparent;
-      color: var(--text-secondary, #999);
+      color: var(--text-secondary);
       text-align: left;
       font: inherit;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .settings-nav-button:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
     }
 
     .settings-nav-button.active {
-      background: rgba(16,185,129,.13);
-      color: #10b981;
+      background: rgba(54,181,138,.13);
+      color: var(--color-primary);
     }
 
     .settings-content {
@@ -127,9 +243,9 @@
       display: none;
       padding: 20px;
       margin-bottom: 15px;
-      border: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border: 1px solid var(--border-color);
       border-radius: 18px;
-      background: var(--card-bg, rgba(255,255,255,.04));
+      background: var(--bg-secondary);
     }
 
     .settings-section.active {
@@ -138,24 +254,19 @@
     }
 
     @keyframes settingsFade {
-      from {
-        opacity: 0;
-        transform: translateY(5px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .settings-section h2 {
+    .settings-section h3 {
       margin: 0 0 7px;
       font: 700 17px Poppins, sans-serif;
+      color: var(--text-primary);
     }
 
     .settings-description {
       margin: 0 0 19px;
-      color: var(--text-secondary, #999);
+      color: var(--text-secondary);
       font-size: 12px;
       line-height: 1.7;
     }
@@ -169,7 +280,7 @@
       margin-bottom: 7px;
       font-size: 12px;
       font-weight: 700;
-      color: var(--text-secondary, #999);
+      color: var(--text-secondary);
     }
 
     .settings-field input,
@@ -178,11 +289,11 @@
       width: 100%;
       min-height: 43px;
       padding: 11px 12px;
-      border: 1px solid var(--border-color, #777);
+      border: 1px solid var(--border-color);
       border-radius: 11px;
       outline: none;
-      color: var(--text-primary, inherit);
-      background: var(--input-bg, transparent);
+      color: var(--text-primary);
+      background: var(--bg-primary);
       font: inherit;
       font-size: 13px;
     }
@@ -196,8 +307,8 @@
     .settings-field input:focus,
     .settings-field textarea:focus,
     .settings-field select:focus {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(54,181,138,.15);
     }
 
     .settings-logo-preview {
@@ -206,7 +317,7 @@
       gap: 14px;
       margin-bottom: 17px;
       padding: 14px;
-      border: 1px dashed var(--border-color, #777);
+      border: 1px dashed var(--border-color);
       border-radius: 13px;
     }
 
@@ -215,18 +326,20 @@
       height: 58px;
       object-fit: contain;
       border-radius: 13px;
-      background: rgba(16,185,129,.1);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
     }
 
     .settings-logo-preview strong {
       display: block;
       font-size: 13px;
+      color: var(--text-primary);
     }
 
     .settings-logo-preview span {
       display: block;
       margin-top: 4px;
-      color: var(--text-secondary, #999);
+      color: var(--text-secondary);
       font-size: 11px;
     }
 
@@ -235,22 +348,34 @@
       padding: 0 16px;
       border: 0;
       border-radius: 10px;
-      background: #087f5b;
+      background: #047857;
       color: #fff;
       font-size: 12px;
       font-weight: 800;
       cursor: pointer;
+      transition: .2s;
+    }
+
+    .settings-button:hover {
+      background: #059669;
     }
 
     .settings-button.secondary {
-      border: 1px solid var(--border-color, #777);
+      border: 1px solid var(--border-color);
       background: transparent;
-      color: var(--text-primary, inherit);
+      color: var(--text-primary);
+    }
+    .settings-button.secondary:hover {
+      background: var(--bg-tertiary);
     }
 
     .settings-button.danger {
-      background: #a83232;
-      color: #fff;
+      background: rgba(239,68,68,.1);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,.2);
+    }
+    .settings-button.danger:hover {
+      background: rgba(239,68,68,.2);
     }
 
     .settings-actions {
@@ -268,21 +393,26 @@
 
     .settings-theme-option {
       padding: 14px 10px;
-      border: 1px solid var(--border-color, #777);
+      border: 1px solid var(--border-color);
       border-radius: 13px;
       background: transparent;
-      color: var(--text-primary, inherit);
+      color: var(--text-primary);
       text-align: center;
       font: inherit;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .settings-theme-option:hover {
+      background: var(--bg-tertiary);
     }
 
     .settings-theme-option.active {
-      border-color: #10b981;
-      background: rgba(16,185,129,.1);
-      color: #10b981;
+      border-color: var(--color-primary);
+      background: rgba(54,181,138,.1);
+      color: var(--color-primary);
     }
 
     .settings-theme-option span {
@@ -297,7 +427,7 @@
       justify-content: space-between;
       gap: 12px;
       padding: 13px 0;
-      border-bottom: 1px solid var(--border-color, rgba(128,128,128,.2));
+      border-bottom: 1px solid var(--border-color);
       font-size: 12px;
     }
 
@@ -306,29 +436,34 @@
     }
 
     .settings-info span {
-      color: var(--text-secondary, #999);
+      color: var(--text-secondary);
+    }
+
+    .settings-info strong {
+      color: var(--text-primary);
     }
 
     .settings-status {
       padding: 5px 9px;
       border-radius: 30px;
-      background: rgba(16,185,129,.12);
-      color: #10b981;
+      background: rgba(54,181,138,.12);
+      color: var(--color-primary);
       font-size: 10px;
       font-weight: 800;
     }
 
     .settings-status.warning {
       background: rgba(245,158,11,.12);
-      color: #d99b25;
+      color: #fbbf24;
     }
 
     .settings-warning {
       padding: 13px;
       margin-top: 15px;
       border-radius: 11px;
-      background: rgba(245,158,11,.09);
-      color: var(--text-secondary, #999);
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.2);
+      color: var(--text-secondary);
       font-size: 11px;
       line-height: 1.7;
     }
@@ -358,14 +493,8 @@
     }
 
     @media (max-width: 760px) {
-      .settings-page {
-        padding: 16px 13px 95px;
-      }
-
-      .settings-layout {
-        grid-template-columns: 1fr;
-      }
-
+      .app-main { padding: 16px; }
+      .settings-layout { grid-template-columns: 1fr; }
       .settings-navigation {
         position: static;
         display: flex;
@@ -374,54 +503,91 @@
         padding: 9px;
         scrollbar-width: thin;
       }
-
       .settings-nav-button {
         flex: 0 0 auto;
         width: auto;
         white-space: nowrap;
       }
-
-      .settings-section {
-        padding: 15px;
-      }
+      .settings-section { padding: 15px; }
     }
 
     @media (max-width: 400px) {
-      .settings-theme-options {
-        grid-template-columns: 1fr;
-      }
+      .settings-theme-options { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
-<body>
-  <div id="app-shell">
-    <main class="settings-page">
+<body class="auth-pending">
 
+  <div class="app-shell">
+
+    <!-- =========================================
+         HEADER UNIVERSAL
+    ========================================== -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-logo-wrap">
+            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+          </div>
+          <div class="header-brand-text">
+            <h1>TARBIYAH</h1>
+            <span>Pengaturan</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
+          ☀
+        </button>
+        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
+          ♧
+        </a>
+      </div>
+    </header>
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+    <main class="app-main">
+
+      <!-- 1. TOMBOL BACK UNIVERSAL -->
+      <div class="page-header-nav">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+          <span class="tarbiyah-page-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+        </a>
+      </div>
+
+      <!-- 2. HERO SECTION -->
       <section class="settings-hero">
         <div class="settings-eyebrow">✦ TARBIYAH CONTROL CENTER</div>
-        <h1>Administrasi & Pengaturan</h1>
+        <h2>Administrasi & Pengaturan</h2>
         <p>
           Kelola preferensi tampilan, identitas aplikasi,
           dan informasi administrasi platform TARBIYAH.
         </p>
       </section>
 
+      <!-- 3. KONTEN UTAMA -->
       <div class="settings-layout">
 
         <nav class="settings-navigation" aria-label="Menu pengaturan">
           <button class="settings-nav-button active" type="button" data-section="identity">
             🏷️ Identitas Aplikasi
           </button>
-
           <button class="settings-nav-button" type="button" data-section="appearance">
             🎨 Tampilan
           </button>
-
           <button class="settings-nav-button" type="button" data-section="account">
             👤 Akun
           </button>
-
           <button class="settings-nav-button" type="button" data-section="system">
             ⚙️ Informasi Sistem
           </button>
@@ -431,17 +597,13 @@
 
           <!-- IDENTITAS APLIKASI -->
           <section class="settings-section active" id="section-identity">
-            <h2>🏷️ Identitas Aplikasi</h2>
+            <h3>🏷️ Identitas Aplikasi</h3>
             <p class="settings-description">
               Informasi identitas dan branding platform TARBIYAH.
             </p>
 
             <div class="settings-logo-preview">
-              <img
-                id="logoPreview"
-                src="./assets/icons/icon-192.png"
-                alt="Logo TARBIYAH"
-              >
+              <img id="logoPreview" src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
               <div>
                 <strong id="previewAppName">TARBIYAH</strong>
                 <span>Logo dan identitas aplikasi</span>
@@ -451,39 +613,22 @@
             <form id="identityForm">
               <div class="settings-field">
                 <label for="appName">Nama aplikasi</label>
-                <input
-                  type="text"
-                  id="appName"
-                  maxlength="60"
-                  value="TARBIYAH"
-                  required
-                >
+                <input type="text" id="appName" maxlength="60" value="TARBIYAH" required>
               </div>
 
               <div class="settings-field">
                 <label for="appDescription">Deskripsi aplikasi</label>
-                <textarea
-                  id="appDescription"
-                  maxlength="250"
-                >Pembelajaran Muslim dan komunitas untuk belajar, bertumbuh, dan berukhuwah.</textarea>
+                <textarea id="appDescription" maxlength="250">Pembelajaran Muslim dan komunitas untuk belajar, bertumbuh, dan berukhuwah.</textarea>
               </div>
 
               <div class="settings-field">
                 <label for="appLogo">Pilih logo baru</label>
-                <input
-                  type="file"
-                  id="appLogo"
-                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                >
+                <input type="file" id="appLogo" accept="image/png,image/jpeg,image/webp,image/svg+xml">
               </div>
 
               <div class="settings-actions">
-                <button class="settings-button" type="submit">
-                  Simpan Preferensi Lokal
-                </button>
-                <button class="settings-button secondary" type="button" id="resetIdentity">
-                  Pulihkan Tampilan Awal
-                </button>
+                <button class="settings-button" type="submit">Simpan Preferensi Lokal</button>
+                <button class="settings-button secondary" type="button" id="resetIdentity">Pulihkan Tampilan Awal</button>
               </div>
             </form>
 
@@ -497,25 +642,20 @@
 
           <!-- TAMPILAN -->
           <section class="settings-section" id="section-appearance">
-            <h2>🎨 Preferensi Tampilan</h2>
+            <h3>🎨 Preferensi Tampilan</h3>
             <p class="settings-description">
               Pilih mode tampilan yang nyaman untuk perangkat Anda.
             </p>
 
             <div class="settings-theme-options">
               <button class="settings-theme-option" type="button" data-theme-choice="light">
-                <span>☀️</span>
-                Terang
+                <span>☀️</span> Terang
               </button>
-
               <button class="settings-theme-option" type="button" data-theme-choice="dark">
-                <span>🌙</span>
-                Gelap
+                <span>🌙</span> Gelap
               </button>
-
               <button class="settings-theme-option" type="button" data-theme-choice="system">
-                <span>📱</span>
-                Sistem
+                <span>📱</span> Sistem
               </button>
             </div>
 
@@ -527,35 +667,27 @@
 
           <!-- AKUN -->
           <section class="settings-section" id="section-account">
-            <h2>👤 Pengaturan Akun</h2>
+            <h3>👤 Pengaturan Akun</h3>
             <p class="settings-description">
               Informasi dasar akun yang sedang digunakan.
             </p>
 
             <div class="settings-info">
               <span>Status autentikasi</span>
-              <strong class="settings-status warning" id="authStatus">
-                Memeriksa...
-              </strong>
+              <strong class="settings-status warning" id="authStatus">Memeriksa...</strong>
             </div>
-
             <div class="settings-info">
               <span>Email pengguna</span>
               <strong id="accountEmail">Belum diketahui</strong>
             </div>
-
             <div class="settings-info">
               <span>ID pengguna</span>
               <strong id="accountId">Belum diketahui</strong>
             </div>
 
             <div class="settings-actions">
-              <button class="settings-button secondary" type="button" id="refreshAccount">
-                Perbarui Informasi
-              </button>
-              <button class="settings-button danger" type="button" id="logoutButton">
-                Keluar dari Akun
-              </button>
+              <button class="settings-button secondary" type="button" id="refreshAccount">Perbarui Informasi</button>
+              <button class="settings-button danger" type="button" id="logoutButton">Keluar dari Akun</button>
             </div>
 
             <div class="settings-warning">
@@ -567,7 +699,7 @@
 
           <!-- SISTEM -->
           <section class="settings-section" id="section-system">
-            <h2>⚙️ Informasi Sistem</h2>
+            <h3>⚙️ Informasi Sistem</h3>
             <p class="settings-description">
               Informasi dasar aplikasi dan status komponen pada perangkat.
             </p>
@@ -576,27 +708,22 @@
               <span>Nama platform</span>
               <strong>TARBIYAH</strong>
             </div>
-
             <div class="settings-info">
               <span>Jenis aplikasi</span>
               <strong>Progressive Web App</strong>
             </div>
-
             <div class="settings-info">
               <span>Status browser</span>
               <strong class="settings-status" id="browserStatus">Aktif</strong>
             </div>
-
             <div class="settings-info">
               <span>Status koneksi internet</span>
               <strong class="settings-status" id="networkStatus">Memeriksa...</strong>
             </div>
-
             <div class="settings-info">
               <span>Service Worker</span>
               <strong class="settings-status warning" id="swStatus">Memeriksa...</strong>
             </div>
-
             <div class="settings-info">
               <span>Versi antarmuka</span>
               <strong>1.0.0</strong>
@@ -611,17 +738,22 @@
 
         </div>
       </div>
+
     </main>
   </div>
 
   <div class="settings-toast" id="settingsToast" role="status"></div>
 
+  <!-- SUPABASE & SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
-  <script src="./js/theme-manager.js"></script>
+  
+  <!-- SCRIPT TEMA -->
+  <script src="./js/tarbiyah-theme.js"></script>
+  
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
@@ -645,25 +777,11 @@
         }, 2400);
       }
 
-      function getThemeManager() {
-        return window.TARBIYAH_THEME_MANAGER ||
-          window.TARBIYAH_THEME ||
-          window.ThemeManager ||
-          null;
-      }
-
       function applyTheme(theme) {
-        const manager = getThemeManager();
-
-        if (manager) {
-          if (typeof manager.setTheme === "function") {
-            manager.setTheme(theme);
-          } else if (typeof manager.changeTheme === "function") {
-            manager.changeTheme(theme);
-          } else if (typeof manager.applyTheme === "function") {
-            manager.applyTheme(theme);
-          } else {
-            document.documentElement.dataset.theme = theme;
+        // Menggunakan API dari tarbiyah-theme.js
+        if (window.TARBIYAH_THEME_CONTROLLER) {
+          if (typeof window.TARBIYAH_THEME_CONTROLLER.setTheme === "function") {
+            window.TARBIYAH_THEME_CONTROLLER.setTheme(theme);
           }
         } else {
           document.documentElement.dataset.theme = theme;
