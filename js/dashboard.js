@@ -1,17 +1,19 @@
+
 /* ============================================================
    TARBIYAH — DASHBOARD CONTROLLER
    File    : js/dashboard.js
-   Versi   : 2.0.0
+   Versi   : 2.1.0
 
-   Tanggung jawab:
+   Fitur:
    - Carousel dashboard
-   - Pencarian menu
+   - Pencarian menu dan navigasi
    - Session Supabase
    - Pembacaan role dari user_roles -> roles(name)
    - Identitas pengguna
    - Penyaringan menu berdasarkan role
    - Tombol logout
-   - Tanggal dan tahun
+   - Tanggal dan tahun WIB
+   - Informasi dashboard berdasarkan role
 
    Role:
    - super_admin
@@ -28,21 +30,24 @@
    - RLS
    - Role assignment
    - Mentor assignment
+   - Sistem foto profil
 ============================================================ */
 
 (() => {
   "use strict";
 
-  if (window.__TARBIYAH_DASHBOARD_V2__) {
-    console.info(
-      "[TARBIYAH DASHBOARD] Sudah diinisialisasi."
-    );
+  /* ==========================================================
+     00. PENCEGAHAN INISIALISASI GANDA
+  ========================================================== */
+
+  if (window.__TARBIYAH_DASHBOARD_V21__) {
+    console.info("[TARBIYAH DASHBOARD] Sudah aktif.");
     return;
   }
 
-  window.__TARBIYAH_DASHBOARD_V2__ = true;
+  window.__TARBIYAH_DASHBOARD_V21__ = true;
 
-  const VERSION = "2.0.0";
+  const VERSION = "2.1.0";
 
   const $ = (selector, root = document) =>
     root.querySelector(selector);
@@ -50,8 +55,11 @@
   const $$ = (selector, root = document) =>
     Array.from(root.querySelectorAll(selector));
 
-  const byId = id =>
-    document.getElementById(id);
+  const byId = id => document.getElementById(id);
+
+  /* ==========================================================
+     01. KONFIGURASI
+  ========================================================== */
 
   const CONFIG = {
     loginPage:
@@ -63,7 +71,6 @@
       "./dashboard.html",
 
     roleTable: "user_roles",
-    roleRelation: "roles",
     roleUserColumn: "user_id",
 
     timezone: "Asia/Jakarta",
@@ -73,18 +80,22 @@
 
   const state = {
     initialized: false,
+
     session: null,
     user: null,
+
     roles: [],
     primaryRole: null,
     roleReady: false,
+
     carouselIndex: 0,
     carouselTimer: null,
+
     isLoggingOut: false
   };
 
   /* ==========================================================
-     01. NOTIFICATION / TOAST
+     02. NOTIFIKASI
   ========================================================== */
 
   function toast(message, type = "info") {
@@ -119,7 +130,7 @@
   }
 
   /* ==========================================================
-     02. DATE AND TIME
+     03. TANGGAL DAN TAHUN
   ========================================================== */
 
   function updateDateInformation() {
@@ -147,10 +158,7 @@
       year: "numeric"
     }).format(now);
 
-    [
-      "currentYear",
-      "footerYear"
-    ].forEach(id => {
+    ["currentYear", "footerYear"].forEach(id => {
       const element = byId(id);
 
       if (element) {
@@ -164,7 +172,7 @@
   }
 
   /* ==========================================================
-     03. CAROUSEL — HTML DASHBOARD COMPATIBLE
+     04. CAROUSEL DASHBOARD
   ========================================================== */
 
   function getCarouselElements() {
@@ -176,7 +184,6 @@
     if (!container) {
       return {
         container: null,
-        track: null,
         slides: [],
         previousButton: null,
         nextButton: null,
@@ -184,33 +191,24 @@
       };
     }
 
-    const track =
-      $("[data-carousel-track]", container) ||
-      $(".dashboard-carousel-track", container);
-
-    // Struktur HTML TARBIYAH saat ini:
-    // .hero-slide berada langsung di dalam .hero-carousel.
     const slides = Array.from(
       container.querySelectorAll(
         ".hero-slide, .dashboard-slide, [data-carousel-slide]"
       )
     );
 
-    const previousButton =
-      $("[data-carousel-prev]", container);
-
-    const nextButton =
-      $("[data-carousel-next]", container);
-
-    const dots = $$(".carousel-dot, [data-carousel-dot]", container);
-
     return {
       container,
-      track,
+
       slides,
-      previousButton,
-      nextButton,
-      dots
+
+      previousButton:
+        $("[data-carousel-prev]", container),
+
+      nextButton:
+        $("[data-carousel-next]", container),
+
+      dots: $$(".carousel-dot, [data-carousel-dot]", container)
     };
   }
 
@@ -242,10 +240,11 @@
 
       dot.classList.toggle("active", active);
 
-      dot.setAttribute(
-        "aria-current",
-        active ? "true" : "false"
-      );
+      if (active) {
+        dot.setAttribute("aria-current", "true");
+      } else {
+        dot.removeAttribute("aria-current");
+      }
     });
 
     const counter =
@@ -290,14 +289,15 @@
     const carousel = getCarouselElements();
 
     if (!carousel.container || !carousel.slides.length) {
-      console.warn(
-        "[TARBIYAH CAROUSEL] Elemen Carousel tidak ditemukan."
+      console.info(
+        "[TARBIYAH CAROUSEL] Tidak ada carousel pada halaman ini."
       );
       return;
     }
 
-    // Hindari memasang event berulang.
-    if (carousel.container.dataset.carouselInitialized === "true") {
+    if (
+      carousel.container.dataset.carouselInitialized === "true"
+    ) {
       return;
     }
 
@@ -352,330 +352,12 @@
     startCarousel();
 
     console.info(
-      `[TARBIYAH CAROUSEL] Berhasil diinisialisasi: ${carousel.slides.length} slide.`
+      `[TARBIYAH CAROUSEL] ${carousel.slides.length} slide aktif.`
     );
   }
-  
-   
-  /* ==========================================================
-     04. SEARCH ROUTES
-  ========================================================== */
-
-  const SEARCH_ROUTES = [
-    {
-      keywords: ["dashboard", "beranda", "home"],
-      url: "./dashboard.html",
-      roles: ["super_admin", "admin", "mentor", "member", "registered_user"]
-    },
-    {
-      keywords: ["profil", "biodata", "akun saya"],
-      url: "./profil-anggota.html",
-      roles: ["super_admin", "admin", "mentor", "member", "registered_user"]
-    },
-    {
-  keywords: ["anggota binaan", "binaan"],
-  url: "./anggota-binaan.html",
-  roles: ["super_admin", "admin", "mentor"]
-},
-    {
-      keywords: ["pembinaan", "catatan pembinaan"],
-      module: "pembinaan",
-      roles: ["super_admin", "admin", "mentor"]
-    },
-    {
-      keywords: ["agenda", "jadwal", "kegiatan"],
-      url: "./agenda-tarbiyah.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-
-   {
-  keywords: [
-    "kelola agenda kajian",
-    "agenda kajian",
-    "buat agenda kajian"
-  ],
-  url: "./agenda-kajian.html",
-  roles: ["super_admin", "admin", "mentor"]
-},
-
-     {
-  keywords: [
-    "kelola agenda kajian",
-    "kelola kajian",
-    "buat agenda kajian",
-    "arsip kajian"
-  ],
-  url: "./agenda-kajian.html"
-},
-{
-  keywords: [
-    "agenda tarbiyah",
-    "jadwal kegiatan",
-    "agenda",
-    "jadwal"
-  ],
-  url: "./agenda-tarbiyah.html"
-},
-    {
-      keywords: ["pembelajaran", "belajar"],
-      url: "./pembelajaran.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["materi", "materi kajian"],
-      url: "./materi-pembelajaran.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["kajian", "riwayat kajian"],
-      url: "./pembelajaran.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["presensi", "absensi"],
-      url: "./presensi-tarbiyah.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["kehadiran", "riwayat kehadiran"],
-      url: "./kehadiran.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["berita", "pengumuman"],
-      url: "./berita-pengumuman.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["galeri", "dokumentasi", "foto", "video"],
-      url: "./galeri-foto-video.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["diskusi"],
-      url: "./diskusi-tarbiyah.html",
-      roles: ["super_admin", "admin", "member"]
-    },
-    {
-      keywords: ["donasi", "infaq"],
-      url: "./donasi-infaq.html",
-      roles: ["super_admin", "admin", "member"]
-    },
-    {
-      keywords: ["notifikasi"],
-      url: "./notifikasi.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    },
-    {
-      keywords: ["administrasi", "dashboard admin"],
-      url: "./dashboard-admin.html",
-      roles: ["super_admin", "admin"]
-    },
-    {
-      keywords: ["pengaturan akun", "pengaturan"],
-      url: "./administrasi-pengaturan.html",
-      roles: ["super_admin", "admin", "mentor", "member"]
-    }
-  ];
-
-  function initializeSearch() {
-    const form =
-      byId("searchForm") ||
-      $("[data-dashboard-search-form]");
-
-    const input =
-      byId("globalSearch") ||
-      $("[data-dashboard-search]");
-
-    if (!form || !input) return;
-
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-
-      const query = String(input.value || "")
-        .trim()
-        .toLowerCase();
-
-      if (!query) return;
-
-      if (!state.roleReady || !state.primaryRole) {
-        toast(
-          "Role akun belum berhasil diverifikasi. Silakan tunggu atau muat ulang halaman.",
-          "warning"
-        );
-        return;
-      }
-
-      const found = SEARCH_ROUTES.find(route =>
-        route.keywords.some(keyword =>
-          query.includes(keyword)
-        )
-      );
-
-      if (!found) {
-        toast(
-          "Menu belum ditemukan. Coba kata kunci lain.",
-          "info"
-        );
-        return;
-      }
-
-      if (!found.roles.includes(state.primaryRole)) {
-        toast(
-          "Akun Anda belum memiliki izin untuk membuka menu tersebut.",
-          "error"
-        );
-        return;
-      }
-
-      if (found.url) {
-        window.location.href = found.url;
-        return;
-      }
-
-      if (found.module) {
-        const moduleAPI = window.TARBIYAH_MODULE;
-
-        if (
-          moduleAPI &&
-          typeof moduleAPI.navigate === "function"
-        ) {
-          moduleAPI.navigate(found.module);
-        } else {
-          toast(
-            "Halaman modul tersebut belum terhubung.",
-            "warning"
-          );
-        }
-      }
-    });
-
-    document.addEventListener("keydown", event => {
-      const activeTag =
-        document.activeElement?.tagName;
-
-      const typing =
-        ["INPUT", "TEXTAREA", "SELECT"].includes(activeTag) ||
-        document.activeElement?.isContentEditable;
-
-      if (event.key === "/" && !typing) {
-        event.preventDefault();
-        input.focus();
-      }
-    });
-  }
 
   /* ==========================================================
-     05. SUPABASE CLIENT
-  ========================================================== */
-
-  function getSupabaseClient() {
-    const client = window.tarbiyahSupabase;
-
-     console.log("[AGENDA DIAGNOSTIK CLIENT]", {
-  url: location.href,
-  tarbiyahSupabase: typeof window.tarbiyahSupabase,
-  supabaseClient: typeof window.supabaseClient,
-  TARBIYAH_SUPABASE: typeof window.TARBIYAH_SUPABASE,
-  clientDitemukan: !!client,
-  authTersedia: typeof client?.auth,
-  fromTersedia: typeof client?.from,
-  backendReady: window.TARBIYAH_BACKEND_READY
-});
-     
-    if (!client) {
-      throw new Error(
-        "Supabase client belum tersedia. Periksa js/config.js dan js/supabase-client.js."
-      );
-    }
-
-    if (
-      window.TARBIYAH_BACKEND_READY === false
-    ) {
-      throw new Error(
-        "Backend TARBIYAH belum siap. Periksa konfigurasi Supabase."
-      );
-    }
-
-    if (
-      typeof client.from !== "function" ||
-      !client.auth
-    ) {
-      throw new Error(
-        "Supabase client belum siap digunakan."
-      );
-    }
-
-    return client;
-  }
-
-  /* ==========================================================
-     06. AUTH SESSION
-  ========================================================== */
-
-  function extractSession(result) {
-    if (!result) return null;
-
-    if (result.session) {
-      return result.session;
-    }
-
-    if (result.data?.session) {
-      return result.data.session;
-    }
-
-    if (result.data?.user) {
-      return result.data;
-    }
-
-    if (result.user) {
-      return result;
-    }
-
-    return null;
-  }
-
-  async function resolveSession() {
-    const guarded = window.TARBIYAH_SESSION;
-
-    if (guarded?.ready === true) {
-      const guardedSession =
-        guarded.session ||
-        (guarded.user ? { user: guarded.user } : null);
-
-      return guardedSession;
-    }
-
-    const authAPI = window.TARBIYAH_AUTH;
-
-    if (typeof authAPI?.getSession === "function") {
-      const result = await authAPI.getSession();
-
-      if (result?.configured === false) {
-        throw new Error(
-          "Backend Supabase belum dikonfigurasi."
-        );
-      }
-
-      if (result?.error) {
-        throw result.error;
-      }
-
-      return extractSession(result);
-    }
-
-    const client = getSupabaseClient();
-
-    const { data, error } =
-      await client.auth.getSession();
-
-    if (error) throw error;
-
-    return data?.session || null;
-  }
-
-  /* ==========================================================
-     07. ROLE CONFIGURATION
+     05. KONFIGURASI ROLE
   ========================================================== */
 
   const ROLE_INFO = {
@@ -724,9 +406,11 @@
   ];
 
   /*
-    Daftar menu ini digunakan untuk mengatur tampilan navigasi.
-    Pemeriksaan keamanan sebenarnya tetap dilakukan di halaman
-    tujuan dan oleh Supabase RLS.
+    Pengaturan ini mengendalikan tampilan menu.
+
+    Ini bukan pengganti keamanan backend.
+    Halaman tujuan dan Supabase RLS tetap wajib
+    melakukan pemeriksaan kewenangan.
   */
 
   const ROLE_MENU_ACCESS = {
@@ -793,7 +477,7 @@
       "kehadiran",
       "riwayat",
       "kajian",
-      "agenda-kajian-manage", 
+      "agenda-kajian-manage",
       "pembelajaran",
       "materi",
       "agenda",
@@ -844,7 +528,104 @@
   }
 
   /* ==========================================================
-     08. FETCH ROLE DARI SUPABASE
+     06. SUPABASE CLIENT
+  ========================================================== */
+
+  function getSupabaseClient() {
+    const client = window.tarbiyahSupabase;
+
+    if (!client) {
+      throw new Error(
+        "Supabase client belum tersedia. Periksa js/config.js dan js/supabase-client.js."
+      );
+    }
+
+    if (window.TARBIYAH_BACKEND_READY === false) {
+      throw new Error(
+        "Backend TARBIYAH belum siap. Periksa konfigurasi Supabase."
+      );
+    }
+
+    if (
+      typeof client.from !== "function" ||
+      !client.auth
+    ) {
+      throw new Error(
+        "Supabase client belum siap digunakan."
+      );
+    }
+
+    return client;
+  }
+
+  /* ==========================================================
+     07. SESSION AUTHENTICATION
+  ========================================================== */
+
+  function extractSession(result) {
+    if (!result) return null;
+
+    if (result.session) {
+      return result.session;
+    }
+
+    if (result.data?.session) {
+      return result.data.session;
+    }
+
+    if (result.data?.user) {
+      return result.data;
+    }
+
+    if (result.user) {
+      return result;
+    }
+
+    return null;
+  }
+
+  async function resolveSession() {
+    const guarded = window.TARBIYAH_SESSION;
+
+    if (guarded?.ready === true) {
+      return (
+        guarded.session ||
+        (guarded.user
+          ? { user: guarded.user }
+          : null)
+      );
+    }
+
+    const authAPI = window.TARBIYAH_AUTH;
+
+    if (typeof authAPI?.getSession === "function") {
+      const result = await authAPI.getSession();
+
+      if (result?.configured === false) {
+        throw new Error(
+          "Backend Supabase belum dikonfigurasi."
+        );
+      }
+
+      if (result?.error) {
+        throw result.error;
+      }
+
+      return extractSession(result);
+    }
+
+    const client = getSupabaseClient();
+
+    const { data, error } =
+      await client.auth.getSession();
+
+    if (error) throw error;
+
+    return data?.session || null;
+  }
+
+  /* ==========================================================
+     08. MEMBACA ROLE DARI DATABASE
   ========================================================== */
 
   async function fetchUserRoles(userId) {
@@ -857,9 +638,9 @@
     const supabase = getSupabaseClient();
 
     const { data, error } = await supabase
-      .from(CONFIG.roleTable)
+      .from("user_roles")
       .select("role_id, roles(name)")
-      .eq(CONFIG.roleUserColumn, userId);
+      .eq("user_id", userId);
 
     if (error) throw error;
 
@@ -875,9 +656,7 @@
           ? relation[0]
           : relation;
 
-        return normalizeRole(
-          roleRecord?.name
-        );
+        return normalizeRole(roleRecord?.name);
       })
       .filter(role =>
         Object.prototype.hasOwnProperty.call(
@@ -890,7 +669,7 @@
   }
 
   /* ==========================================================
-     09. USER IDENTITY
+     09. IDENTITAS PENGGUNA
   ========================================================== */
 
   function getUserDisplayName(user) {
@@ -905,17 +684,6 @@
     );
   }
 
-  function getInitials(name) {
-    return String(name || "")
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(part => part.charAt(0))
-      .join("")
-      .toUpperCase() || "T";
-  }
-
   function setTextForSelectors(selectors, value) {
     selectors.forEach(selector => {
       $$(selector).forEach(element => {
@@ -925,53 +693,47 @@
   }
 
   function renderUserIdentity(user) {
-  const name = getUserDisplayName(user);
+    const name = getUserDisplayName(user);
 
-  // Nama pengguna pada Header dan Sidebar.
-  setTextForSelectors(
-    [
-      "#userName",
-      "#sidebarName",
-      "[data-user-name]",
-      "[data-sidebar-user-name]"
-    ],
-    name
-  );
+    setTextForSelectors(
+      [
+        "#userName",
+        "#sidebarName",
+        "[data-user-name]",
+        "[data-sidebar-user-name]"
+      ],
+      name
+    );
 
-  // Nama pada sapaan Dashboard.
-  const welcome = byId("welcomeTitle");
+    const welcome = byId("welcomeTitle");
 
-  if (welcome) {
-    welcome.textContent = `Assalamu’alaikum, ${name}`;
+    if (welcome) {
+      welcome.textContent =
+        `Assalamu’alaikum, ${name}`;
+    }
+
+    const greeting = $("[data-greeting-name]");
+
+    if (greeting) {
+      greeting.textContent = name;
+    }
+
+    $$("[data-user-email], #userEmail").forEach(element => {
+      element.textContent = user.email || "";
+    });
+
+    /*
+      Foto profil tidak disentuh oleh file ini.
+      Pengelola avatar tetap dashboard-profile-avatar.js.
+    */
+
+    document.body.classList.remove("auth-pending");
+
+    return name;
   }
-
-  const greeting = $("[data-greeting-name]");
-
-  if (greeting) {
-    greeting.textContent = name;
-  }
-
-  // Email pengguna.
-  const emailElements = $$(
-    "[data-user-email], #userEmail"
-  );
-
-  emailElements.forEach(element => {
-    element.textContent = user.email || "";
-  });
-
-  // PENTING:
-  // Jangan mengubah isi elemen avatar di sini.
-  // Foto profil sepenuhnya ditangani oleh
-  // dashboard-profile-avatar.js.
-
-  document.body.classList.remove("auth-pending");
-
-  return name;
-}
 
   /* ==========================================================
-     10. MENU ACCESS
+     10. PEMETAAN NAVIGASI
   ========================================================== */
 
   function getNavigationKey(element) {
@@ -989,6 +751,7 @@
 
     const file = href
       .split("?")[0]
+      .split("#")[0]
       .split("/")
       .pop()
       .toLowerCase();
@@ -996,20 +759,30 @@
     const routeMap = {
       "dashboard.html": "dashboard",
       "tarbiyah.html": "dashboard",
+
       "profil-anggota.html": "profil",
+
+      "anggota.html": "anggota",
+      "anggota-binaan.html": "anggota-binaan",
+
       "agenda-kajian.html": "agenda-kajian-manage",
       "agenda-tarbiyah.html": "agenda",
+
       "pembelajaran.html": "pembelajaran",
       "materi-pembelajaran.html": "materi",
+
       "berita-pengumuman.html": "berita",
       "galeri-foto-video.html": "galeri",
       "diskusi-tarbiyah.html": "diskusi",
       "donasi-infaq.html": "donasi",
+
       "presensi-tarbiyah.html": "presensi",
       "presensi-mentor.html": "presensi-mentor",
       "kehadiran.html": "kehadiran",
+
       "catatan-refleksi.html": "catatan",
       "riwayat-aktivitas.html": "riwayat",
+
       "notifikasi.html": "notifikasi",
       "dashboard-admin.html": "administrasi",
       "administrasi-pengaturan.html": "pengaturan"
@@ -1019,11 +792,14 @@
   }
 
   function canShowMenu(role, menuKey) {
-    const allowed =
-      ROLE_MENU_ACCESS[role] || [];
+    const allowed = ROLE_MENU_ACCESS[role] || [];
 
     return allowed.includes(menuKey);
   }
+
+  /* ==========================================================
+     11. FILTER MENU BERDASARKAN ROLE
+  ========================================================== */
 
   function applyRoleMenuAccess(role) {
     const menuElements = $$(
@@ -1033,12 +809,12 @@
     menuElements.forEach(element => {
       const key = getNavigationKey(element);
 
-      // Elemen yang tidak dapat dikenali tidak diubah.
       if (!key) return;
 
       const visible = canShowMenu(role, key);
 
       element.hidden = !visible;
+
       element.setAttribute(
         "aria-hidden",
         String(!visible)
@@ -1051,33 +827,30 @@
       }
     });
 
-    // Tautan dan banner administrasi.
     const isAdmin =
       role === "admin" ||
       role === "super_admin";
 
-    const adminElements = [
+    [
       byId("adminLink"),
       byId("adminBanner")
-    ].filter(Boolean);
+    ]
+      .filter(Boolean)
+      .forEach(element => {
+        element.hidden = !isAdmin;
+      });
 
-    adminElements.forEach(element => {
-      element.hidden = !isAdmin;
-    });
-
-    // Elemen yang secara eksplisit ditandai admin-only.
     $$("[data-admin-only]").forEach(element => {
       element.hidden = !isAdmin;
     });
 
-    // Elemen khusus Super Admin.
     $$("[data-super-admin-only]").forEach(element => {
       element.hidden = role !== "super_admin";
     });
   }
 
   /* ==========================================================
-     11. RENDER ROLE
+     12. RENDER ROLE PENGGUNA
   ========================================================== */
 
   function renderUserRole(role) {
@@ -1106,9 +879,7 @@
       sidebarRole.textContent = roleDescription;
     }
 
-    const roleBadges = $$("[data-role-label]");
-
-    roleBadges.forEach(element => {
+    $$("[data-role-label]").forEach(element => {
       element.textContent = roleLabel;
     });
 
@@ -1117,21 +888,25 @@
     const roleState = {
       ready: state.roleReady,
       name: state.primaryRole,
+
       label: roleLabel,
       description: roleDescription,
+
       isAdmin: Boolean(info?.isAdmin),
       isSuperAdmin: Boolean(info?.isSuperAdmin),
+
       isMentor: role === "mentor",
       isMember: role === "member"
     };
 
     window.TARBIYAH_USER_ROLE = roleState;
 
-    document.dispatchEvent(
-      new CustomEvent("tarbiyah:role-ready", {
-        detail: roleState
-      })
+    const event = new CustomEvent(
+      "tarbiyah:role-ready",
+      { detail: roleState }
     );
+
+    document.dispatchEvent(event);
 
     window.dispatchEvent(
       new CustomEvent("tarbiyah:role-ready", {
@@ -1143,11 +918,10 @@
   }
 
   /* ==========================================================
-     12. LOAD USER AND ROLE
+     13. MEMUAT IDENTITAS DAN ROLE
   ========================================================== */
 
   async function hydrateUser() {
-    // Status aman sebelum role selesai dibaca.
     renderUserRole(null);
 
     const session = await resolveSession();
@@ -1169,8 +943,7 @@
 
     state.roles = roles;
 
-    const primaryRole =
-      selectPrimaryRole(roles);
+    const primaryRole = selectPrimaryRole(roles);
 
     if (!primaryRole) {
       renderUserRole(null);
@@ -1199,7 +972,346 @@
   }
 
   /* ==========================================================
-     13. LOGOUT
+     14. PENCARIAN MENU
+  ========================================================== */
+
+  /*
+    Urutan pencarian dibuat spesifik terlebih dahulu.
+
+    Contoh:
+    "Agenda Kajian" harus membuka agenda-kajian.html,
+    bukan agenda-tarbiyah.html.
+
+    Setiap route wajib memiliki daftar role.
+  */
+
+  const SEARCH_ROUTES = [
+    {
+      keywords: [
+        "kelola agenda kajian",
+        "buat agenda kajian",
+        "agenda kajian",
+        "kelola kajian",
+        "arsip kajian"
+      ],
+      url: "./agenda-kajian.html",
+      roles: ["super_admin", "admin", "mentor"]
+    },
+
+    {
+      keywords: [
+        "anggota binaan",
+        "data binaan"
+      ],
+      url: "./anggota-binaan.html",
+      roles: ["super_admin", "admin", "mentor"]
+    },
+
+    {
+      keywords: [
+        "dashboard admin",
+        "panel administrasi",
+        "administrasi"
+      ],
+      url: "./dashboard-admin.html",
+      roles: ["super_admin", "admin"]
+    },
+
+    {
+      keywords: [
+        "agenda tarbiyah",
+        "jadwal kegiatan",
+        "agenda kegiatan",
+        "agenda",
+        "jadwal"
+      ],
+      url: "./agenda-tarbiyah.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "dashboard",
+        "beranda",
+        "home"
+      ],
+      url: "./dashboard.html",
+      roles: [
+        "super_admin",
+        "admin",
+        "mentor",
+        "member",
+        "registered_user"
+      ]
+    },
+
+    {
+      keywords: [
+        "profil anggota",
+        "profil",
+        "biodata",
+        "akun saya"
+      ],
+      url: "./profil-anggota.html",
+      roles: [
+        "super_admin",
+        "admin",
+        "mentor",
+        "member",
+        "registered_user"
+      ]
+    },
+
+    {
+      keywords: [
+        "pembinaan",
+        "catatan pembinaan"
+      ],
+      module: "pembinaan",
+      roles: ["super_admin", "admin", "mentor"]
+    },
+
+    {
+      keywords: [
+        "pembelajaran",
+        "belajar"
+      ],
+      url: "./pembelajaran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "materi pembelajaran",
+        "materi kajian",
+        "materi"
+      ],
+      url: "./materi-pembelajaran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "riwayat kajian",
+        "kajian"
+      ],
+      url: "./pembelajaran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "presensi",
+        "absensi"
+      ],
+      url: "./presensi-tarbiyah.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "riwayat kehadiran",
+        "kehadiran"
+      ],
+      url: "./kehadiran.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "berita",
+        "pengumuman"
+      ],
+      url: "./berita-pengumuman.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "galeri",
+        "dokumentasi",
+        "foto",
+        "video"
+      ],
+      url: "./galeri-foto-video.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "diskusi",
+        "forum"
+      ],
+      url: "./diskusi-tarbiyah.html",
+      roles: ["super_admin", "admin", "member"]
+    },
+
+    {
+      keywords: [
+        "donasi",
+        "infaq"
+      ],
+      url: "./donasi-infaq.html",
+      roles: ["super_admin", "admin", "member"]
+    },
+
+    {
+      keywords: [
+        "notifikasi",
+        "pemberitahuan"
+      ],
+      url: "./notifikasi.html",
+      roles: ["super_admin", "admin", "mentor", "member"]
+    },
+
+    {
+      keywords: [
+        "pengaturan akun",
+        "pengaturan"
+      ],
+      url: "./administrasi-pengaturan.html",
+      roles: [
+        "super_admin",
+        "admin",
+        "mentor",
+        "member",
+        "registered_user"
+      ]
+    }
+  ];
+
+  function findSearchRoute(query) {
+    const normalizedQuery = String(query || "")
+      .trim()
+      .toLowerCase();
+
+    /*
+      Kata kunci yang lebih panjang diperiksa terlebih dahulu.
+      Ini mencegah "agenda" mengambil alih "agenda kajian".
+    */
+
+    const sortedRoutes = SEARCH_ROUTES
+      .map(route => ({
+        ...route,
+        keywords: [...route.keywords].sort(
+          (a, b) => b.length - a.length
+        )
+      }))
+      .sort((a, b) => {
+        const longestA = Math.max(
+          ...a.keywords.map(keyword => keyword.length)
+        );
+
+        const longestB = Math.max(
+          ...b.keywords.map(keyword => keyword.length)
+        );
+
+        return longestB - longestA;
+      });
+
+    return sortedRoutes.find(route =>
+      route.keywords.some(keyword =>
+        normalizedQuery.includes(keyword)
+      )
+    ) || null;
+  }
+
+  function initializeSearch() {
+    const form =
+      byId("searchForm") ||
+      $("[data-dashboard-search-form]");
+
+    const input =
+      byId("globalSearch") ||
+      $("[data-dashboard-search]");
+
+    if (!form || !input) {
+      console.info(
+        "[TARBIYAH SEARCH] Form pencarian tidak ditemukan."
+      );
+      return;
+    }
+
+    if (form.dataset.searchInitialized === "true") {
+      return;
+    }
+
+    form.dataset.searchInitialized = "true";
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+
+      const query = String(input.value || "").trim();
+
+      if (!query) return;
+
+      if (!state.roleReady || !state.primaryRole) {
+        toast(
+          "Role akun belum berhasil diverifikasi. Silakan tunggu atau muat ulang halaman.",
+          "warning"
+        );
+        return;
+      }
+
+      const found = findSearchRoute(query);
+
+      if (!found) {
+        toast(
+          "Menu belum ditemukan. Coba kata kunci lain.",
+          "info"
+        );
+        return;
+      }
+
+      if (!found.roles.includes(state.primaryRole)) {
+        toast(
+          "Akun Anda belum memiliki izin untuk membuka menu tersebut.",
+          "error"
+        );
+        return;
+      }
+
+      if (found.url) {
+        window.location.href = found.url;
+        return;
+      }
+
+      if (found.module) {
+        const moduleAPI = window.TARBIYAH_MODULE;
+
+        if (
+          moduleAPI &&
+          typeof moduleAPI.navigate === "function"
+        ) {
+          moduleAPI.navigate(found.module);
+        } else {
+          toast(
+            "Halaman modul tersebut belum terhubung.",
+            "warning"
+          );
+        }
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      const activeTag =
+        document.activeElement?.tagName;
+
+      const typing =
+        ["INPUT", "TEXTAREA", "SELECT"].includes(activeTag) ||
+        document.activeElement?.isContentEditable;
+
+      if (event.key === "/" && !typing) {
+        event.preventDefault();
+        input.focus();
+      }
+    });
+
+    console.info("[TARBIYAH SEARCH] Siap digunakan.");
+  }
+
+  /* ==========================================================
+     15. LOGOUT
   ========================================================== */
 
   async function logout(button) {
@@ -1217,9 +1329,7 @@
     });
 
     if (button) {
-      button.dataset.originalText =
-        button.textContent;
-
+      button.dataset.originalText = button.textContent;
       button.textContent = "Memproses...";
     }
 
@@ -1275,6 +1385,12 @@
     );
 
     buttons.forEach(button => {
+      if (button.dataset.logoutInitialized === "true") {
+        return;
+      }
+
+      button.dataset.logoutInitialized = "true";
+
       button.addEventListener("click", event => {
         event.preventDefault();
         logout(button);
@@ -1283,9 +1399,10 @@
   }
 
   /* ==========================================================
-     14. DASHBOARD ROLE INFORMATION
+     16. DASHBOARD BERDASARKAN ROLE
   ========================================================== */
-   function initializeRoleDashboard() {
+
+  function initializeRoleDashboard() {
     document.addEventListener(
       "tarbiyah:role-ready",
       event => {
@@ -1294,25 +1411,24 @@
         if (role === "mentor") {
           document.body.dataset.dashboardRole = "mentor";
 
-          const heading = $(
-            "[data-dashboard-heading]"
-          );
+          const heading = $("[data-dashboard-heading]");
 
           if (heading) {
             heading.textContent =
               "Dashboard Pembinaan dan Pendampingan Anggota";
           }
 
-          const welcomeDescription = $(
-            "[data-dashboard-description]"
-          );
+          const description =
+            $("[data-dashboard-description]");
 
-          if (welcomeDescription) {
-            welcomeDescription.textContent =
+          if (description) {
+            description.textContent =
               "Pantau anggota binaan, kehadiran, riwayat kajian, dan catatan pembinaan.";
           }
+
         } else if (role) {
           document.body.dataset.dashboardRole = role;
+
         } else {
           delete document.body.dataset.dashboardRole;
         }
@@ -1321,7 +1437,7 @@
   }
 
   /* ==========================================================
-     15. INITIALIZATION
+     17. INITIALIZATION
   ========================================================== */
 
   async function initialize() {
@@ -1330,6 +1446,7 @@
     state.initialized = true;
 
     updateDateInformation();
+
     initializeCarousel();
     initializeSearch();
     initializeLogout();
@@ -1337,6 +1454,7 @@
 
     try {
       await hydrateUser();
+
     } catch (error) {
       renderUserRole(null);
 
@@ -1358,7 +1476,7 @@
   }
 
   /* ==========================================================
-     16. PUBLIC API
+     18. PUBLIC API
   ========================================================== */
 
   window.TARBIYAH_DASHBOARD = Object.freeze({
@@ -1397,6 +1515,10 @@
 
     logout
   });
+
+  /* ==========================================================
+     19. JALANKAN DASHBOARD
+  ========================================================== */
 
   if (document.readyState === "loading") {
     document.addEventListener(
