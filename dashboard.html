@@ -28,6 +28,29 @@
     /* =========================================
        HEADER FIX (MENGUNCI LOGO & TOMBOL IKON)
     ========================================= */
+    /* Kunci agar sidebar tidak terpotong */
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden; /* Mencegah seluruh sidebar ter-scroll */
+}
+
+/* Area menu dibuat scrollable */
+.sidebar-navigation, .admin-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+/* Area profil dan logout terkunci di bawah */
+.sidebar-footer-wrapper, .sidebar-bottom {
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  padding-bottom: max(16px, env(safe-area-inset-bottom)); /* Jarak aman untuk HP berponi */
+  border-top: 1px solid var(--border-color);
+}
     .app-header {
       display: flex;
       align-items: center;
