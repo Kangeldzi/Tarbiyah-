@@ -422,6 +422,41 @@
 
   <script src="./js/dashboard-admin.js" defer></script>
   <script src="./js/member-management.js" defer></script>
+  
+  <!-- TAMBAHKAN SCRIPT INI UNTUK MENGUNCI FOTO PROFIL -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Fungsi untuk memaksa foto profil muncul
+      function forceProfileImages() {
+        const sidebarAvatar = document.getElementById("sidebarAvatarImg");
+        const topbarAvatar = document.getElementById("topbarAvatarImg");
+        const imgUrl = "./assets/icons/icon-192.png";
+
+        if (sidebarAvatar) sidebarAvatar.src = imgUrl;
+        if (topbarAvatar) topbarAvatar.src = imgUrl;
+        
+        // Sembunyikan inisial huruf "A" jika JS bawaan memunculkannya
+        const adminAvatar = document.getElementById("adminAvatar");
+        const topAvatar = document.getElementById("topAvatar");
+        
+        if (adminAvatar && adminAvatar.tagName !== "A") {
+          // Jika JS mengubah tag <a> menjadi <div>, kita paksa isi ulang gambarnya
+          adminAvatar.innerHTML = `<img src="${imgUrl}" alt="Foto Profil" style="width:100%; height:100%; object-fit:cover;">`;
+        }
+        if (topAvatar && topAvatar.tagName !== "A") {
+          topAvatar.innerHTML = `<img src="${imgUrl}" alt="Foto Profil" style="width:100%; height:100%; object-fit:cover;">`;
+        }
+      }
+
+      // Jalankan saat halaman dimuat
+      forceProfileImages();
+
+      // Jalankan setiap 1 detik sekali untuk mencegah JS bawaan menimpa fotonya
+      setInterval(forceProfileImages, 1000);
+    });
+  </script>
+
   <script src="./js/pwa.js" defer></script>
+  
 </body>
 </html>
