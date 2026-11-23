@@ -58,6 +58,15 @@
       access: "member"
     },
 
+        "agenda-kajian": {
+      id: "agenda-kajian",
+      title: "Kelola Agenda Kajian",
+      description: "Membuat, mengatur, dan mengarsipkan agenda kajian TARBIYAH.",
+      icon: "calendar-check",
+      url: "./agenda-kajian.html",
+      access: "member"
+    },
+    
     pembelajaran: {
       id: "pembelajaran",
       title: "Pembelajaran",
@@ -227,6 +236,10 @@
 
     "agenda-tarbiyah": "agenda",
     jadwal: "agenda",
+
+    "agenda-kajian-manage": "agenda-kajian",
+    "kelola-agenda-kajian": "agenda-kajian",
+    "kelola-kajian": "agenda-kajian",
 
     "materi-pembelajaran": "materi",
     "materi-tarbiyah": "materi",
