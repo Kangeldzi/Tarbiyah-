@@ -1,48 +1,85 @@
-
+```javascript
 /* ============================================================
-   TARBIYAH — PENGELOLAAN AGENDA KAJIAN
-   File       : js/agenda-kajian.js
-   Database   : kajian_agenda
-   Role       : super_admin, admin, mentor
-   Timezone   : Asia/Jakarta (WIB)
-   Version    : 3.1 — Unified, Archive & Super Admin Delete
+   TARBIYAH — AGENDA KAJIAN
+   Version 3.2 — Unified Agenda & Role-Based Access
+   Timezone: Asia/Jakarta
+
+   Fitur:
+   - Agenda aktif dan arsip dalam satu halaman
+   - Hak akses Anggota, Mentor, Admin, Super Admin
+   - Tambah, ubah, arsipkan, pulihkan agenda
+   - Hapus permanen khusus Super Admin
+   - Integrasi Supabase
+   - Google Maps
+   - Validasi tanggal dan waktu WIB
    ============================================================ */
 
 (() => {
   "use strict";
 
-  /* ============================================================
-     0. PENCEGAHAN SCRIPT GANDA
-  ============================================================ */
-
-  if (window.__TARBIYAH_AGENDA_KAJIAN_V3__) {
-    console.info("[TARBIYAH AGENDA] Modul sudah aktif.");
-    return;
-  }
-
-  window.__TARBIYAH_AGENDA_KAJIAN_V3__ = true;
+  if (window.__TARBIYAH_AGENDA_KAJIAN_V32__) return;
+  window.__TARBIYAH_AGENDA_KAJIAN_V32__ = true;
 
   /* ============================================================
      1. KONFIGURASI
-  ============================================================ */
+     ============================================================ */
 
-  const TABLE = "kajian_agenda";
-  const ATTENDANCE_TABLE = "kajian_attendance";
-  const ROLE_TABLE = "user_roles";
-  const TIMEZONE = "Asia/Jakarta";
-  const ALLOWED_ROLES = [
-    "super_admin",
-    "admin",
-    "mentor"
-  ];
-  const CLIENT_WAIT_MS = 15000;
+  const CONFIG = {
+    TABLE: "kajian_agenda",
+    ATTENDANCE_TABLE: "kajian_attendance",
+    ROLE_TABLE: "user_roles",
+    TIMEZONE: "Asia/Jakarta",
+    CLIENT_WAIT_MS: 15000,
+    MAX_AGENDAS: 200
+  };
 
-  const $ = (id) => document.getElementById(id);
+  const PERMISSIONS = {
+    member: {
+      viewPublished: true,
+      viewArchived: false,
+      create: false,
+      edit: false,
+      archive: false,
+      restore: false,
+      delete: false
+    },
+
+    mentor: {
+      viewPublished: true,
+      viewArchived: true,
+      create: true,
+      edit: true,
+      archive: true,
+      restore: true,
+      delete: false
+    },
+
+    admin: {
+      viewPublished: true,
+      viewArchived: true,
+      create: true,
+      edit: true,
+      archive: true,
+      restore: true,
+      delete: false
+    },
+
+    super_admin: {
+      viewPublished: true,
+      viewArchived: true,
+      create: true,
+      edit: true,
+      archive: true,
+      restore: true,
+      delete: true
+    }
+  };
 
   const state = {
     supabase: null,
     user: null,
-    role: null,
+    role: "member",
+    roleLookupWarning: "",
     agendas: [],
     editingId: null,
     busy: false,
@@ -52,87 +89,144 @@
   };
 
   /* ============================================================
-     2. UTILITAS DASAR
-  ============================================================ */
+     2. ELEMEN DOM
+     ============================================================ */
 
-  function log(message, data) {
-    if (typeof data === "undefined") {
-      console.info("[TARBIYAH AGENDA]", message);
-    } else {
-      console.info("[TARBIYAH AGENDA]", message, data);
-    }
-  }
+  const $ = (id) => document.getElementById(id);
 
-  function showNotice(message, type = "success") {
-    const box = $("agendaNotice");
+  const elements = {
+    form: $("agendaForm"),
+    formPanel: $("agendaFormPanel"),
+    formHeading: $("formHeading"),
+    agendaId: $("agendaId"),
 
-    if (!box) {
-      console.warn("[TARBIYAH AGENDA]", message);
-      return;
-    }
+    title: $("title"),
+    description: $("description"),
+    speakerName: $("speakerName"),
+    startsAt: $("startsAt"),
+    endsAt: $("endsAt"),
+    locationName: $("locationName"),
+    locationAddress: $("locationAddress"),
 
-    box.textContent = String(message || "");
-    box.classList.toggle("error", type === "error");
-    box.hidden = false;
-  }
+    saveButton: $("saveButton"),
+    cancelEditButton: $("cancelEditButton"),
 
-  function hideNotice() {
-    const box = $("agendaNotice");
+    agendaList: $("agendaList"),
+    agendaCount: $("agendaCount"),
 
-    if (box) {
-      box.hidden = true;
-      box.textContent = "";
-      box.classList.remove("error");
-    }
-  }
+    notice: $("agendaNotice"),
 
-  function setConnection(status, title, description) {
-    const indicator = $("connectionIndicator");
-    const titleElement = $("connectionTitle");
-    const descriptionElement = $("connectionDescription");
+    connectionIndicator: $("connectionIndicator"),
+    connectionTitle: $("connectionTitle"),
+    connectionDescription: $("connectionDescription"),
 
-    if (indicator) {
-      indicator.classList.remove("is-ready", "is-error");
+    refreshButton: $("refreshButton"),
+    userRole: $("userRole"),
+    currentYear: $("currentYear"),
 
-      if (status === "ready") {
-        indicator.classList.add("is-ready");
-      }
+    accessInformation: $("agendaAccessInformation"),
+    accessMessage: $("agendaAccessMessage")
+  };
 
-      if (status === "error") {
-        indicator.classList.add("is-error");
-      }
-    }
-
-    if (titleElement) {
-      titleElement.textContent = title || "";
-    }
-
-    if (descriptionElement) {
-      descriptionElement.textContent = description || "";
-    }
-  }
+  /* ============================================================
+     3. UTILITAS
+     ============================================================ */
 
   function normalizeRole(value) {
-    return String(value || "")
+    const role = String(value || "")
       .trim()
       .toLowerCase()
       .replace(/[\s-]+/g, "_");
+
+    if ([
+      "super_admin",
+      "superadmin",
+      "superadministrator"
+    ].includes(role)) {
+      return "super_admin";
+    }
+
+    if ([
+      "admin",
+      "administrator"
+    ].includes(role)) {
+      return "admin";
+    }
+
+    if ([
+      "mentor",
+      "ustadz",
+      "pengajar"
+    ].includes(role)) {
+      return "mentor";
+    }
+
+    return "member";
+  }
+
+  function getPermissions() {
+    return PERMISSIONS[state.role] || PERMISSIONS.member;
+  }
+
+  function can(permission) {
+    return getPermissions()[permission] === true;
   }
 
   function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, (character) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    })[character]);
+    return String(value ?? "").replace(/[&<>"']/g, (char) => {
+      const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      };
+
+      return map[char];
+    });
+  }
+
+  function showNotice(message, type = "info") {
+    if (!elements.notice) return;
+
+    elements.notice.textContent = message;
+    elements.notice.className = `agenda-notice is-${type}`;
+    elements.notice.hidden = false;
+
+    if (state.noticeTimer) {
+      clearTimeout(state.noticeTimer);
+    }
+
+    state.noticeTimer = setTimeout(() => {
+      if (elements.notice) {
+        elements.notice.hidden = true;
+      }
+    }, 6000);
+  }
+
+  function hideNotice() {
+    if (!elements.notice) return;
+
+    elements.notice.hidden = true;
+    elements.notice.textContent = "";
+  }
+
+  function setConnection(status, title, description) {
+    if (elements.connectionTitle) {
+      elements.connectionTitle.textContent = title;
+    }
+
+    if (elements.connectionDescription) {
+      elements.connectionDescription.textContent = description;
+    }
+
+    if (elements.connectionIndicator) {
+      elements.connectionIndicator.dataset.status = status;
+    }
   }
 
   function getErrorMessage(error) {
-    if (!error) {
-      return "Terjadi kesalahan yang tidak diketahui.";
-    }
+    if (!error) return "Terjadi kesalahan yang tidak diketahui.";
 
     return (
       error.message ||
@@ -143,8 +237,8 @@
   }
 
   /* ============================================================
-     3. KONEKSI SUPABASE
-  ============================================================ */
+     4. SUPABASE CLIENT
+     ============================================================ */
 
   function findSupabaseClient() {
     const candidates = [
@@ -153,139 +247,190 @@
       window.TARBIYAH_SUPABASE
     ];
 
-    return candidates.find((client) =>
-      client &&
-      client.auth &&
-      typeof client.auth.getUser === "function" &&
-      typeof client.from === "function"
-    ) || null;
+    return candidates.find((client) => {
+      return (
+        client &&
+        client.auth &&
+        typeof client.auth.getUser === "function" &&
+        typeof client.from === "function"
+      );
+    }) || null;
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async function waitForSupabaseClient() {
-    const startedAt = Date.now();
+    const started = Date.now();
 
-    while (Date.now() - startedAt < CLIENT_WAIT_MS) {
+    while (Date.now() - started < CONFIG.CLIENT_WAIT_MS) {
       const client = findSupabaseClient();
 
       if (client) {
         state.supabase = client;
-        log("Supabase client berhasil ditemukan.");
         return client;
       }
 
-      await new Promise((resolve) => {
-        window.setTimeout(resolve, 250);
-      });
+      await sleep(250);
     }
 
     throw new Error(
-      "Supabase client tidak ditemukan. Periksa pemuatan js/config.js dan js/supabase-client.js."
+      "Supabase belum tersedia. Periksa urutan pemuatan config.js dan supabase-client.js."
     );
   }
 
   /* ============================================================
-     4. PEMERIKSAAN SESI LOGIN
-  ============================================================ */
+     5. AUTENTIKASI
+     ============================================================ */
 
   async function getAuthenticatedUser() {
     if (!state.supabase) {
       throw new Error("Koneksi Supabase belum tersedia.");
     }
 
-    const guardedUser =
-      window.TARBIYAH_SESSION?.user ||
-      window.TARBIYAH_AUTH?.user ||
-      null;
-
-    if (guardedUser?.id) {
-      log("Sesi pengguna diperoleh dari aplikasi.");
-      return guardedUser;
-    }
-
-    const { data, error } =
-      await state.supabase.auth.getUser();
+    const {
+      data,
+      error
+    } = await state.supabase.auth.getUser();
 
     if (error) {
+      throw error;
+    }
+
+    if (!data || !data.user) {
       throw new Error(
-        "Pemeriksaan sesi login gagal: " +
-        getErrorMessage(error)
+        "Sesi pengguna tidak ditemukan. Silakan masuk kembali."
       );
     }
 
-    if (!data?.user?.id) {
-      throw new Error(
-        "Sesi login tidak ditemukan. Silakan masuk kembali melalui halaman login TARBIYAH."
-      );
-    }
-
-    log("Sesi pengguna berhasil diverifikasi.");
     return data.user;
   }
 
   /* ============================================================
-     5. PEMERIKSAAN HAK AKSES
-  ============================================================ */
+     6. PEMBACAAN ROLE
+     ============================================================ */
 
   async function loadUserRole() {
-    const { data, error } = await state.supabase
-      .from(ROLE_TABLE)
+    const {
+      data,
+      error
+    } = await state.supabase
+      .from(CONFIG.ROLE_TABLE)
       .select("role_id, roles(name)")
       .eq("user_id", state.user.id);
 
     if (error) {
-      throw new Error(
-        "Gagal memeriksa hak akses akun: " +
-        getErrorMessage(error)
+      state.role = "member";
+      state.roleLookupWarning =
+        "Hak akses tidak dapat diverifikasi. Mode baca saja diaktifkan.";
+
+      console.warn(
+        "[TARBIYAH] Gagal membaca role pengguna:",
+        error
       );
+
+      return;
     }
 
-    const roles = (data || [])
-      .map((item) => {
-        const relation = Array.isArray(item.roles)
-          ? item.roles[0]
-          : item.roles;
+    state.roleLookupWarning = "";
 
-        return normalizeRole(relation?.name);
+    const rows = Array.isArray(data) ? data : [];
+
+    const roleNames = rows
+      .map((row) => {
+        const relation = row.roles;
+
+        if (Array.isArray(relation)) {
+          return relation[0]?.name || "";
+        }
+
+        return relation?.name || "";
       })
       .filter(Boolean);
 
-    // Prioritas Super Admin, kemudian Admin, lalu Mentor.
-    const permittedRole = ALLOWED_ROLES.find((role) =>
-      roles.includes(role)
-    );
+    const normalizedRoles = roleNames.map(normalizeRole);
 
-    if (!permittedRole) {
-      throw new Error(
-        "Akun Anda belum memiliki hak akses untuk mengelola agenda kajian. " +
-        "Akses tersedia untuk Super Admin, Admin, dan Mentor."
-      );
+    if (normalizedRoles.includes("super_admin")) {
+      state.role = "super_admin";
+    } else if (normalizedRoles.includes("admin")) {
+      state.role = "admin";
+    } else if (normalizedRoles.includes("mentor")) {
+      state.role = "mentor";
+    } else {
+      state.role = "member";
     }
-
-    state.role = permittedRole;
-
-    const roleElement = $("userRole");
-
-    if (roleElement) {
-      roleElement.textContent = permittedRole
-        .replaceAll("_", " ")
-        .toUpperCase();
-    }
-
-    log("Hak akses berhasil diverifikasi.", {
-      userId: state.user.id,
-      role: state.role
-    });
   }
 
   /* ============================================================
-     6. KONVERSI DAN VALIDASI WAKTU WIB
-  ============================================================ */
+     7. TAMPILAN BERDASARKAN ROLE
+     ============================================================ */
+
+  function updateRoleInterface() {
+    const permissions = getPermissions();
+
+    if (elements.userRole) {
+      const labels = {
+        member: "Anggota",
+        mentor: "Mentor",
+        admin: "Admin",
+        super_admin: "Super Admin"
+      };
+
+      elements.userRole.textContent =
+        labels[state.role] || "Anggota";
+    }
+
+    // Form hanya untuk pengguna yang berhak mengelola agenda.
+    if (elements.formPanel) {
+      elements.formPanel.hidden = !permissions.create;
+    }
+
+    // Anggota hanya dapat melihat agenda aktif.
+    const archivedTab = document.querySelector(
+      '[data-agenda-view="archived"]'
+    );
+
+    if (archivedTab) {
+      archivedTab.hidden = !permissions.viewArchived;
+    }
+
+    if (!permissions.viewArchived && state.view === "archived") {
+      state.view = "published";
+    }
+
+    updateViewTabs();
+
+    if (elements.accessInformation && elements.accessMessage) {
+      elements.accessInformation.hidden = false;
+
+      if (state.roleLookupWarning) {
+        elements.accessMessage.textContent =
+          state.roleLookupWarning;
+      } else if (state.role === "member") {
+        elements.accessMessage.textContent =
+          "Anda dapat melihat agenda kajian aktif. Fitur pengelolaan agenda hanya tersedia bagi Mentor, Admin, dan Super Admin.";
+      } else if (state.role === "super_admin") {
+        elements.accessMessage.textContent =
+          "Anda masuk sebagai Super Admin dan memiliki akses penuh untuk mengelola agenda kajian.";
+      } else {
+        elements.accessMessage.textContent =
+          "Anda dapat mengelola agenda kajian sesuai hak akses akun Anda.";
+      }
+    }
+
+    if (!permissions.create) {
+      resetForm();
+    }
+  }
+
+  /* ============================================================
+     8. TANGGAL DAN WAKTU WIB
+     ============================================================ */
 
   function jakartaDateTimeToISO(value) {
     if (!value) {
-      throw new Error(
-        "Tanggal dan waktu agenda wajib diisi."
-      );
+      throw new Error("Tanggal dan waktu wajib diisi.");
     }
 
     const match = String(value).match(
@@ -293,37 +438,38 @@
     );
 
     if (!match) {
-      throw new Error(
-        "Format tanggal atau waktu tidak valid."
-      );
+      throw new Error("Format tanggal dan waktu tidak valid.");
     }
 
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-    const hour = Number(match[4]);
-    const minute = Number(match[5]);
+    const [
+      ,
+      year,
+      month,
+      day,
+      hour,
+      minute
+    ] = match;
 
-    const check = new Date(
-      Date.UTC(year, month - 1, day, hour, minute)
-    );
+    const y = Number(year);
+    const m = Number(month);
+    const d = Number(day);
+    const h = Number(hour);
+    const min = Number(minute);
+
+    const check = new Date(Date.UTC(y, m - 1, d));
 
     if (
-      check.getUTCFullYear() !== year ||
-      check.getUTCMonth() !== month - 1 ||
-      check.getUTCDate() !== day ||
-      check.getUTCHours() !== hour ||
-      check.getUTCMinutes() !== minute
+      check.getUTCFullYear() !== y ||
+      check.getUTCMonth() !== m - 1 ||
+      check.getUTCDate() !== d ||
+      h > 23 ||
+      min > 59
     ) {
-      throw new Error(
-        "Tanggal atau waktu yang dimasukkan tidak valid."
-      );
+      throw new Error("Tanggal atau waktu tidak valid.");
     }
 
-    // WIB = UTC+07:00.
-    return new Date(
-      `${value}:00+07:00`
-    ).toISOString();
+    // WIB = UTC+07:00
+    return `${year}-${month}-${day}T${hour}:${minute}:00+07:00`;
   }
 
   function toJakartaInput(value) {
@@ -331,26 +477,29 @@
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
+    if (Number.isNaN(date.getTime())) return "";
 
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: TIMEZONE,
+    const formatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: CONFIG.TIMEZONE,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
       hourCycle: "h23"
-    }).formatToParts(date);
+    });
 
-    const part = (type) =>
-      parts.find((item) => item.type === type)?.value || "";
+    const parts = {};
+
+    formatter.formatToParts(date).forEach((part) => {
+      if (part.type !== "literal") {
+        parts[part.type] = part.value;
+      }
+    });
 
     return (
-      `${part("year")}-${part("month")}-${part("day")}` +
-      `T${part("hour")}:${part("minute")}`
+      `${parts.year}-${parts.month}-${parts.day}` +
+      `T${parts.hour}:${parts.minute}`
     );
   }
 
@@ -359,12 +508,10 @@
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
-      return "-";
-    }
+    if (Number.isNaN(date.getTime())) return "-";
 
-    const formatted = new Intl.DateTimeFormat("id-ID", {
-      timeZone: TIMEZONE,
+    return new Intl.DateTimeFormat("id-ID", {
+      timeZone: CONFIG.TIMEZONE,
       weekday: "long",
       day: "2-digit",
       month: "long",
@@ -372,714 +519,545 @@
       hour: "2-digit",
       minute: "2-digit",
       hourCycle: "h23"
-    }).format(date);
-
-    return `${formatted} WIB`;
+    }).format(date) + " WIB";
   }
 
   /* ============================================================
-     7. TAUTAN GOOGLE MAPS
-  ============================================================ */
+     9. GOOGLE MAPS
+     ============================================================ */
 
-  function getMapURL(address) {
-    const value = String(address || "").trim();
+  function getMapURL(locationAddress, locationName) {
+    const address = String(locationAddress || "").trim();
 
-    if (!value) return "";
+    if (address) {
+      if (/^https?:\/\//i.test(address)) {
+        try {
+          const url = new URL(address);
 
-    if (
-      /^https?:\/\/(maps\.app\.goo\.gl|goo\.gl\/maps)\//i.test(value)
-    ) {
-      return value;
-    }
+          const allowedHosts = [
+            "maps.app.goo.gl",
+            "goo.gl",
+            "google.com",
+            "www.google.com",
+            "maps.google.com"
+          ];
 
-    if (
-      /^https?:\/\/(www\.)?google\.[^/]+\/maps/i.test(value)
-    ) {
-      return value;
-    }
-
-    const coordinateMatch = value.match(
-      /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/
-    );
-
-    if (coordinateMatch) {
-      const lat = Number(coordinateMatch[1]);
-      const lng = Number(coordinateMatch[2]);
+          if (
+            allowedHosts.includes(url.hostname) ||
+            url.hostname.endsWith(".google.com")
+          ) {
+            return url.href;
+          }
+        } catch (_) {
+          // Lanjutkan sebagai alamat pencarian.
+        }
+      }
 
       if (
-        lat >= -90 &&
-        lat <= 90 &&
-        lng >= -180 &&
-        lng <= 180
+        /^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(address)
       ) {
         return (
           "https://www.google.com/maps/search/?api=1&query=" +
-          encodeURIComponent(`${lat},${lng}`)
+          encodeURIComponent(address)
         );
       }
+
+      return (
+        "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(address)
+      );
     }
 
-    return (
-      "https://www.google.com/maps/search/?api=1&query=" +
-      encodeURIComponent(value)
-    );
+    if (locationName) {
+      return (
+        "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(locationName)
+      );
+    }
+
+    return "";
   }
 
   /* ============================================================
-     8. TAB AGENDA AKTIF DAN ARSIP
-  ============================================================ */
-
-  function ensureViewTabs() {
-    const list = $("agendaList");
-
-    if (!list) return;
-
-    let tabs = document.querySelector(".agenda-tabs");
-
-    if (!tabs) {
-      tabs = document.createElement("div");
-      tabs.className = "agenda-tabs";
-
-      tabs.innerHTML = `
-        <button
-          type="button"
-          class="agenda-tab"
-          data-agenda-view="published">
-          Agenda Aktif
-        </button>
-
-        <button
-          type="button"
-          class="agenda-tab"
-          data-agenda-view="archived">
-          Arsip Agenda
-        </button>
-      `;
-
-      list.parentNode.insertBefore(tabs, list);
-    }
-
-    updateViewTabs();
-  }
+     10. TAB AGENDA AKTIF DAN ARSIP
+     ============================================================ */
 
   function updateViewTabs() {
-    document
-      .querySelectorAll("[data-agenda-view]")
-      .forEach((button) => {
-        const active =
-          button.dataset.agendaView === state.view;
+    document.querySelectorAll("[data-agenda-view]").forEach((tab) => {
+      const selected = tab.dataset.agendaView === state.view;
 
-        button.classList.toggle("active", active);
-        button.setAttribute(
-          "aria-pressed",
-          active ? "true" : "false"
-        );
-      });
+      tab.classList.toggle("active", selected);
+      tab.setAttribute(
+        "aria-selected",
+        selected ? "true" : "false"
+      );
+    });
   }
 
   async function switchAgendaView(view) {
     if (state.busy) return;
 
-    if (!["published", "archived"].includes(view)) {
+    if (view !== "published" && view !== "archived") {
       return;
     }
 
-    if (state.view === view) return;
+    if (view === "archived" && !can("viewArchived")) {
+      showNotice(
+        "Akses arsip agenda tidak tersedia untuk akun Anda.",
+        "warning"
+      );
+      return;
+    }
 
     state.view = view;
     updateViewTabs();
-    hideNotice();
 
-    try {
-      await loadAgendas();
-    } catch (error) {
-      console.error(
-        "[TARBIYAH AGENDA] Gagal mengganti tampilan:",
-        error
-      );
-
-      showNotice(
-        getErrorMessage(error),
-        "error"
-      );
-    }
+    resetForm();
+    await loadAgendas();
   }
 
   /* ============================================================
-     9. MEMUAT AGENDA DARI SUPABASE
-  ============================================================ */
+     11. MEMUAT DATA AGENDA
+     ============================================================ */
 
   async function loadAgendas() {
-    const list = $("agendaList");
+    if (!state.supabase || !state.user) return;
 
-    if (list) {
-      list.innerHTML = `
-        <div class="agenda-empty">
-          Memuat data agenda...
-        </div>
-      `;
+    if (
+      state.view === "archived" &&
+      !can("viewArchived")
+    ) {
+      state.view = "published";
     }
 
-    const { data, error } = await state.supabase
-      .from(TABLE)
-      .select(
-        "id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status"
-      )
-      .eq("status", state.view)
-      .order("starts_at", { ascending: true })
-      .limit(200);
+    if (elements.agendaList) {
+      elements.agendaList.innerHTML =
+        '<div class="agenda-loading">Memuat agenda kajian...</div>';
+    }
 
-    if (error) {
-      throw new Error(
-        "Gagal memuat agenda: " + getErrorMessage(error)
+    try {
+      let query = state.supabase
+        .from(CONFIG.TABLE)
+        .select(
+          "id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status"
+        )
+        .eq("status", state.view)
+        .order("starts_at", { ascending: true })
+        .limit(CONFIG.MAX_AGENDAS);
+
+      // Pengguna anggota tidak pernah meminta data arsip.
+      if (state.role === "member") {
+        query = query.eq("status", "published");
+      }
+
+      const {
+        data,
+        error
+      } = await query;
+
+      if (error) throw error;
+
+      state.agendas = Array.isArray(data) ? data : [];
+
+      renderAgendas();
+
+      setConnection(
+        "connected",
+        "Terhubung",
+        "Data agenda kajian berhasil dimuat dari Supabase."
+      );
+
+      if (elements.refreshButton) {
+        elements.refreshButton.disabled = false;
+      }
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH] Gagal memuat agenda:",
+        error
+      );
+
+      state.agendas = [];
+
+      if (elements.agendaList) {
+        elements.agendaList.innerHTML = `
+          <div class="agenda-empty">
+            <strong>Agenda belum dapat dimuat.</strong>
+            <p>${escapeHTML(getErrorMessage(error))}</p>
+            <p>Periksa koneksi Supabase dan kebijakan RLS tabel kajian_agenda.</p>
+          </div>
+        `;
+      }
+
+      if (elements.agendaCount) {
+        elements.agendaCount.textContent = "0";
+      }
+
+      setConnection(
+        "error",
+        "Gagal memuat data",
+        getErrorMessage(error)
       );
     }
-
-    state.agendas = data || [];
-
-    renderAgendas();
-
-    log("Daftar agenda berhasil dimuat.", {
-      view: state.view,
-      count: state.agendas.length
-    });
   }
 
   /* ============================================================
-     10. MENAMPILKAN DAFTAR AGENDA
-  ============================================================ */
+     12. RENDER AGENDA
+     ============================================================ */
 
   function renderAgendas() {
-    const list = $("agendaList");
-    const count = $("agendaCount");
+    if (!elements.agendaList) return;
 
-    if (!list) return;
-
-    if (count) {
-      count.textContent = `${state.agendas.length} agenda`;
+    if (elements.agendaCount) {
+      elements.agendaCount.textContent =
+        String(state.agendas.length);
     }
 
-    updateViewTabs();
-
     if (!state.agendas.length) {
-      const emptyTitle =
-        state.view === "archived"
-          ? "Belum ada agenda yang diarsipkan"
-          : "Belum ada agenda terbit";
-
-      const emptyDescription =
-        state.view === "archived"
-          ? "Agenda yang diarsipkan akan ditampilkan di sini."
-          : "Gunakan formulir untuk membuat agenda kajian pertama.";
-
-      list.innerHTML = `
+      elements.agendaList.innerHTML = `
         <div class="agenda-empty">
-          <span>☾</span>
-          <strong>${emptyTitle}</strong>
-          <p>${emptyDescription}</p>
+          <strong>
+            ${state.view === "published"
+              ? "Belum ada agenda kajian aktif."
+              : "Belum ada agenda dalam arsip."}
+          </strong>
+          <p>
+            ${state.view === "published"
+              ? "Agenda kajian yang diterbitkan akan tampil di sini."
+              : "Agenda yang diarsipkan akan tampil di sini."}
+          </p>
         </div>
       `;
 
       return;
     }
 
-    list.innerHTML = state.agendas.map((item) => {
-      const location =
-        item.location_name ||
-        item.location_address ||
-        "";
-
-      const mapURL = getMapURL(
-        item.location_address || item.location_name
-      );
-
-      const mapLink = mapURL
-        ? `
-          <a
-            class="agenda-map-link"
-            href="${escapeHTML(mapURL)}"
-            target="_blank"
-            rel="noopener noreferrer">
-            ⌖ Buka Peta
-          </a>
-        `
-        : "";
-
-      const regularActionButtons =
-        state.view === "published"
-          ? `
-            <button
-              type="button"
-              data-edit-id="${escapeHTML(item.id)}">
-              Ubah Agenda
-            </button>
-
-            <button
-              type="button"
-              data-archive-id="${escapeHTML(item.id)}">
-              Arsipkan Agenda
-            </button>
-          `
-          : `
-            <button
-              type="button"
-              data-restore-id="${escapeHTML(item.id)}">
-              Pulihkan Agenda
-            </button>
-          `;
-
-      // Tombol hapus hanya ditampilkan kepada Super Admin.
-      const deleteActionButton =
-        state.role === "super_admin"
-          ? `
-            <button
-              type="button"
-              data-delete-id="${escapeHTML(item.id)}"
-              class="agenda-delete-button">
-              Hapus Permanen
-            </button>
-          `
-          : "";
-
-      const actionButtons =
-        regularActionButtons + deleteActionButton;
-
-      const statusLabel =
-        state.view === "archived"
-          ? "DIARSIPKAN"
-          : "TERBIT";
-
-      return `
-        <article class="agenda-card">
-          <div class="agenda-card-top">
-            <div>
-              <h3>${escapeHTML(item.title)}</h3>
-              <span class="agenda-live-label">
-                ${statusLabel}
-              </span>
-            </div>
-          </div>
-
-          <p>
-            ◷ Mulai:
-            ${escapeHTML(formatDateTime(item.starts_at))}
-          </p>
-
-          <p>
-            ◷ Selesai:
-            ${escapeHTML(formatDateTime(item.ends_at))}
-          </p>
-
-          ${
-            item.speaker_name
-              ? `
-                <p>
-                  ◉ Pemateri:
-                  ${escapeHTML(item.speaker_name)}
-                </p>
-              `
-              : ""
-          }
-
-          ${
-            location
-              ? `<p>⌖ ${escapeHTML(location)}</p>`
-              : ""
-          }
-
-          ${
-            item.description
-              ? `<p>${escapeHTML(item.description)}</p>`
-              : ""
-          }
-
-          <div class="agenda-card-actions">
-            ${actionButtons}
-            ${mapLink}
-          </div>
-        </article>
-      `;
-    }).join("");
-
-    bindCardEvents();
+    elements.agendaList.innerHTML = state.agendas
+      .map((agenda) => renderAgendaCard(agenda))
+      .join("");
   }
 
-  /* ============================================================
-     11. EVENT TOMBOL PADA KARTU AGENDA
-  ============================================================ */
+  function renderAgendaCard(agenda) {
+    const id = escapeHTML(agenda.id);
+    const title = escapeHTML(agenda.title);
+    const description = escapeHTML(
+      agenda.description || "Tidak ada deskripsi."
+    );
 
-  function bindCardEvents() {
-    const list = $("agendaList");
+    const speaker = escapeHTML(
+      agenda.speaker_name || "Belum ditentukan"
+    );
 
-    if (!list) return;
+    const location = escapeHTML(
+      agenda.location_name || "Lokasi belum ditentukan"
+    );
 
-    list.querySelectorAll("[data-edit-id]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const item = state.agendas.find(
-          (agenda) =>
-            String(agenda.id) === button.dataset.editId
-        );
+    const address = escapeHTML(
+      agenda.location_address || ""
+    );
 
-        if (item) {
-          startEdit(item);
+    const mapURL = getMapURL(
+      agenda.location_address,
+      agenda.location_name
+    );
+
+    let actions = "";
+
+    if (state.view === "published") {
+      if (can("edit")) {
+        actions += `
+          <button
+            type="button"
+            class="agenda-action agenda-edit"
+            data-action="edit"
+            data-id="${id}">
+            Ubah
+          </button>
+        `;
+      }
+
+      if (can("archive")) {
+        actions += `
+          <button
+            type="button"
+            class="agenda-action agenda-archive"
+            data-action="archive"
+            data-id="${id}">
+            Arsipkan
+          </button>
+        `;
+      }
+
+    } else {
+      if (can("restore")) {
+        actions += `
+          <button
+            type="button"
+            class="agenda-action agenda-restore"
+            data-action="restore"
+            data-id="${id}">
+            Pulihkan
+          </button>
+        `;
+      }
+
+      if (can("delete")) {
+        actions += `
+          <button
+            type="button"
+            class="agenda-action agenda-delete"
+            data-action="delete"
+            data-id="${id}">
+            Hapus Permanen
+          </button>
+        `;
+      }
+    }
+
+    const mapButton = mapURL
+      ? `
+        <a
+          class="agenda-map-link"
+          href="${escapeHTML(mapURL)}"
+          target="_blank"
+          rel="noopener noreferrer">
+          Lihat Lokasi di Google Maps
+        </a>
+      `
+      : "";
+
+    return `
+      <article class="agenda-card" data-agenda-id="${id}">
+
+        <div class="agenda-card-header">
+          <h3>${title}</h3>
+
+          <span class="agenda-status ${
+            state.view === "published"
+              ? "status-active"
+              : "status-archived"
+          }">
+            ${
+              state.view === "published"
+                ? "Agenda Aktif"
+                : "Agenda Diarsipkan"
+            }
+          </span>
+        </div>
+
+        <div class="agenda-card-body">
+
+          <p class="agenda-description">
+            ${description}
+          </p>
+
+          <div class="agenda-detail">
+            <span>Pemateri</span>
+            <strong>${speaker}</strong>
+          </div>
+
+          <div class="agenda-detail">
+            <span>Mulai</span>
+            <strong>${escapeHTML(formatDateTime(agenda.starts_at))}</strong>
+          </div>
+
+          <div class="agenda-detail">
+            <span>Selesai</span>
+            <strong>${escapeHTML(formatDateTime(agenda.ends_at))}</strong>
+          </div>
+
+          <div class="agenda-detail">
+            <span>Lokasi</span>
+            <strong>${location}</strong>
+          </div>
+
+          ${
+            address
+              ? `<div class="agenda-address">${address}</div>`
+              : ""
+          }
+
+          ${mapButton}
+
+        </div>
+
+        ${
+          actions
+            ? `<div class="agenda-card-actions">${actions}</div>`
+            : ""
         }
-      });
-    });
 
-    list.querySelectorAll("[data-archive-id]").forEach((button) => {
-      button.addEventListener("click", () => {
-        changeAgendaStatus(
-          button.dataset.archiveId,
-          "archived"
-        );
-      });
-    });
-
-    list.querySelectorAll("[data-restore-id]").forEach((button) => {
-      button.addEventListener("click", () => {
-        changeAgendaStatus(
-          button.dataset.restoreId,
-          "published"
-        );
-      });
-    });
-
-    list.querySelectorAll("[data-delete-id]").forEach((button) => {
-      button.addEventListener("click", () => {
-        deleteAgendaPermanently(button.dataset.deleteId);
-      });
-    });
+      </article>
+    `;
   }
 
   /* ============================================================
-     12. HAPUS PERMANEN — KHUSUS SUPER ADMIN
-  ============================================================ */
+     13. MENCARI AGENDA
+     ============================================================ */
 
-  async function deleteAgendaPermanently(id) {
-    if (state.busy) return;
+  function findAgenda(id) {
+    return state.agendas.find(
+      (agenda) => String(agenda.id) === String(id)
+    );
+  }
 
-    // Pemeriksaan hak akses tambahan di sisi klien.
-    // Pengamanan utama tetap RLS Supabase.
-    if (state.role !== "super_admin") {
+  /* ============================================================
+     14. EDIT AGENDA
+     ============================================================ */
+
+  function startEdit(id) {
+    if (!can("edit")) {
       showNotice(
-        "Akses ditolak. Hanya Super Admin yang dapat menghapus agenda permanen.",
-        "error"
+        "Anda tidak memiliki izin untuk mengubah agenda.",
+        "warning"
       );
       return;
     }
 
-    const item = state.agendas.find(
-      (agenda) => String(agenda.id) === String(id)
-    );
+    const agenda = findAgenda(id);
 
-    if (!item) {
+    if (!agenda) {
       showNotice("Agenda tidak ditemukan.", "error");
       return;
     }
 
-    const confirmation = window.confirm(
-      `PERINGATAN: Hapus permanen agenda "${item.title}"?\n\n` +
-      "Tindakan ini tidak dapat dibatalkan.\n" +
-      "Riwayat kehadiran anggota tidak akan dihapus.\n" +
-      "Agenda yang memiliki riwayat kehadiran tidak dapat dihapus."
-    );
+    if (!elements.form) return;
 
-    if (!confirmation) return;
+    state.editingId = agenda.id;
 
-    try {
-      setBusy(true);
-      hideNotice();
-
-      // Periksa riwayat kehadiran sebelum menghapus agenda.
-      const attendanceResult = await state.supabase
-        .from(ATTENDANCE_TABLE)
-        .select("id", {
-          count: "exact",
-          head: true
-        })
-        .eq("agenda_id", id);
-
-      if (attendanceResult.error) {
-        throw new Error(
-          "Gagal memeriksa riwayat kehadiran. Agenda tidak dihapus. " +
-          getErrorMessage(attendanceResult.error)
-        );
-      }
-
-      const attendanceCount = Number(
-        attendanceResult.count || 0
-      );
-
-      if (attendanceCount > 0) {
-        throw new Error(
-          `Agenda tidak dapat dihapus karena memiliki ${attendanceCount} ` +
-          "catatan kehadiran. Silakan arsipkan agenda agar riwayat anggota tetap tersimpan."
-        );
-      }
-
-      // Penghapusan hanya berdasarkan ID agenda.
-      // RLS database membatasi DELETE untuk Super Admin.
-      const { data, error } = await state.supabase
-        .from(TABLE)
-        .delete()
-        .eq("id", id)
-        .select("id")
-        .maybeSingle();
-
-      if (error) {
-        throw new Error(
-          "Penghapusan gagal: " + getErrorMessage(error)
-        );
-      }
-
-      if (!data) {
-        throw new Error(
-          "Agenda tidak terhapus. Periksa kebijakan DELETE dan SELECT RLS."
-        );
-      }
-
-      await loadAgendas();
-
-      showNotice(
-        `Agenda "${item.title}" berhasil dihapus secara permanen.`
-      );
-
-      log("Agenda berhasil dihapus permanen.", { id });
-
-    } catch (error) {
-      console.error(
-        "[TARBIYAH AGENDA] Hapus permanen gagal:",
-        error
-      );
-
-      showNotice(
-        getErrorMessage(error),
-        "error"
-      );
-
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  /* ============================================================
-     13. ARSIP DAN PEMULIHAN AGENDA
-  ============================================================ */
-
-  async function changeAgendaStatus(id, newStatus) {
-    if (state.busy) return;
-
-    if (!["published", "archived"].includes(newStatus)) {
-      showNotice("Status agenda tidak valid.", "error");
-      return;
+    if (elements.agendaId) {
+      elements.agendaId.value = agenda.id;
     }
 
-    const item = state.agendas.find(
-      (agenda) => String(agenda.id) === String(id)
-    );
+    elements.title.value = agenda.title || "";
+    elements.description.value = agenda.description || "";
+    elements.speakerName.value = agenda.speaker_name || "";
+    elements.startsAt.value = toJakartaInput(agenda.starts_at);
+    elements.endsAt.value = toJakartaInput(agenda.ends_at);
+    elements.locationName.value = agenda.location_name || "";
+    elements.locationAddress.value = agenda.location_address || "";
 
-    if (!item) {
-      showNotice("Agenda tidak ditemukan.", "error");
-      return;
+    if (elements.formHeading) {
+      elements.formHeading.textContent = "Ubah Agenda Kajian";
     }
 
-    const isArchive = newStatus === "archived";
-
-    const confirmation = isArchive
-      ? `Arsipkan agenda "${item.title}"? Agenda tidak akan dihapus permanen.`
-      : `Pulihkan agenda "${item.title}" agar tampil kembali dalam daftar aktif?`;
-
-    if (!window.confirm(confirmation)) {
-      return;
+    if (elements.saveButton) {
+      elements.saveButton.textContent = "Simpan Perubahan";
     }
 
-    try {
-      setBusy(true);
-      hideNotice();
-
-      const { data, error } = await state.supabase
-        .from(TABLE)
-        .update({ status: newStatus })
-        .eq("id", id)
-        .select("id")
-        .maybeSingle();
-
-      if (error) {
-        throw new Error(getErrorMessage(error));
-      }
-
-      if (!data) {
-        throw new Error(
-          "Status agenda tidak berubah. Periksa izin UPDATE dan SELECT pada kebijakan RLS."
-        );
-      }
-
-      await loadAgendas();
-
-      showNotice(
-        isArchive
-          ? "Agenda berhasil diarsipkan."
-          : "Agenda berhasil dipulihkan."
-      );
-
-      log(
-        isArchive
-          ? "Agenda berhasil diarsipkan."
-          : "Agenda berhasil dipulihkan.",
-        { id }
-      );
-
-    } catch (error) {
-      console.error(
-        "[TARBIYAH AGENDA] Perubahan status gagal:",
-        error
-      );
-
-      showNotice(
-        getErrorMessage(error),
-        "error"
-      );
-
-    } finally {
-      setBusy(false);
+    if (elements.cancelEditButton) {
+      elements.cancelEditButton.hidden = false;
     }
-  }
 
-  /* ============================================================
-     14. FORMULIR UBAH AGENDA
-  ============================================================ */
-
-  function startEdit(item) {
-    if (state.busy) return;
-
-    state.editingId = item.id;
-
-    $("agendaId").value = item.id;
-    $("title").value = item.title || "";
-    $("description").value = item.description || "";
-    $("speakerName").value = item.speaker_name || "";
-    $("startsAt").value = toJakartaInput(item.starts_at);
-    $("endsAt").value = toJakartaInput(item.ends_at);
-    $("locationName").value = item.location_name || "";
-    $("locationAddress").value = item.location_address || "";
-
-    $("formHeading").textContent = "Ubah Agenda";
-    $("saveButton").textContent = "Simpan Perubahan";
-    $("cancelEditButton").hidden = false;
-
-    hideNotice();
-
-    $("agendaForm").scrollIntoView({
+    elements.form.scrollIntoView({
       behavior: "smooth",
       block: "start"
     });
   }
 
+  /* ============================================================
+     15. RESET FORM
+     ============================================================ */
+
   function resetForm() {
+    if (elements.form) {
+      elements.form.reset();
+    }
+
     state.editingId = null;
 
-    const form = $("agendaForm");
-
-    if (form) {
-      form.reset();
+    if (elements.agendaId) {
+      elements.agendaId.value = "";
     }
 
-    if ($("agendaId")) {
-      $("agendaId").value = "";
+    if (elements.formHeading) {
+      elements.formHeading.textContent = "Tambah Agenda Kajian";
     }
 
-    if ($("formHeading")) {
-      $("formHeading").textContent = "Buat Agenda Baru";
+    if (elements.saveButton) {
+      elements.saveButton.textContent = "Simpan Agenda";
     }
 
-    if ($("saveButton")) {
-      $("saveButton").textContent = "Terbitkan Agenda";
-    }
-
-    if ($("cancelEditButton")) {
-      $("cancelEditButton").hidden = true;
+    if (elements.cancelEditButton) {
+      elements.cancelEditButton.hidden = true;
     }
   }
 
   /* ============================================================
-     15. PENGENDALIAN PROSES
-  ============================================================ */
+     16. STATUS BUSY
+     ============================================================ */
 
-  function setBusy(value) {
-    state.busy = Boolean(value);
+  function setBusy(busy) {
+    state.busy = Boolean(busy);
 
-    const saveButton = $("saveButton");
-    const refreshButton = $("refreshButton");
-    const cancelButton = $("cancelEditButton");
-
-    if (saveButton) {
-      saveButton.disabled = state.busy;
-
-      saveButton.textContent = state.busy
-        ? "Memproses..."
-        : state.editingId
-          ? "Simpan Perubahan"
-          : "Terbitkan Agenda";
+    if (elements.form) {
+      elements.form
+        .querySelectorAll("input, textarea, select, button")
+        .forEach((element) => {
+          element.disabled =
+            state.busy || !can("create");
+        });
     }
 
-    if (refreshButton) {
-      refreshButton.disabled = state.busy;
+    if (elements.refreshButton) {
+      elements.refreshButton.disabled = state.busy;
     }
 
-    if (cancelButton) {
-      cancelButton.disabled = state.busy;
-    }
-
-    document
-      .querySelectorAll(
-        "#agendaList button[data-edit-id], " +
-        "#agendaList button[data-archive-id], " +
-        "#agendaList button[data-restore-id], " +
-        "#agendaList button[data-delete-id]"
-      )
-      .forEach((button) => {
-        button.disabled = state.busy;
-      });
-
-    document
-      .querySelectorAll("[data-agenda-view]")
-      .forEach((button) => {
-        button.disabled = state.busy;
-      });
+    document.querySelectorAll(
+      ".agenda-action, [data-agenda-view]"
+    ).forEach((element) => {
+      element.disabled = state.busy;
+    });
   }
 
   /* ============================================================
-     16. SIMPAN AGENDA BARU DAN PERUBAHAN
-  ============================================================ */
+     17. SIMPAN AGENDA
+     ============================================================ */
 
   async function saveAgenda(event) {
     event.preventDefault();
 
     if (state.busy) return;
 
-    hideNotice();
+    if (!can("create")) {
+      showNotice(
+        "Anda tidak memiliki izin untuk menambah agenda.",
+        "warning"
+      );
+      return;
+    }
 
-    const editingAtStart = state.editingId;
+    if (state.editingId && !can("edit")) {
+      showNotice(
+        "Anda tidak memiliki izin untuk mengubah agenda.",
+        "warning"
+      );
+      return;
+    }
 
     try {
-      const title = $("title").value.trim();
+      const title = elements.title.value.trim();
+      const description = elements.description.value.trim();
+      const speakerName = elements.speakerName.value.trim();
+      const startsAt = elements.startsAt.value;
+      const endsAt = elements.endsAt.value;
+      const locationName = elements.locationName.value.trim();
+      const locationAddress = elements.locationAddress.value.trim();
 
       if (!title) {
-        throw new Error("Judul agenda wajib diisi.");
+        throw new Error("Judul kajian wajib diisi.");
       }
 
-      const startsAt = jakartaDateTimeToISO(
-        $("startsAt").value
-      );
+      if (!startsAt || !endsAt) {
+        throw new Error(
+          "Tanggal dan waktu mulai serta selesai wajib diisi."
+        );
+      }
 
-      const endsAt = jakartaDateTimeToISO(
-        $("endsAt").value
-      );
+      const startISO = jakartaDateTimeToISO(startsAt);
+      const endISO = jakartaDateTimeToISO(endsAt);
 
-      if (
-        new Date(endsAt).getTime() <=
-        new Date(startsAt).getTime()
-      ) {
+      if (new Date(endISO) <= new Date(startISO)) {
         throw new Error(
           "Waktu selesai harus setelah waktu mulai."
         );
@@ -1087,16 +1065,12 @@
 
       const payload = {
         title,
-        description:
-          $("description").value.trim() || null,
-        speaker_name:
-          $("speakerName").value.trim() || null,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        location_name:
-          $("locationName").value.trim() || null,
-        location_address:
-          $("locationAddress").value.trim() || null,
+        description,
+        speaker_name: speakerName,
+        starts_at: startISO,
+        ends_at: endISO,
+        location_name: locationName,
+        location_address: locationAddress,
         status: "published"
       };
 
@@ -1104,62 +1078,54 @@
 
       let result;
 
-      if (editingAtStart) {
+      if (state.editingId) {
         result = await state.supabase
-          .from(TABLE)
+          .from(CONFIG.TABLE)
           .update(payload)
-          .eq("id", editingAtStart)
+          .eq("id", state.editingId)
           .select("id")
           .maybeSingle();
 
       } else {
         result = await state.supabase
-          .from(TABLE)
+          .from(CONFIG.TABLE)
           .insert({
             ...payload,
             created_by: state.user.id
           })
           .select("id")
-          .maybeSingle();
+          .single();
       }
 
       if (result.error) {
-        throw new Error(
-          getErrorMessage(result.error)
-        );
+        throw result.error;
       }
 
       if (!result.data) {
         throw new Error(
-          editingAtStart
-            ? "Tidak ada agenda yang diperbarui. Periksa izin UPDATE dan SELECT pada RLS."
-            : "Agenda belum berhasil disimpan. Periksa izin INSERT dan SELECT pada RLS."
+          "Tidak ada data yang tersimpan. Periksa izin database atau kebijakan RLS."
         );
       }
 
+      const wasEditing = Boolean(state.editingId);
+
       resetForm();
+
+      showNotice(
+        wasEditing
+          ? "Agenda kajian berhasil diperbarui."
+          : "Agenda kajian berhasil ditambahkan.",
+        "success"
+      );
 
       state.view = "published";
       updateViewTabs();
 
       await loadAgendas();
 
-      showNotice(
-        editingAtStart
-          ? "Perubahan agenda berhasil disimpan."
-          : "Agenda baru berhasil diterbitkan."
-      );
-
-      log(
-        editingAtStart
-          ? "Agenda berhasil diperbarui."
-          : "Agenda baru berhasil diterbitkan.",
-        { id: result.data.id }
-      );
-
     } catch (error) {
       console.error(
-        "[TARBIYAH AGENDA] Simpan agenda gagal:",
+        "[TARBIYAH] Gagal menyimpan agenda:",
         error
       );
 
@@ -1174,188 +1140,79 @@
   }
 
   /* ============================================================
-     17. EVENT LISTENER HALAMAN
-  ============================================================ */
+     18. ARSIPKAN DAN PULIHKAN
+     ============================================================ */
 
-  function bindEvents() {
-    if (state.eventsBound) return;
+  async function changeAgendaStatus(id, newStatus) {
+    const isArchive = newStatus === "archived";
 
-    const form = $("agendaForm");
-    const cancelButton = $("cancelEditButton");
-    const refreshButton = $("refreshButton");
-
-    if (!form || !refreshButton) {
-      throw new Error(
-        "Formulir atau tombol muat ulang tidak ditemukan pada halaman."
+    if (isArchive && !can("archive")) {
+      showNotice(
+        "Anda tidak memiliki izin untuk mengarsipkan agenda.",
+        "warning"
       );
+      return;
     }
 
-    form.addEventListener("submit", saveAgenda);
-
-    if (cancelButton) {
-      cancelButton.addEventListener("click", () => {
-        resetForm();
-        hideNotice();
-      });
+    if (!isArchive && !can("restore")) {
+      showNotice(
+        "Anda tidak memiliki izin untuk memulihkan agenda.",
+        "warning"
+      );
+      return;
     }
 
-    refreshButton.addEventListener("click", async () => {
-      if (state.busy) return;
+    const agenda = findAgenda(id);
 
-      try {
-        hideNotice();
-        setBusy(true);
-
-        await loadAgendas();
-
-        showNotice(
-          "Daftar agenda berhasil diperbarui."
-        );
-
-      } catch (error) {
-        console.error(
-          "[TARBIYAH AGENDA] Refresh gagal:",
-          error
-        );
-
-        showNotice(
-          getErrorMessage(error),
-          "error"
-        );
-
-      } finally {
-        setBusy(false);
-      }
-    });
-
-    document
-      .querySelectorAll("[data-agenda-view]")
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          switchAgendaView(
-            button.dataset.agendaView
-          );
-        });
-      });
-
-    state.eventsBound = true;
-  }
-
-  /* ============================================================
-     18. AKTIFKAN / NONAKTIFKAN FORMULIR
-  ============================================================ */
-
-  function enableForm() {
-    const form = $("agendaForm");
-
-    if (!form) return;
-
-    form
-      .querySelectorAll(
-        "input, textarea, select, button"
-      )
-      .forEach((element) => {
-        element.disabled = false;
-      });
-
-    const saveButton = $("saveButton");
-    const refreshButton = $("refreshButton");
-
-    if (saveButton) saveButton.disabled = false;
-    if (refreshButton) refreshButton.disabled = false;
-  }
-
-  function disableForm() {
-    const form = $("agendaForm");
-
-    if (form) {
-      form
-        .querySelectorAll(
-          "input, textarea, select, button"
-        )
-        .forEach((element) => {
-          element.disabled = true;
-        });
+    if (!agenda) {
+      showNotice("Agenda tidak ditemukan.", "error");
+      return;
     }
 
-    const refreshButton = $("refreshButton");
+    const confirmed = window.confirm(
+      isArchive
+        ? `Arsipkan agenda "${agenda.title}"?`
+        : `Pulihkan agenda "${agenda.title}" ke daftar agenda aktif?`
+    );
 
-    if (refreshButton) {
-      refreshButton.disabled = true;
-    }
-  }
-
-  /* ============================================================
-     19. INISIALISASI HALAMAN
-  ============================================================ */
-
-  async function initialize() {
-    if (state.initialized) return;
-
-    state.initialized = true;
-
-    const agendaList = $("agendaList");
-    const agendaForm = $("agendaForm");
+    if (!confirmed) return;
 
     try {
-      setConnection(
-        "loading",
-        "Menghubungkan ke layanan...",
-        "Memeriksa sesi dan koneksi aplikasi."
-      );
+      setBusy(true);
 
-      if (!agendaList || !agendaForm) {
+      const {
+        data,
+        error
+      } = await state.supabase
+        .from(CONFIG.TABLE)
+        .update({
+          status: newStatus
+        })
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
         throw new Error(
-          "Elemen halaman agenda tidak ditemukan. Periksa agenda-kajian.html."
+          "Perubahan tidak berhasil. Periksa izin database atau RLS."
         );
       }
 
-      // 1. Tunggu Supabase tersedia.
-      await waitForSupabaseClient();
-
-      // 2. Periksa sesi pengguna.
-      state.user = await getAuthenticatedUser();
-
-      // 3. Periksa hak akses.
-      await loadUserRole();
-
-      // 4. Siapkan tab agenda aktif dan arsip.
-      ensureViewTabs();
-
-      // 5. Pasang event listener satu kali.
-      bindEvents();
-
-      // 6. Aktifkan formulir.
-      enableForm();
-
-      // 7. Ambil data agenda dari database.
-      await loadAgendas();
-
-      setConnection(
-        "ready",
-        "Terhubung",
-        "Sesi login dan hak akses berhasil diverifikasi."
+      showNotice(
+        isArchive
+          ? "Agenda berhasil diarsipkan."
+          : "Agenda berhasil dipulihkan.",
+        "success"
       );
 
-      log("Modul agenda siap digunakan.", {
-        userId: state.user.id,
-        role: state.role,
-        agendaCount: state.agendas.length,
-        view: state.view
-      });
+      await loadAgendas();
 
     } catch (error) {
       console.error(
-        "[TARBIYAH AGENDA] Inisialisasi gagal:",
+        "[TARBIYAH] Gagal mengubah status agenda:",
         error
-      );
-
-      state.initialized = false;
-
-      setConnection(
-        "error",
-        "Koneksi atau akses bermasalah",
-        getErrorMessage(error)
       );
 
       showNotice(
@@ -1363,26 +1220,285 @@
         "error"
       );
 
-      if (agendaList) {
-        agendaList.innerHTML = `
-          <div class="agenda-empty">
-            <span>!</span>
-            <strong>Pengelolaan agenda belum dapat diaktifkan</strong>
-            <p>
-              Periksa koneksi Supabase, sesi login,
-              hak akses pengguna, dan pesan kesalahan.
-            </p>
-          </div>
-        `;
-      }
-
-      disableForm();
+    } finally {
+      setBusy(false);
     }
   }
 
   /* ============================================================
-     20. JALANKAN MODUL
-  ============================================================ */
+     19. HAPUS PERMANEN — SUPER ADMIN
+     ============================================================ */
+
+  async function deleteAgendaPermanently(id) {
+    if (!can("delete")) {
+      showNotice(
+        "Hanya Super Admin yang dapat menghapus agenda permanen.",
+        "warning"
+      );
+      return;
+    }
+
+    const agenda = findAgenda(id);
+
+    if (!agenda) {
+      showNotice("Agenda tidak ditemukan.", "error");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `PERINGATAN!\n\n` +
+      `Anda akan menghapus agenda "${agenda.title}" secara permanen.\n\n` +
+      `Penghapusan hanya diizinkan jika belum ada catatan kehadiran yang terkait.\n\n` +
+      `Lanjutkan?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setBusy(true);
+
+      // Pemeriksaan kehadiran dilakukan sebelum penghapusan.
+      // Jika pemeriksaan gagal, penghapusan dibatalkan.
+      const attendanceCheck = await state.supabase
+        .from(CONFIG.ATTENDANCE_TABLE)
+        .select("id", {
+          count: "exact",
+          head: true
+        })
+        .eq("agenda_id", id);
+
+      if (attendanceCheck.error) {
+        throw new Error(
+          "Pemeriksaan riwayat kehadiran gagal. Agenda tidak dihapus demi keamanan. " +
+          getErrorMessage(attendanceCheck.error)
+        );
+      }
+
+      if ((attendanceCheck.count ?? 0) > 0) {
+        throw new Error(
+          "Agenda tidak dapat dihapus karena sudah memiliki riwayat kehadiran."
+        );
+      }
+
+      const {
+        data,
+        error
+      } = await state.supabase
+        .from(CONFIG.TABLE)
+        .delete()
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        throw new Error(
+          "Agenda tidak terhapus. Periksa izin DELETE pada kebijakan RLS."
+        );
+      }
+
+      showNotice(
+        "Agenda berhasil dihapus secara permanen.",
+        "success"
+      );
+
+      await loadAgendas();
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH] Gagal menghapus agenda:",
+        error
+      );
+
+      showNotice(
+        getErrorMessage(error),
+        "error"
+      );
+
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /* ============================================================
+     20. EVENT DELEGATION KARTU AGENDA
+     ============================================================ */
+
+  function bindCardEvents() {
+    if (!elements.agendaList) return;
+
+    elements.agendaList.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-action]");
+
+      if (!button || state.busy) return;
+
+      const action = button.dataset.action;
+      const id = button.dataset.id;
+
+      if (!id) return;
+
+      switch (action) {
+        case "edit":
+          startEdit(id);
+          break;
+
+        case "archive":
+          await changeAgendaStatus(id, "archived");
+          break;
+
+        case "restore":
+          await changeAgendaStatus(id, "published");
+          break;
+
+        case "delete":
+          await deleteAgendaPermanently(id);
+          break;
+
+        default:
+          break;
+      }
+    });
+  }
+
+  /* ============================================================
+     21. EVENT LISTENERS
+     ============================================================ */
+
+  function bindEvents() {
+    if (state.eventsBound) return;
+
+    state.eventsBound = true;
+
+    if (elements.form) {
+      elements.form.addEventListener("submit", saveAgenda);
+    }
+
+    if (elements.cancelEditButton) {
+      elements.cancelEditButton.addEventListener("click", resetForm);
+    }
+
+    if (elements.refreshButton) {
+      elements.refreshButton.addEventListener("click", async () => {
+        if (!state.busy) {
+          await loadAgendas();
+          showNotice("Data agenda diperbarui.", "success");
+        }
+      });
+    }
+
+    document.querySelectorAll("[data-agenda-view]").forEach((tab) => {
+      tab.addEventListener("click", async () => {
+        await switchAgendaView(tab.dataset.agendaView);
+      });
+    });
+
+    bindCardEvents();
+  }
+
+  /* ============================================================
+     22. INISIALISASI
+     ============================================================ */
+
+  async function initialize() {
+    if (state.initialized) return;
+
+    state.initialized = true;
+
+    try {
+      setConnection(
+        "loading",
+        "Menghubungkan...",
+        "Memeriksa sesi pengguna dan koneksi database."
+      );
+
+      await waitForSupabaseClient();
+
+      state.user = await getAuthenticatedUser();
+
+      await loadUserRole();
+
+      updateRoleInterface();
+
+      bindEvents();
+
+      if (elements.currentYear) {
+        elements.currentYear.textContent =
+          new Date().getFullYear();
+      }
+
+      await loadAgendas();
+
+      if (state.roleLookupWarning) {
+        showNotice(
+          state.roleLookupWarning,
+          "warning"
+        );
+      }
+
+      console.info(
+        "[TARBIYAH] Agenda Kajian v3.2 berhasil diinisialisasi.",
+        {
+          role: state.role,
+          userId: state.user.id
+        }
+      );
+
+    } catch (error) {
+      console.error(
+        "[TARBIYAH] Inisialisasi Agenda Kajian gagal:",
+        error
+      );
+
+      setConnection(
+        "error",
+        "Gagal menginisialisasi",
+        getErrorMessage(error)
+      );
+
+      if (elements.agendaList) {
+        elements.agendaList.innerHTML = `
+          <div class="agenda-empty">
+            <strong>Halaman belum dapat digunakan.</strong>
+            <p>${escapeHTML(getErrorMessage(error))}</p>
+            <p>Silakan masuk kembali atau periksa koneksi aplikasi.</p>
+          </div>
+        `;
+      }
+
+      if (elements.formPanel) {
+        elements.formPanel.hidden = true;
+      }
+    }
+  }
+
+  /* ============================================================
+     23. API PUBLIK
+     ============================================================ */
+
+  window.TARBIYAH_AGENDA_KAJIAN = {
+    refresh: loadAgendas,
+
+    getRole() {
+      return state.role;
+    },
+
+    getView() {
+      return state.view;
+    },
+
+    getPermissions() {
+      return { ...getPermissions() };
+    },
+
+    getAgendas() {
+      return [...state.agendas];
+    }
+  };
+
+  /* ============================================================
+     24. START
+     ============================================================ */
 
   if (document.readyState === "loading") {
     document.addEventListener(
@@ -1395,3 +1511,4 @@
   }
 
 })();
+```
