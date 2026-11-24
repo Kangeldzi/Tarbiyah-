@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -17,47 +18,75 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- CSS Utama TARBIYAH -->
+  <!-- CSS UTAMA TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
-  
-  <!-- CSS Navigasi Tombol Back Universal -->
   <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
-    /* =========================================
-       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
-    ========================================= */
-    .app-header {
+    /* =====================================================
+       MODULE PAGE — TARBIYAH
+    ===================================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      font-family: "Inter", sans-serif;
+    }
+
+    .app-shell {
+      min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-color);
-      height: 70px;
+      flex-direction: column;
+    }
+
+    /* =====================================================
+       HEADER
+    ===================================================== */
+
+    .app-header {
       position: sticky;
       top: 0;
       z-index: 100;
-    }
-
-    .header-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 70px;
+      padding: 10px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
     }
 
+    .header-left,
+    .header-right,
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
     }
 
-    /* KUNCI LOGO AGAR TIDAK PECAH */
+    .header-left {
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .header-right {
+      gap: 9px;
+    }
+
+    .header-brand {
+      gap: 10px;
+      min-width: 0;
+    }
+
     .brand-logo-wrap {
       display: inline-flex;
       align-items: center;
@@ -65,56 +94,49 @@
       width: 40px;
       height: 40px;
       flex: 0 0 40px;
-      border-radius: 10px;
       overflow: hidden;
+      border-radius: 10px;
     }
 
-    .brand-logo-wrap .brand-logo {
+    .brand-logo-wrap img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: contain;
-      display: block;
     }
 
     .header-brand-text h1 {
       margin: 0;
-      font-size: 1.15rem;
+      color: var(--color-primary, #36b58a);
+      font-family: var(--font-heading, "Poppins", sans-serif);
+      font-size: 1.1rem;
       font-weight: 800;
       letter-spacing: .05em;
-      color: var(--color-primary, #36b58a);
-      line-height: 1.1;
-      font-family: var(--font-heading);
+      line-height: 1.2;
     }
 
     .header-brand-text span {
       display: block;
-      font-size: .75rem;
+      margin-top: 3px;
       color: var(--text-secondary);
-      font-weight: 500;
-      margin-top: 2px;
+      font-size: .72rem;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
     .icon-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: 42px;
       height: 42px;
+      flex: 0 0 42px;
       border: 1px solid var(--border-color);
       border-radius: 12px;
       background: var(--bg-secondary);
       color: var(--text-primary);
       cursor: pointer;
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       text-decoration: none;
-      transition: all .2s ease;
+      transition: .2s ease;
     }
 
     .icon-button:hover {
@@ -122,25 +144,152 @@
       background: var(--bg-tertiary);
     }
 
-    /* =========================================
-       LAYOUT UTAMA
-    ========================================= */
+    .menu-toggle {
+      display: inline-flex;
+    }
+
+    /* =====================================================
+       LAYOUT SIDEBAR DAN KONTEN
+    ===================================================== */
+
+    .app-layout {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      align-items: stretch;
+    }
+
+    .app-sidebar {
+      position: sticky;
+      top: 70px;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      width: 270px;
+      height: calc(100vh - 70px);
+      flex: 0 0 270px;
+      overflow-y: auto;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      transition: transform .25s ease, width .25s ease;
+    }
+
+    .sidebar-heading {
+      padding: 20px 18px 10px;
+      color: var(--text-secondary);
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-navigation {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 8px 12px 18px;
+    }
+
+    .sidebar-group {
+      display: grid;
+      gap: 5px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      padding: 10px 13px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      color: var(--text-secondary);
+      font-size: .84rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: .2s ease;
+    }
+
+    .sidebar-link:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .sidebar-link.active,
+    .sidebar-link[aria-current="page"] {
+      border-color: rgba(54,181,138,.2);
+      background: rgba(54,181,138,.12);
+      color: var(--color-primary, #36b58a);
+    }
+
+    .sidebar-link-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      flex: 0 0 24px;
+      font-size: 1.05rem;
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      margin: 8px 14px;
+      background: var(--border-color);
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 14px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .sidebar-dashboard-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      color: var(--text-secondary);
+      font-size: .82rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .sidebar-dashboard-link:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .sidebar-overlay {
+      display: none;
+    }
+
+    /* =====================================================
+       MAIN CONTENT
+    ===================================================== */
+
     .app-main {
       flex: 1;
       width: 100%;
-      max-width: 1100px;
-      margin: 0 auto;
+      min-width: 0;
       padding: 24px;
     }
 
-    /* Jarak aman untuk tombol back */
-    .page-header-nav {
-      margin-bottom: 30px;
+    .app-main-inner {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    /* =========================================
-       KONTEN MODUL (TEMA UNIVERSAL)
-    ========================================= */
+    .page-header-nav {
+      margin-bottom: 24px;
+    }
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
     .module-hero {
       position: relative;
       overflow: hidden;
@@ -149,7 +298,11 @@
       border: 1px solid var(--border-color);
       border-radius: 20px;
       background:
-        radial-gradient(circle at 90% 10%, rgba(54,181,138,.18), transparent 38%),
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(54,181,138,.18),
+          transparent 38%
+        ),
         var(--bg-secondary);
     }
 
@@ -167,19 +320,23 @@
 
     .module-hero h2 {
       margin: 0 0 10px;
-      font-family: var(--font-heading);
+      color: var(--text-primary);
+      font-family: var(--font-heading, "Poppins", sans-serif);
       font-size: clamp(1.4rem, 4vw, 2rem);
       line-height: 1.3;
-      color: var(--text-primary);
     }
 
     .module-hero p {
       max-width: 680px;
       margin: 0;
       color: var(--text-secondary);
-      line-height: 1.7;
       font-size: .95rem;
+      line-height: 1.7;
     }
+
+    /* =====================================================
+       TOOLBAR
+    ===================================================== */
 
     .module-toolbar {
       display: flex;
@@ -204,11 +361,11 @@
       padding: 11px 14px;
       border: 1px solid var(--border-color);
       border-radius: 12px;
+      outline: none;
       background: var(--bg-primary);
       color: var(--text-primary);
       font: inherit;
       font-size: .88rem;
-      outline: none;
     }
 
     .module-toolbar-search input:focus {
@@ -216,7 +373,17 @@
       box-shadow: 0 0 0 3px rgba(54,181,138,.15);
     }
 
+    .module-toolbar button {
+      min-height: 42px;
+    }
+
+    /* =====================================================
+       MODULE CONTENT
+    ===================================================== */
+
     .module-content {
+      width: 100%;
+      min-width: 0;
       min-height: 220px;
     }
 
@@ -249,6 +416,10 @@
       line-height: 1.65;
     }
 
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+
     .module-footer {
       padding: 24px 0 12px;
       margin-top: 28px;
@@ -258,158 +429,641 @@
       font-size: .78rem;
     }
 
-    @media (max-width: 640px) {
-      .app-main {
-        padding: 16px;
+    .module-footer p {
+      margin: 0 0 5px;
+    }
+
+    /* =====================================================
+       MOBILE BOTTOM NAVIGATION
+    ===================================================== */
+
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 900px) {
+      .app-layout {
+        display: block;
       }
+
+      .app-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1001;
+        width: min(290px, 85vw);
+        height: 100dvh;
+        max-height: 100dvh;
+        transform: translateX(-105%);
+        box-shadow: 12px 0 35px rgba(0,0,0,.2);
+      }
+
+      .app-shell.sidebar-open .app-sidebar,
+      body.sidebar-open .app-sidebar {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: block;
+        background: rgba(0,0,0,.55);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .25s ease, visibility .25s ease;
+      }
+
+      .sidebar-overlay.is-visible,
+      .app-shell.sidebar-open .sidebar-overlay,
+      body.sidebar-open .sidebar-overlay {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .app-main {
+        padding: 18px;
+      }
+
+      .mobile-bottom-nav {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 80;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        min-height: 64px;
+        padding: 6px 5px calc(6px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+      }
+
+      .mobile-bottom-nav a {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        min-width: 0;
+        border-radius: 9px;
+        color: var(--text-secondary);
+        font-size: .65rem;
+        text-decoration: none;
+      }
+
+      .mobile-bottom-nav a span:first-child {
+        font-size: 1.15rem;
+      }
+
+      .mobile-bottom-nav a.active,
+      .mobile-bottom-nav a[aria-current="page"] {
+        color: var(--color-primary, #36b58a);
+        font-weight: 800;
+      }
+
+      .app-main {
+        padding-bottom: 95px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-header {
+        min-height: 62px;
+        padding: 8px 12px;
+      }
+
+      .brand-logo-wrap {
+        width: 35px;
+        height: 35px;
+        flex-basis: 35px;
+      }
+
+      .header-brand-text h1 {
+        font-size: .98rem;
+      }
+
+      .header-brand-text span {
+        font-size: .65rem;
+      }
+
+      .icon-button {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+      }
+
+      .app-main {
+        padding: 15px;
+        padding-bottom: 95px;
+      }
+
       .module-toolbar {
         align-items: stretch;
       }
+
       .module-toolbar-search {
         max-width: none;
       }
-      .module-toolbar > .btn {
+
+      .module-toolbar > button {
         width: 100%;
       }
+
       .module-hero {
         border-radius: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
       }
     }
   </style>
 </head>
 
-<body class="auth-pending">
+<body class="auth-pending" data-module="module">
 
   <div class="app-shell">
 
-    <!-- =========================================
+    <!-- =================================================
          HEADER UNIVERSAL
-    ========================================== -->
+    ================================================== -->
     <header class="app-header">
+
       <div class="header-left">
+
+        <button
+          type="button"
+          id="menuOpen"
+          class="icon-button menu-toggle"
+          aria-label="Buka navigasi"
+          aria-controls="appSidebar"
+          aria-expanded="false"
+          data-sidebar-toggle
+        >
+          ☰
+        </button>
+
         <div class="header-brand">
+
           <div class="brand-logo-wrap">
-            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+            <img
+              src="./assets/icons/icon-192.png"
+              class="brand-logo"
+              alt="Logo TARBIYAH"
+            >
           </div>
+
           <div class="header-brand-text">
             <h1>TARBIYAH</h1>
             <span>Modul Pembelajaran</span>
           </div>
+
         </div>
       </div>
 
       <div class="header-right">
-        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
-          ☀
-        </button>
-        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
-          ♧
-        </a>
-      </div>
-    </header>
-
-    <!-- =========================================
-         MAIN CONTENT
-    ========================================== -->
-    <main class="app-main">
-
-      <!-- 1. TOMBOL BACK UNIVERSAL -->
-      <div class="page-header-nav">
-        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
-          <span class="tarbiyah-page-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </span>
-          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
-        </a>
-      </div>
-
-      <!-- 2. HERO SECTION -->
-      <section class="module-hero">
-        <span class="module-hero-label">
-          🌿 RUANG BELAJAR & UKHUWAH
-        </span>
-
-        <h2 data-module-title>
-          Modul TARBIYAH
-        </h2>
-
-        <p data-module-description>
-          Ruang untuk belajar, bertumbuh, berbagi ilmu, dan mempererat ukhuwah Islamiyah.
-        </p>
-      </section>
-
-      <!-- 3. TOOLBAR PENCARIAN -->
-      <section class="module-toolbar">
-        <form class="module-toolbar-search" data-module-search-form>
-          <input
-            type="search"
-            data-module-search
-            placeholder="Cari informasi..."
-            aria-label="Cari informasi dalam modul">
-
-          <button type="submit" class="btn btn-primary">
-            Cari
-          </button>
-        </form>
 
         <button
           type="button"
-          class="btn btn-primary"
-          data-module-primary-action
-          hidden>
-          Tambah Data
+          id="btnTheme"
+          class="icon-button"
+          aria-label="Ubah tema"
+          title="Ubah tema"
+        >
+          ☀
         </button>
-      </section>
 
-      <!-- 4. KONTEN MODUL -->
-      <section
-        class="module-content"
-        data-module-content
-        aria-live="polite">
+        <a
+          href="./notifikasi.html"
+          class="icon-button"
+          aria-label="Notifikasi"
+          title="Notifikasi"
+        >
+          ♧
+        </a>
 
-        <div class="module-content-empty">
-          <div>
-            <div class="module-content-empty-icon">🌱</div>
+      </div>
+    </header>
 
-            <h3>Selamat Datang di Modul TARBIYAH</h3>
+    <!-- =================================================
+         LAYOUT SIDEBAR + MAIN
+    ================================================== -->
+    <div class="app-layout">
 
-            <p>
-              Konten modul akan ditampilkan sesuai halaman yang sedang dibuka.
-              Data akan dimuat dari sistem TARBIYAH setelah integrasi modul selesai.
-            </p>
-          </div>
+      <!-- OVERLAY SIDEBAR MOBILE -->
+      <div
+        id="sidebarScrim"
+        class="sidebar-overlay"
+        data-sidebar-overlay
+        aria-hidden="true"
+      ></div>
+
+      <!-- =================================================
+           SIDEBAR NAVIGATION
+      ================================================== -->
+      <aside
+        class="app-sidebar"
+        id="appSidebar"
+        aria-label="Navigasi utama TARBIYAH"
+      >
+
+        <div class="sidebar-heading">
+          Menu Utama
         </div>
 
-      </section>
+        <nav class="sidebar-navigation">
 
-      <!-- 5. FOOTER -->
-      <footer class="module-footer">
-        <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
-        <small>
-          © <span data-dashboard-year>2026</span> TARBIYAH — Pembelajaran Muslim
-        </small>
-      </footer>
+          <div class="sidebar-group">
 
-    </main>
+            <a
+              href="./tarbiyah.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="dashboard"
+            >
+              <span class="sidebar-link-icon">⌂</span>
+              <span>Dashboard</span>
+            </a>
+
+            <a
+              href="./profil.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="profil"
+            >
+              <span class="sidebar-link-icon">👤</span>
+              <span>Profil Saya</span>
+            </a>
+
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-heading">
+            Pembelajaran
+          </div>
+
+          <div class="sidebar-group">
+
+            <a
+              href="./module.html?module=agenda-kajian"
+              class="sidebar-link"
+              data-nav-link
+              data-module="agenda-kajian"
+              data-nav-key="agenda-kajian"
+            >
+              <span class="sidebar-link-icon">🗓</span>
+              <span>Kelola Agenda Kajian</span>
+            </a>
+
+            <a
+              href="./pembelajaran.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="pembelajaran"
+            >
+              <span class="sidebar-link-icon">📖</span>
+              <span>Pembelajaran</span>
+            </a>
+
+            <a
+              href="./materi.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="materi"
+            >
+              <span class="sidebar-link-icon">📚</span>
+              <span>Materi Kajian</span>
+            </a>
+
+            <a
+              href="./berita.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="berita"
+            >
+              <span class="sidebar-link-icon">📰</span>
+              <span>Berita</span>
+            </a>
+
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-heading">
+            Aktivitas
+          </div>
+
+          <div class="sidebar-group">
+
+            <a
+              href="./presensi.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="presensi"
+            >
+              <span class="sidebar-link-icon">☑</span>
+              <span>Presensi</span>
+            </a>
+
+            <a
+              href="./galeri.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="galeri"
+            >
+              <span class="sidebar-link-icon">🖼</span>
+              <span>Galeri Dokumentasi</span>
+            </a>
+
+            <a
+              href="./diskusi.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="diskusi"
+            >
+              <span class="sidebar-link-icon">💬</span>
+              <span>Diskusi</span>
+            </a>
+
+            <a
+              href="./donasi.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="donasi"
+            >
+              <span class="sidebar-link-icon">🤲</span>
+              <span>Donasi</span>
+            </a>
+
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-heading">
+            Akun & Administrasi
+          </div>
+
+          <div class="sidebar-group">
+
+            <a
+              href="./anggota.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="anggota"
+            >
+              <span class="sidebar-link-icon">👥</span>
+              <span>Anggota Tarbiyah</span>
+            </a>
+
+            <a
+              href="./administrasi.html"
+              class="sidebar-link"
+              data-nav-link
+              data-nav-key="administrasi"
+            >
+              <span class="sidebar-link-icon">⚙</span>
+              <span>Administrasi</span>
+            </a>
+
+          </div>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+          <a
+            href="./tarbiyah.html"
+            class="sidebar-dashboard-link"
+          >
+            <span>←</span>
+            <span>Kembali ke Dashboard</span>
+          </a>
+
+        </div>
+
+      </aside>
+
+      <!-- =================================================
+           MAIN CONTENT
+      ================================================== -->
+      <main class="app-main">
+
+        <div class="app-main-inner">
+
+          <!-- TOMBOL KEMBALI UNIVERSAL -->
+          <div class="page-header-nav">
+
+            <a
+              href="./tarbiyah.html"
+              class="tarbiyah-page-nav__button"
+              aria-label="Kembali ke Dashboard"
+            >
+              <span class="tarbiyah-page-nav__icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+              </span>
+
+              <span class="tarbiyah-page-nav__label">
+                Kembali ke Dashboard
+              </span>
+            </a>
+
+          </div>
+
+          <!-- HERO -->
+          <section class="module-hero">
+
+            <span class="module-hero-label">
+              🌿 RUANG BELAJAR & UKHUWAH
+            </span>
+
+            <h2 data-module-title>
+              Modul TARBIYAH
+            </h2>
+
+            <p data-module-description>
+              Ruang untuk belajar, bertumbuh, berbagi ilmu,
+              dan mempererat ukhuwah Islamiyah.
+            </p>
+
+          </section>
+
+          <!-- TOOLBAR PENCARIAN -->
+          <section class="module-toolbar">
+
+            <form
+              class="module-toolbar-search"
+              data-module-search-form
+              role="search"
+            >
+
+              <input
+                type="search"
+                data-module-search
+                placeholder="Cari informasi..."
+                aria-label="Cari informasi dalam modul"
+              >
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+              >
+                Cari
+              </button>
+
+            </form>
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-module-primary-action
+              hidden
+            >
+              Tambah Data
+            </button>
+
+          </section>
+
+          <!-- AREA KONTEN DINAMIS -->
+          <section
+            class="module-content"
+            data-module-content
+            aria-live="polite"
+          >
+
+            <div class="module-content-empty">
+
+              <div>
+                <div class="module-content-empty-icon">
+                  🌱
+                </div>
+
+                <h3>Selamat Datang di Modul TARBIYAH</h3>
+
+                <p>
+                  Konten modul akan ditampilkan sesuai halaman
+                  yang sedang dibuka. Data akan dimuat dari
+                  sistem TARBIYAH setelah integrasi modul selesai.
+                </p>
+              </div>
+
+            </div>
+
+          </section>
+
+          <!-- FOOTER -->
+          <footer class="module-footer">
+
+            <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
+
+            <small>
+              © <span data-dashboard-year>2026</span>
+              TARBIYAH — Pembelajaran Muslim
+            </small>
+
+          </footer>
+
+        </div>
+      </main>
+
+    </div>
+
+    <!-- =================================================
+         BOTTOM NAVIGATION MOBILE
+    ================================================== -->
+    <nav
+      class="mobile-bottom-nav bottom-nav"
+      aria-label="Navigasi bawah"
+    >
+
+      <a
+        href="./tarbiyah.html"
+        data-nav-link
+        data-nav-key="dashboard"
+      >
+        <span>⌂</span>
+        <span>Beranda</span>
+      </a>
+
+      <a
+        href="./module.html?module=agenda-kajian"
+        data-nav-link
+        data-module="agenda-kajian"
+        data-nav-key="agenda-kajian"
+      >
+        <span>🗓</span>
+        <span>Agenda</span>
+      </a>
+
+      <a
+        href="./presensi.html"
+        data-nav-link
+        data-nav-key="presensi"
+      >
+        <span>☑</span>
+        <span>Presensi</span>
+      </a>
+
+      <a
+        href="./profil.html"
+        data-nav-link
+        data-nav-key="profil"
+      >
+        <span>👤</span>
+        <span>Profil</span>
+      </a>
+
+    </nav>
 
   </div>
 
-  <!-- SUPABASE & SCRIPTS -->
+  <!-- =====================================================
+       SUPABASE & AUTENTIKASI
+  ====================================================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
-  
-  <!-- SCRIPT TEMA -->
+
+  <!-- TEMA -->
   <script src="./js/tarbiyah-theme.js"></script>
+
+  <!-- PENGELOLA MODUL DAN NAVIGASI -->
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
-  <!-- RENDERER MODUL AGENDA KAJIAN -->
+
+  <!-- RENDERER AGENDA KAJIAN -->
   <script src="./js/agenda-kajian-module.js"></script>
+
+  <!-- PWA -->
   <script src="./js/pwa.js"></script>
 
 </body>
