@@ -25,16 +25,6 @@
   <!-- CSS KHUSUS AGENDA -->
   <link rel="stylesheet" href="./css/agenda-kajian.css">
 
-  <!-- SUPABASE -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- KONFIGURASI DAN AUTENTIKASI -->
-  <script src="./js/config.js"></script>
-  <script src="./js/supabase-client.js"></script>
-  <script src="./js/auth.js"></script>
-  <script src="./js/auth-guard.js"></script>
-  <script src="./js/tarbiyah-theme.js"></script>
-
   <style>
     /* =========================================
        HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
@@ -64,7 +54,6 @@
       gap: 10px;
     }
 
-    /* KUNCI LOGO AGAR TIDAK PECAH */
     .brand-logo-wrap {
       display: inline-flex;
       align-items: center;
@@ -107,7 +96,6 @@
       gap: 10px;
     }
 
-    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
     .icon-button {
       display: inline-flex;
       align-items: center;
@@ -143,6 +131,8 @@
     /* Jarak aman untuk tombol back */
     .page-header-nav {
       margin-bottom: 30px;
+      position: relative;
+      z-index: 9999; /* Memaksa tombol back berada di atas */
     }
   </style>
 </head>
@@ -184,7 +174,7 @@
 
       <!-- 1. TOMBOL BACK UNIVERSAL -->
       <div class="page-header-nav">
-        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard" onclick="window.location.href='./dashboard.html'; return false;">
           <span class="tarbiyah-page-nav__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -201,9 +191,7 @@
           <p class="agenda-eyebrow">RUANG KAJIAN TARBIYAH</p>
           <h1>Agenda <span>Kajian</span></h1>
           <p class="agenda-hero-description">
-            Temukan jadwal kajian, informasi pemateri,
-            waktu pelaksanaan, serta lokasi kegiatan
-            TARBIYAH.
+            Temukan jadwal kajian, informasi pemateri, waktu pelaksanaan, serta lokasi kegiatan TARBIYAH.
           </p>
         </div>
         <div class="agenda-hero-icon" aria-hidden="true">🗓️</div>
@@ -226,8 +214,6 @@
 
       <!-- 4. TATA LETAK AGENDA -->
       <section class="agenda-layout">
-
-        <!-- FORMULIR PENGELOLAAN -->
         <article class="agenda-panel agenda-form-panel" id="agendaFormPanel">
           <div class="agenda-panel-heading">
             <div>
@@ -239,22 +225,18 @@
 
           <form id="agendaForm" novalidate>
             <input type="hidden" id="agendaId" name="agenda_id">
-
             <div class="agenda-field">
               <label for="title">Judul kajian <span>*</span></label>
               <input id="title" name="title" type="text" maxlength="180" placeholder="Contoh: Kajian Tauhid dan Keimanan" autocomplete="off" required>
             </div>
-
             <div class="agenda-field">
               <label for="description">Deskripsi kajian</label>
               <textarea id="description" name="description" rows="4" maxlength="3000" placeholder="Tuliskan ringkasan atau informasi kajian..."></textarea>
             </div>
-
             <div class="agenda-field">
               <label for="speakerName">Pemateri / Ustaz</label>
               <input id="speakerName" name="speaker_name" type="text" maxlength="150" placeholder="Nama pemateri" autocomplete="off">
             </div>
-
             <div class="agenda-field-grid">
               <div class="agenda-field">
                 <label for="startsAt">Waktu mulai <span>*</span></label>
@@ -265,21 +247,17 @@
                 <input id="endsAt" name="ends_at" type="datetime-local" required>
               </div>
             </div>
-
             <p class="agenda-field-hint">
               Semua waktu menggunakan WIB (Asia/Jakarta). Agenda malam yang melewati tengah malam tetap diperbolehkan selama waktu selesai lebih besar daripada waktu mulai.
             </p>
-
             <div class="agenda-field">
               <label for="locationName">Nama lokasi</label>
               <input id="locationName" name="location_name" type="text" maxlength="180" placeholder="Contoh: Masjid / Aula / Rumah Belajar" autocomplete="off">
             </div>
-
             <div class="agenda-field">
               <label for="locationAddress">Alamat atau tautan Google Maps</label>
               <textarea id="locationAddress" name="location_address" rows="3" maxlength="1000" placeholder="Masukkan alamat lengkap, koordinat, atau tautan Google Maps"></textarea>
             </div>
-
             <div class="agenda-form-actions">
               <button class="agenda-button agenda-button-primary" id="saveButton" type="submit" disabled>
                 Terbitkan Agenda
@@ -289,13 +267,11 @@
               </button>
             </div>
           </form>
-
           <div class="agenda-form-footnote">
             <span>*</span> Wajib diisi. Agenda baru akan disimpan dengan status <strong>published</strong>.
           </div>
         </article>
 
-        <!-- DAFTAR AGENDA -->
         <section class="agenda-panel agenda-list-panel" aria-labelledby="agendaListHeading">
           <div class="agenda-panel-heading agenda-list-heading">
             <div>
@@ -306,7 +282,9 @@
             <span class="agenda-count" id="agendaCount">0 agenda</span>
           </div>
 
+          <!-- TABS -->
           <div class="agenda-tabs" role="group" aria-label="Filter daftar agenda">
+            <!-- Ditambahkan onclick agar pasti berfungsi meskipun ada error di JS -->
             <button type="button" class="agenda-tab active" data-agenda-view="published" aria-pressed="true">
               <span aria-hidden="true">◉</span> Agenda Aktif
             </button>
@@ -325,13 +303,11 @@
         </section>
       </section>
 
-      <!-- KETERANGAN HAK AKSES -->
       <section class="agenda-access-information" id="agendaAccessInformation" aria-live="polite" hidden>
         <span aria-hidden="true">🔐</span>
         <p id="agendaAccessMessage"></p>
       </section>
 
-      <!-- FOOTER -->
       <footer class="agenda-footer">
         <span>© <span id="currentYear">2026</span> TARBIYAH</span>
         <span>Belajar, Bertumbuh, dan Berukhuwah.</span>
@@ -339,6 +315,16 @@
 
     </main>
   </div>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- KONFIGURASI DAN AUTENTIKASI -->
+  <script src="./js/config.js"></script>
+  <script src="./js/supabase-client.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <script src="./js/tarbiyah-theme.js"></script>
 
   <!-- JAVASCRIPT -->
   <script src="./js/module.js"></script>
