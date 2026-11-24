@@ -629,37 +629,14 @@
             </div>
 
             <!-- CAROUSEL CONTROL -->
-            <div class="carousel-controls">
-
-              <div class="carousel-dots">
-
-                <button
-                  class="carousel-dot active"
-                  type="button"
-                  data-slide="0"
-                  aria-label="Slide 1"
-                  aria-current="true"
-                ></button>
-
-                <button
-                  class="carousel-dot"
-                  type="button"
-                  data-slide="1"
-                  aria-label="Slide 2"
-                ></button>
-
-                <button
-                  class="carousel-dot"
-                  type="button"
-                  data-slide="2"
-                  aria-label="Slide 3"
-                ></button>
-
-              </div>
-
-              <span id="slideCounter">01 / 03</span>
-
-            </div>
+            <div class="carousel-controls" style="display:flex; align-items:center; justify-content:center; gap:16px; margin-top:24px; padding-bottom:16px; flex-wrap:wrap;">
+            <div class="carousel-dots" style="display:flex; align-items:center; gap:8px;">
+            <button class="carousel-dot active" data-slide="0" aria-label="Slide 1"></button>
+            <button class="carousel-dot" data-slide="1" aria-label="Slide 2"></button>
+            <button class="carousel-dot" data-slide="2" aria-label="Slide 3"></button>
+          </div>
+          <span id="slideCounter" style="font-size:.8rem; font-weight:700; color:var(--text-secondary);">01 / 03</span>
+        </div>
 
           </section>
 
