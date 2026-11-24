@@ -189,7 +189,7 @@
   if (!elements.notice) return;
 
   elements.notice.textContent = message;
-  elements.notice.className = "agenda-notice is-" + type;
+  elements.notice.className = `agenda-notice is-${type}`;
   elements.notice.hidden = false;
 
   if (state.noticeTimer) {
