@@ -350,6 +350,27 @@
   <!-- JAVASCRIPT -->
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
+
+<!-- DIAGNOSTIK SINTAKS SEMENTARA -->
+<script>
+  window.addEventListener("error", function(event) {
+    if (
+      event.filename &&
+      event.filename.includes("agenda-kajian.js")
+    ) {
+      console.error(
+        "[TARBIYAH DIAGNOSTIK] Lokasi kesalahan:",
+        {
+          file: event.filename,
+          baris: event.lineno,
+          kolom: event.colno,
+          pesan: event.message
+        }
+      );
+    }
+  }, true);
+</script>
+
   <script src="./js/agenda-kajian.js"></script>
   <script src="./js/pwa.js"></script>
 
