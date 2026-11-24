@@ -261,6 +261,21 @@
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  function withTimeout(promise, ms, message) {
+  let timer;
+
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        reject(new Error(message));
+      }, ms);
+    })
+  ]).finally(() => {
+    clearTimeout(timer);
+  });
+}
+
   async function waitForSupabaseClient() {
     const started = Date.now();
 
@@ -1399,78 +1414,118 @@
   /* ============================================================
      22. INISIALISASI
      ============================================================ */
+async function initialize() {
+  if (state.initialized) return;
 
-  async function initialize() {
-    if (state.initialized) return;
+  state.initialized = true;
 
-    state.initialized = true;
+  // Pasang event tombol lebih awal.
+  bindEvents();
 
-    try {
-      setConnection(
-        "loading",
-        "Menghubungkan...",
-        "Memeriksa sesi pengguna dan koneksi database."
-      );
+  setConnection(
+    "loading",
+    "Menghubungkan ke layanan...",
+    "Memeriksa sesi login dan koneksi aplikasi."
+  );
 
-      await waitForSupabaseClient();
+  try {
+    // TAHAP 1 — Supabase
+    await withTimeout(
+      waitForSupabaseClient(),
+      17000,
+      "Koneksi Supabase tidak ditemukan. Periksa supabase-client.js."
+    );
 
-      state.user = await getAuthenticatedUser();
+    setConnection(
+      "loading",
+      "Memeriksa sesi login...",
+      "Koneksi database tersedia. Memeriksa akun Anda."
+    );
 
-      await loadUserRole();
+    // TAHAP 2 — Autentikasi
+    state.user = await withTimeout(
+      getAuthenticatedUser(),
+      12000,
+      "Pemeriksaan sesi terlalu lama. Silakan muat ulang halaman."
+    );
 
-      updateRoleInterface();
+    setConnection(
+      "loading",
+      "Memeriksa hak akses...",
+      "Sesi login ditemukan. Memeriksa role pengguna."
+    );
 
-      bindEvents();
+    // TAHAP 3 — Role
+    await withTimeout(
+      loadUserRole(),
+      10000,
+      "Pemeriksaan hak akses terlalu lama."
+    );
 
-      if (elements.currentYear) {
-        elements.currentYear.textContent =
-          new Date().getFullYear();
-      }
+    // TAHAP 4 — Tampilan
+    updateRoleInterface();
 
-      await loadAgendas();
-
-      if (state.roleLookupWarning) {
-        showNotice(
-          state.roleLookupWarning,
-          "warning"
-        );
-      }
-
-      console.info(
-        "[TARBIYAH] Agenda Kajian v3.2 berhasil diinisialisasi.",
-        {
-          role: state.role,
-          userId: state.user.id
-        }
-      );
-
-    } catch (error) {
-      console.error(
-        "[TARBIYAH] Inisialisasi Agenda Kajian gagal:",
-        error
-      );
-
-      setConnection(
-        "error",
-        "Gagal menginisialisasi",
-        getErrorMessage(error)
-      );
-
-      if (elements.agendaList) {
-        elements.agendaList.innerHTML = `
-          <div class="agenda-empty">
-            <strong>Halaman belum dapat digunakan.</strong>
-            <p>${escapeHTML(getErrorMessage(error))}</p>
-            <p>Silakan masuk kembali atau periksa koneksi aplikasi.</p>
-          </div>
-        `;
-      }
-
-      if (elements.formPanel) {
-        elements.formPanel.hidden = true;
-      }
+    if (elements.currentYear) {
+      elements.currentYear.textContent =
+        new Date().getFullYear();
     }
+
+    // TAHAP 5 — Data agenda
+    setConnection(
+      "loading",
+      "Memuat agenda kajian...",
+      "Mengambil data agenda dari database."
+    );
+
+    await loadAgendas();
+
+    if (state.roleLookupWarning) {
+      showNotice(state.roleLookupWarning, "warning");
+    }
+
+    console.info(
+      "[TARBIYAH] Agenda Kajian berhasil diinisialisasi.",
+      {
+        role: state.role,
+        userId: state.user.id
+      }
+    );
+
+  } catch (error) {
+    console.error(
+      "[TARBIYAH] Initialization Error:",
+      error
+    );
+
+    setConnection(
+      "error",
+      "Gagal menghubungkan layanan",
+      getErrorMessage(error)
+    );
+
+    showNotice(
+      getErrorMessage(error),
+      "error"
+    );
+
+    if (elements.agendaList) {
+      elements.agendaList.innerHTML = `
+        <div class="agenda-empty">
+          <strong>Agenda belum dapat dimuat.</strong>
+          <p>${escapeHTML(getErrorMessage(error))}</p>
+          <p>Periksa koneksi dan sesi login Anda.</p>
+        </div>
+      `;
+    }
+
+    if (elements.formPanel) {
+      elements.formPanel.hidden = true;
+    }
+
+    // Izinkan inisialisasi ulang setelah halaman dimuat kembali.
+    state.initialized = false;
   }
+}
 
   /* ============================================================
      23. API PUBLIK
