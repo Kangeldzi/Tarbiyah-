@@ -187,22 +187,22 @@
   }
 
   function showNotice(message, type = "info") {
-    if (!elements.notice) return;
+  if (!elements.notice) return;
 
-    elements.notice.textContent = message;
-    elements.notice.className = `agenda-notice is-${type}`;
-    elements.notice.hidden = false;
+  elements.notice.textContent = message;
+  elements.notice.className = "agenda-notice is-" + type;
+  elements.notice.hidden = false;
 
-    if (state.noticeTimer) {
-      clearTimeout(state.noticeTimer);
-    }
-
-    state.noticeTimer = setTimeout(() => {
-      if (elements.notice) {
-        elements.notice.hidden = true;
-      }
-    }, 6000);
+  if (state.noticeTimer) {
+    clearTimeout(state.noticeTimer);
   }
+
+  state.noticeTimer = setTimeout(() => {
+    if (elements.notice) {
+      elements.notice.hidden = true;
+    }
+  }, 6000);
+}
 
   function hideNotice() {
     if (!elements.notice) return;
