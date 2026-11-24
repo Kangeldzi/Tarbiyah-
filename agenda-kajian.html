@@ -315,28 +315,7 @@
 
     </main>
   </div>
-
-  <!-- =====================================
-       ERUDA DEBUG CONSOLE
-  ====================================== -->
-
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-
-  <script>
-    if (
-      window.eruda &&
-      !window.__TARBIYAH_ERUDA_READY__
-    ) {
-      window.eruda.init();
-      window.__TARBIYAH_ERUDA_READY__ = true;
-
-      console.log(
-        "[TARBIYAH] Eruda Console berhasil diaktifkan."
-      );
-    }
-  </script>
-
-
+  
   <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -382,44 +361,6 @@
       }
     })();
   </script>
-
-  
-<script>
-(async function diagnoseTarbiyahScripts() {
-  const files = [
-    "./js/module.js",
-    "./js/module-shell.js",
-    "./js/agenda-kajian.js",
-    "./js/pwa.js"
-  ];
-
-  console.log("=== PEMERIKSAAN SINTAKS TARBIYAH ===");
-
-  for (const file of files) {
-    try {
-      const response = await fetch(file, { cache: "no-store" });
-
-      if (!response.ok) {
-        console.error("FILE TIDAK DAPAT DIBACA:", file, response.status);
-        continue;
-      }
-
-      const source = await response.text();
-
-      try {
-        new Function(source + "\n//# sourceURL=" + new URL(file, location.href).href);
-        console.log("LULUS:", file);
-      } catch (error) {
-        console.error("SINTAKS BERMASALAH:", file, error.message, error.stack);
-      }
-    } catch (error) {
-      console.error("GAGAL MEMERIKSA:", file, error);
-    }
-  }
-
-  console.log("=== PEMERIKSAAN SELESAI ===");
-})();
-</script>
 
 </body>
 </html>
