@@ -1,387 +1,860 @@
-<!doctype html>
-<html lang="id" data-theme="dark" data-module="agenda-kajian">
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="Agenda Kajian TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah.">
-  <title>Agenda Kajian — TARBIYAH</title>
+  <meta name="description" content="Kelola agenda kajian TARBIYAH">
 
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./assets/icons/icon-192.png">
+  <title>Kelola Kajian — TARBIYAH</title>
+
+  <!-- Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- CSS GLOBAL -->
+  <!-- CSS utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
-  <link rel="stylesheet" href="./css/brand-logo.css">
-  <link rel="stylesheet" href="./css/module.css">
-  <link rel="stylesheet" href="./css/module-shell.css">
-  <link rel="stylesheet" href="./css/page-navigation.css">
-
-  <!-- CSS KHUSUS AGENDA -->
-  <link rel="stylesheet" href="./css/agenda-kajian.css">
 
   <style>
-    /* =========================================
-       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
-    ========================================= */
+    :root {
+      --agenda-primary: #10b981;
+      --agenda-primary-dark: #059669;
+      --agenda-bg: #102a22;
+      --agenda-panel: #17382d;
+      --agenda-card: #1b4033;
+      --agenda-border: rgba(255,255,255,.10);
+      --agenda-text: #f0fdf4;
+      --agenda-muted: #a7c5b5;
+      --agenda-danger: #ef4444;
+      --agenda-warning: #f59e0b;
+      --agenda-radius: 18px;
+      --agenda-shadow: 0 12px 35px rgba(0,0,0,.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, sans-serif;
+      background: var(--agenda-bg);
+      color: var(--agenda-text);
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button,
+    a,
+    input,
+    textarea,
+    select {
+      touch-action: manipulation;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* HEADER */
+
     .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      min-height: 70px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       padding: 12px 20px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-color);
-      height: 70px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      background: rgba(16,42,34,.97);
+      border-bottom: 1px solid var(--agenda-border);
+      box-shadow: 0 5px 20px rgba(0,0,0,.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 11px;
+      min-width: 0;
     }
 
-    .brand-logo-wrap {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      flex: 0 0 40px;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .brand-logo-wrap .brand-logo {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    .header-brand-text h1 {
-      margin: 0;
-      font-size: 1.15rem;
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: linear-gradient(135deg,#10b981,#047857);
+      color: white;
+      font-size: 21px;
       font-weight: 800;
-      letter-spacing: .05em;
-      color: var(--color-primary, #36b58a);
-      line-height: 1.1;
-      font-family: var(--font-heading);
+      box-shadow: 0 5px 18px rgba(16,185,129,.25);
     }
 
-    .header-brand-text span {
-      display: block;
-      font-size: .75rem;
-      color: var(--text-secondary);
-      font-weight: 500;
+    .brand-name {
+      font-family: Poppins,sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .brand-subtitle {
+      color: var(--agenda-muted);
+      font-size: 11px;
       margin-top: 2px;
     }
 
-    .header-right {
+    .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .icon-button {
+    .header-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 42px;
-      height: 42px;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      cursor: pointer;
-      font-size: 1.25rem;
-      text-decoration: none;
-      transition: all .2s ease;
+      min-height: 40px;
+      padding: 8px 12px;
+      border: 1px solid var(--agenda-border);
+      border-radius: 11px;
+      color: var(--agenda-text);
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255,255,255,.04);
+      transition: background .2s ease;
     }
 
-    .icon-button:hover {
-      border-color: var(--color-primary);
-      background: var(--bg-tertiary);
+    .header-link:hover {
+      background: rgba(16,185,129,.15);
     }
 
-    /* =========================================
-       LAYOUT UTAMA
-    ========================================= */
-    .app-main {
-      flex: 1;
-      width: 100%;
-      max-width: 1100px;
+    /* MAIN */
+
+    .agenda-main {
+      width: min(100% - 32px, 1100px);
       margin: 0 auto;
-      padding: 24px;
+      padding: 28px 0 55px;
     }
 
-    /* Jarak aman untuk tombol back */
-    .page-header-nav {
-      margin-bottom: 30px;
-      position: relative;
-      z-index: 9999; /* Memaksa tombol back berada di atas */
+    .page-intro {
+      margin-bottom: 24px;
+    }
+
+    .page-eyebrow {
+      color: #6ee7b7;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .page-title {
+      font-family: Poppins,sans-serif;
+      font-size: clamp(24px,5vw,34px);
+      font-weight: 800;
+      line-height: 1.25;
+      margin: 0 0 9px;
+    }
+
+    .page-description {
+      max-width: 680px;
+      color: var(--agenda-muted);
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* CONNECTION */
+
+    .connection-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 17px;
+      margin-bottom: 22px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid var(--agenda-border);
+      border-radius: 15px;
+    }
+
+    .connection-icon {
+      width: 39px;
+      height: 39px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 39px;
+      border-radius: 12px;
+      background: rgba(16,185,129,.13);
+      color: #6ee7b7;
+      font-size: 18px;
+    }
+
+    .connection-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .connection-description {
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    /* ROLE */
+
+    .role-information {
+      padding: 13px 16px;
+      margin-bottom: 22px;
+      border: 1px solid rgba(16,185,129,.25);
+      border-radius: 14px;
+      background: rgba(16,185,129,.075);
+    }
+
+    .role-information strong {
+      color: #6ee7b7;
+      font-size: 12px;
+    }
+
+    .role-information p {
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.6;
+      margin: 5px 0 0;
+    }
+
+    /* LAYOUT */
+
+    .agenda-layout {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .agenda-panel {
+      min-width: 0;
+      padding: 23px;
+      background: var(--agenda-panel);
+      border: 1px solid var(--agenda-border);
+      border-radius: var(--agenda-radius);
+      box-shadow: var(--agenda-shadow);
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .panel-heading h2 {
+      font-family: Poppins,sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .panel-heading p {
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.5;
+      margin: 5px 0 0;
+    }
+
+    .panel-icon {
+      width: 43px;
+      height: 43px;
+      flex: 0 0 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      color: #6ee7b7;
+      background: rgba(16,185,129,.13);
+      font-size: 20px;
+    }
+
+    /* FORM */
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 17px;
+    }
+
+    .form-group {
+      min-width: 0;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      display: block;
+      color: #d1fae5;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .form-label .required {
+      color: #f87171;
+    }
+
+    .form-control {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      min-height: 46px;
+      padding: 12px 13px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 11px;
+      outline: none;
+      background: #102a22;
+      color: #f0fdf4;
+      font-size: 13px;
+      line-height: 1.5;
+      box-shadow: none;
+      opacity: 1;
+      pointer-events: auto;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--agenda-primary);
+      box-shadow: 0 0 0 3px rgba(16,185,129,.13);
+    }
+
+    .form-control::placeholder {
+      color: #78998a;
+      opacity: 1;
+    }
+
+    textarea.form-control {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input[type="datetime-local"].form-control {
+      color-scheme: dark;
+    }
+
+    .form-help {
+      display: block;
+      margin-top: 6px;
+      color: var(--agenda-muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    /* BUTTONS */
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 11px 17px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: filter .2s ease, background .2s ease;
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,#10b981,#059669);
+      color: white;
+      box-shadow: 0 5px 16px rgba(16,185,129,.17);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      color: var(--agenda-text);
+      background: rgba(255,255,255,.07);
+      border-color: var(--agenda-border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255,255,255,.12);
+    }
+
+    /* NOTICE */
+
+    .agenda-notice {
+      display: none;
+      padding: 12px 14px;
+      margin: 16px 0 0;
+      border-radius: 11px;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .agenda-notice:not(:empty) {
+      display: block;
+    }
+
+    /* LIST */
+
+    .agenda-list-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .agenda-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 31px;
+      min-height: 27px;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: rgba(16,185,129,.14);
+      color: #6ee7b7;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .agenda-list {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .empty-state {
+      padding: 30px 15px;
+      border: 1px dashed rgba(255,255,255,.16);
+      border-radius: 14px;
+      text-align: center;
+      color: var(--agenda-muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .empty-state-icon {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 9px;
+    }
+
+    /* FOOTER */
+
+    .agenda-footer {
+      padding: 24px 12px;
+      text-align: center;
+      color: var(--agenda-muted);
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 600px) {
+      .app-header {
+        min-height: 64px;
+        padding: 10px 13px;
+      }
+
+      .brand-logo {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+      }
+
+      .brand-name {
+        font-size: 14px;
+      }
+
+      .brand-subtitle {
+        font-size: 9px;
+      }
+
+      .header-link {
+        min-height: 37px;
+        padding: 7px 9px;
+        font-size: 10px;
+      }
+
+      .agenda-main {
+        width: calc(100% - 26px);
+        padding-top: 23px;
+      }
+
+      .agenda-panel {
+        padding: 17px 15px;
+        border-radius: 15px;
+      }
+
+      .form-grid {
+        grid-template-columns: minmax(0,1fr);
+        gap: 15px;
+      }
+
+      .form-group.full {
+        grid-column: auto;
+      }
+
+      .form-actions .btn {
+        flex: 1 1 auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
     }
   </style>
 </head>
 
-<body class="auth-pending">
+<body>
 
-  <div class="app-shell">
+  <!-- HEADER: tidak menggunakan tautan transparan atau overlay -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo" aria-hidden="true">T</div>
+      <div>
+        <div class="brand-name">TARBIYAH</div>
+        <div class="brand-subtitle">Pembelajaran Muslim</div>
+      </div>
+    </div>
 
-    <!-- =========================================
-         HEADER UNIVERSAL
-    ========================================== -->
-    <header class="app-header">
-      <div class="header-left">
-        <div class="header-brand">
-          <div class="brand-logo-wrap">
-            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
-          </div>
-          <div class="header-brand-text">
-            <h1>TARBIYAH</h1>
-            <span>Agenda Kajian</span>
-          </div>
+    <nav class="header-actions" aria-label="Navigasi halaman">
+      <a class="header-link" href="./dashboard.html">
+        ← Dashboard
+      </a>
+
+      <a class="header-link"
+         href="./notifikasi.html"
+         aria-label="Notifikasi">
+        ♧
+      </a>
+    </nav>
+  </header>
+
+  <!-- KONTEN UTAMA -->
+  <main class="agenda-main">
+
+    <section class="page-intro">
+      <div class="page-eyebrow">TARBIYAH • KEGIATAN PEMBELAJARAN</div>
+      <h1 class="page-title">Kelola Kajian</h1>
+      <p class="page-description">
+        Pusat informasi agenda kajian, jadwal pembelajaran,
+        pemateri, dan lokasi kegiatan TARBIYAH.
+      </p>
+    </section>
+
+    <!-- STATUS SUPABASE -->
+    <section class="connection-card"
+             id="connectionIndicator"
+             aria-live="polite">
+      <div class="connection-icon" aria-hidden="true">◉</div>
+      <div>
+        <div class="connection-title" id="connectionTitle">
+          Memeriksa koneksi...
+        </div>
+        <div class="connection-description"
+             id="connectionDescription">
+          Menghubungkan halaman dengan layanan TARBIYAH.
         </div>
       </div>
+    </section>
 
-      <div class="header-right">
-        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
-          ☀
-        </button>
-        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
-          ♧
-        </a>
-      </div>
-    </header>
+    <!-- INFORMASI AKSES -->
+    <section class="role-information"
+             id="agendaAccessInformation">
+      <strong>Informasi hak akses</strong>
+      <p id="userRole">
+        Memeriksa hak akses akun...
+      </p>
+    </section>
 
-    <!-- =========================================
-         MAIN CONTENT
-    ========================================== -->
-    <main class="app-main">
+    <div class="agenda-layout">
 
-      <!-- 1. TOMBOL BACK UNIVERSAL -->
-      <div class="page-header-nav">
-        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard" onclick="window.location.href='./dashboard.html'; return false;">
-          <span class="tarbiyah-page-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </span>
-          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
-        </a>
-      </div>
+      <!-- PANEL FORMULIR -->
+      <section class="agenda-panel"
+               id="agendaFormPanel">
 
-      <!-- 2. HERO SECTION -->
-      <section class="agenda-hero">
-        <div>
-          <p class="agenda-eyebrow">RUANG KAJIAN TARBIYAH</p>
-          <h1>Agenda <span>Kajian</span></h1>
-          <p class="agenda-hero-description">
-            Temukan jadwal kajian, informasi pemateri, waktu pelaksanaan, serta lokasi kegiatan TARBIYAH.
-          </p>
+        <div class="panel-heading">
+          <div>
+            <h2 id="formHeading">Buat Agenda Kajian</h2>
+            <p>Lengkapi informasi kegiatan kajian.</p>
+          </div>
+          <div class="panel-icon" aria-hidden="true">✎</div>
         </div>
-        <div class="agenda-hero-icon" aria-hidden="true">🗓️</div>
-      </section>
 
-      <!-- 3. STATUS KONEKSI -->
-      <section class="agenda-status-panel" aria-live="polite">
-        <div class="agenda-status-indicator" id="connectionIndicator"></div>
-        <div class="agenda-status-copy">
-          <strong id="connectionTitle">Menghubungkan ke layanan...</strong>
-          <span id="connectionDescription">Memeriksa sesi login dan koneksi aplikasi.</span>
-        </div>
-        <button class="agenda-button agenda-button-ghost agenda-refresh-top" id="refreshButton" type="button" disabled>
-          ↻ Muat ulang
-        </button>
-      </section>
+        <form id="agendaForm" autocomplete="on">
 
-      <!-- NOTIFIKASI -->
-      <div class="agenda-notice" id="agendaNotice" role="status" aria-live="polite" hidden></div>
+          <!-- ID agenda untuk mode edit -->
+          <input type="hidden" id="agendaId" name="agendaId">
 
-      <!-- 4. TATA LETAK AGENDA -->
-      <section class="agenda-layout">
-        <article class="agenda-panel agenda-form-panel" id="agendaFormPanel">
-          <div class="agenda-panel-heading">
-            <div>
-              <p class="agenda-eyebrow">PANEL PENGELOLA</p>
-              <h2 id="formHeading">Buat Agenda Baru</h2>
+          <div class="form-grid">
+
+            <div class="form-group full">
+              <label class="form-label" for="title">
+                Judul Kajian <span class="required">*</span>
+              </label>
+              <input
+                class="form-control"
+                type="text"
+                id="title"
+                name="title"
+                placeholder="Contoh: Kajian Tauhid dan Akidah"
+                maxlength="180"
+                required
+                autocomplete="off"
+              >
             </div>
-            <span class="agenda-panel-icon" aria-hidden="true">✦</span>
+
+            <div class="form-group full">
+              <label class="form-label" for="description">
+                Deskripsi Kajian
+              </label>
+              <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                placeholder="Tuliskan penjelasan, materi, atau informasi kajian..."
+                maxlength="5000"
+              ></textarea>
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label" for="speakerName">
+                Nama Pemateri
+              </label>
+              <input
+                class="form-control"
+                type="text"
+                id="speakerName"
+                name="speakerName"
+                placeholder="Nama ustaz atau pemateri"
+                maxlength="180"
+                autocomplete="name"
+              >
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="startsAt">
+                Waktu Mulai <span class="required">*</span>
+              </label>
+              <input
+                class="form-control"
+                type="datetime-local"
+                id="startsAt"
+                name="startsAt"
+                required
+              >
+              <small class="form-help">
+                Menggunakan waktu lokal perangkat. Sistem agenda
+                perlu menyimpan waktu sesuai zona Asia/Jakarta.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="endsAt">
+                Waktu Selesai
+              </label>
+              <input
+                class="form-control"
+                type="datetime-local"
+                id="endsAt"
+                name="endsAt"
+              >
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label" for="locationName">
+                Nama Tempat
+              </label>
+              <input
+                class="form-control"
+                type="text"
+                id="locationName"
+                name="locationName"
+                placeholder="Contoh: Masjid atau Aula TARBIYAH"
+                maxlength="180"
+              >
+            </div>
+
+            <div class="form-group full">
+              <label class="form-label" for="locationAddress">
+                Alamat / Lokasi Kajian
+              </label>
+              <textarea
+                class="form-control"
+                id="locationAddress"
+                name="locationAddress"
+                placeholder="Masukkan alamat lengkap atau informasi lokasi..."
+                maxlength="1000"
+              ></textarea>
+            </div>
+
           </div>
 
-          <form id="agendaForm" novalidate>
-            <input type="hidden" id="agendaId" name="agenda_id">
-            <div class="agenda-field">
-              <label for="title">Judul kajian <span>*</span></label>
-              <input id="title" name="title" type="text" maxlength="180" placeholder="Contoh: Kajian Tauhid dan Keimanan" autocomplete="off" required>
-            </div>
-            <div class="agenda-field">
-              <label for="description">Deskripsi kajian</label>
-              <textarea id="description" name="description" rows="4" maxlength="3000" placeholder="Tuliskan ringkasan atau informasi kajian..."></textarea>
-            </div>
-            <div class="agenda-field">
-              <label for="speakerName">Pemateri / Ustaz</label>
-              <input id="speakerName" name="speaker_name" type="text" maxlength="150" placeholder="Nama pemateri" autocomplete="off">
-            </div>
-            <div class="agenda-field-grid">
-              <div class="agenda-field">
-                <label for="startsAt">Waktu mulai <span>*</span></label>
-                <input id="startsAt" name="starts_at" type="datetime-local" required>
-              </div>
-              <div class="agenda-field">
-                <label for="endsAt">Waktu selesai <span>*</span></label>
-                <input id="endsAt" name="ends_at" type="datetime-local" required>
-              </div>
-            </div>
-            <p class="agenda-field-hint">
-              Semua waktu menggunakan WIB (Asia/Jakarta). Agenda malam yang melewati tengah malam tetap diperbolehkan selama waktu selesai lebih besar daripada waktu mulai.
-            </p>
-            <div class="agenda-field">
-              <label for="locationName">Nama lokasi</label>
-              <input id="locationName" name="location_name" type="text" maxlength="180" placeholder="Contoh: Masjid / Aula / Rumah Belajar" autocomplete="off">
-            </div>
-            <div class="agenda-field">
-              <label for="locationAddress">Alamat atau tautan Google Maps</label>
-              <textarea id="locationAddress" name="location_address" rows="3" maxlength="1000" placeholder="Masukkan alamat lengkap, koordinat, atau tautan Google Maps"></textarea>
-            </div>
-            <div class="agenda-form-actions">
-              <button class="agenda-button agenda-button-primary" id="saveButton" type="submit" disabled>
-                Terbitkan Agenda
-              </button>
-              <button class="agenda-button agenda-button-secondary" id="cancelEditButton" type="button" hidden>
-                Batal mengubah
-              </button>
-            </div>
-          </form>
-          <div class="agenda-form-footnote">
-            <span>*</span> Wajib diisi. Agenda baru akan disimpan dengan status <strong>published</strong>.
-          </div>
-        </article>
-
-        <section class="agenda-panel agenda-list-panel" aria-labelledby="agendaListHeading">
-          <div class="agenda-panel-heading agenda-list-heading">
-            <div>
-              <p class="agenda-eyebrow">DATABASE KAJIAN</p>
-              <h2 id="agendaListHeading">Daftar Agenda</h2>
-              <p class="agenda-list-subtitle">Informasi agenda kajian yang tersimpan di database TARBIYAH.</p>
-            </div>
-            <span class="agenda-count" id="agendaCount">0 agenda</span>
-          </div>
-
-          <!-- TABS -->
-          <div class="agenda-tabs" role="group" aria-label="Filter daftar agenda">
-            <!-- Ditambahkan onclick agar pasti berfungsi meskipun ada error di JS -->
-            <button type="button" class="agenda-tab active" data-agenda-view="published" aria-pressed="true">
-              <span aria-hidden="true">◉</span> Agenda Aktif
+          <div class="form-actions">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              id="saveButton"
+            >
+              <span aria-hidden="true">＋</span>
+              Simpan Agenda
             </button>
-            <button type="button" class="agenda-tab" data-agenda-view="archived" aria-pressed="false">
-              <span aria-hidden="true">▣</span> Arsip Agenda
+
+            <button
+              class="btn btn-secondary"
+              type="button"
+              id="cancelEditButton"
+              hidden
+            >
+              Batalkan Edit
             </button>
           </div>
 
-          <div class="agenda-list" id="agendaList" aria-live="polite" aria-busy="true">
-            <div class="agenda-empty">
-              <span aria-hidden="true">◷</span>
-              <strong>Menyiapkan daftar agenda</strong>
-              <p>Mohon tunggu sebentar...</p>
+          <div
+            class="agenda-notice"
+            id="agendaNotice"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+        </form>
+      </section>
+
+      <!-- PANEL DAFTAR AGENDA -->
+      <section class="agenda-panel" id="agendaListPanel">
+
+        <div class="agenda-list-heading">
+          <div class="panel-heading" style="margin:0">
+            <div>
+              <h2>Daftar Agenda Kajian</h2>
+              <p>Informasi agenda yang tersimpan.</p>
             </div>
           </div>
-        </section>
+
+          <div style="display:flex;align-items:center;gap:9px">
+            <span class="agenda-count" id="agendaCount">0</span>
+
+            <button
+              class="btn btn-secondary"
+              type="button"
+              id="refreshButton"
+            >
+              ↻ Perbarui
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="agenda-list"
+          id="agendaList"
+          aria-live="polite"
+        >
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">◷</span>
+            Memuat daftar agenda kajian...
+          </div>
+        </div>
+
       </section>
 
-      <section class="agenda-access-information" id="agendaAccessInformation" aria-live="polite" hidden>
-        <span aria-hidden="true">🔐</span>
-        <p id="agendaAccessMessage"></p>
-      </section>
+    </div>
 
-      <footer class="agenda-footer">
-        <span>© <span id="currentYear">2026</span> TARBIYAH</span>
-        <span>Belajar, Bertumbuh, dan Berukhuwah.</span>
-      </footer>
+    <footer class="agenda-footer">
+      <div>
+        TARBIYAH — Pembelajaran Muslim
+      </div>
+      <div>
+        Belajar, Bertumbuh, dan Berukhuwah.
+      </div>
+      <div>
+        © <span id="currentYear"></span> TARBIYAH
+      </div>
+    </footer>
 
-    </main>
-  </div>
+  </main>
 
- <!-- ERUDA CONSOLE - DEBUGGING TARBIYAH -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  window.addEventListener("load", function () {
-    if (window.eruda) {
-      eruda.init({
-        tool: ["console", "elements", "network", "resources"],
-        defaults: {
-          displaySize: 50,
-          transparency: 0.95
-        }
-      });
+  <!-- Tahun footer -->
+  <script>
+    document.getElementById("currentYear").textContent =
+      new Date().getFullYear();
+  </script>
 
-      console.log("TARBIYAH ERUDA CONSOLE AKTIF");
-    } else {
-      console.error("Eruda gagal dimuat. Periksa koneksi internet.");
-    }
-  });
-</script>
-<!-- END ERUDA CONSOLE -->
-  
-  <!-- SUPABASE -->
+  <!-- SUPABASE DAN MODUL TARBIYAH -->
+  <!-- Urutan dipertahankan agar kompatibel dengan sistem yang ada. -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- KONFIGURASI DAN AUTENTIKASI -->
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
   <script src="./js/tarbiyah-theme.js"></script>
 
-  <!-- JAVASCRIPT -->
-  <script src="./js/module.js"></script>
-  <script src="./js/module-shell.js"></script>
-
-<!-- DIAGNOSTIK SINTAKS SEMENTARA -->
-<script>
-  window.addEventListener("error", function(event) {
-    if (
-      event.filename &&
-      event.filename.includes("agenda-kajian.js")
-    ) {
-      console.error(
-        "[TARBIYAH DIAGNOSTIK] Lokasi kesalahan:",
-        {
-          file: event.filename,
-          baris: event.lineno,
-          kolom: event.colno,
-          pesan: event.message
-        }
-      );
-    }
-  }, true);
-</script>
-
+  <!-- Modul utama agenda kajian -->
   <script src="./js/agenda-kajian.js"></script>
-  <script src="./js/pwa.js"></script>
 
-  <script>
-    (() => {
-      const yearElement = document.getElementById("currentYear");
-      if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
-      }
-    })();
-  </script>
+  <!-- PWA -->
+  <script src="./js/pwa.js"></script>
 
 </body>
 </html>
