@@ -316,6 +316,27 @@
     </main>
   </div>
 
+  <!-- =====================================
+       ERUDA DEBUG CONSOLE
+  ====================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+
+  <script>
+    if (
+      window.eruda &&
+      !window.__TARBIYAH_ERUDA_READY__
+    ) {
+      window.eruda.init();
+      window.__TARBIYAH_ERUDA_READY__ = true;
+
+      console.log(
+        "[TARBIYAH] Eruda Console berhasil diaktifkan."
+      );
+    }
+  </script>
+
+
   <!-- SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
