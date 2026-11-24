@@ -361,5 +361,44 @@
       }
     })();
   </script>
+
+  
+<script>
+(async function diagnoseTarbiyahScripts() {
+  const files = [
+    "./js/module.js",
+    "./js/module-shell.js",
+    "./js/agenda-kajian.js",
+    "./js/pwa.js"
+  ];
+
+  console.log("=== PEMERIKSAAN SINTAKS TARBIYAH ===");
+
+  for (const file of files) {
+    try {
+      const response = await fetch(file, { cache: "no-store" });
+
+      if (!response.ok) {
+        console.error("FILE TIDAK DAPAT DIBACA:", file, response.status);
+        continue;
+      }
+
+      const source = await response.text();
+
+      try {
+        new Function(source + "\n//# sourceURL=" + new URL(file, location.href).href);
+        console.log("LULUS:", file);
+      } catch (error) {
+        console.error("SINTAKS BERMASALAH:", file, error.message, error.stack);
+      }
+    } catch (error) {
+      console.error("GAGAL MEMERIKSA:", file, error);
+    }
+  }
+
+  console.log("=== PEMERIKSAAN SELESAI ===");
+})();
+</script>
+
 </body>
 </html>
