@@ -378,6 +378,7 @@
       border-radius: 20px;
     }
 
+    /* PERBAIKAN ELEMEN DETAILS */
     .attendance-topics {
       margin-top: 14px;
       padding-top: 12px;
@@ -390,6 +391,13 @@
       font-weight: 700;
       color: var(--attendance-green);
       user-select: none;
+      outline: none; /* Menghilangkan outline bawaan */
+      position: relative;
+      z-index: 10; /* Memastikan bisa diklik */
+    }
+
+    .attendance-topics summary:hover {
+      text-decoration: underline;
     }
 
     .topic-list {
@@ -528,7 +536,7 @@
         </p>
       </div>
 
-      <button class="attendance-button" id="refreshAttendance" type="button">
+      <button type="button" class="attendance-button" id="refreshAttendance">
         ↻ Perbarui
       </button>
     </header>
@@ -583,13 +591,13 @@
 
       <!-- TABS NAVIGASI -->
       <div class="attendance-tabs" role="group" aria-label="Kategori riwayat">
-        <button class="attendance-tab active" type="button" data-source="all">
+        <button type="button" class="attendance-tab active" data-source="all">
           Semua Kajian
         </button>
-        <button class="attendance-tab" type="button" data-source="historical">
+        <button type="button" class="attendance-tab" data-source="historical">
           Arsip Historis
         </button>
-        <button class="attendance-tab" type="button" data-source="latest">
+        <button type="button" class="attendance-tab" data-source="latest">
           Kajian Terbaru
         </button>
       </div>
@@ -895,8 +903,14 @@
 
     function createTopicDetails(record) {
       if (!record.topics || !record.topics.length) return null;
+      
       const details = document.createElement("details");
       details.className = "attendance-topics";
+      
+      // Memastikan browser tidak melakukan reload saat diklik
+      details.addEventListener("click", (e) => {
+        e.stopPropagation(); // Mencegah bubbling ke elemen induk
+      });
 
       const summary = document.createElement("summary");
       summary.textContent = `Lihat ${record.topics.length} topik pembelajaran`;
@@ -1051,7 +1065,8 @@
       $("attendanceFilter").addEventListener("change", renderRecords);
 
       document.querySelectorAll(".attendance-tab").forEach(button => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
           document.querySelectorAll(".attendance-tab").forEach(tab => tab.classList.remove("active"));
           button.classList.add("active");
           state.source = button.dataset.source || "all";
