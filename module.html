@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id" data-theme="dark">
 <head>
@@ -18,46 +17,140 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CSS Utama TARBIYAH -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
   <link rel="stylesheet" href="./css/brand-logo.css">
   <link rel="stylesheet" href="./css/module.css">
   <link rel="stylesheet" href="./css/module-shell.css">
+  
+  <!-- CSS Navigasi Tombol Back Universal -->
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <style>
-    .module-page {
-      width: 100%;
-      min-width: 0;
-      padding-bottom: 32px;
-    }
-
-    .module-breadcrumb {
+    /* =========================================
+       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
+    ========================================= */
+    .app-header {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 18px;
-      color: var(--text-secondary, #aab5af);
-      font-size: .82rem;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      height: 70px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .module-breadcrumb a {
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* KUNCI LOGO AGAR TIDAK PECAH */
+    .brand-logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .brand-logo-wrap .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .header-brand-text h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
       color: var(--color-primary, #36b58a);
-      text-decoration: none;
-      font-weight: 600;
+      line-height: 1.1;
+      font-family: var(--font-heading);
     }
 
+    .header-brand-text span {
+      display: block;
+      font-size: .75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* TOMBOL IKON (TOGGLE TEMA TERKUNCI) */
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 1.25rem;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .icon-button:hover {
+      border-color: var(--color-primary);
+      background: var(--bg-tertiary);
+    }
+
+    /* =========================================
+       LAYOUT UTAMA
+    ========================================= */
+    .app-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Jarak aman untuk tombol back */
+    .page-header-nav {
+      margin-bottom: 30px;
+    }
+
+    /* =========================================
+       KONTEN MODUL (TEMA UNIVERSAL)
+    ========================================= */
     .module-hero {
       position: relative;
       overflow: hidden;
       padding: clamp(20px, 4vw, 32px);
       margin-bottom: 24px;
-      border: 1px solid var(--border-color, rgba(255,255,255,.1));
+      border: 1px solid var(--border-color);
       border-radius: 20px;
       background:
         radial-gradient(circle at 90% 10%, rgba(54,181,138,.18), transparent 38%),
-        var(--surface-color, rgba(255,255,255,.04));
+        var(--bg-secondary);
     }
 
     .module-hero-label {
@@ -65,25 +158,27 @@
       align-items: center;
       gap: 7px;
       margin-bottom: 12px;
-      color: var(--color-primary, #36b58a);
+      color: var(--color-primary);
       font-size: .75rem;
       font-weight: 700;
       letter-spacing: .08em;
       text-transform: uppercase;
     }
 
-    .module-hero h1 {
+    .module-hero h2 {
       margin: 0 0 10px;
-      font-family: "Poppins", sans-serif;
+      font-family: var(--font-heading);
       font-size: clamp(1.4rem, 4vw, 2rem);
       line-height: 1.3;
+      color: var(--text-primary);
     }
 
     .module-hero p {
       max-width: 680px;
       margin: 0;
-      color: var(--text-secondary, #aab5af);
+      color: var(--text-secondary);
       line-height: 1.7;
+      font-size: .95rem;
     }
 
     .module-toolbar {
@@ -106,6 +201,19 @@
     .module-toolbar-search input {
       min-width: 0;
       flex: 1;
+      padding: 11px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font: inherit;
+      font-size: .88rem;
+      outline: none;
+    }
+
+    .module-toolbar-search input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(54,181,138,.15);
     }
 
     .module-content {
@@ -117,9 +225,9 @@
       place-items: center;
       min-height: 220px;
       padding: 28px 18px;
-      border: 1px dashed var(--border-color, rgba(255,255,255,.15));
+      border: 1px dashed var(--border-color);
       border-radius: 17px;
-      color: var(--text-secondary, #aab5af);
+      color: var(--text-secondary);
       text-align: center;
     }
 
@@ -128,9 +236,9 @@
       font-size: 2.2rem;
     }
 
-    .module-content-empty h2 {
+    .module-content-empty h3 {
       margin: 0 0 8px;
-      color: var(--text-primary, #fff);
+      color: var(--text-primary);
       font-size: 1.05rem;
     }
 
@@ -144,29 +252,25 @@
     .module-footer {
       padding: 24px 0 12px;
       margin-top: 28px;
-      border-top: 1px solid var(--border-color, rgba(255,255,255,.1));
-      color: var(--text-secondary, #aab5af);
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
       text-align: center;
       font-size: .78rem;
     }
 
     @media (max-width: 640px) {
-      .module-page {
-        padding-bottom: 90px;
+      .app-main {
+        padding: 16px;
       }
-
       .module-toolbar {
         align-items: stretch;
       }
-
       .module-toolbar-search {
         max-width: none;
       }
-
       .module-toolbar > .btn {
         width: 100%;
       }
-
       .module-hero {
         border-radius: 16px;
       }
@@ -174,200 +278,71 @@
   </style>
 </head>
 
-<body class="auth-pending" data-module="module">
+<body class="auth-pending">
 
   <div class="app-shell">
 
-    <!-- HEADER -->
+    <!-- =========================================
+         HEADER UNIVERSAL
+    ========================================== -->
     <header class="app-header">
-
-      <button
-        class="app-header-menu"
-        type="button"
-        data-sidebar-toggle
-        aria-label="Buka navigasi"
-        aria-expanded="false">
-        ☰
-      </button>
-
-      <a class="brand-logo brand-logo-header" href="./tarbiyah.html">
-        <img src="./assets/icons/icon-192.png" alt="Logo TARBIYAH">
-        <span class="brand-logo-text">
-          <strong>TARBIYAH</strong>
-          <small>Pembelajaran Muslim</small>
-        </span>
-      </a>
-
-      <div class="app-header-actions">
-
-        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
-         ☀
-        </button>
-
-        <a
-          href="./notifikasi.html"
-          class="app-header-action notification-action"
-          aria-label="Notifikasi">
-          ♧
-          <span class="notification-count" data-notification-count>0</span>
-        </a>
-
-        <button
-          type="button"
-          class="app-header-user"
-          data-user-menu-toggle
-          aria-label="Menu akun">
-          <img
-            src="./assets/icons/icon-192.png"
-            alt="Foto profil"
-            data-user-avatar>
-        </button>
-
-      </div>
-    </header>
-
-    <!-- SIDEBAR OVERLAY -->
-    <div
-      class="sidebar-overlay"
-      data-sidebar-overlay
-      aria-hidden="true">
-    </div>
-
-    <!-- SIDEBAR -->
-    <aside class="app-sidebar" aria-label="Navigasi utama">
-
-      <div class="sidebar-profile">
-        <img
-          src="./assets/icons/icon-192.png"
-          alt="Foto profil anggota"
-          class="sidebar-avatar"
-          data-sidebar-avatar>
-
-        <div class="sidebar-profile-info">
-          <strong data-sidebar-user-name>Anggota TARBIYAH</strong>
-          <small data-sidebar-user-role>Anggota</small>
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-logo-wrap">
+            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
+          </div>
+          <div class="header-brand-text">
+            <h1>TARBIYAH</h1>
+            <span>Modul Pembelajaran</span>
+          </div>
         </div>
       </div>
 
-      <nav class="sidebar-navigation">
-
-        <p class="sidebar-nav-heading">MENU UTAMA</p>
-
-        <a href="./tarbiyah.html" data-module="dashboard" class="sidebar-nav-item">
-          <span>⌂</span>
-          <span>Beranda</span>
-        </a>
-
-        <a href="./profil-anggota.html" data-module="profil" class="sidebar-nav-item">
-          <span>♙</span>
-          <span>Profil Anggota</span>
-        </a>
-
-        <a href="./agenda-tarbiyah.html" data-module="agenda" class="sidebar-nav-item">
-          <span>▦</span>
-          <span>Agenda & Jadwal</span>
-        </a>
-
-        <a href="./pembelajaran.html" data-module="pembelajaran" class="sidebar-nav-item">
-          <span>▤</span>
-          <span>Pembelajaran</span>
-        </a>
-
-        <a href="./materi-pembelajaran.html" data-module="materi" class="sidebar-nav-item">
-          <span>▧</span>
-          <span>Materi Kajian</span>
-        </a>
-
-        <a href="./berita-pengumuman.html" data-module="berita" class="sidebar-nav-item">
-          <span>▥</span>
-          <span>Berita & Pengumuman</span>
-        </a>
-
-        <a href="./presensi-tarbiyah.html" data-module="presensi" class="sidebar-nav-item">
-          <span>✓</span>
-          <span>Presensi</span>
-        </a>
-
-        <p class="sidebar-nav-heading">KOMUNITAS</p>
-
-        <a href="./galeri-foto-video.html" data-module="galeri" class="sidebar-nav-item">
-          <span>▣</span>
-          <span>Galeri Dokumentasi</span>
-        </a>
-
-        <a href="./diskusi-tarbiyah.html" data-module="diskusi" class="sidebar-nav-item">
-          <span>☷</span>
-          <span>Ruang Diskusi</span>
-        </a>
-
-        <a href="./donasi-infaq.html" data-module="donasi" class="sidebar-nav-item">
-          <span>♡</span>
-          <span>Infaq & Donasi</span>
-        </a>
-
-        <p class="sidebar-nav-heading">AKUN & AKTIVITAS</p>
-
-        <a href="./kehadiran.html" data-module="kehadiran" class="sidebar-nav-item">
-          <span>◷</span>
-          <span>Riwayat Kehadiran</span>
-        </a>
-
-        <a href="./catatan-refleksi.html" data-module="catatan" class="sidebar-nav-item">
-          <span>✎</span>
-          <span>Catatan Refleksi</span>
-        </a>
-
-        <a href="./riwayat-aktivitas.html" data-module="riwayat" class="sidebar-nav-item">
-          <span>↻</span>
-          <span>Riwayat Aktivitas</span>
-        </a>
-
-        <a href="./administrasi-pengaturan.html" data-module="administrasi" class="sidebar-nav-item">
-          <span>⚙</span>
-          <span>Pengaturan</span>
-        </a>
-
-      </nav>
-
-      <div class="sidebar-footer">
-        <button type="button" class="sidebar-logout" data-logout>
-          ⇥ Keluar dari Akun
+      <div class="header-right">
+        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
+          ☀
         </button>
+        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
+          ♧
+        </a>
+      </div>
+    </header>
 
-        <small>© <span data-dashboard-year>2026</span> TARBIYAH</small>
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+    <main class="app-main">
+
+      <!-- 1. TOMBOL BACK UNIVERSAL -->
+      <div class="page-header-nav">
+        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard">
+          <span class="tarbiyah-page-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </span>
+          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
+        </a>
       </div>
 
-    </aside>
-
-    <!-- MAIN -->
-    <main class="app-main module-page">
-
-      <div class="module-breadcrumb">
-        <a href="./tarbiyah.html">Beranda</a>
-        <span>›</span>
-        <span data-module-breadcrumb>Modul TARBIYAH</span>
-      </div>
-
-      <!-- MODULE HERO -->
+      <!-- 2. HERO SECTION -->
       <section class="module-hero">
-
         <span class="module-hero-label">
           🌿 RUANG BELAJAR & UKHUWAH
         </span>
 
-        <h1 data-module-title>
+        <h2 data-module-title>
           Modul TARBIYAH
-        </h1>
+        </h2>
 
         <p data-module-description>
           Ruang untuk belajar, bertumbuh, berbagi ilmu, dan mempererat ukhuwah Islamiyah.
         </p>
-
       </section>
 
-      <!-- MODULE TOOLBAR -->
+      <!-- 3. TOOLBAR PENCARIAN -->
       <section class="module-toolbar">
-
         <form class="module-toolbar-search" data-module-search-form>
           <input
             type="search"
@@ -387,10 +362,9 @@
           hidden>
           Tambah Data
         </button>
-
       </section>
 
-      <!-- MODULE CONTENT -->
+      <!-- 4. KONTEN MODUL -->
       <section
         class="module-content"
         data-module-content
@@ -400,7 +374,7 @@
           <div>
             <div class="module-content-empty-icon">🌱</div>
 
-            <h2>Selamat Datang di Modul TARBIYAH</h2>
+            <h3>Selamat Datang di Modul TARBIYAH</h3>
 
             <p>
               Konten modul akan ditampilkan sesuai halaman yang sedang dibuka.
@@ -411,7 +385,7 @@
 
       </section>
 
-      <!-- MODULE FOOTER -->
+      <!-- 5. FOOTER -->
       <footer class="module-footer">
         <p>Belajar, Bertumbuh, dan Berukhuwah.</p>
         <small>
@@ -421,42 +395,18 @@
 
     </main>
 
-    <!-- MOBILE BOTTOM NAV -->
-    <nav class="mobile-bottom-nav" aria-label="Navigasi bawah">
-
-      <a href="./tarbiyah.html" data-module="dashboard">
-        <span>⌂</span>
-        <small>Beranda</small>
-      </a>
-
-      <a href="./agenda-tarbiyah.html" data-module="agenda">
-        <span>▦</span>
-        <small>Agenda</small>
-      </a>
-
-      <a href="./materi-pembelajaran.html" data-module="materi">
-        <span>▤</span>
-        <small>Materi</small>
-      </a>
-
-      <a href="./profil-anggota.html" data-module="profil">
-        <span>♙</span>
-        <small>Profil</small>
-      </a>
-
-    </nav>
-
   </div>
 
-  <!-- SUPABASE -->
+  <!-- SUPABASE & SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- APPLICATION SCRIPTS -->
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
+  
+  <!-- SCRIPT TEMA -->
   <script src="./js/tarbiyah-theme.js"></script>
+  
   <script src="./js/module.js"></script>
   <script src="./js/module-shell.js"></script>
   <script src="./js/pwa.js"></script>
