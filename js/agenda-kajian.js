@@ -1,4 +1,3 @@
-```javascript
 /* ============================================================
    TARBIYAH — AGENDA KAJIAN
    Version 3.2 — Unified Agenda & Role-Based Access
@@ -1566,4 +1565,3 @@ async function initialize() {
   }
 
 })();
-```
