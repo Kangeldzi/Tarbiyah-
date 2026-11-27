@@ -1,343 +1,1245 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="id" data-theme="dark" data-module="agenda-kajian">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#102a22">
-  <meta name="description" content="Agenda Kajian TARBIYAH — Belajar, Bertumbuh, dan Berukhuwah.">
-  <title>Agenda Kajian — TARBIYAH</title>
+  <meta name="description" content="Kelola agenda kajian TARBIYAH — Pembelajaran Muslim.">
+  <title>Kelola Kajian — TARBIYAH</title>
 
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" href="./assets/icons/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- CSS GLOBAL -->
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
-  <link rel="stylesheet" href="./css/brand-logo.css">
-  <link rel="stylesheet" href="./css/module.css">
-  <link rel="stylesheet" href="./css/module-shell.css">
-  <link rel="stylesheet" href="./css/page-navigation.css">
-
-  <!-- CSS KHUSUS AGENDA -->
-  <link rel="stylesheet" href="./css/agenda-kajian.css">
 
   <style>
-    /* =========================================
-       HEADER & UI (STANDAR UNIVERSAL TARBIYAH)
-    ========================================= */
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border-color);
-      height: 70px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    :root {
+      --agenda-primary: #10b981;
+      --agenda-primary-dark: #059669;
+      --agenda-primary-soft: rgba(16, 185, 129, .13);
+      --agenda-bg: #102a22;
+      --agenda-panel: #17382e;
+      --agenda-panel-soft: #1c4235;
+      --agenda-text: #ecfdf5;
+      --agenda-muted: #a7c4b7;
+      --agenda-border: rgba(167, 243, 208, .14);
+      --agenda-danger: #ef4444;
+      --agenda-warning: #f59e0b;
+      --agenda-radius: 18px;
+      --agenda-shadow: 0 12px 35px rgba(0, 0, 0, .18);
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+    html[data-theme="light"] {
+      --agenda-bg: #f1f8f4;
+      --agenda-panel: #ffffff;
+      --agenda-panel-soft: #f4faf6;
+      --agenda-text: #15372b;
+      --agenda-muted: #60796d;
+      --agenda-border: rgba(21, 55, 43, .13);
+      --agenda-shadow: 0 12px 35px rgba(15, 55, 35, .08);
     }
 
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    * {
+      box-sizing: border-box;
     }
 
-    .brand-logo-wrap {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      flex: 0 0 40px;
-      border-radius: 10px;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--agenda-bg);
+      color: var(--agenda-text);
+      font-family: "Inter", sans-serif;
+      transition: background .25s ease, color .25s ease;
+    }
+
+    body.agenda-menu-open {
       overflow: hidden;
     }
 
-    .brand-logo-wrap .brand-logo {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
+    button,
+    input,
+    textarea {
+      font: inherit;
     }
 
-    .header-brand-text h1 {
-      margin: 0;
-      font-size: 1.15rem;
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px clamp(14px, 4vw, 34px);
+      background: var(--agenda-panel);
+      border-bottom: 1px solid var(--agenda-border);
+      box-shadow: 0 5px 22px rgba(0, 0, 0, .10);
+    }
+
+    .header-left,
+    .header-brand,
+    .header-actions {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-left {
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .header-brand {
+      gap: 11px;
+      color: var(--agenda-text);
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: linear-gradient(145deg, #10b981, #047857);
+      color: #fff;
+      font-family: "Poppins", sans-serif;
       font-weight: 800;
-      letter-spacing: .05em;
-      color: var(--color-primary, #36b58a);
-      line-height: 1.1;
-      font-family: var(--font-heading);
+      font-size: 22px;
+      box-shadow: 0 5px 18px rgba(16, 185, 129, .25);
     }
 
-    .header-brand-text span {
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy strong {
       display: block;
-      font-size: .75rem;
-      color: var(--text-secondary);
-      font-weight: 500;
+      font-family: "Poppins", sans-serif;
+      font-size: 16px;
+      letter-spacing: .7px;
+      line-height: 1.3;
+    }
+
+    .brand-copy small {
+      display: block;
+      color: var(--agenda-muted);
+      font-size: 10px;
       margin-top: 2px;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .header-actions {
+      gap: 9px;
     }
 
+    .header-link,
     .icon-button {
+      min-height: 40px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 42px;
-      height: 42px;
-      border: 1px solid var(--border-color);
+      gap: 7px;
+      padding: 9px 13px;
+      border: 1px solid var(--agenda-border);
       border-radius: 12px;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      cursor: pointer;
-      font-size: 1.25rem;
+      background: var(--agenda-panel-soft);
+      color: var(--agenda-text);
       text-decoration: none;
-      transition: all .2s ease;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
     }
 
+    .header-link:hover,
     .icon-button:hover {
-      border-color: var(--color-primary);
-      background: var(--bg-tertiary);
+      border-color: var(--agenda-primary);
+      color: var(--agenda-primary);
+      transform: translateY(-1px);
     }
 
-    /* =========================================
-       LAYOUT UTAMA
-    ========================================= */
-    .app-main {
-      flex: 1;
-      width: 100%;
-      max-width: 1100px;
+    .icon-button {
+      width: 42px;
+      padding: 0;
+      font-size: 20px;
+    }
+
+    .menu-button {
+      display: inline-flex;
+    }
+
+    /* SIDEBAR */
+    .agenda-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, .58);
+      opacity: 0;
+      visibility: hidden;
+      transition: .25s ease;
+    }
+
+    .agenda-sidebar-overlay.is-visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .agenda-sidebar {
+      position: fixed;
+      z-index: 90;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: min(290px, 84vw);
+      padding: 20px 15px;
+      background: var(--agenda-panel);
+      border-right: 1px solid var(--agenda-border);
+      box-shadow: var(--agenda-shadow);
+      transform: translateX(-105%);
+      transition: transform .28s ease;
+      overflow-y: auto;
+    }
+
+    .agenda-sidebar.is-open {
+      transform: translateX(0);
+    }
+
+    .sidebar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 5px 5px 20px;
+      border-bottom: 1px solid var(--agenda-border);
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Poppins", sans-serif;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      gap: 7px;
+      margin-top: 20px;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 13px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      color: var(--agenda-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: .2s ease;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      color: var(--agenda-primary);
+      background: var(--agenda-primary-soft);
+      border-color: var(--agenda-border);
+    }
+
+    .sidebar-nav .nav-icon {
+      width: 22px;
+      text-align: center;
+      font-size: 17px;
+    }
+
+    .sidebar-caption {
+      margin: 22px 10px 8px;
+      color: var(--agenda-muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    /* MAIN */
+    .agenda-main {
+      width: min(1120px, 100%);
       margin: 0 auto;
-      padding: 24px;
+      padding: 28px clamp(14px, 3vw, 28px) 40px;
     }
 
-    /* Jarak aman untuk tombol back */
-    .page-header-nav {
-      margin-bottom: 30px;
-      position: relative;
-      z-index: 9999; /* Memaksa tombol back berada di atas */
+    .page-intro {
+      margin-bottom: 23px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--agenda-primary);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .page-intro h1 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(25px, 5vw, 34px);
+      line-height: 1.2;
+    }
+
+    .page-intro p {
+      margin: 9px 0 0;
+      color: var(--agenda-muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .connection-card,
+    .role-information,
+    .agenda-panel {
+      border: 1px solid var(--agenda-border);
+      border-radius: var(--agenda-radius);
+      background: var(--agenda-panel);
+      box-shadow: var(--agenda-shadow);
+    }
+
+    .connection-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px 17px;
+      margin-bottom: 13px;
+    }
+
+    .connection-indicator {
+      width: 10px;
+      height: 10px;
+      flex: 0 0 10px;
+      margin-top: 5px;
+      border-radius: 50%;
+      background: var(--agenda-warning);
+      box-shadow: 0 0 0 5px rgba(245, 158, 11, .12);
+    }
+
+    .connection-card[data-status="connected"] .connection-indicator {
+      background: var(--agenda-primary);
+      box-shadow: 0 0 0 5px rgba(16, 185, 129, .12);
+    }
+
+    .connection-card[data-status="error"] .connection-indicator {
+      background: var(--agenda-danger);
+      box-shadow: 0 0 0 5px rgba(239, 68, 68, .12);
+    }
+
+    .connection-copy strong {
+      display: block;
+      font-size: 12px;
+    }
+
+    .connection-copy p {
+      margin: 4px 0 0;
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .role-information {
+      padding: 15px 17px;
+      margin-bottom: 22px;
+      border-left: 3px solid var(--agenda-primary);
+    }
+
+    .role-information strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .role-information p {
+      margin: 4px 0 0;
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.65;
+    }
+
+    .agenda-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .agenda-panel {
+      min-width: 0;
+      padding: clamp(16px, 3vw, 23px);
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .panel-heading h2 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: 17px;
+    }
+
+    .panel-heading p {
+      margin: 5px 0 0;
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    /* FORM */
+    .agenda-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .form-field {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      color: var(--agenda-text);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .required-mark {
+      color: #f87171;
+    }
+
+    .form-control {
+      width: 100%;
+      min-height: 44px;
+      padding: 11px 12px;
+      border: 1px solid var(--agenda-border);
+      border-radius: 11px;
+      outline: none;
+      background: var(--agenda-panel-soft);
+      color: var(--agenda-text);
+      font-size: 12px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .form-control::placeholder {
+      color: var(--agenda-muted);
+      opacity: .75;
+    }
+
+    .form-control:focus {
+      border-color: var(--agenda-primary);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .12);
+    }
+
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input[type="datetime-local"] {
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] input[type="datetime-local"] {
+      color-scheme: light;
+    }
+
+    .form-help {
+      color: var(--agenda-muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      grid-column: 1 / -1;
+      margin-top: 3px;
+    }
+
+    .btn {
+      min-height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .btn:disabled,
+    .agenda-action:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 5px 15px rgba(16, 185, 129, .18);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, .25);
+    }
+
+    .btn-secondary {
+      border-color: var(--agenda-border);
+      background: var(--agenda-panel-soft);
+      color: var(--agenda-text);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--agenda-primary);
+      color: var(--agenda-primary);
+    }
+
+    .agenda-notice {
+      grid-column: 1 / -1;
+      padding: 12px 13px;
+      border: 1px solid var(--agenda-border);
+      border-radius: 10px;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .agenda-notice.is-success {
+      color: #6ee7b7;
+      background: rgba(16, 185, 129, .10);
+      border-color: rgba(16, 185, 129, .25);
+    }
+
+    .agenda-notice.is-error,
+    .agenda-notice.is-warning {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, .09);
+      border-color: rgba(239, 68, 68, .23);
+    }
+
+    .agenda-notice.is-info {
+      color: var(--agenda-text);
+      background: var(--agenda-primary-soft);
+    }
+
+    /* TABS & LIST */
+    .agenda-list-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .agenda-list-heading h2 {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      font-size: 17px;
+    }
+
+    .agenda-count {
+      display: inline-grid;
+      min-width: 27px;
+      height: 27px;
+      place-items: center;
+      padding: 0 7px;
+      border-radius: 20px;
+      background: var(--agenda-primary-soft);
+      color: var(--agenda-primary);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .agenda-tabs {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 2px 1px 10px;
+      margin-bottom: 12px;
+      scrollbar-width: thin;
+    }
+
+    .agenda-tab {
+      min-height: 38px;
+      flex: 0 0 auto;
+      padding: 9px 13px;
+      border: 1px solid var(--agenda-border);
+      border-radius: 10px;
+      background: var(--agenda-panel-soft);
+      color: var(--agenda-muted);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .agenda-tab:hover {
+      border-color: var(--agenda-primary);
+      color: var(--agenda-primary);
+    }
+
+    .agenda-tab.is-active {
+      border-color: var(--agenda-primary);
+      background: var(--agenda-primary);
+      color: #fff;
+    }
+
+    .agenda-list {
+      display: grid;
+      gap: 13px;
+    }
+
+    .agenda-card {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--agenda-border);
+      border-radius: 15px;
+      background: var(--agenda-panel-soft);
+      transition: border-color .2s, transform .2s;
+    }
+
+    .agenda-card:hover {
+      border-color: rgba(16, 185, 129, .5);
+      transform: translateY(-2px);
+    }
+
+    .agenda-card.is-archived {
+      opacity: .88;
+    }
+
+    .agenda-card-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 11px;
+    }
+
+    .agenda-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .status-active {
+      background: rgba(16, 185, 129, .13);
+      color: #34d399;
+    }
+
+    .status-archived {
+      background: rgba(245, 158, 11, .13);
+      color: #fbbf24;
+    }
+
+    .agenda-card-date {
+      color: var(--agenda-muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .agenda-card-title {
+      margin: 0 0 9px;
+      font-family: "Poppins", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .agenda-description {
+      margin: 0 0 13px;
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .agenda-details {
+      display: grid;
+      gap: 8px;
+    }
+
+    .agenda-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .agenda-detail strong {
+      color: var(--agenda-text);
+    }
+
+    .agenda-map-link {
+      display: inline-flex;
+      margin-top: 13px;
+      color: var(--agenda-primary);
+      font-size: 11px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .agenda-map-link:hover {
+      text-decoration: underline;
+    }
+
+    .agenda-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 13px;
+      margin-top: 13px;
+      border-top: 1px solid var(--agenda-border);
+    }
+
+    .agenda-action {
+      min-height: 35px;
+      padding: 8px 11px;
+      border: 1px solid var(--agenda-border);
+      border-radius: 9px;
+      background: transparent;
+      color: var(--agenda-text);
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .agenda-action:hover {
+      transform: translateY(-1px);
+    }
+
+    .agenda-edit {
+      border-color: rgba(59, 130, 246, .3);
+      color: #60a5fa;
+    }
+
+    .agenda-archive {
+      border-color: rgba(245, 158, 11, .3);
+      color: #fbbf24;
+    }
+
+    .agenda-restore {
+      border-color: rgba(16, 185, 129, .35);
+      color: #34d399;
+    }
+
+    .agenda-delete {
+      border-color: rgba(239, 68, 68, .35);
+      color: #f87171;
+    }
+
+    .agenda-empty,
+    .agenda-loading {
+      padding: 32px 16px;
+      border: 1px dashed var(--agenda-border);
+      border-radius: 14px;
+      text-align: center;
+      color: var(--agenda-muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .agenda-empty-icon {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 28px;
+    }
+
+    .agenda-empty strong {
+      display: block;
+      color: var(--agenda-text);
+      font-size: 13px;
+    }
+
+    .agenda-empty p {
+      margin: 5px 0 0;
+    }
+
+    .footer {
+      padding: 22px 14px;
+      color: var(--agenda-muted);
+      text-align: center;
+      font-size: 10px;
+    }
+
+    @media (max-width: 650px) {
+      .app-header {
+        min-height: 62px;
+        padding: 9px 12px;
+      }
+
+      .brand-logo {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+      }
+
+      .brand-copy strong {
+        font-size: 14px;
+      }
+
+      .brand-copy small {
+        font-size: 9px;
+      }
+
+      .header-link {
+        width: 39px;
+        min-height: 39px;
+        padding: 0;
+        overflow: hidden;
+        font-size: 0;
+      }
+
+      .header-link span {
+        font-size: 17px;
+      }
+
+      .agenda-main {
+        padding-top: 22px;
+      }
+
+      .agenda-form {
+        grid-template-columns: 1fr;
+      }
+
+      .form-field.full {
+        grid-column: auto;
+      }
+
+      .form-actions {
+        grid-column: auto;
+      }
+
+      .form-actions .btn {
+        flex: 1 1 100%;
+      }
+
+      .panel-heading {
+        align-items: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
     }
   </style>
 </head>
 
-<body class="auth-pending">
+<body class="agenda-kajian-page">
 
-  <div class="app-shell">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-left">
+      <button
+        class="icon-button menu-button"
+        id="agendaMenuButton"
+        type="button"
+        aria-label="Buka menu navigasi"
+        aria-controls="agendaSidebar"
+        aria-expanded="false">
+        ☰
+      </button>
 
-    <!-- HEADER UNIVERSAL -->
-    <header class="app-header">
-      <div class="header-left">
-        <div class="header-brand">
-          <div class="brand-logo-wrap">
-            <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo TARBIYAH">
-          </div>
-          <div class="header-brand-text">
-            <h1>TARBIYAH</h1>
-            <span>Agenda Kajian</span>
-          </div>
-        </div>
-      </div>
+      <a class="header-brand" href="./dashboard.html">
+        <span class="brand-logo" aria-hidden="true">T</span>
+        <span class="brand-copy">
+          <strong>TARBIYAH</strong>
+          <small>Pembelajaran Muslim</small>
+        </span>
+      </a>
+    </div>
 
-      <div class="header-right">
-        <button type="button" id="btnTheme" class="icon-button" aria-label="Ubah tema">
-          ☀
-        </button>
-        <a href="./notifikasi.html" class="icon-button" aria-label="Notifikasi">
-          ♧
-        </a>
-      </div>
-    </header>
+    <nav class="header-actions" aria-label="Navigasi cepat">
+      <a class="header-link" href="./dashboard.html" aria-label="Dashboard">
+        <span aria-hidden="true">⌂</span>
+        Dashboard
+      </a>
 
-    <!-- MAIN CONTENT -->
-    <main class="app-main">
+      <a class="header-link" href="./notifikasi.html" aria-label="Notifikasi">
+        <span aria-hidden="true">♧</span>
+        Notifikasi
+      </a>
+    </nav>
+  </header>
 
-      <!-- 1. TOMBOL BACK UNIVERSAL (ANTI ERROR JS) -->
-      <div class="page-header-nav">
-        <a href="./dashboard.html" class="tarbiyah-page-nav__button" aria-label="Kembali ke Dashboard" onclick="window.location.href='./dashboard.html'; return false;">
-          <span class="tarbiyah-page-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </span>
-          <span class="tarbiyah-page-nav__label">Kembali ke Dashboard</span>
-        </a>
-      </div>
-
-      <!-- 2. HERO SECTION -->
-      <section class="agenda-hero">
-        <div>
-          <p class="agenda-eyebrow">RUANG KAJIAN TARBIYAH</p>
-          <h1>Agenda <span>Kajian</span></h1>
-          <p class="agenda-hero-description">
-            Temukan jadwal kajian, informasi pemateri, waktu pelaksanaan, serta lokasi kegiatan TARBIYAH.
-          </p>
-        </div>
-        <div class="agenda-hero-icon" aria-hidden="true">🗓️</div>
-      </section>
-
-      <!-- 3. STATUS KONEKSI -->
-      <section class="agenda-status-panel" aria-live="polite">
-        <div class="agenda-status-indicator" id="connectionIndicator"></div>
-        <div class="agenda-status-copy">
-          <strong id="connectionTitle">Menghubungkan ke layanan...</strong>
-          <span id="connectionDescription">Memeriksa sesi login dan koneksi aplikasi.</span>
-        </div>
-        <button class="agenda-button agenda-button-ghost agenda-refresh-top" id="refreshButton" type="button" disabled>
-          ↻ Muat ulang
-        </button>
-      </section>
-
-      <!-- NOTIFIKASI -->
-      <div class="agenda-notice" id="agendaNotice" role="status" aria-live="polite" hidden></div>
-
-      <!-- 4. TATA LETAK AGENDA -->
-      <section class="agenda-layout">
-        
-        <!-- FORMULIR PENGELOLAAN -->
-        <article class="agenda-panel agenda-form-panel" id="agendaFormPanel">
-          <div class="agenda-panel-heading">
-            <div>
-              <p class="agenda-eyebrow">PANEL PENGELOLA</p>
-              <h2 id="formHeading">Buat Agenda Baru</h2>
-            </div>
-            <span class="agenda-panel-icon" aria-hidden="true">✦</span>
-          </div>
-
-          <form id="agendaForm" novalidate>
-            <input type="hidden" id="agendaId" name="agenda_id">
-            <div class="agenda-field">
-              <label for="title">Judul kajian <span>*</span></label>
-              <input id="title" name="title" type="text" maxlength="180" placeholder="Contoh: Kajian Tauhid dan Keimanan" autocomplete="off" required>
-            </div>
-            <div class="agenda-field">
-              <label for="description">Deskripsi kajian</label>
-              <textarea id="description" name="description" rows="4" maxlength="3000" placeholder="Tuliskan ringkasan atau informasi kajian..."></textarea>
-            </div>
-            <div class="agenda-field">
-              <label for="speakerName">Pemateri / Ustaz</label>
-              <input id="speakerName" name="speaker_name" type="text" maxlength="150" placeholder="Nama pemateri" autocomplete="off">
-            </div>
-            <div class="agenda-field-grid">
-              <div class="agenda-field">
-                <label for="startsAt">Waktu mulai <span>*</span></label>
-                <input id="startsAt" name="starts_at" type="datetime-local" required>
-              </div>
-              <div class="agenda-field">
-                <label for="endsAt">Waktu selesai <span>*</span></label>
-                <input id="endsAt" name="ends_at" type="datetime-local" required>
-              </div>
-            </div>
-            <p class="agenda-field-hint">
-              Semua waktu menggunakan WIB (Asia/Jakarta). Agenda malam yang melewati tengah malam tetap diperbolehkan selama waktu selesai lebih besar daripada waktu mulai.
-            </p>
-            <div class="agenda-field">
-              <label for="locationName">Nama lokasi</label>
-              <input id="locationName" name="location_name" type="text" maxlength="180" placeholder="Contoh: Masjid / Aula / Rumah Belajar" autocomplete="off">
-            </div>
-            <div class="agenda-field">
-              <label for="locationAddress">Alamat atau tautan Google Maps</label>
-              <textarea id="locationAddress" name="location_address" rows="3" maxlength="1000" placeholder="Masukkan alamat lengkap, koordinat, atau tautan Google Maps"></textarea>
-            </div>
-            <div class="agenda-form-actions">
-              <button class="agenda-button agenda-button-primary" id="saveButton" type="submit" disabled>
-                Terbitkan Agenda
-              </button>
-              <button class="agenda-button agenda-button-secondary" id="cancelEditButton" type="button" hidden>
-                Batal mengubah
-              </button>
-            </div>
-          </form>
-          <div class="agenda-form-footnote">
-            <span>*</span> Wajib diisi. Agenda baru akan disimpan dengan status <strong>published</strong>.
-          </div>
-        </article>
-
-        <!-- DAFTAR AGENDA -->
-        <section class="agenda-panel agenda-list-panel" aria-labelledby="agendaListHeading">
-          <div class="agenda-panel-heading agenda-list-heading">
-            <div>
-              <p class="agenda-eyebrow">DATABASE KAJIAN</p>
-              <h2 id="agendaListHeading">Daftar Agenda</h2>
-              <p class="agenda-list-subtitle">Informasi agenda kajian yang tersimpan di database TARBIYAH.</p>
-            </div>
-            <span class="agenda-count" id="agendaCount">0 agenda</span>
-          </div>
-
-          <div class="agenda-tabs" role="group" aria-label="Filter daftar agenda">
-            <button type="button" class="agenda-tab active" data-agenda-view="published" aria-pressed="true">
-              <span aria-hidden="true">◉</span> Agenda Aktif
-            </button>
-            <button type="button" class="agenda-tab" data-agenda-view="archived" aria-pressed="false">
-              <span aria-hidden="true">▣</span> Arsip Agenda
-            </button>
-          </div>
-
-          <div class="agenda-list" id="agendaList" aria-live="polite" aria-busy="true">
-            <div class="agenda-empty">
-              <span aria-hidden="true">◷</span>
-              <strong>Menyiapkan daftar agenda</strong>
-              <p>Mohon tunggu sebentar...</p>
-            </div>
-          </div>
-        </section>
-      </section>
-
-      <section class="agenda-access-information" id="agendaAccessInformation" aria-live="polite" hidden>
-        <span aria-hidden="true">🔐</span>
-        <p id="agendaAccessMessage"></p>
-      </section>
-
-      <footer class="agenda-footer">
-        <span>© <span id="currentYear">2026</span> TARBIYAH</span>
-        <span>Belajar, Bertumbuh, dan Berukhuwah.</span>
-      </footer>
-
-    </main>
+  <!-- SIDEBAR OVERLAY -->
+  <div
+    class="agenda-sidebar-overlay"
+    id="agendaSidebarOverlay"
+    aria-hidden="true">
   </div>
 
-  <!-- SUPABASE -->
+  <!-- SIDEBAR -->
+  <aside
+    class="agenda-sidebar"
+    id="agendaSidebar"
+    aria-label="Menu navigasi"
+    aria-hidden="true">
+
+    <div class="sidebar-top">
+      <div class="sidebar-brand">
+        <span class="brand-logo" aria-hidden="true">T</span>
+        <span>TARBIYAH</span>
+      </div>
+
+      <button
+        class="icon-button"
+        id="agendaMenuClose"
+        type="button"
+        aria-label="Tutup menu">
+        ×
+      </button>
+    </div>
+
+    <p class="sidebar-caption">Menu Utama</p>
+
+    <nav class="sidebar-nav">
+      <a href="./dashboard.html">
+        <span class="nav-icon" aria-hidden="true">⌂</span>
+        Dashboard
+      </a>
+
+      <a href="./agenda-kajian.html" class="active" aria-current="page">
+        <span class="nav-icon" aria-hidden="true">📚</span>
+        Agenda Kajian
+      </a>
+
+      <a href="./notifikasi.html">
+        <span class="nav-icon" aria-hidden="true">♧</span>
+        Notifikasi
+      </a>
+
+      <a href="./galeri.html">
+        <span class="nav-icon" aria-hidden="true">▧</span>
+        Galeri
+      </a>
+
+      <a href="./profil.html">
+        <span class="nav-icon" aria-hidden="true">◎</span>
+        Profil Saya
+      </a>
+    </nav>
+
+    <p class="sidebar-caption">Akun</p>
+
+    <nav class="sidebar-nav">
+      <a href="./dashboard.html">
+        <span class="nav-icon" aria-hidden="true">↩</span>
+        Kembali ke Dashboard
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="agenda-main">
+
+    <section class="page-intro">
+      <span class="eyebrow">TARBIYAH • KEGIATAN PEMBELAJARAN</span>
+      <h1>Kelola Kajian</h1>
+      <p>
+        Informasi agenda kajian, jadwal pembelajaran, pemateri,
+        dan lokasi kegiatan dalam satu halaman.
+      </p>
+    </section>
+
+    <!-- CONNECTION STATUS -->
+    <section
+      class="connection-card"
+      id="connectionIndicator"
+      data-status="loading"
+      aria-live="polite">
+
+      <span class="connection-indicator" aria-hidden="true"></span>
+
+      <div class="connection-copy">
+        <strong id="connectionTitle">Memeriksa koneksi...</strong>
+        <p id="connectionDescription">
+          Sedang memeriksa sesi akun dan koneksi database.
+        </p>
+      </div>
+    </section>
+
+    <!-- ROLE INFORMATION -->
+    <section
+      class="role-information"
+      id="agendaAccessInformation"
+      aria-live="polite">
+
+      <strong>Informasi hak akses</strong>
+      <p id="userRole">Memeriksa hak akses akun...</p>
+      <p id="agendaAccessMessage">
+        Hak akses akan ditampilkan setelah akun berhasil diverifikasi.
+      </p>
+    </section>
+
+    <div class="agenda-layout">
+
+      <!-- FORM PANEL -->
+      <section class="agenda-panel" id="agendaFormPanel" hidden>
+        <div class="panel-heading">
+          <div>
+            <h2 id="formHeading">Tambah Agenda Kajian</h2>
+            <p>Lengkapi informasi kegiatan kajian di bawah ini.</p>
+          </div>
+        </div>
+
+        <form id="agendaForm" class="agenda-form" novalidate>
+          <input type="hidden" id="agendaId" name="agendaId">
+
+          <div class="form-field full">
+            <label for="title">
+              Judul Kajian <span class="required-mark">*</span>
+            </label>
+            <input
+              class="form-control"
+              type="text"
+              id="title"
+              name="title"
+              maxlength="200"
+              placeholder="Contoh: Kajian Tauhid dan Akhlak"
+              required>
+          </div>
+
+          <div class="form-field full">
+            <label for="description">Deskripsi Kajian</label>
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              maxlength="5000"
+              placeholder="Tuliskan ringkasan atau keterangan kajian..."></textarea>
+          </div>
+
+          <div class="form-field full">
+            <label for="speakerName">Nama Pemateri</label>
+            <input
+              class="form-control"
+              type="text"
+              id="speakerName"
+              name="speakerName"
+              maxlength="150"
+              placeholder="Nama ustaz atau pemateri">
+          </div>
+
+          <div class="form-field">
+            <label for="startsAt">
+              Waktu Mulai <span class="required-mark">*</span>
+            </label>
+            <input
+              class="form-control"
+              type="datetime-local"
+              id="startsAt"
+              name="startsAt"
+              required>
+            <span class="form-help">Menggunakan waktu Indonesia Barat (WIB).</span>
+          </div>
+
+          <div class="form-field">
+            <label for="endsAt">
+              Waktu Selesai <span class="required-mark">*</span>
+            </label>
+            <input
+              class="form-control"
+              type="datetime-local"
+              id="endsAt"
+              name="endsAt"
+              required>
+            <span class="form-help">Waktu selesai harus setelah waktu mulai.</span>
+          </div>
+
+          <div class="form-field full">
+            <label for="locationName">Nama Tempat</label>
+            <input
+              class="form-control"
+              type="text"
+              id="locationName"
+              name="locationName"
+              maxlength="200"
+              placeholder="Contoh: Masjid Al-Ikhlas">
+          </div>
+
+          <div class="form-field full">
+            <label for="locationAddress">Alamat atau Tautan Lokasi</label>
+            <textarea
+              class="form-control"
+              id="locationAddress"
+              name="locationAddress"
+              maxlength="1000"
+              placeholder="Masukkan alamat lengkap atau tautan Google Maps..."></textarea>
+            <span class="form-help">
+              Jika alamat diisi, sistem akan menampilkan tautan untuk membuka Google Maps.
+            </span>
+          </div>
+
+          <div class="form-actions">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              id="saveButton">
+              Simpan Agenda
+            </button>
+
+            <button
+              class="btn btn-secondary"
+              type="button"
+              id="cancelEditButton"
+              hidden>
+              Batal Edit
+            </button>
+          </div>
+
+          <div
+            class="agenda-notice"
+            id="agendaNotice"
+            role="status"
+            aria-live="polite"
+            hidden>
+          </div>
+        </form>
+      </section>
+
+      <!-- AGENDA LIST PANEL -->
+      <section class="agenda-panel" id="agendaListPanel">
+        <div class="agenda-list-heading">
+          <div>
+            <h2>Daftar Agenda</h2>
+            <p style="margin:5px 0 0;color:var(--agenda-muted);font-size:11px;">
+              Pilih kategori agenda yang ingin ditampilkan.
+            </p>
+          </div>
+
+          <span class="agenda-count" id="agendaCount">0</span>
+        </div>
+
+        <!-- THREE TABS -->
+        <div
+          class="agenda-tabs"
+          role="tablist"
+          aria-label="Kategori agenda">
+
+          <button
+            class="agenda-tab is-active"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            data-agenda-view="published">
+            Semua Kajian
+          </button>
+
+          <button
+            class="agenda-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            data-agenda-view="archived">
+            Arsip Historis
+          </button>
+
+          <button
+            class="agenda-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            data-agenda-view="latest">
+            Kajian Terbaru
+          </button>
+        </div>
+
+        <div class="agenda-list" id="agendaList" aria-live="polite">
+          <div class="agenda-loading">
+            Memuat data agenda kajian...
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            id="refreshButton">
+            ↻ Muat Ulang Agenda
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    © <span id="currentYear"></span> TARBIYAH — Pembelajaran Muslim.
+    <br>
+    Belajar, bertumbuh, dan saling menguatkan dalam kebaikan.
+  </footer>
+
+  <!-- SUPABASE & APPLICATION SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- KONFIGURASI DAN AUTENTIKASI -->
   <script src="./js/config.js"></script>
   <script src="./js/supabase-client.js"></script>
   <script src="./js/auth.js"></script>
   <script src="./js/auth-guard.js"></script>
   <script src="./js/tarbiyah-theme.js"></script>
 
-  <!-- JAVASCRIPT -->
-  <script src="./js/module.js"></script>
-  <script src="./js/module-shell.js"></script>
-  
-  <!-- SCRIPT AGENDA (Dengan penanganan error agar halaman tetap hidup) -->
+  <!-- Agenda Kajian v3.3.0 -->
   <script src="./js/agenda-kajian.js"></script>
+
   <script src="./js/pwa.js"></script>
 
-  <script>
-    (() => {
-      const yearElement = document.getElementById("currentYear");
-      if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
-      }
-    })();
-  </script>
 </body>
 </html>
