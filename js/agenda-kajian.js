@@ -400,20 +400,41 @@
     }).format(date) + " WIB";
   }
 
-  function getMapURL(agenda) {
-    const address = String(agenda.location_address || "").trim();
-    const name = String(agenda.location_name || "").trim();
+    function getMapURL(locationAddress, locationName) {
+    const address = String(locationAddress || "").trim();
 
-    if (!address && !name) return "";
+    // JIKA ADMIN MEMASUKKAN LINK GOOGLE MAPS (https://...)
+    if (address) {
+      // Cek apakah ini URL valid
+      if (/^https?:\/\//i.test(address)) {
+        try {
+          const url = new URL(address);
+          // Jika host adalah google maps atau goo.gl, langsung kembalikan URL aslinya
+          if (url.hostname.includes("google") || url.hostname.includes("goo.gl")) {
+            return url.href;
+          }
+        } catch (_) {
+          // Abaikan jika bukan URL valid
+        }
+      }
 
-    const input = `${name} ${address}`.trim();
+      // JIKA ADMIN MEMASUKKAN KOORDINAT (Misal: -6.123, 106.456)
+      if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(address)) {
+        return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
+      }
 
-    if (/^https?:\/\/(www\.)?(google\.[^/]+\/maps|maps\.app\.goo\.gl)/i.test(input)) {
-      return input;
+      // JIKA ADMIN MEMASUKKAN ALAMAT TEKS BIASA
+      return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
     }
 
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(input)}`;
+    // JIKA HANYA ADA NAMA LOKASI
+    if (locationName) {
+      return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(locationName);
+    }
+
+    return "";
   }
+   
 
   function getAgendaViewLabel() {
     if (state.view === "archived") return "Arsip Historis";
