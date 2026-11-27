@@ -402,18 +402,18 @@
 
     // Anggota hanya dapat melihat agenda aktif.
     const archivedTab = document.querySelector(
-      '[data-agenda-view="archived"]'
-    );
+  '[data-agenda-view="archived"]'
+);
 
-    if (archivedTab) {
-      archivedTab.hidden = !permissions.viewArchived;
-    }
+if (archivedTab) {
+  archivedTab.hidden = !permissions.viewArchived;
+}
 
-    if (!permissions.viewArchived && state.view === "archived") {
-      state.view = "published";
-    }
+if (!permissions.viewArchived && state.view === "archived") {
+  state.view = "published";
+}
 
-    updateViewTabs();
+updateViewTabs();
 
     if (elements.accessInformation && elements.accessMessage) {
       elements.accessInformation.hidden = false;
@@ -595,41 +595,37 @@
   /* ============================================================
      10. TAB AGENDA AKTIF DAN ARSIP
      ============================================================ */
+function updateViewTabs() {
+  document.querySelectorAll("[data-agenda-view]").forEach((tab) => {
+    const selected = tab.dataset.agendaView === state.view;
 
-  function updateViewTabs() {
-    document.querySelectorAll("[data-agenda-view]").forEach((tab) => {
-      const selected = tab.dataset.agendaView === state.view;
+    tab.classList.toggle("active", selected);
+    tab.setAttribute("aria-selected", selected ? "true" : "false");
+  });
+}
 
-      tab.classList.toggle("active", selected);
-      tab.setAttribute(
-        "aria-selected",
-        selected ? "true" : "false"
-      );
-    });
+async function switchAgendaView(view) {
+  if (state.busy) return;
+
+  if (!["published", "archived", "latest"].includes(view)) {
+    return;
   }
 
-  async function switchAgendaView(view) {
-    if (state.busy) return;
-
-    if (view !== "published" && view !== "archived") {
-      return;
-    }
-
-    if (view === "archived" && !can("viewArchived")) {
-      showNotice(
-        "Akses arsip agenda tidak tersedia untuk akun Anda.",
-        "warning"
-      );
-      return;
-    }
-
-    state.view = view;
-    updateViewTabs();
-
-    resetForm();
-    await loadAgendas();
+  if (view === "archived" && !can("viewArchived")) {
+    showNotice(
+      "Akses arsip agenda tidak tersedia untuk akun Anda.",
+      "warning"
+    );
+    return;
   }
 
+  state.view = view;
+  updateViewTabs();
+
+  resetForm();
+  await loadAgendas();
+}
+  
   /* ============================================================
      11. MEMUAT DATA AGENDA
      ============================================================ */
@@ -649,15 +645,19 @@
         '<div class="agenda-loading">Memuat agenda kajian...</div>';
     }
 
-    try {
-      let query = state.supabase
-        .from(CONFIG.TABLE)
-        .select(
-          "id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status"
-        )
-        .eq("status", state.view)
-        .order("starts_at", { ascending: true })
-        .limit(CONFIG.MAX_AGENDAS);
+    const selectedStatus =
+  state.view === "archived" ? "archived" : "published";
+
+const sortDescending = state.view === "latest";
+
+let query = state.supabase
+  .from(CONFIG.TABLE)
+  .select(
+    "id, title, description, speaker_name, starts_at, ends_at, location_name, location_address, status"
+  )
+  .eq("status", selectedStatus)
+  .order("starts_at", { ascending: !sortDescending })
+  .limit(CONFIG.MAX_AGENDAS);
 
       // Pengguna anggota tidak pernah meminta data arsip.
       if (state.role === "member") {
