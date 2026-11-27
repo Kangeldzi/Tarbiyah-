@@ -400,34 +400,31 @@
     }).format(date) + " WIB";
   }
 
-    function getMapURL(locationAddress, locationName) {
+  function getMapURL(locationAddress, locationName) {
     const address = String(locationAddress || "").trim();
 
-    // JIKA ADMIN MEMASUKKAN LINK GOOGLE MAPS (https://...)
     if (address) {
-      // Cek apakah ini URL valid
+      // 1. JIKA URL GOOGLE MAPS ASLI (https://maps.app.goo.gl/...)
       if (/^https?:\/\//i.test(address)) {
         try {
           const url = new URL(address);
-          // Jika host adalah google maps atau goo.gl, langsung kembalikan URL aslinya
+          // Langsung kembalikan URL aslinya tanpa diutak-atik
           if (url.hostname.includes("google") || url.hostname.includes("goo.gl")) {
             return url.href;
           }
-        } catch (_) {
-          // Abaikan jika bukan URL valid
-        }
+        } catch (_) {}
       }
 
-      // JIKA ADMIN MEMASUKKAN KOORDINAT (Misal: -6.123, 106.456)
+      // 2. JIKA KOORDINAT (Contoh: -6.123, 106.456)
       if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(address)) {
         return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
       }
 
-      // JIKA ADMIN MEMASUKKAN ALAMAT TEKS BIASA
+      // 3. JIKA ALAMAT TEKS BIASA
       return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
     }
 
-    // JIKA HANYA ADA NAMA LOKASI
+    // 4. JIKA HANYA NAMA TEMPAT
     if (locationName) {
       return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(locationName);
     }
