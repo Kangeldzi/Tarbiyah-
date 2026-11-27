@@ -1,4 +1,3 @@
-
 /* =========================================================
    TARBIYAH — AGENDA KAJIAN
    Versi 3.3.1 — Unified Agenda & Role-Based Access
@@ -1258,67 +1257,101 @@
      ARSIP DAN PULIHKAN AGENDA
      ======================================================= */
 
-  async function changeAgendaStatus(id, nextStatus) {
-    const allowed =
-      (
-        nextStatus === "archived" &&
-        can("archive")
-      ) ||
-      (
-        nextStatus === "published" &&
-        can("restore")
-      );
+async function changeAgendaStatus(id, nextStatus) {
+  const allowed =
+    (nextStatus === "archived" && can("archive")) ||
+    (nextStatus === "published" && can("restore"));
 
-    if (!allowed) {
-      showNotice(
-        "Kamu tidak memiliki izin untuk tindakan ini.",
-        "warning"
-      );
-      return;
-    }
+  if (!allowed) {
+    showNotice("Kamu tidak memiliki izin untuk tindakan ini.", "warning");
+    return;
+  }
 
-    const agenda = state.agendas.find(
-      item => String(item.id) === String(id)
+  const agenda = state.agendas.find(
+    item => String(item.id) === String(id)
+  );
+
+  if (!agenda) {
+    showNotice(
+      "Data agenda tidak ditemukan. Muat ulang daftar agenda.",
+      "error"
+    );
+    return;
+  }
+
+  const confirmation = nextStatus === "archived"
+    ? `Arsipkan agenda "${agenda.title}"?`
+    : `Pulihkan agenda "${agenda.title}" ke daftar kajian?`;
+
+  if (!window.confirm(confirmation)) return;
+
+  let timeoutId = null;
+
+  try {
+    showNotice(
+      nextStatus === "archived"
+        ? "Sedang memindahkan agenda ke arsip..."
+        : "Sedang memulihkan agenda...",
+      "info"
     );
 
-    if (!agenda) return;
+    const updateRequest = state.supabase
+      .from(CONFIG.TABLE)
+      .update({ status: nextStatus })
+      .eq("id", id)
+      .select("id, status")
+      .single();
 
-    const confirmation =
-      nextStatus === "archived"
-        ? `Arsipkan agenda "${agenda.title}"?`
-        : `Pulihkan agenda "${agenda.title}" ke daftar kajian?`;
+    const result = await Promise.race([
+      updateRequest,
+      new Promise((_, reject) => {
+        timeoutId = window.setTimeout(() => {
+          reject(new Error(
+            "Permintaan ke Supabase melewati batas waktu 15 detik. Periksa koneksi dan kebijakan database."
+          ));
+        }, 15000);
+      })
+    ]);
 
-    if (!window.confirm(confirmation)) return;
+    if (result.error) throw result.error;
 
-    try {
-      const { error } = await state.supabase
-        .from(CONFIG.TABLE)
-        .update({ status: nextStatus })
-        .eq("id", id);
-
-      if (error) throw error;
-
-      showNotice(
-        nextStatus === "archived"
-          ? "Agenda berhasil dipindahkan ke arsip."
-          : "Agenda berhasil dipulihkan.",
-        "success"
-      );
-
-      await loadAgendas();
-    } catch (error) {
-      console.error(
-        "[TARBIYAH Agenda] Gagal mengubah status:",
-        error
-      );
-
-      showNotice(
-        error.message ||
-          "Status agenda gagal diperbarui.",
-        "error"
+    if (
+      !result.data ||
+      String(result.data.id) !== String(id) ||
+      result.data.status !== nextStatus
+    ) {
+      throw new Error(
+        "Perubahan status tidak terkonfirmasi oleh database."
       );
     }
+
+    showNotice(
+      nextStatus === "archived"
+        ? "Agenda berhasil dipindahkan ke arsip."
+        : "Agenda berhasil dipulihkan.",
+      "success"
+    );
+
+    await loadAgendas();
+
+  } catch (error) {
+    console.error(
+      "[TARBIYAH Agenda] Gagal mengubah status:",
+      error
+    );
+
+    showNotice(
+      error.message || "Status agenda gagal diperbarui.",
+      "error"
+    );
+
+  } finally {
+    if (timeoutId !== null) {
+      window.clearTimeout(timeoutId);
+    }
   }
+}
+
 
   /* =======================================================
      HAPUS PERMANEN
