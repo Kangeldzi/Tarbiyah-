@@ -218,7 +218,7 @@
     <!-- HEADER -->
     <header class="app-header">
       <div class="header-left">
-        <button class="icon-button" id="agendaMenuButton" aria-label="Buka menu">☰</button>
+        <button class="icon-button" id="agendaMenuButton" type="button" aria-label="Buka menu" aria-controls="agendaSidebar" aria-expanded="false">☰</button>
         <div class="header-brand">
           <div class="brand-logo-wrap">
             <img src="./assets/icons/icon-192.png" class="brand-logo" alt="Logo">
@@ -236,13 +236,13 @@
     </header>
 
     <!-- SIDEBAR OVERLAY -->
-    <div class="agenda-sidebar-overlay" id="agendaSidebarOverlay"></div>
+    <div class="agenda-sidebar-overlay" id="agendaSidebarOverlay" aria-hidden="true"></div>
 
     <!-- SIDEBAR HAMBURGER -->
-    <aside class="agenda-sidebar" id="agendaSidebar">
+    <aside class="agenda-sidebar" id="agendaSidebar" aria-label="Menu navigasi" aria-hidden="true">
       <div class="sidebar-top">
         <div class="sidebar-brand"><span>TARBIYAH</span></div>
-        <button class="icon-button" id="agendaMenuClose" style="border:none; background:transparent;">×</button>
+        <button class="icon-button" id="agendaMenuClose" type="button" aria-label="Tutup menu" style="border:none; background:transparent;">×</button>
       </div>
 
       <nav class="sidebar-nav">
@@ -291,9 +291,10 @@
         </div>
       </section>
 
-      <section class="role-information">
+      <section class="role-information" id="agendaAccessInformation" aria-live="polite">
         <strong>Informasi hak akses</strong>
         <p id="userRole">Memeriksa hak akses akun...</p>
+        <p id="agendaAccessMessage">Hak akses akan ditampilkan setelah akun berhasil diverifikasi.</p>
       </section>
 
       <!-- FORM PANEL -->
@@ -362,6 +363,9 @@
       </section>
 
     </main>
+    <footer class="agenda-footer" style="padding:20px 14px;text-align:center;color:var(--text-secondary);font-size:11px;">
+      © <span id="currentYear"></span> TARBIYAH — Pembelajaran Muslim.
+    </footer>
   </div>
 
   <!-- SUPABASE & APPLICATION SCRIPTS -->
@@ -374,24 +378,5 @@
   <script src="./js/agenda-kajian.js"></script>
   <script src="./js/pwa.js"></script>
 
-  <script>
-    (() => {
-      const btnOpen = document.getElementById("agendaMenuButton");
-      const btnClose = document.getElementById("agendaMenuClose");
-      const sidebar = document.getElementById("agendaSidebar");
-      const overlay = document.getElementById("agendaSidebarOverlay");
-
-      function toggleMenu(open) {
-        sidebar.classList.toggle("is-open", open);
-        overlay.classList.toggle("is-visible", open);
-        if(open) document.body.style.overflow = "hidden";
-        else document.body.style.overflow = "";
-      }
-
-      if (btnOpen) btnOpen.addEventListener("click", () => toggleMenu(true));
-      if (btnClose) btnClose.addEventListener("click", () => toggleMenu(false));
-      if (overlay) overlay.addEventListener("click", () => toggleMenu(false));
-    })();
-  </script>
 </body>
 </html>
