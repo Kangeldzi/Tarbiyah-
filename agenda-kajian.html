@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id" data-theme="dark" data-module="agenda-kajian">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -562,6 +562,212 @@
         animation-duration: .01ms !important;
       }
     }
+
+    /* TAB NAVIGASI AGENDA */
+.agenda-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0 0 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--agenda-border);
+}
+
+.agenda-tab {
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid var(--agenda-border);
+  border-radius: 10px;
+  background: rgba(255,255,255,.045);
+  color: var(--agenda-muted);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.agenda-tab.active {
+  background: rgba(16,185,129,.16);
+  border-color: var(--agenda-primary);
+  color: #6ee7b7;
+}
+
+.agenda-tab:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* KARTU AGENDA */
+.agenda-card {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--agenda-border);
+  border-radius: 15px;
+  background: var(--agenda-card);
+}
+
+.agenda-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.agenda-card-header h3 {
+  margin: 0;
+  font-family: Poppins, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.agenda-status {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.status-active {
+  color: #6ee7b7;
+  background: rgba(16,185,129,.15);
+}
+
+.status-archived {
+  color: #fcd34d;
+  background: rgba(245,158,11,.13);
+}
+
+.agenda-description {
+  color: var(--agenda-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0 0 15px;
+}
+
+.agenda-detail {
+  display: grid;
+  grid-template-columns: 85px minmax(0,1fr);
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid rgba(255,255,255,.07);
+  font-size: 11px;
+}
+
+.agenda-detail span {
+  color: var(--agenda-muted);
+}
+
+.agenda-detail strong {
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
+.agenda-address {
+  margin-top: 10px;
+  color: var(--agenda-muted);
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.agenda-map-link {
+  display: inline-flex;
+  margin-top: 13px;
+  color: #6ee7b7;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.agenda-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 17px;
+  padding-top: 13px;
+  border-top: 1px solid var(--agenda-border);
+}
+
+.agenda-action {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--agenda-border);
+  border-radius: 9px;
+  background: rgba(255,255,255,.07);
+  color: var(--agenda-text);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.agenda-edit {
+  color: #6ee7b7;
+}
+
+.agenda-archive {
+  color: #fcd34d;
+}
+
+.agenda-restore {
+  color: #6ee7b7;
+  border-color: rgba(16,185,129,.35);
+}
+
+.agenda-delete {
+  color: #fca5a5;
+  border-color: rgba(239,68,68,.35);
+  background: rgba(239,68,68,.08);
+}
+
+.agenda-action:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.agenda-empty,
+.agenda-loading {
+  padding: 25px 15px;
+  border: 1px dashed var(--agenda-border);
+  border-radius: 13px;
+  color: var(--agenda-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.agenda-empty strong {
+  color: var(--agenda-text);
+}
+
+.agenda-empty p {
+  margin: 7px 0 0;
+}
+
+@media (max-width: 600px) {
+  .agenda-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .agenda-tab {
+    width: 100%;
+    text-align: center;
+  }
+
+  .agenda-card {
+    padding: 14px;
+  }
+
+  .agenda-card-actions .agenda-action {
+    flex: 1 1 auto;
+  }
+}
+    
   </style>
 </head>
 
@@ -619,12 +825,10 @@
     </section>
 
     <!-- INFORMASI AKSES -->
-    <section class="role-information"
-             id="agendaAccessInformation">
-      <strong>Informasi hak akses</strong>
-      <p id="userRole">
-        Memeriksa hak akses akun...
-      </p>
+    <section class="role-information" id="agendaAccessInformation">
+  <strong>Informasi hak akses</strong>
+  <p id="userRole">Memeriksa hak akses akun...</p>
+  <p id="agendaAccessMessage"></p>
     </section>
 
     <div class="agenda-layout">
@@ -711,14 +915,16 @@
 
             <div class="form-group">
               <label class="form-label" for="endsAt">
-                Waktu Selesai
-              </label>
-              <input
-                class="form-control"
-                type="datetime-local"
-                id="endsAt"
-                name="endsAt"
-              >
+              Waktu Selesai <span class="required">*</span>
+            </label>
+
+            <input
+             class="form-control"
+             type="datetime-local"
+             id="endsAt"
+             name="endsAt"
+             required
+            >
             </div>
 
             <div class="form-group full">
@@ -804,6 +1010,28 @@
           </div>
         </div>
 
+        <nav class="agenda-tabs" aria-label="Filter agenda kajian">
+  <button type="button"
+          class="agenda-tab active"
+          data-agenda-view="published"
+          aria-selected="true">
+    Semua Kajian
+  </button>
+
+  <button type="button"
+          class="agenda-tab"
+          data-agenda-view="archived"
+          aria-selected="false">
+    Arsip Historis
+  </button>
+
+  <button type="button"
+          class="agenda-tab"
+          data-agenda-view="latest"
+          aria-selected="false">
+    Kajian Terbaru
+  </button>
+</nav>
         <div
           class="agenda-list"
           id="agendaList"
@@ -821,13 +1049,13 @@
 
     <footer class="agenda-footer">
       <div>
-        TARBIYAH — Pembelajaran Muslim
+        TAUHID — Tarbiyah Muslim
       </div>
       <div>
-        Belajar, Bertumbuh, dan Berukhuwah.
+        Tarbiyah, Berdakwah, dan Beramal.
       </div>
       <div>
-        © <span id="currentYear"></span> TARBIYAH
+        © <span id="currentYear"></span> TARBIYAH TAUHID
       </div>
     </footer>
 
