@@ -400,38 +400,27 @@
     }).format(date) + " WIB";
   }
 
-  function getMapURL(locationAddress, locationName) {
+    function getMapURL(locationAddress, locationName) {
     const address = String(locationAddress || "").trim();
-
     if (address) {
-      // 1. JIKA URL GOOGLE MAPS ASLI (https://maps.app.goo.gl/...)
       if (/^https?:\/\//i.test(address)) {
         try {
           const url = new URL(address);
-          // Langsung kembalikan URL aslinya tanpa diutak-atik
           if (url.hostname.includes("google") || url.hostname.includes("goo.gl")) {
-            return url.href;
+            return url.href; // Kembalikan URL asli
           }
         } catch (_) {}
       }
-
-      // 2. JIKA KOORDINAT (Contoh: -6.123, 106.456)
       if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(address)) {
         return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
       }
-
-      // 3. JIKA ALAMAT TEKS BIASA
       return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
     }
-
-    // 4. JIKA HANYA NAMA TEMPAT
     if (locationName) {
       return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(locationName);
     }
-
     return "";
   }
-   
 
   function getAgendaViewLabel() {
     if (state.view === "archived") return "Arsip Historis";
@@ -535,113 +524,54 @@
       .join("");
   }
 
-  function renderAgendaCard(agenda) {
-    const archived = agenda.status === "archived";
-    const mapURL = getMapURL(agenda);
+    function renderAgendaCard(agenda) {
+    const id = escapeHTML(agenda.id);
+    const title = escapeHTML(agenda.title);
+    const description = escapeHTML(agenda.description || "Tidak ada deskripsi.");
+    const speaker = escapeHTML(agenda.speaker_name || "Belum ditentukan");
+    const location = escapeHTML(agenda.location_name || "Lokasi belum ditentukan");
+    const address = escapeHTML(agenda.location_address || "");
+    
+    const mapURL = getMapURL(agenda.location_address, agenda.location_name);
 
-    const actions = [];
-
-    if (!archived && can("edit")) {
-      actions.push(`
-        <button class="agenda-action agenda-edit"
-          type="button" data-action="edit"
-          data-id="${escapeHTML(agenda.id)}">
-          Edit
-        </button>
-      `);
+    let actions = "";
+    if (state.view === "published") {
+      if (can("edit")) actions += `<button type="button" class="agenda-action agenda-edit" data-action="edit" data-id="${id}">Edit</button>`;
+      if (can("archive")) actions += `<button type="button" class="agenda-action agenda-archive" data-action="archive" data-id="${id}">Arsipkan</button>`;
+    } else {
+      if (can("restore")) actions += `<button type="button" class="agenda-action agenda-restore" data-action="restore" data-id="${id}">Pulihkan</button>`;
+      if (can("delete")) actions += `<button type="button" class="agenda-action agenda-delete" data-action="delete" data-id="${id}">Hapus Permanen</button>`;
     }
 
-    if (!archived && can("archive")) {
-      actions.push(`
-        <button class="agenda-action agenda-archive"
-          type="button" data-action="archive"
-          data-id="${escapeHTML(agenda.id)}">
-          Arsipkan
-        </button>
-      `);
-    }
-
-    if (archived && can("restore")) {
-      actions.push(`
-        <button class="agenda-action agenda-restore"
-          type="button" data-action="restore"
-          data-id="${escapeHTML(agenda.id)}">
-          Pulihkan Arsip
-        </button>
-      `);
-    }
-
-    if (archived && can("delete")) {
-      actions.push(`
-        <button class="agenda-action agenda-delete"
-          type="button" data-action="delete"
-          data-id="${escapeHTML(agenda.id)}">
-          Hapus Permanen
-        </button>
-      `);
-    }
+    const mapButton = mapURL ? `<a class="agenda-map-link" href="${escapeHTML(mapURL)}" target="_blank" rel="noopener noreferrer">↗ Buka Lokasi di Google Maps</a>` : "";
 
     return `
-      <article class="agenda-card ${archived ? "is-archived" : ""}">
+      <article class="agenda-card" data-agenda-id="${id}">
         <div class="agenda-card-header">
-          <span class="agenda-status ${archived ? "status-archived" : "status-active"}">
-            ${archived ? "Diarsipkan" : "Diterbitkan"}
-          </span>
-          <span class="agenda-card-date">
-            ${escapeHTML(formatDateTime(agenda.starts_at))}
+          <h3 class="agenda-card-title">${title}</h3>
+          <span class="agenda-status ${state.view === "published" ? "status-active" : "status-archived"}">
+            ${state.view === "published" ? "Diterbitkan" : "Diarsipkan"}
           </span>
         </div>
 
-        <h3 class="agenda-card-title">${escapeHTML(agenda.title)}</h3>
-
-        ${agenda.description ? `
-          <p class="agenda-description">
-            ${escapeHTML(agenda.description)}
-          </p>
-        ` : ""}
-
-        <div class="agenda-details">
-          ${agenda.speaker_name ? `
-            <div class="agenda-detail">
-              <span aria-hidden="true">🎙️</span>
-              <span><strong>Pemateri:</strong> ${escapeHTML(agenda.speaker_name)}</span>
-            </div>
-          ` : ""}
-
-          <div class="agenda-detail">
-            <span aria-hidden="true">🕒</span>
-            <span><strong>Selesai:</strong> ${escapeHTML(formatDateTime(agenda.ends_at))}</span>
+        <div class="agenda-card-body">
+          <div style="font-size:11px; color:var(--agenda-muted); margin-bottom:10px;">
+            <strong>${escapeHTML(formatDateTime(agenda.starts_at))}</strong>
+          </div>
+          
+          <p class="agenda-description" style="margin-bottom:12px; white-space:pre-wrap; font-size:12px; line-height:1.6;">${description}</p>
+          
+          <div style="font-size:11px; line-height:1.8; color:var(--agenda-text);">
+            <div>🎙️ <strong>Pemateri:</strong> ${speaker}</div>
+            <div>⏱️ <strong>Selesai:</strong> ${escapeHTML(formatDateTime(agenda.ends_at))}</div>
+            <div>📍 <strong>Lokasi:</strong> ${location}</div>
           </div>
 
-          ${agenda.location_name ? `
-            <div class="agenda-detail">
-              <span aria-hidden="true">📍</span>
-              <span><strong>Lokasi:</strong> ${escapeHTML(agenda.location_name)}</span>
-            </div>
-          ` : ""}
-
-          ${agenda.location_address ? `
-            <div class="agenda-detail agenda-address">
-              <span aria-hidden="true">🗺️</span>
-              <span>${escapeHTML(agenda.location_address)}</span>
-            </div>
-          ` : ""}
+          ${address ? `<div class="agenda-address">🔗 ${address}</div>` : ""}
+          ${mapButton}
         </div>
 
-        ${mapURL ? `
-          <a class="agenda-map-link"
-            href="${escapeHTML(mapURL)}"
-            target="_blank"
-            rel="noopener noreferrer">
-            Buka Lokasi di Google Maps ↗
-          </a>
-        ` : ""}
-
-        ${actions.length ? `
-          <div class="agenda-card-actions">
-            ${actions.join("")}
-          </div>
-        ` : ""}
+        ${actions ? `<div class="agenda-card-actions">${actions}</div>` : ""}
       </article>
     `;
   }
