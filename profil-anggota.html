@@ -21,36 +21,14 @@
   <link rel="stylesheet" href="./css/variables.css">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/theme.css">
+  <link rel="stylesheet" href="./css/page-navigation.css">
 
   <!-- CSS khusus halaman profil -->
   <link rel="stylesheet" href="./css/profil-anggota.css">
 
   <link rel="icon" href="./assets/icons/tarbiyah-mark.svg">
 
-  
-<!-- ERUDA CONSOLE - DEBUGGING TARBIYAH -->
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>
-  window.addEventListener("load", function () {
-    if (window.eruda) {
-      eruda.init({
-        tool: ["console", "elements", "network", "resources"],
-        defaults: {
-          displaySize: 50,
-          transparency: 0.95
-        }
-      });
-
-      console.log("TARBIYAH ERUDA CONSOLE AKTIF");
-    } else {
-      console.error("Eruda gagal dimuat. Periksa koneksi internet.");
-    }
-  });
-</script>
-<!-- END ERUDA CONSOLE -->
-
 </head>
-
 <body>
 
   <!-- =====================================
@@ -73,13 +51,19 @@
 
     <div class="header-left">
 
-      <button
-        type="button"
-        id="btnBack"
-        class="icon-button"
-        aria-label="Kembali ke dashboard">
-        ←
-      </button>
+      <a
+  href="./dashboard.html"
+  class="tarbiyah-page-nav__button"
+  aria-label="Kembali ke Dashboard"
+  style="padding: 8px 14px; border-radius: 10px;"
+>
+  <span class="tarbiyah-page-nav__icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+  </span>
+  </a>
 
       <div class="header-brand">
         <img
