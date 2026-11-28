@@ -242,13 +242,24 @@
       ])
     );
 
-    members = rows
-      .filter((member) => profileMap.has(member.user_id))
-      .map((member) => ({
-        ...member,
-        profile: profileMap.get(member.user_id)
-      }));
+    
+   // Kumpulkan ID semua pengguna yang memiliki role Mentor.
+const mentorUserIds = new Set(
+  mentors.map((mentor) => mentor.id)
+);
 
+// Hanya anggota aktif yang bukan Mentor
+// yang boleh menjadi Anggota Binaan.
+members = rows
+  .filter((member) =>
+    profileMap.has(member.user_id) &&
+    !mentorUserIds.has(member.user_id)
+  )
+  .map((member) => ({
+    ...member,
+    profile: profileMap.get(member.user_id)
+  }));
+     
     members.forEach((member) => {
       membersById.set(member.id, member);
       profilesById.set(member.user_id, member.profile);
@@ -718,12 +729,16 @@
     profilesById = new Map();
     membersById = new Map();
 
-    await Promise.all([
-      loadMentors(),
-      loadMembers(),
-      loadAssignments()
-    ]);
 
+// Mentor harus dimuat lebih dahulu agar dapat dikecualikan
+// dari daftar calon Anggota Binaan.
+await loadMentors();
+
+await Promise.all([
+  loadMembers(),
+  loadAssignments()
+]);
+     
     renderMentorOptions();
     renderAssignments();
 
