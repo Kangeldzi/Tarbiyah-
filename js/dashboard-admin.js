@@ -1,4 +1,3 @@
-
 (() => {
   "use strict";
 
@@ -103,46 +102,43 @@
   }
 
   function setIdentity(user, role) {
-    const metadata = user.user_metadata || {};
+  const metadata = user.user_metadata || {};
 
-    const name =
-      metadata.full_name ||
-      metadata.display_name ||
-      metadata.name ||
-      user.email?.split("@")[0] ||
-      "Administrator";
+  const name =
+    metadata.full_name ||
+    metadata.display_name ||
+    metadata.name ||
+    user.email?.split("@")[0] ||
+    "Administrator";
 
-    const initials = name
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(part => part[0])
-      .join("")
-      .toUpperCase();
+  const roleLabel = ROLE_LABELS[role] || "Administrator";
 
-    ["adminName", "topName"].forEach(id => {
-      if ($(id)) $(id).textContent = name;
-    });
+  // Sinkronisasi nama pengguna
+  ["adminName", "topName", "welcomeName"].forEach(id => {
+    const element = $(id);
+    if (element) element.textContent = name;
+  });
 
-    ["adminAvatar", "topAvatar"].forEach(id => {
-      if ($(id)) $(id).textContent = initials;
-    });
+  // Sinkronisasi role pada sidebar dan topbar
+  ["adminRole", "topRole", "roleStatus"].forEach(id => {
+    const element = $(id);
+    if (element) element.textContent = roleLabel;
+  });
 
-    if ($("adminRole")) {
-      $("adminRole").textContent =
-        ROLE_LABELS[role] || "Administrator";
-    }
+  // Jangan mengganti isi elemen avatar.
+  // Elemen tersebut berisi gambar profil dan harus tetap utuh.
 
-    if ($("welcomeName")) {
-      $("welcomeName").textContent = name;
-    }
+  const sidebarImage = $("sidebarAvatarImg");
+  const topbarImage = $("topbarAvatarImg");
 
-    if ($("roleStatus")) {
-      $("roleStatus").textContent =
-        ROLE_LABELS[role] || "Tidak dikenali";
-    }
+  if (sidebarImage) {
+    sidebarImage.alt = `Foto profil ${name}`;
   }
+
+  if (topbarImage) {
+    topbarImage.alt = `Foto profil ${name}`;
+  }
+}
 
   function setStatus(id, message, success = true) {
     const element = $(id);
@@ -313,7 +309,6 @@
     }
 
     setupSidebar();
-    setupTheme();
     setupNavigation();
     setupLogout();
 
