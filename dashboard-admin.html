@@ -89,6 +89,11 @@
         <span class="nav-soon">Tahap berikutnya</span>
       </a>
 
+      <a class="admin-nav-link" href="#mentorManagement" id="mentorManagementNav" hidden>
+        <span class="nav-icon">♙</span>
+        <span>Mentor & Anggota Binaan</span>
+      </a>
+      
       <span class="nav-caption">PENGELOLAAN KONTEN</span>
 
       <a class="admin-nav-link" href="#agenda">
@@ -303,6 +308,79 @@
   </div>
 </section>
         
+  <!-- =====================================================
+     TAHAP 4 — MANAJEMEN MENTOR & ANGGOTA BINAAN
+====================================================== -->
+<section class="content-card mentor-management-card" id="mentorManagement" hidden>
+  <div class="card-heading">
+    <div>
+      <span class="section-kicker">PEMBINAAN ANGGOTA</span>
+      <h3>Manajemen Mentor & Anggota Binaan</h3>
+    </div>
+    <span class="coming-badge" id="mentorManagementStatus">Memuat...</span>
+  </div>
+
+  <p>
+    Tetapkan anggota aktif kepada Mentor dan pantau penugasan
+    pembinaan yang sedang berjalan.
+  </p>
+
+  <div class="mentor-management-toolbar">
+    <label for="mentorSelect">Pilih Mentor</label>
+    <select id="mentorSelect">
+      <option value="">Memuat daftar Mentor...</option>
+    </select>
+
+    <label for="menteeSelect">Pilih Anggota Binaan</label>
+    <select id="menteeSelect">
+      <option value="">Pilih Mentor terlebih dahulu</option>
+    </select>
+
+    <label for="mentorAssignmentNotes">Catatan Penugasan (Opsional)</label>
+    <textarea
+      id="mentorAssignmentNotes"
+      rows="3"
+      maxlength="1000"
+      placeholder="Catatan pembinaan..."
+    ></textarea>
+
+    <button type="button" class="refresh-button" id="assignMentorButton">
+      + Tetapkan Anggota Binaan
+    </button>
+    <button type="button" class="refresh-button" id="refreshMentorAssignments">
+      ↻ Perbarui Data
+    </button>
+  </div>
+
+  <div id="mentorAssignmentSummary" aria-live="polite">
+    Memuat data penugasan...
+  </div>
+
+  <div class="member-table-wrap">
+    <table class="member-table">
+      <thead>
+        <tr>
+          <th>Mentor</th>
+          <th>Anggota Binaan</th>
+          <th>Tanggal Penugasan</th>
+          <th>Catatan</th>
+          <th>Status</th>
+          <th>Tindakan</th>
+        </tr>
+      </thead>
+      <tbody id="mentorAssignmentTableBody">
+        <tr>
+          <td colspan="6" class="member-empty">Memuat data...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="mentorAssignmentMobileList" class="member-mobile-list">
+    <div class="member-empty">Memuat data...</div>
+  </div>
+</section>
+        
         <section class="content-card" id="agenda">
           <div class="card-heading">
             <div>
@@ -426,6 +504,7 @@
   <script src="./js/dashboard-admin.js" defer></script>
   <script src="./js/role-management.js"></script>
   <script src="./js/member-management.js" defer></script>
+  <script src="./js/mentor-assignment-management.js" defer></script>
   <script src="./js/pwa.js" defer></script>
 
   
