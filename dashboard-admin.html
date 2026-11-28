@@ -426,6 +426,38 @@
   <script src="./js/dashboard-admin.js" defer></script>
   <script src="./js/member-management.js" defer></script>
   <script src="./js/pwa.js" defer></script>
+
   
+<!-- TARBIYAH - TEMPORARY DEBUG CONSOLE -->
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  if (window.eruda) {
+    window.eruda.init();
+    console.log("TARBIYAH ERUDA CONSOLE READY");
+    console.log("Supabase tersedia:", !!window.tarbiyahSupabase);
+    console.log("Auth tersedia:", !!window.TARBIYAH_AUTH);
+  }
+</script>
+<!-- END TEMPORARY DEBUG CONSOLE -->
+
+
+<box border radius="lg" padding={3} gap={2}>
+  **Hasil yang diharapkan**
+  <row align="center" justify="between">
+    `TARBIYAH ERUDA CONSOLE READY`
+    <badge color="success">Muncul</badge>
+  </row>
+  <divider color="subtle"/>
+  <row align="center" justify="between">
+    `Supabase tersedia: true`
+    <badge color="success">True</badge>
+  </row>
+  <divider color="subtle"/>
+  <row align="center" justify="between">
+    `Auth tersedia: true`
+    <badge color="success">True</badge>
+  </row>
+</box>
+
 </body>
 </html>
