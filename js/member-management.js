@@ -23,11 +23,12 @@
   };
 
   const ROLE_LABELS = {
-    super_admin: "Super Admin",
-    admin: "Admin",
-    member: "Anggota",
-    registered_user: "Pengguna Terdaftar"
-  };
+  super_admin: "Super Admin",
+  admin: "Admin",
+  mentor: "Mentor",
+  member: "Anggota",
+  registered_user: "Pengguna Terdaftar"
+};
 
   function notify(message) {
     const toast = $("adminToast");
